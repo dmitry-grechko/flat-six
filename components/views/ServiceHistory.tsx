@@ -29,8 +29,8 @@ export default function ServiceHistory() {
   ];
 
   return (
-    <div style={{ padding: 28, maxWidth: 1080 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 24 }}>
+    <div className="padView" style={{ padding: 28, maxWidth: 1080 }}>
+      <div className="statCardsSm" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 24 }}>
         {stats.map((st) => (
           <div key={st.k} style={{ background: '#fff', border: '1px solid #E3E3E5', borderRadius: 4, padding: 18 }}>
             <div style={{ font: "500 10px/1 'JetBrains Mono',monospace", letterSpacing: '.12em', color: '#9A9AA0' }}>{st.k}</div>
@@ -129,9 +129,16 @@ function ServiceRow({ rec }: { rec: ServiceRecord }) {
                 <span style={{ font: "500 11px/1 'JetBrains Mono',monospace", color: '#9A9AA0' }}>{item.cost}</span>
               )}
               {item.description && (
-                <span style={{ width: '100%', font: "400 12.5px/1.45 'Helvetica Neue',Arial,sans-serif", color: '#8A8A8F' }}>
+                <div
+                  style={{
+                    width: '100%',
+                    whiteSpace: 'pre-wrap',
+                    font: "400 12.5px/1.5 'Helvetica Neue',Arial,sans-serif",
+                    color: '#8A8A8F',
+                  }}
+                >
                   {item.description}
-                </span>
+                </div>
               )}
             </div>
           ))}
@@ -143,6 +150,7 @@ function ServiceRow({ rec }: { rec: ServiceRecord }) {
               padding: '8px 10px',
               background: '#FAFAFA',
               borderLeft: '2px solid #E3E3E5',
+              whiteSpace: 'pre-wrap',
               font: "400 12.5px/1.5 'Helvetica Neue',Arial,sans-serif",
               color: '#6E6E73',
             }}

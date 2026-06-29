@@ -157,9 +157,20 @@ export default function NewServiceRecord() {
     color: '#0B0B0C',
     font,
   });
+  const cellTextarea: React.CSSProperties = {
+    width: '100%',
+    minHeight: 64,
+    padding: '9px 10px',
+    background: '#fff',
+    border: '1px solid #DDDDE0',
+    borderRadius: 2,
+    color: '#0B0B0C',
+    font: "400 13px/1.55 'Helvetica Neue',Arial,sans-serif",
+    resize: 'vertical',
+  };
 
   return (
-    <div style={{ padding: 28, maxWidth: 820 }} className="fadeUp">
+    <div style={{ padding: 28, maxWidth: 820 }} className="fadeUp padView">
       <div style={{ background: '#fff', border: '1px solid #E3E3E5', borderRadius: 4, padding: 26 }}>
         <div style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.16em', color: RED, marginBottom: 18 }}>
           {sourcePlan ? 'START SERVICE FROM PLAN' : 'NEW SERVICE RECORD'}
@@ -191,7 +202,7 @@ export default function NewServiceRecord() {
           ))}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 130px 130px', gap: 14, marginBottom: 18 }}>
+        <div className="stackSm" style={{ display: 'grid', gridTemplateColumns: '1fr 130px 130px', gap: 14, marginBottom: 18 }}>
           <div>
             <label style={{ ...labelStyle, margin: '0 0 8px' }}>Title</label>
             <input
@@ -286,24 +297,27 @@ export default function NewServiceRecord() {
                   ×
                 </button>
               </div>
-              <div style={{ display: 'flex', gap: 8, paddingLeft: 28 }}>
-                <input
+              <div style={{ paddingLeft: 28 }}>
+                <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+                  <input
+                    value={it.partNumber ?? ''}
+                    onChange={(e) => patchItem(it.id, { partNumber: e.target.value })}
+                    placeholder="Part #"
+                    style={{ ...cellInput(`500 12px ${mono}`), flex: 1 }}
+                  />
+                  <input
+                    value={it.cost ?? ''}
+                    onChange={(e) => patchItem(it.id, { cost: e.target.value })}
+                    placeholder="Cost"
+                    style={{ ...cellInput(`500 12px ${mono}`), width: 110 }}
+                  />
+                </div>
+                <textarea
                   value={it.description ?? ''}
                   onChange={(e) => patchItem(it.id, { description: e.target.value })}
-                  placeholder="Detail — e.g. 7.5 L Mobil 1 0W-40, drain plug @ 50 Nm"
-                  style={{ ...cellInput("400 13px 'Helvetica Neue',Arial,sans-serif"), flex: 1 }}
-                />
-                <input
-                  value={it.partNumber ?? ''}
-                  onChange={(e) => patchItem(it.id, { partNumber: e.target.value })}
-                  placeholder="Part #"
-                  style={{ ...cellInput(`500 12px ${mono}`), width: 150 }}
-                />
-                <input
-                  value={it.cost ?? ''}
-                  onChange={(e) => patchItem(it.id, { cost: e.target.value })}
-                  placeholder="Cost"
-                  style={{ ...cellInput(`500 12px ${mono}`), width: 90 }}
+                  placeholder={'Detail — what you did. Multi-line is fine:\n7.5 L Mobil 1 0W-40\nDrain plug @ 50 Nm\nNew crush washer'}
+                  rows={3}
+                  style={cellTextarea}
                 />
               </div>
             </div>

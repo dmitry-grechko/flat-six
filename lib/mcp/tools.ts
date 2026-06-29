@@ -9,7 +9,7 @@ import {
 } from '@/lib/knowledge';
 import { searchCatalog, formatPartNumber } from '@/lib/catalog';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { resolveUser, AUTH_REQUIRED_MESSAGE } from './auth';
+import { resolveUser, AUTH_REQUIRED_MESSAGE, publicClient } from './auth';
 
 /** Wrap a JSON-serialisable value as an MCP text content result. */
 function json(value: unknown) {
@@ -150,25 +150,41 @@ export function registerTools(server: McpServer): void {
     {
       title: 'Find an OEM part',
       description:
-        'Search the OEM parts catalog by name, part number or keyword. Returns part numbers, ' +
-        'torque and notes.',
+        'Search the full Porsche 981 OEM parts catalog (~4,100 parts) by part number or keyword, ' +
+        'plus the curated catalog (torque/notes) and knowledge base. Returns part numbers, ' +
+        'descriptions and the assembly system.',
       inputSchema: {
-        query: z.string().min(1).describe('Part name or number, e.g. "oil filter" or "98110713200"'),
+        query: z.string().min(1).describe('Part name or number, e.g. "oil filter", "9A1 105", "981.351"'),
       },
     },
     async ({ query }) => {
+      // 1) Full PET parts catalog in Supabase (part-number + full-text search).
+      //    Falls back gracefully if env/table is absent.
+      let parts: unknown[] = [];
+      const pub = publicClient();
+      if (pub) {
+        const { data, error } = await pub.rpc('search_parts', { q: query, lim: 15 });
+        if (!error && Array.isArray(data)) {
+          parts = data.map((r: any) => ({
+            partNumber: r.part_number,
+            description: r.description,
+            system: r.system,
+            models: r.models,
+          }));
+        }
+      }
+      // 2) Curated catalog (adds torque/notes the PET catalog lacks).
       const fromCatalog = searchCatalog(query, 10).map((p) => ({
         ...p,
         partNumber: p.partNumber,
         partNumberFormatted: formatPartNumber(p.partNumber),
       }));
-      // Pull any parts surfaced by the knowledge base too (articles/specs may
-      // mention parts the OEM catalog doesn't index).
+      // 3) Parts mentioned in the knowledge base (specs/articles).
       const fromKnowledge = searchKnowledge(query, { limit: 5, kinds: ['spec', 'article'] });
-      if (fromCatalog.length === 0 && fromKnowledge.length === 0) {
+      if (parts.length === 0 && fromCatalog.length === 0 && fromKnowledge.length === 0) {
         return err(`No part matching "${query}" was found.`);
       }
-      return json({ catalog: fromCatalog, knowledge: fromKnowledge });
+      return json({ parts, catalog: fromCatalog, knowledge: fromKnowledge });
     },
   );
 

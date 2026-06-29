@@ -15,13 +15,20 @@ const NAV: { no: string; label: string; href: string }[] = [
 
 const mono = "'JetBrains Mono',monospace";
 
-export default function Sidebar() {
+export default function Sidebar({
+  open = false,
+  onClose,
+}: {
+  open?: boolean;
+  onClose?: () => void;
+} = {}) {
   const pathname = usePathname();
   const router = useRouter();
   const { vehicle: VEHICLE } = useVehicle();
 
   return (
     <aside
+      className={'appSidebar' + (open ? ' open' : '')}
       style={{
         width: 248, flexShrink: 0, background: '#0B0B0C', color: '#fff',
         display: 'flex', flexDirection: 'column', position: 'sticky', top: 0, height: '100vh',
@@ -58,6 +65,7 @@ export default function Sidebar() {
               key={it.href}
               href={it.href}
               className="navitem"
+              onClick={onClose}
               style={{
                 display: 'flex', alignItems: 'center', gap: 13, padding: '11px 12px', borderRadius: 4,
                 cursor: 'pointer', marginBottom: 2, transition: 'background .15s',

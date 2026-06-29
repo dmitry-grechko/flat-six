@@ -42,6 +42,14 @@ const verifyToken = async (
   };
 };
 
-const authedHandler = withMcpAuth(handler, verifyToken, { required: false });
+const authedHandler = withMcpAuth(handler, verifyToken, {
+  // Auth stays optional so the open knowledge tools keep working with no token.
+  // Claude Desktop / claude.ai discover the OAuth server via the protected-resource
+  // metadata document and run the login flow on connect; garage tools then unlock.
+  required: false,
+  // Points the WWW-Authenticate challenge (emitted when a supplied token is
+  // invalid/expired) at our discovery document, per RFC 9728.
+  resourceMetadataPath: '/.well-known/oauth-protected-resource',
+});
 
 export { authedHandler as GET, authedHandler as POST, authedHandler as DELETE };

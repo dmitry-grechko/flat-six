@@ -1,8 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { MCP_TOOLS, RAG_SOURCES, ENGINES, TRANS, COLORS } from '@/lib/data';
+import { useRouter } from 'next/navigation';
+import { MCP_TOOLS, ENGINES, TRANS, COLORS } from '@/lib/data';
+import { KNOWLEDGE_SOURCES } from '@/lib/knowledge';
 import { useVehicle, MODEL_OPTIONS } from '@/lib/vehicle-context';
+import { useServiceRecords } from '@/lib/records-context';
 import { createClient } from '@/lib/supabase/client';
 import { DEMO_MODE, DEMO_EMAIL, DEMO_TOKEN } from '@/lib/demo';
 import type { BodyType } from '@/lib/types';
@@ -13,23 +16,75 @@ const DEFAULT_MODEL_NAME: Record<BodyType, string> = {
 };
 
 export default function SettingsMcp() {
+  const router = useRouter();
   const { vehicle, update, reset } = useVehicle();
-  const [mcpOn, setMcpOn] = useState<boolean>(false);
+  const { records } = useServiceRecords();
   const [email, setEmail] = useState<string>('');
   const [endpoint, setEndpoint] = useState<string>('/api/mcp');
   const [token, setToken] = useState<string>('');
   const [tokenShown, setTokenShown] = useState<boolean>(false);
   const [copied, setCopied] = useState<string>('');
+  const [partsCount, setPartsCount] = useState<number | null>(null);
+
+  // Delete-account flow state.
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setEndpoint(`${window.location.origin}/api/mcp`);
     }
+    // Live count of the shared OEM parts catalog (public read; works in demo too).
+    createClient()
+      .from('parts')
+      .select('*', { count: 'exact', head: true })
+      .then(
+        ({ count }) => setPartsCount(count ?? 0),
+        () => setPartsCount(null),
+      );
+
     if (DEMO_MODE) { setEmail(DEMO_EMAIL); setToken(DEMO_TOKEN); return; }
     const supabase = createClient();
     supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? ''));
     supabase.auth.getSession().then(({ data }) => setToken(data.session?.access_token ?? ''));
   }, []);
+
+  async function deleteAccount() {
+    setDeleting(true);
+    setDeleteError('');
+    try {
+      const res = await fetch('/api/account/delete', { method: 'POST' });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.detail || body.error || `Request failed (${res.status})`);
+      }
+      router.push('/');
+    } catch (e) {
+      setDeleteError(e instanceof Error ? e.message : 'Could not delete account.');
+      setDeleting(false);
+    }
+  }
+
+  // Real RAG sources Claude searches: the bundled 981 knowledge base, the OEM
+  // parts catalog (live DB count) and the signed-in user's own service history.
+  const ragSources: { name: string; detail: string; live: boolean }[] = [
+    ...KNOWLEDGE_SOURCES.map((s) => ({
+      name: s.name,
+      detail: `${s.count} ${s.count === 1 ? 'entry' : 'entries'}`,
+      live: false,
+    })),
+    {
+      name: 'OEM Parts Catalog',
+      detail: partsCount === null ? 'counting…' : `${partsCount.toLocaleString()} parts`,
+      live: false,
+    },
+    {
+      name: 'Your service history',
+      detail: `${records.length} ${records.length === 1 ? 'record' : 'records'}`,
+      live: true,
+    },
+  ];
 
   const copy = (value: string, key: string) => {
     if (!value) return;
@@ -66,7 +121,7 @@ export default function SettingsMcp() {
   };
 
   return (
-    <div style={{ padding: 28, maxWidth: 880 }}>
+    <div className="padView" style={{ padding: 28, maxWidth: 880 }}>
       {/* account */}
       <div style={{ background: '#fff', border: '1px solid #E3E3E5', borderRadius: 4, padding: 24, marginBottom: 18 }}>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: 18 }}>
@@ -112,7 +167,7 @@ export default function SettingsMcp() {
           ))}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 20 }}>
+        <div className="stackSm" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 20 }}>
           <div>
             <label style={fieldLabel}>Model name</label>
             <input value={vehicle.model} onChange={(e) => update({ model: e.target.value })} style={inputStyle} />
@@ -174,15 +229,19 @@ export default function SettingsMcp() {
           <span
             style={{
               marginLeft: 'auto',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
               font: "600 9px/1 'JetBrains Mono',monospace",
               letterSpacing: '.12em',
               padding: '5px 9px',
               borderRadius: 2,
-              color: mcpOn ? '#3CD37A' : '#A8A8AD',
-              background: mcpOn ? 'rgba(60,211,122,.14)' : 'rgba(255,255,255,.08)',
+              color: '#3CD37A',
+              background: 'rgba(60,211,122,.14)',
             }}
           >
-            {mcpOn ? 'CONNECTED' : 'OFFLINE'}
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#3CD37A' }} />
+            LIVE
           </span>
         </div>
         <p style={{ margin: '6px 0 20px', font: "400 14px/1.6 'Helvetica Neue',Arial,sans-serif", color: '#A8A8AD', maxWidth: 560 }}>
@@ -247,15 +306,16 @@ export default function SettingsMcp() {
           </span>
         </div>
         <p style={{ margin: '-6px 0 16px', font: "400 11px/1.5 'Helvetica Neue',Arial,sans-serif", color: '#76767B', maxWidth: 560 }}>
-          This is your Supabase access token. It expires in ~1 hour — re-copy after it refreshes.
-          Knowledge tools work without it; garage tools (your vehicles & service history) need it as a Bearer header.
+          Manual fallback only. Claude Desktop / claude.ai and Claude Code sign in via the one-click OAuth
+          connector below — no token needed. This raw Supabase token (≈1 hr) is just for the MCP Inspector or a
+          hand-set Bearer header.
         </p>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <div className="stackSm" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           {MCP_TOOLS.map((t) => (
             <div key={t.name} style={{ background: '#141416', border: '1px solid #232327', borderRadius: 3, padding: '13px 14px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: mcpOn ? '#1E8E4E' : '#76767B' }} />
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#3CD37A' }} />
                 <span style={{ font: "500 12px/1 'JetBrains Mono',monospace", color: '#fff' }}>{t.name}</span>
                 <span
                   style={{
@@ -287,6 +347,21 @@ export default function SettingsMcp() {
           }}
         >
           <div style={{ font: "500 10px/1 'JetBrains Mono',monospace", letterSpacing: '.12em', color: '#76767B', marginBottom: 10 }}>
+            CONNECT FROM CLAUDE DESKTOP / CLAUDE.AI
+          </div>
+          <ol style={{ margin: '0 0 4px', paddingLeft: 18, font: "400 12px/1.7 'Helvetica Neue',Arial,sans-serif", color: '#C9C9CD' }}>
+            <li>Settings → Connectors → <strong>Add custom connector</strong></li>
+            <li>
+              Paste this URL:{' '}
+              <span style={{ fontFamily: "'JetBrains Mono',monospace", color: '#fff' }}>{mcpEndpoint}</span>
+            </li>
+            <li>Click <strong>Connect</strong> → a FLAT·SIX sign-in window opens → approve. That&rsquo;s it.</li>
+          </ol>
+          <p style={{ margin: '8px 0 14px', font: "400 11px/1.5 'Helvetica Neue',Arial,sans-serif", color: '#76767B' }}>
+            OAuth handles the token for you and refreshes it automatically — no copy-paste, nothing to renew.
+          </p>
+
+          <div style={{ font: "500 10px/1 'JetBrains Mono',monospace", letterSpacing: '.12em', color: '#76767B', margin: '4px 0 10px' }}>
             CONNECT FROM CLAUDE CODE
           </div>
           <pre
@@ -298,38 +373,19 @@ export default function SettingsMcp() {
               color: '#D8D8DC',
             }}
           >
-            {`claude mcp add --transport http flatsix \\\n  ${mcpEndpoint} \\\n  --header "Authorization: Bearer ${tokenShown && token ? token : '<token>'}"`}
+            {`claude mcp add --transport http flatsix ${mcpEndpoint}`}
           </pre>
           <p style={{ margin: '10px 0 0', font: "400 11px/1.5 'Helvetica Neue',Arial,sans-serif", color: '#76767B' }}>
-            Omit the header to use the open knowledge tools only. For Claude Desktop / claude.ai, add{' '}
-            <span style={{ fontFamily: "'JetBrains Mono',monospace", color: '#A8A8AD' }}>{mcpEndpoint}</span> as a custom connector
-            (the deployed HTTPS URL), or test locally with{' '}
-            <span style={{ fontFamily: "'JetBrains Mono',monospace", color: '#A8A8AD' }}>npx @modelcontextprotocol/inspector</span>. See MCP_SETUP.md.
+            Claude Code runs the same OAuth sign-in on first use. To skip OAuth (open knowledge tools only) just add the URL;
+            to force the manual token instead, append{' '}
+            <span style={{ fontFamily: "'JetBrains Mono',monospace", color: '#A8A8AD' }}>--header &quot;Authorization: Bearer &lt;token&gt;&quot;</span>. See MCP_SETUP.md.
           </p>
         </div>
 
-        <div style={{ marginTop: 18, display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button
-            onClick={() => setMcpOn((v) => !v)}
-            style={{
-              height: 42,
-              padding: '0 22px',
-              border: 'none',
-              borderRadius: 2,
-              font: "600 11px/1 'Helvetica Neue',Arial,sans-serif",
-              letterSpacing: '.1em',
-              textTransform: 'uppercase',
-              cursor: 'pointer',
-              background: mcpOn ? '#232327' : 'var(--red, #D5001C)',
-              color: '#fff',
-            }}
-          >
-            {mcpOn ? 'Disconnect' : 'Connect server'}
-          </button>
-          <span style={{ font: "400 12px/1.4 'Helvetica Neue',Arial,sans-serif", color: '#76767B' }}>
-            {mcpOn ? 'Active in your Claude clients. Reads & writes require approval.' : 'Add the endpoint to Claude to enable garage tools.'}
-          </span>
-        </div>
+        <p style={{ marginTop: 16, marginBottom: 0, font: "400 12px/1.5 'Helvetica Neue',Arial,sans-serif", color: '#76767B' }}>
+          The server runs wherever this app is deployed — there&rsquo;s nothing to start or stop here. Connect from your
+          Claude client using the steps above; each read and write still asks for your approval in the client.
+        </p>
       </div>
 
       {/* RAG */}
@@ -338,29 +394,88 @@ export default function SettingsMcp() {
           KNOWLEDGE BASE (RAG)
         </div>
         <p style={{ margin: '0 0 18px', font: "400 13px/1.55 'Helvetica Neue',Arial,sans-serif", color: '#6E6E73', maxWidth: 560 }}>
-          Indexed sources Claude searches when answering questions about your car.
+          The sources Claude searches when answering questions about your car, via the MCP tools above.
         </p>
-        {RAG_SOURCES.map((r) => {
-          const live = !!r.live;
-          return (
-            <div key={r.name} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '13px 0', borderTop: '1px solid #F0F0F1' }}>
-              <span style={{ font: "500 11px/1 'JetBrains Mono',monospace", color: '#6E6E73', flex: 1 }}>{r.name}</span>
-              <span style={{ font: "500 10px/1 'JetBrains Mono',monospace", color: '#9A9AA0' }}>{r.chunks}</span>
-              <span
+        {ragSources.map((r) => (
+          <div key={r.name} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '13px 0', borderTop: '1px solid #F0F0F1' }}>
+            <span style={{ font: "500 11px/1 'JetBrains Mono',monospace", color: '#6E6E73', flex: 1 }}>{r.name}</span>
+            <span style={{ font: "500 10px/1 'JetBrains Mono',monospace", color: '#9A9AA0' }}>{r.detail}</span>
+            <span
+              style={{
+                font: "600 9px/1 'JetBrains Mono',monospace",
+                letterSpacing: '.1em',
+                padding: '4px 7px',
+                borderRadius: 2,
+                color: r.live ? 'var(--red, #D5001C)' : '#1E8E4E',
+                background: r.live ? 'rgba(213,0,28,.1)' : 'rgba(30,142,78,.1)',
+              }}
+            >
+              {r.live ? 'LIVE' : 'INDEXED'}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* DANGER ZONE — delete account */}
+      <div style={{ background: '#fff', border: '1px solid #F0CDD2', borderRadius: 4, padding: 24, marginTop: 18 }}>
+        <div style={{ font: "500 10px/1 'JetBrains Mono',monospace", letterSpacing: '.16em', color: 'var(--red, #D5001C)', marginBottom: 6 }}>
+          DANGER ZONE
+        </div>
+        <p style={{ margin: '0 0 16px', font: "400 13px/1.55 'Helvetica Neue',Arial,sans-serif", color: '#6E6E73', maxWidth: 560 }}>
+          Permanently delete your account and everything tied to it — every vehicle, service record and plan. This cannot be undone.
+        </p>
+
+        {DEMO_MODE ? (
+          <div style={{ font: "400 12px/1.5 'Helvetica Neue',Arial,sans-serif", color: '#9A9AA0' }}>
+            Account deletion is disabled in demo mode.
+          </div>
+        ) : !confirmDelete ? (
+          <button
+            onClick={() => { setConfirmDelete(true); setDeleteError(''); }}
+            style={{
+              height: 40, padding: '0 18px', borderRadius: 2, cursor: 'pointer',
+              background: 'transparent', color: 'var(--red, #D5001C)', border: '1px solid var(--red, #D5001C)',
+              font: "600 11px/1 'Helvetica Neue',Arial,sans-serif", letterSpacing: '.08em', textTransform: 'uppercase',
+            }}
+          >
+            Delete account
+          </button>
+        ) : (
+          <div>
+            <div style={{ font: "400 13px/1.5 'Helvetica Neue',Arial,sans-serif", color: '#0B0B0C', marginBottom: 12 }}>
+              Delete <strong>{email || 'your account'}</strong> and all its data? This is permanent.
+            </div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                onClick={deleteAccount}
+                disabled={deleting}
                 style={{
-                  font: "600 9px/1 'JetBrains Mono',monospace",
-                  letterSpacing: '.1em',
-                  padding: '4px 7px',
-                  borderRadius: 2,
-                  color: live ? 'var(--red, #D5001C)' : '#1E8E4E',
-                  background: live ? 'rgba(213,0,28,.1)' : 'rgba(30,142,78,.1)',
+                  height: 40, padding: '0 18px', border: 'none', borderRadius: 2, cursor: deleting ? 'default' : 'pointer',
+                  background: 'var(--red, #D5001C)', color: '#fff', opacity: deleting ? 0.6 : 1,
+                  font: "600 11px/1 'Helvetica Neue',Arial,sans-serif", letterSpacing: '.08em', textTransform: 'uppercase',
                 }}
               >
-                {r.statusLabel}
-              </span>
+                {deleting ? 'Deleting…' : 'Yes, delete everything'}
+              </button>
+              <button
+                onClick={() => setConfirmDelete(false)}
+                disabled={deleting}
+                style={{
+                  height: 40, padding: '0 18px', borderRadius: 2, cursor: deleting ? 'default' : 'pointer',
+                  background: 'transparent', color: '#6E6E73', border: '1px solid #D2D2D6',
+                  font: "600 11px/1 'Helvetica Neue',Arial,sans-serif", letterSpacing: '.08em', textTransform: 'uppercase',
+                }}
+              >
+                Cancel
+              </button>
             </div>
-          );
-        })}
+          </div>
+        )}
+        {deleteError && (
+          <div style={{ marginTop: 12, font: "400 12px/1.5 'Helvetica Neue',Arial,sans-serif", color: 'var(--red, #D5001C)' }}>
+            {deleteError}
+          </div>
+        )}
       </div>
     </div>
   );

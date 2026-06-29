@@ -1,15 +1,17 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type FC } from 'react';
 import { useRouter } from 'next/navigation';
 import { COMPONENTS, SYSTEMS, COLORS, diffDots, DIFF_LABELS } from '@/lib/data';
 import { catalogForSystem, formatPartNumber } from '@/lib/catalog';
+import { lookupPart, type CatalogPartRow } from '@/lib/parts-lookup';
 import { useVehicle, modelGlb } from '@/lib/vehicle-context';
 import { MODEL_CREDITS, CUTAWAY_CREDIT, ENGINE_CUTAWAY_CREDIT } from '@/lib/credits';
 import type { Component, SystemName, Vehicle, EnginePart } from '@/lib/types';
 // GLBViewer is a forwardRef wrapper; it dynamically imports the R3F Canvas
 // (ssr:false) internally so we can keep a working ref through it.
 import GLBViewer, { type GLBViewerHandle } from './GLBViewer';
+import UnifiedViewer from './UnifiedViewer';
 import { XRAY_ASSEMBLIES, type XrayAssembly, loadAssemblyParts, isPrimary, childrenOf } from './xray-assemblies';
 
 const mono = "'JetBrains Mono',monospace";
@@ -32,25 +34,30 @@ export default function ComponentExplorer() {
   // Paint follows the vehicle's colour unless the user picks a swatch here.
   const activePaint = paint ?? vehicle.colorHex;
 
-  // X-RAY assembly selector (engine / transaxle / exhaust).
-  const [assemblyId, setAssemblyId] = useState<XrayAssembly['id']>('engine');
-  const assembly = XRAY_ASSEMBLIES.find((a) => a.id === assemblyId) ?? XRAY_ASSEMBLIES[0];
+  // null = all systems unified view; non-null = focused single assembly.
+  const [assemblyId, setAssemblyId] = useState<XrayAssembly['id'] | null>(null);
+  const assembly = assemblyId ? (XRAY_ASSEMBLIES.find((a) => a.id === assemblyId) ?? null) : null;
 
   // Parts manifest for the active assembly (lazy, cached per assembly).
   const [partsByAssembly, setPartsByAssembly] = useState<Record<string, EnginePart[]>>({});
-  const parts = partsByAssembly[assemblyId] ?? [];
+  const parts = assembly ? (partsByAssembly[assembly.id] ?? []) : [];
   const [selectedPartId, setSelectedPartId] = useState<string | null>(null);
   // Which primary part is expanded into its sub-parts (drill-down tier).
   const [drillId, setDrillId] = useState<string | null>(null);
 
+  // Load all 9 assembly manifests when X-RAY activates so part counts and
+  // search are available immediately without per-assembly lazy fetches.
   useEffect(() => {
-    if (!xray || partsByAssembly[assemblyId]) return;
-    let alive = true;
-    loadAssemblyParts(assembly.manifest).then((p) => {
-      if (alive) setPartsByAssembly((m) => ({ ...m, [assemblyId]: p }));
+    if (!xray) return;
+    XRAY_ASSEMBLIES.forEach((a) => {
+      if (!partsByAssembly[a.id]) {
+        loadAssemblyParts(a.manifest).then((p) =>
+          setPartsByAssembly((m) => ({ ...m, [a.id]: p }))
+        );
+      }
     });
-    return () => { alive = false; };
-  }, [xray, assemblyId, assembly.manifest, partsByAssembly]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [xray]);
 
   // The parts currently visible as pins/rows: primary tier by default; when a
   // primary with children is drilled into, its sub-parts.
@@ -58,15 +65,14 @@ export default function ComponentExplorer() {
   const visibleParts = drillPart ? childrenOf(parts, drillId!) : parts.filter(isPrimary);
   const selectedPart = parts.find((p) => p.id === selectedPartId) || null;
 
-  // Switching assemblies resets selection + drill state.
-  const switchAssembly = (id: XrayAssembly['id']) => {
+  // Switch to a specific assembly (or back to the all-systems unified view).
+  const switchAssembly = (id: XrayAssembly['id'] | null) => {
     setAssemblyId(id);
     setSelectedPartId(null);
     setDrillId(null);
   };
 
-  // Selecting a primary that has children drills into it; selecting any other
-  // part just highlights it.
+  // Selecting a primary that has children drills into it; any other highlights it.
   const handleSelectPart = (id: string | null) => {
     if (id && !drillId) {
       const part = parts.find((p) => p.id === id);
@@ -96,9 +102,9 @@ export default function ComponentExplorer() {
   });
 
   return (
-    <div style={{ display: 'flex', height: '100%', minHeight: 0 }}>
+    <div className="xplrRoot" style={{ display: 'flex', height: '100%', minHeight: 0, overflow: 'hidden' }}>
       {/* viewer stage */}
-      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', padding: '22px 24px' }}>
+      <div className="xplrStage" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', padding: '22px 24px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', flexShrink: 0, background: '#fff', border: '1px solid #DDDDE0', borderRadius: 3, overflow: 'hidden' }}>
             <button onClick={() => setView('3d')} style={segBtn(view === '3d')}>3D</button>
@@ -109,7 +115,7 @@ export default function ComponentExplorer() {
           {view === '3d' ? (
             <>
               <button
-                onClick={() => setXray((v) => !v)}
+                onClick={() => { const next = !xray; if (!next) switchAssembly(null); setXray(next); }}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 8, height: 34, padding: '0 14px', borderRadius: 3,
                   cursor: 'pointer', font: `600 11px/1 ${mono}`, letterSpacing: '.08em',
@@ -118,17 +124,6 @@ export default function ComponentExplorer() {
               >
                 <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'currentColor' }} /> X-RAY {xray ? 'ON' : 'OFF'}
               </button>
-              {/* Assembly selector — only meaningful while inspecting internals. */}
-              {xray && (
-                <div style={{ display: 'flex', flexShrink: 0, background: '#fff', border: '1px solid #DDDDE0', borderRadius: 3, overflow: 'hidden' }}>
-                  {XRAY_ASSEMBLIES.map((a) => (
-                    <button key={a.id} onClick={() => switchAssembly(a.id)} style={segBtn(assemblyId === a.id)}>
-                      {a.label.toUpperCase()}
-                    </button>
-                  ))}
-                </div>
-              )}
-              {/* Auto-rotate only applies to the exterior; procedural components never spin. */}
               {!xray && (
                 <button
                   onClick={() => setAutoSpin((v) => !v)}
@@ -157,12 +152,13 @@ export default function ComponentExplorer() {
           )}
 
           <div style={{ marginLeft: 'auto', font: `500 10px/1 ${mono}`, letterSpacing: '.12em', color: '#9A9AA0' }}>
-            {view === '3d' ? (xray ? 'X-RAY · DRAG TO ORBIT' : 'DRAG TO ORBIT · RECOLOR LIVE') : `${viewComponents.length} COMPONENTS · CLICK A NODE`}
+            {view === '3d' ? (xray ? (assemblyId ? 'X-RAY · DRAG TO ORBIT · CLICK A PART' : 'ALL SYSTEMS · DRAG TO ORBIT · CLICK A SYSTEM') : 'DRAG TO ORBIT · RECOLOR LIVE') : `${viewComponents.length} COMPONENTS · CLICK A NODE`}
           </div>
         </div>
 
         {/* stage */}
         <div
+          className="xplrStageBox"
           style={{
             flex: 1, position: 'relative', background: 'radial-gradient(120% 92% at 50% 36%,#FCFCFD 0%,#E5E5E8 100%)',
             border: '1px solid #E0E0E2', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
@@ -170,23 +166,34 @@ export default function ComponentExplorer() {
         >
           <div style={{ position: 'absolute', left: 18, top: 16, font: `500 10px/1.7 ${mono}`, letterSpacing: '.1em', color: '#A6A6AB', zIndex: 2 }}>
             <div style={{ color: '#6E6E73' }}>{vehicle.model}</div>
-            <div>{view === '3d' ? '3D MODEL' : view === 'front' ? 'FRONT 3/4' : 'ENGINE BAY'} · {view === '3d' ? 'EXTERIOR' : 'FACTORY CUTAWAY'}</div>
+            <div>
+              {view === '3d'
+                ? (xray ? (assemblyId ? `X-RAY · ${assembly?.label.toUpperCase()}` : 'ALL SYSTEMS · STRIPPED') : '3D MODEL · EXTERIOR')
+                : view === 'front' ? 'FRONT 3/4 · FACTORY CUTAWAY'
+                : 'ENGINE BAY · FACTORY CUTAWAY'}
+            </div>
           </div>
 
           {view === '3d' && (
             <div style={{ position: 'absolute', inset: 0 }}>
-              {/* ONE persistent react-three-fiber canvas — swapping `src` between
-                  the exterior and the internals keeps a single WebGL context
-                  (mounting a second Canvas per mode exhausts/loses contexts). */}
-              <GLBViewer
-                ref={viewerRef}
-                src={xray ? assembly.glb : modelGlb(vehicle.body)}
-                paintHex={xray ? undefined : activePaint}
-                autoRotate={!xray && autoSpin}
-                parts={xray ? visibleParts : undefined}
-                selectedPartId={xray ? selectedPartId : null}
-                onSelectPart={handleSelectPart}
-              />
+              {xray && assemblyId === null ? (
+                /* ── All-systems unified / stripped view ── */
+                <UnifiedViewer
+                  selectedAssemblyId={null}
+                  onSelectAssembly={(id) => { if (id) switchAssembly(id as XrayAssembly['id']); }}
+                />
+              ) : (
+                /* ── Exterior (xray=false) or focused single assembly (xray=true + assemblyId set) ── */
+                <GLBViewer
+                  ref={viewerRef}
+                  src={xray && assembly ? assembly.glb : modelGlb(vehicle.body)}
+                  paintHex={xray ? undefined : activePaint}
+                  autoRotate={!xray && autoSpin}
+                  parts={xray ? visibleParts : undefined}
+                  selectedPartId={xray ? selectedPartId : null}
+                  onSelectPart={handleSelectPart}
+                />
+              )}
 
               {!xray && (
                 <div style={{ position: 'absolute', left: 18, bottom: 16, display: 'flex', alignItems: 'center', gap: 11, zIndex: 3 }}>
@@ -214,10 +221,12 @@ export default function ComponentExplorer() {
                 RESET VIEW
               </button>
               <div style={{ position: 'absolute', right: 14, top: 14, zIndex: 3, display: 'flex', alignItems: 'center', gap: 7, background: 'rgba(11,11,12,.8)', padding: '6px 11px', borderRadius: 20, font: `500 9px/1 ${mono}`, letterSpacing: '.08em', color: '#fff', whiteSpace: 'nowrap' }}>
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: RED }} /> {xray ? `PROCEDURAL INTERNALS · ${assembly.label.toUpperCase()}` : `${vehicle.model.toUpperCase()} · REAL MODEL`}
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: RED }} />
+                {xray
+                  ? (assemblyId ? `X-RAY · ${assembly?.label.toUpperCase()}` : 'ALL SYSTEMS · CLICK A SYSTEM TO INSPECT')
+                  : `${vehicle.model.toUpperCase()} · REAL MODEL`}
               </div>
 
-              {/* CC-BY attribution for the third-party exterior model (required by licence). */}
               {!xray && (
                 <div style={{ position: 'absolute', left: '50%', bottom: 14, transform: 'translateX(-50%)', zIndex: 3, font: `500 9px/1.5 ${mono}`, letterSpacing: '.04em', color: '#A6A6AB', textAlign: 'center', whiteSpace: 'nowrap' }}>
                   {MODEL_CREDITS[vehicle.body].title} ·{' '}
@@ -282,15 +291,17 @@ export default function ComponentExplorer() {
       </div>
 
       {/* right rail */}
-      <aside style={{ width: 344, flexShrink: 0, background: '#fff', borderLeft: '1px solid #E0E0E2', display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
-        {view === '3d' && xray ? (
-          <EnginePartsRail
-            assemblyLabel={assembly.label}
-            allParts={parts}
+      <aside className="xplrRail" style={{ width: 344, flexShrink: 0, background: '#fff', borderLeft: '1px solid #E0E0E2', display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
+        {xray ? (
+          <XraySidebar
+            assemblyId={assemblyId}
+            assembly={assembly}
+            partsByAssembly={partsByAssembly}
             visibleParts={visibleParts}
             drillPart={drillPart}
-            selected={selectedPart}
-            onSelect={handleSelectPart}
+            selectedPart={selectedPart}
+            onSelectAssembly={switchAssembly}
+            onSelectPart={handleSelectPart}
             onExitDrill={exitDrill}
             vehicle={vehicle}
             onLog={() => router.push('/history/new')}
@@ -517,6 +528,16 @@ function PartDetailCard({ part, vehicle, assemblyLabel, onClose, onLog, onAsk }:
   const comp = part.componentId ? COMPONENTS.find((c) => c.id === part.componentId) ?? null : null;
   const oem = part.partNumber ? formatPartNumber(part.partNumber) : null;
 
+  // Resolve the part number against the central Supabase parts catalog so the
+  // displayed description is the verified OEM one (single source of truth).
+  const [verified, setVerified] = useState<CatalogPartRow | null>(null);
+  useEffect(() => {
+    let on = true;
+    if (part.partNumber) lookupPart(part.partNumber).then((r) => on && setVerified(r));
+    else setVerified(null);
+    return () => { on = false; };
+  }, [part.partNumber]);
+
   const askPrompt = (() => {
     let p = `I have a ${vehicle.year} ${vehicle.model}. Tell me about the ${part.label} in the ${assemblyLabel.toLowerCase()} assembly`;
     if (oem) p += ` (OEM part ${oem})`;
@@ -542,7 +563,18 @@ function PartDetailCard({ part, vehicle, assemblyLabel, onClose, onLog, onAsk }:
       {oem && (
         <div style={{ display: 'flex', gap: 14, padding: '12px 0 0' }}>
           <div style={{ flexShrink: 0, width: 96, font: `500 10px/1.4 ${mono}`, letterSpacing: '.08em', textTransform: 'uppercase', color: '#9A9AA0' }}>Part No.</div>
-          <div style={{ font: `500 13px/1.45 ${mono}`, color: '#0B0B0C' }}>{oem}</div>
+          <div style={{ font: `500 13px/1.45 ${mono}`, color: '#0B0B0C' }}>
+            {oem}
+            {verified && (
+              <span title="Matched in the OEM parts catalog" style={{ marginLeft: 8, font: `600 8px/1 ${mono}`, letterSpacing: '.08em', color: RED }}>✓ CATALOG</span>
+            )}
+          </div>
+        </div>
+      )}
+      {verified?.description && (
+        <div style={{ display: 'flex', gap: 14, padding: '10px 0 0' }}>
+          <div style={{ flexShrink: 0, width: 96, font: `500 10px/1.4 ${mono}`, letterSpacing: '.08em', textTransform: 'uppercase', color: '#9A9AA0' }}>Catalog</div>
+          <div style={{ font: "400 13px/1.45 'Helvetica Neue',Arial,sans-serif", color: '#46464A' }}>{verified.description}</div>
         </div>
       )}
       {comp?.torque && (
@@ -573,6 +605,231 @@ function PartDetailCard({ part, vehicle, assemblyLabel, onClose, onLog, onAsk }:
           <span style={{ color: RED, fontFamily: mono }}>∗</span> Ask Claude
         </button>
       </div>
+    </div>
+  );
+}
+
+function GroupedAssemblySidebar({
+  partsByAssembly, activeAssemblyId, selectedPartId, onSelectPart, vehicle, onLog, onAsk,
+}: {
+  partsByAssembly: Record<string, EnginePart[]>;
+  activeAssemblyId: string;
+  selectedPartId: string | null;
+  onSelectPart: (assemblyId: XrayAssembly['id'], partId: string | null) => void;
+  vehicle: Vehicle;
+  onLog: () => void;
+  onAsk: (p: string) => void;
+}) {
+  const [search, setSearch] = useState('');
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set([activeAssemblyId]));
+
+  useEffect(() => {
+    setExpandedIds((prev) => new Set([...prev, activeAssemblyId]));
+  }, [activeAssemblyId]);
+
+  const toggleExpand = (id: string) =>
+    setExpandedIds((prev) => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s; });
+
+  const selectedPart = selectedPartId
+    ? Object.values(partsByAssembly).flat().find((p) => p.id === selectedPartId) ?? null
+    : null;
+  const selectedAssembly = selectedPart
+    ? XRAY_ASSEMBLIES.find((a) => (partsByAssembly[a.id] ?? []).some((p) => p.id === selectedPartId))
+    : null;
+
+  const loadedCount = XRAY_ASSEMBLIES.filter((a) => partsByAssembly[a.id]).length;
+  const totalParts = XRAY_ASSEMBLIES.reduce((n, a) => n + (partsByAssembly[a.id]?.filter(isPrimary).length ?? 0), 0);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+      {/* header + search */}
+      <div style={{ padding: '18px 20px 14px', borderBottom: '1px solid #EEEEF0', flexShrink: 0 }}>
+        <div style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.16em', color: '#9A9AA0', marginBottom: 10 }}>
+          ALL SYSTEMS{' '}
+          <span style={{ color: '#C4C4C8' }}>
+            {loadedCount < XRAY_ASSEMBLIES.length ? `· LOADING ${loadedCount}/${XRAY_ASSEMBLIES.length}` : `· ${totalParts} PARTS`}
+          </span>
+        </div>
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search parts…"
+          style={{
+            width: '100%', height: 32, padding: '0 10px', border: '1px solid #DDDDE0', borderRadius: 3,
+            font: `500 12px/1 ${mono}`, letterSpacing: '.04em', color: '#2A2A2E', background: '#FAFAFA',
+            outline: 'none', boxSizing: 'border-box',
+          }}
+        />
+      </div>
+
+      {/* selected part detail (sticky at top) */}
+      {selectedPart && selectedAssembly && (
+        <PartDetailCard
+          part={selectedPart}
+          vehicle={vehicle}
+          assemblyLabel={selectedAssembly.label}
+          onClose={() => onSelectPart(activeAssemblyId as XrayAssembly['id'], null)}
+          onLog={onLog}
+          onAsk={onAsk}
+        />
+      )}
+
+      {/* assembly sections */}
+      <div style={{ flex: 1, overflowY: 'auto', paddingBottom: 24 }}>
+        {XRAY_ASSEMBLIES.map((a) => {
+          const asmParts = (partsByAssembly[a.id] ?? []).filter(isPrimary);
+          const q = search.trim().toLowerCase();
+          const filtered = q
+            ? asmParts.filter((p) => p.label.toLowerCase().includes(q) || (p.partNumber ?? '').toLowerCase().includes(q))
+            : asmParts;
+          if (q && filtered.length === 0) return null;
+
+          const isActive = a.id === activeAssemblyId;
+          const isExpanded = q ? filtered.length > 0 : expandedIds.has(a.id);
+
+          return (
+            <div key={a.id}>
+              <button
+                onClick={() => { if (!q) toggleExpand(a.id); }}
+                style={{
+                  width: '100%', display: 'flex', alignItems: 'center', padding: '10px 20px',
+                  background: isActive ? 'rgba(213,0,28,.04)' : 'transparent',
+                  border: 'none', borderBottom: '1px solid #F2F2F3', cursor: 'pointer', textAlign: 'left', gap: 10,
+                }}
+              >
+                <span style={{ flex: 1, font: `600 10px/1 ${mono}`, letterSpacing: '.1em', color: isActive ? RED : '#46464A' }}>
+                  {a.label.toUpperCase()}
+                </span>
+                <span style={{ font: `500 10px/1 ${mono}`, color: '#C4C4C8' }}>{asmParts.length || '…'}</span>
+                {!q && (
+                  <span style={{
+                    font: `500 12px/1 ${mono}`, color: '#B4B4B8',
+                    display: 'inline-block', transition: 'transform .15s',
+                    transform: isExpanded ? 'rotate(180deg)' : 'none',
+                  }}>▾</span>
+                )}
+              </button>
+
+              {isExpanded && filtered.map((p) => {
+                const active = p.id === selectedPartId && a.id === activeAssemblyId;
+                return (
+                  <button
+                    key={p.id}
+                    onClick={() => onSelectPart(a.id as XrayAssembly['id'], p.id)}
+                    style={{
+                      width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                      padding: '7px 20px 7px 32px', textAlign: 'left', cursor: 'pointer',
+                      background: active ? 'rgba(213,0,28,.06)' : 'transparent',
+                      border: '1px solid ' + (active ? 'rgba(213,0,28,.22)' : 'transparent'),
+                    }}
+                  >
+                    <span style={{ flex: 1, font: "400 12px/1.3 'Helvetica Neue',Arial,sans-serif", color: active ? '#0B0B0C' : '#2A2A2E' }}>
+                      {p.label}
+                    </span>
+                    {p.partNumber && (
+                      <span style={{ font: `500 10px/1 ${mono}`, color: '#9A9AA0', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                        {formatPartNumber(p.partNumber)}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function XraySidebar({
+  assemblyId, assembly, partsByAssembly, visibleParts, drillPart, selectedPart,
+  onSelectAssembly, onSelectPart, onExitDrill, vehicle, onLog, onAsk,
+}: {
+  assemblyId: XrayAssembly['id'] | null;
+  assembly: XrayAssembly | null;
+  partsByAssembly: Record<string, EnginePart[]>;
+  visibleParts: EnginePart[];
+  drillPart: EnginePart | null;
+  selectedPart: EnginePart | null;
+  onSelectAssembly: (id: XrayAssembly['id'] | null) => void;
+  onSelectPart: (id: string | null) => void;
+  onExitDrill: () => void;
+  vehicle: Vehicle;
+  onLog: () => void;
+  onAsk: (p: string) => void;
+}) {
+  const loadedCount = XRAY_ASSEMBLIES.filter((a) => partsByAssembly[a.id]).length;
+  const totalParts = XRAY_ASSEMBLIES.reduce((n, a) => n + (partsByAssembly[a.id]?.filter(isPrimary).length ?? 0), 0);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+      {/* ALL button — always at the top, returns to the unified stripped view */}
+      <div style={{ padding: '14px 20px', borderBottom: '1px solid #EEEEF0', flexShrink: 0 }}>
+        <button
+          onClick={() => onSelectAssembly(null)}
+          style={{
+            width: '100%', display: 'flex', alignItems: 'center', gap: 9,
+            padding: '10px 14px', borderRadius: 3, cursor: 'pointer', textAlign: 'left',
+            background: assemblyId === null ? '#0B0B0C' : '#F6F6F7',
+            border: `1px solid ${assemblyId === null ? '#0B0B0C' : '#E6E6E8'}`,
+            color: assemblyId === null ? '#fff' : '#46464A',
+          }}
+        >
+          <span style={{ font: `600 11px/1 ${mono}`, letterSpacing: '.1em' }}>ALL SYSTEMS</span>
+          <span style={{ marginLeft: 'auto', font: `500 10px/1 ${mono}`, opacity: .55 }}>
+            {loadedCount < XRAY_ASSEMBLIES.length ? `${loadedCount}/${XRAY_ASSEMBLIES.length}` : `${totalParts}`}
+          </span>
+        </button>
+      </div>
+
+      {assemblyId === null ? (
+        /* ── Assembly overview: pick a system ── */
+        <div style={{ flex: 1, overflowY: 'auto', padding: '10px 12px 24px' }}>
+          <div style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.14em', color: '#B4B4B8', padding: '8px 8px 12px' }}>
+            CLICK A SYSTEM TO INSPECT ITS PARTS
+          </div>
+          {XRAY_ASSEMBLIES.map((a) => {
+            const count = (partsByAssembly[a.id] ?? []).filter(isPrimary).length;
+            return (
+              <button
+                key={a.id}
+                onClick={() => onSelectAssembly(a.id)}
+                style={{
+                  width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                  padding: '11px 14px', marginBottom: 4, borderRadius: 3, cursor: 'pointer', textAlign: 'left',
+                  background: '#F6F6F7', border: '1px solid #EEEEF0',
+                }}
+              >
+                <span style={{ flex: 1, font: `500 12px/1 ${mono}`, letterSpacing: '.06em', color: '#2A2A2E' }}>
+                  {a.label}
+                </span>
+                <span style={{ font: `500 10px/1 ${mono}`, color: count ? '#9A9AA0' : '#D0D0D4' }}>
+                  {count || '…'}
+                </span>
+                <span style={{ font: `500 12px/1 ${mono}`, color: '#CACACE' }}>›</span>
+              </button>
+            );
+          })}
+        </div>
+      ) : (
+        /* ── Focused assembly: show its parts ── */
+        <div style={{ flex: 1, overflowY: 'auto' }}>
+          <EnginePartsRail
+            assemblyLabel={assembly?.label ?? ''}
+            allParts={partsByAssembly[assemblyId] ?? []}
+            visibleParts={visibleParts}
+            drillPart={drillPart}
+            selected={selectedPart}
+            onSelect={onSelectPart}
+            onExitDrill={onExitDrill}
+            vehicle={vehicle}
+            onLog={onLog}
+            onAsk={onAsk}
+          />
+        </div>
+      )}
     </div>
   );
 }

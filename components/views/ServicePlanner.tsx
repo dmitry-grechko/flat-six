@@ -51,6 +51,17 @@ const cellInput = (font: string): React.CSSProperties => ({
   color: '#0B0B0C',
   font,
 });
+const cellTextarea: React.CSSProperties = {
+  width: '100%',
+  minHeight: 64,
+  padding: '9px 10px',
+  background: '#fff',
+  border: '1px solid #DDDDE0',
+  borderRadius: 2,
+  color: '#0B0B0C',
+  font: "400 13px/1.55 'Helvetica Neue',Arial,sans-serif",
+  resize: 'vertical',
+};
 const chip = (active: boolean): React.CSSProperties => ({
   padding: '9px 13px',
   background: active ? RED : '#F6F6F7',
@@ -108,7 +119,7 @@ export default function ServicePlanner() {
   }
 
   return (
-    <div style={{ padding: 28, maxWidth: 1080 }} className="fadeUp">
+    <div style={{ padding: 28, maxWidth: 1080 }} className="fadeUp padView">
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: 18 }}>
         <div>
           <div style={{ font: `500 11px/1 ${mono}`, letterSpacing: '.16em', color: '#6E6E73' }}>
@@ -196,8 +207,8 @@ function PlanCard({
 
   return (
     <div style={{ background: '#fff', border: '1px solid #E3E3E5', borderRadius: 4, overflow: 'hidden' }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, padding: '18px 20px' }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '18px 20px', flexWrap: 'wrap' }}>
+        <div style={{ flex: 1, minWidth: 180 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
             <span style={{ font: "400 17px/1.2 'Helvetica Neue',Arial,sans-serif", color: '#0B0B0C' }}>{plan.title}</span>
             <span
@@ -256,7 +267,7 @@ function PlanCard({
       {open && (
         <div style={{ borderTop: '1px solid #F0F0F1', padding: '6px 20px 16px' }}>
           {plan.notes && (
-            <div style={{ margin: '12px 0', font: "400 13px/1.5 'Helvetica Neue',Arial,sans-serif", color: '#6E6E73' }}>
+            <div style={{ margin: '12px 0', whiteSpace: 'pre-wrap', font: "400 13px/1.5 'Helvetica Neue',Arial,sans-serif", color: '#6E6E73' }}>
               {plan.notes}
             </div>
           )}
@@ -318,7 +329,14 @@ function PlanCard({
                     )}
                   </div>
                   {it.description && (
-                    <div style={{ marginTop: 4, font: "400 12.5px/1.45 'Helvetica Neue',Arial,sans-serif", color: '#8A8A8F' }}>
+                    <div
+                      style={{
+                        marginTop: 4,
+                        whiteSpace: 'pre-wrap',
+                        font: "400 12.5px/1.5 'Helvetica Neue',Arial,sans-serif",
+                        color: '#8A8A8F',
+                      }}
+                    >
                       {it.description}
                     </div>
                   )}
@@ -488,7 +506,7 @@ function PlanEditor({
   }
 
   return (
-    <div style={{ padding: 28, maxWidth: 860 }} className="fadeUp">
+    <div style={{ padding: 28, maxWidth: 860 }} className="fadeUp padView">
       <div style={{ background: '#fff', border: '1px solid #E3E3E5', borderRadius: 4, padding: 26 }}>
         <div style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.16em', color: RED, marginBottom: 18 }}>
           {plan ? 'EDIT SERVICE PLAN' : 'NEW SERVICE PLAN'}
@@ -502,7 +520,7 @@ function PlanEditor({
           style={{ ...inputBase, font: "400 14px 'Helvetica Neue',Arial,sans-serif", marginBottom: 20 }}
         />
 
-        <div style={{ display: 'grid', gridTemplateColumns: '160px 160px', gap: 14, marginBottom: 20 }}>
+        <div className="stackSm" style={{ display: 'grid', gridTemplateColumns: '160px 160px', gap: 14, marginBottom: 20 }}>
           <div>
             <label style={{ ...labelStyle, margin: '0 0 8px' }}>Target date</label>
             <input
@@ -571,18 +589,19 @@ function PlanEditor({
                   ×
                 </button>
               </div>
-              <div style={{ display: 'flex', gap: 8, paddingLeft: 28, marginBottom: 8 }}>
-                <input
-                  value={it.description ?? ''}
-                  onChange={(e) => patchItem(it.id, { description: e.target.value })}
-                  placeholder="Detail — why / what's involved"
-                  style={{ ...cellInput("400 13px 'Helvetica Neue',Arial,sans-serif"), flex: 1 }}
-                />
+              <div style={{ paddingLeft: 28, marginBottom: 8 }}>
                 <input
                   value={it.partNumber ?? ''}
                   onChange={(e) => patchItem(it.id, { partNumber: e.target.value })}
                   placeholder="Part #"
-                  style={{ ...cellInput(`500 12px ${mono}`), width: 160 }}
+                  style={{ ...cellInput(`500 12px ${mono}`), marginBottom: 8 }}
+                />
+                <textarea
+                  value={it.description ?? ''}
+                  onChange={(e) => patchItem(it.id, { description: e.target.value })}
+                  placeholder={'Detail — why / what’s involved. Multi-line is fine:\n- Bed pads over 200 mi\n- Torque caliper to 85 Nm'}
+                  rows={3}
+                  style={cellTextarea}
                 />
               </div>
 

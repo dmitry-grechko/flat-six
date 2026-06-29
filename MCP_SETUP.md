@@ -6,13 +6,16 @@ and (with auth) read and write your own service history.
 
 - **Endpoint:** `/api/mcp`
   - Local: `http://localhost:3000/api/mcp`
-  - Deployed: `https://<your-vercel-domain>/api/mcp`
+  - Deployed: `https://flat-six.org/api/mcp`
 - **Transport:** HTTP (Streamable). Built on [`mcp-handler`](https://github.com/vercel/mcp-handler) `v1.1.0`.
-- **Auth:** `Authorization: Bearer <token>`, where the token is your **Supabase
-  access token**. Knowledge tools work with **no token**; garage tools require one.
+- **Auth:** **OAuth 2.1** (authorization code + PKCE, dynamic client registration).
+  Just paste the endpoint URL into Claude — it discovers the OAuth server, opens a
+  FLAT·SIX sign-in window, and manages/refreshes the token for you. Knowledge
+  tools also work with **no auth**.
 
-Get your token from the app: **Settings → CLAUDE / MCP INTEGRATION → TOKEN**
-(Show, then Copy). It expires in ~1 hour — re-copy after it refreshes.
+There's no token to copy by hand anymore. (A manual `Authorization: Bearer
+<supabase-access-token>` still works for the MCP Inspector — get it from
+**Settings → CLAUDE / MCP INTEGRATION → TOKEN** — but it expires in ~1 hour.)
 
 ---
 
@@ -40,41 +43,41 @@ a Bearer token" message; the open tools keep working regardless.
 
 ---
 
+## Connect from Claude Desktop / claude.ai
+
+1. **Settings → Connectors → Add custom connector**
+2. URL = `https://flat-six.org/api/mcp`
+3. Click **Connect** → a FLAT·SIX sign-in window opens → approve.
+
+That's the whole flow. Claude registers itself (DCR), runs the OAuth login, and
+stores + refreshes the token automatically. Use the **deployed HTTPS URL** here —
+these surfaces don't accept `localhost`.
+
+---
+
 ## Connect from Claude Code
 
-With auth (all tools):
+OAuth (all tools — recommended):
 ```bash
-claude mcp add --transport http flatsix \
-  http://localhost:3000/api/mcp \
-  --header "Authorization: Bearer <token>"
+claude mcp add --transport http flatsix https://flat-six.org/api/mcp
+```
+On first use Claude Code runs the same OAuth sign-in in your browser.
+
+Open knowledge tools only (skip the login):
+```bash
+claude mcp add --transport http flatsix https://flat-six.org/api/mcp
+# …then just don't authenticate when prompted
 ```
 
-Deployed variant:
+Manual token instead of OAuth (Inspector-style):
 ```bash
 claude mcp add --transport http flatsix \
-  https://<your-vercel-domain>/api/mcp \
-  --header "Authorization: Bearer <token>"
-```
-
-Knowledge tools only (no token needed):
-```bash
-claude mcp add --transport http flatsix http://localhost:3000/api/mcp
+  https://flat-six.org/api/mcp \
+  --header "Authorization: Bearer <supabase-access-token>"
 ```
 
 Verify with `claude mcp list`, then ask Claude e.g. *"what's the wheel bolt torque
 on a 981?"* (open) or *"log an oil change on my Boxster at 43,000 miles"* (auth).
-
----
-
-## Connect from Claude Desktop / claude.ai
-
-Add a **custom connector / remote MCP server** pointing at the endpoint:
-
-- Settings → Connectors → Add custom connector → URL = `https://<your-vercel-domain>/api/mcp`.
-- These surfaces generally need the **deployed HTTPS URL** (not `localhost`).
-- They favour OAuth over a static Bearer header, so the **authenticated** garage
-  tools are best tested from **Claude Code** (which supports `--header`) or the
-  **MCP Inspector** (below). The open knowledge tools work without any header.
 
 ---
 
@@ -93,21 +96,41 @@ In the Inspector UI:
 
 ---
 
+## Deploy / setup (one-time)
+
+The OAuth flow needs two things beyond the base Supabase setup:
+
+1. **Service-role key.** Add `SUPABASE_SERVICE_ROLE_KEY` (Supabase → Settings →
+   API → `service_role`) to your Vercel project env **and** `.env.local`. It's a
+   server-only secret — never `NEXT_PUBLIC`. The OAuth routes use it to manage the
+   `oauth_clients` / `oauth_codes` tables.
+2. **Migration.** Apply `supabase/migrations/0004_oauth.sql` with `npm run db:push`
+   (creates those two tables; RLS on, no policies → service-role-only).
+
+That's it — `flat-six.org` already serves the discovery documents at
+`/.well-known/oauth-protected-resource` and `/.well-known/oauth-authorization-server`.
+
 ## How auth works (implementation note)
 
-- The route (`app/api/[transport]/route.ts`) wraps the handler with
-  `withMcpAuth(handler, verifyToken, { required: false })`.
-- `verifyToken` passes the incoming Bearer token straight through as
-  `authInfo.token` without validating it (so open tools stay reachable).
-- Garage tools read `extra.authInfo?.token`, then `lib/mcp/auth.ts → resolveUser`
-  builds a Supabase client with `Authorization: Bearer <token>` and calls
-  `auth.getUser(token)`. Postgres **Row Level Security** then scopes every
-  read/write to that user. An invalid/expired token resolves to no user → the
-  tool returns the "authenticate" error.
+**OAuth 2.1, with the issued tokens *being* the user's Supabase session.** This
+keeps Row Level Security as the single source of truth — the resource server never
+learns a second identity.
 
-## Caveat & future work
+1. Claude fetches `/.well-known/oauth-protected-resource` → finds the auth server
+   (`/.well-known/oauth-authorization-server`).
+2. Claude self-registers (`POST /api/oauth/register`, DCR) → gets a `client_id`.
+3. Browser opens `/oauth/authorize` (PKCE). If there's no session it redirects to
+   `/auth/login?next=…` (magic link) and returns. The user approves on a consent
+   screen; we mint a single-use code (60 s TTL) bound to the PKCE challenge and the
+   user's Supabase access + refresh tokens (`lib/oauth` → `oauth_codes`).
+4. Claude exchanges the code at `POST /api/oauth/token` (verifying PKCE) and gets
+   back the **Supabase access token** as `access_token` and the **Supabase refresh
+   token** as `refresh_token`. Refresh grants delegate straight to Supabase.
+5. Claude calls `/api/mcp` with `Authorization: Bearer <access_token>`. The route
+   wraps the handler with `withMcpAuth(handler, verifyToken, { required: false })`;
+   garage tools read `extra.authInfo?.token` → `lib/mcp/auth.ts → resolveUser`
+   builds an RLS-scoped Supabase client. Open tools ignore auth entirely.
 
-Supabase access tokens are short-lived (~1 hour). For a smoother experience you
-could add a **long-lived personal access token** table (hashed PATs mapped to a
-user id) and have `resolveUser` accept either a Supabase JWT or a PAT — then a
-connector wouldn't need re-pasting an expiring token.
+Because the access token is a normal Supabase JWT, nothing in `resolveUser` or the
+tools changed — OAuth just removes the manual copy-paste and the 1-hour cliff
+(Claude refreshes automatically).

@@ -102,15 +102,15 @@ export default function Landing() {
   });
 
   return (
-    <div style={{ fontFamily: sans, color: '#0B0B0C', background: '#ECECEE' }}>
+    <div className="landing" style={{ fontFamily: sans, color: '#0B0B0C', background: '#ECECEE' }}>
       {/* ===== NAV ===== */}
       <header style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(11,11,12,.96)', borderBottom: '1px solid #1C1C1F' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', height: 64, padding: '0 28px', display: 'flex', alignItems: 'center', gap: 14 }}>
+        <div className="landingNav" style={{ maxWidth: 1200, margin: '0 auto', height: 64, padding: '0 28px', display: 'flex', alignItems: 'center', gap: 14 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
             <div style={{ width: 12, height: 12, background: RED }} />
             <div style={{ font: `700 14px/1 ${mono}`, letterSpacing: '.3em', color: '#fff' }}>FLAT·SIX</div>
           </div>
-          <nav style={{ marginLeft: 36, display: 'flex', gap: 28 }}>
+          <nav className="landingNavLinks" style={{ marginLeft: 36, display: 'flex', gap: 28 }}>
             {[
               ['#inspector', 'Inspector'],
               ['#features', 'Features'],
@@ -136,7 +136,7 @@ export default function Landing() {
       {/* ===== HERO ===== */}
       <section style={{ position: 'relative', background: '#0B0B0C', color: '#fff', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', right: -60, top: 40, font: `700 420px/.8 ${mono}`, color: '#121214', letterSpacing: '-.04em', userSelect: 'none', pointerEvents: 'none' }}>981</div>
-        <div style={{ position: 'relative', maxWidth: 1200, margin: '0 auto', padding: '84px 28px 92px', display: 'grid', gridTemplateColumns: '1.05fr .95fr', gap: 56, alignItems: 'center' }} className="heroGrid">
+        <div style={{ position: 'relative', maxWidth: 1200, margin: '0 auto', padding: '84px 28px 92px', display: 'grid', gridTemplateColumns: '1.05fr .95fr', gap: 56, alignItems: 'center' }} className="heroGrid landingHero">
           {/* copy */}
           <div style={{ animation: 'fadeUp .5s ease' }}>
             <div style={{ font: `500 12px/1 ${mono}`, letterSpacing: '.26em', color: RED, marginBottom: 22 }}>DIY MAINTENANCE OS · PORSCHE 981</div>
@@ -357,7 +357,7 @@ export default function Landing() {
               <span style={{ font: `500 10px/1 ${mono}`, color: RED }}>COPY</span>
             </div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div className="landingMcpGrid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             {MCP.map((t) => (
               <div key={t.name} style={{ background: '#141416', border: '1px solid #232327', borderRadius: 4, padding: 18 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>

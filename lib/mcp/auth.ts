@@ -45,3 +45,23 @@ export async function resolveUser(token: string | undefined): Promise<AuthedUser
 
   return { userId: user.id, email: user.email ?? null, supabase };
 }
+
+let _publicClient: SupabaseClient | null = null;
+
+/**
+ * Anonymous Supabase client for OPEN tools that read world-readable reference
+ * data (e.g. the parts catalog, protected by a `using (true)` RLS read policy).
+ * Returns null when Supabase env vars are absent so callers can fall back to the
+ * static catalog. Memoized — no per-call auth.
+ */
+export function publicClient(): SupabaseClient | null {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !anonKey) return null;
+  if (!_publicClient) {
+    _publicClient = createClient(url, anonKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+  }
+  return _publicClient;
+}

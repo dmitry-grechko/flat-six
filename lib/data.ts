@@ -156,12 +156,8 @@ export const MCP_TOOLS: McpTool[] = [
   { name: 'log_service_record', desc: 'Add a service record to a vehicle.', auth: true },
 ];
 
-export const RAG_SOURCES: RagSource[] = [
-  { name: '981 Workshop Manual (PIWIS)', chunks: '1,284 chunks', statusLabel: 'INDEXED' },
-  { name: 'Owner Handbook 981', chunks: '412 chunks', statusLabel: 'INDEXED' },
-  { name: 'Technical Service Bulletins', chunks: '96 chunks', statusLabel: 'INDEXED' },
-  { name: 'Your service history', chunks: RECORDS.length + ' records', statusLabel: 'LIVE', live: true },
-];
+// (RAG sources are now computed from real data in components/views/SettingsMcp.tsx
+// using KNOWLEDGE_SOURCES + the live parts/service-history counts.)
 
 export const DIFF_LABELS = ['Beginner', 'Beginner', 'Intermediate', 'Advanced', 'Specialist'];
 

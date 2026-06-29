@@ -1,0 +1,225 @@
+{
+  "glb": "/models/components/rbrakes.glb",
+  "parts": [
+    {
+      "id": "rear-rotor-left",
+      "node": "rearRotorLeft",
+      "label": "Rear Brake Rotor — Left (299mm)",
+      "assembly": "Rotors",
+      "system": "Brakes",
+      "tier": "primary",
+      "partNumber": "981.352.031.00",
+      "function": "Vented cast iron disc that provides the friction surface for rear brake pad clamping to generate stopping force.",
+      "componentId": "rbrakes"
+    },
+    {
+      "id": "rear-rotor-right",
+      "node": "rearRotorRight",
+      "label": "Rear Brake Rotor — Right (299mm)",
+      "assembly": "Rotors",
+      "system": "Brakes",
+      "tier": "primary",
+      "partNumber": "981.352.032.00",
+      "function": "Vented cast iron disc that provides the friction surface for rear brake pad clamping to generate stopping force.",
+      "componentId": "rbrakes"
+    },
+    {
+      "id": "rear-caliper-left",
+      "node": "rearCaliperLeft",
+      "label": "Rear Brake Caliper — Left (4-piston with EPB)",
+      "assembly": "Calipers",
+      "system": "Brakes",
+      "tier": "primary",
+      "partNumber": "986.352.423.10",
+      "function": "Fixed 4-piston caliper that clamps brake pads against the rotor and houses the integrated electronic parking brake motor-in-caliper actuator.",
+      "componentId": "rbrakes"
+    },
+    {
+      "id": "rear-caliper-right",
+      "node": "rearCaliperRight",
+      "label": "Rear Brake Caliper — Right (4-piston with EPB)",
+      "assembly": "Calipers",
+      "system": "Brakes",
+      "tier": "primary",
+      "partNumber": "986.352.424.10",
+      "function": "Fixed 4-piston caliper that clamps brake pads against the rotor and houses the integrated electronic parking brake motor-in-caliper actuator.",
+      "componentId": "rbrakes"
+    },
+    {
+      "id": "rear-brake-pads",
+      "node": "rearBrakePads",
+      "label": "Rear Brake Pads",
+      "assembly": "Calipers",
+      "system": "Brakes",
+      "tier": "primary",
+      "partNumber": "EBC DP42008R (upgrade)",
+      "function": "Friction material pads that press against the rear rotors under hydraulic caliper clamping force to decelerate the vehicle.",
+      "componentId": "rbrakes"
+    },
+    {
+      "id": "epb-actuator-left",
+      "node": "epbActuatorLeft",
+      "label": "EPB Actuator — Left",
+      "assembly": "Parking Brake",
+      "system": "Brakes",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Motor-in-caliper electric actuator that mechanically clamps the rear caliper pistons to hold the vehicle stationary when the electronic parking brake is engaged.",
+      "componentId": "rbrakes"
+    },
+    {
+      "id": "epb-actuator-right",
+      "node": "epbActuatorRight",
+      "label": "EPB Actuator — Right",
+      "assembly": "Parking Brake",
+      "system": "Brakes",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Motor-in-caliper electric actuator that mechanically clamps the rear caliper pistons to hold the vehicle stationary when the electronic parking brake is engaged.",
+      "componentId": "rbrakes"
+    },
+    {
+      "id": "wheel-speed-sensor-rear-left",
+      "node": "wheelSpeedSensorRearLeft",
+      "label": "Wheel Speed Sensor — Rear Left",
+      "assembly": "Sensors",
+      "system": "Brakes",
+      "tier": "primary",
+      "partNumber": "991.606.407.01",
+      "function": "Active Hall-effect sensor that reads the ABS tone ring to report rear-left wheel rotational speed to the ABS/PSM control unit.",
+      "componentId": "rbrakes"
+    },
+    {
+      "id": "wheel-speed-sensor-rear-right",
+      "node": "wheelSpeedSensorRearRight",
+      "label": "Wheel Speed Sensor — Rear Right",
+      "assembly": "Sensors",
+      "system": "Brakes",
+      "tier": "primary",
+      "partNumber": "991.606.407.01",
+      "function": "Active Hall-effect sensor that reads the ABS tone ring to report rear-right wheel rotational speed to the ABS/PSM control unit.",
+      "componentId": "rbrakes"
+    },
+    {
+      "id": "abs-psm-hydraulic-unit",
+      "node": "absPsmHydraulicUnit",
+      "label": "ABS / PSM Hydraulic Control Unit",
+      "assembly": "Hydraulics",
+      "system": "Brakes",
+      "tier": "primary",
+      "partNumber": "981.355.955.00",
+      "function": "Bosch integrated ABS and Porsche Stability Management hydraulic modulator that independently regulates brake pressure at each wheel during ABS, traction control, and stability events.",
+      "componentId": "rbrakes"
+    },
+    {
+      "id": "brake-lines",
+      "node": "brakeLines",
+      "label": "Brake Lines (Hard & Stainless Braided Flex)",
+      "assembly": "Hydraulics",
+      "system": "Brakes",
+      "tier": "primary",
+      "partNumber": "981.355.189.04",
+      "function": "Hard steel lines and stainless braided flexible hoses that route hydraulic brake fluid from the master cylinder through the ABS unit to each caliper.",
+      "componentId": "rbrakes"
+    },
+    {
+      "id": "brake-fluid-reservoir",
+      "node": "brakeFluidReservoir",
+      "label": "Brake Fluid Reservoir",
+      "assembly": "Hydraulics",
+      "system": "Brakes",
+      "tier": "primary",
+      "partNumber": "991.355.013.01",
+      "function": "Translucent reservoir mounted on the brake master cylinder that stores and supplies DOT brake fluid to maintain system pressure and compensate for pad wear.",
+      "componentId": "rbrakes"
+    },
+    {
+      "id": "rear-brakes-new-001",
+      "node": "brakeMasterCylinder",
+      "label": "Brake Master Cylinder",
+      "assembly": "Hydraulics",
+      "system": "Brakes",
+      "tier": "sub",
+      "partNumber": "981.355.130.26",
+      "function": "Converts pedal force into hydraulic pressure that is transmitted through the brake lines to actuate all four calipers for braking.",
+      "componentId": "rbrakes"
+    },
+    {
+      "id": "rear-brakes-new-002",
+      "node": "brakeServo",
+      "label": "Brake Servo (Vacuum Booster)",
+      "assembly": "Hydraulics",
+      "system": "Brakes",
+      "tier": "sub",
+      "partNumber": "991.355.125.26",
+      "function": "Vacuum-assisted booster mounted between the brake pedal and master cylinder that multiplies driver pedal force to reduce braking effort.",
+      "componentId": "rbrakes"
+    },
+    {
+      "id": "rear-brakes-new-003",
+      "node": "rotorDustShieldLeft",
+      "label": "Rear Brake Disc Cover Plate — Left",
+      "assembly": "Rotors",
+      "system": "Brakes",
+      "tier": "sub",
+      "partNumber": "981.352.801.02",
+      "function": "Sheet metal splash shield mounted behind the rear rotor that deflects road debris and water away from the rotor and caliper.",
+      "componentId": "rbrakes"
+    },
+    {
+      "id": "rear-brakes-new-004",
+      "node": "rotorDustShieldRight",
+      "label": "Rear Brake Disc Cover Plate — Right",
+      "assembly": "Rotors",
+      "system": "Brakes",
+      "tier": "sub",
+      "partNumber": "981.352.802.02",
+      "function": "Sheet metal splash shield mounted behind the rear rotor that deflects road debris and water away from the rotor and caliper.",
+      "componentId": "rbrakes"
+    },
+    {
+      "id": "rear-brakes-new-005",
+      "node": "caliperSealRepairSet",
+      "label": "Rear Caliper Seal Repair Set",
+      "assembly": "Calipers",
+      "system": "Brakes",
+      "tier": "sub",
+      "partNumber": "951.352.917.01",
+      "function": "Piston seal and dust boot repair kit for the rear brake calipers, used when rebuilding calipers to restore hydraulic sealing and prevent fluid leaks.",
+      "componentId": "rbrakes"
+    },
+    {
+      "id": "rear-brakes-new-006",
+      "node": "brakeFluid",
+      "label": "Brake Fluid (DOT)",
+      "assembly": "Hydraulics",
+      "system": "Brakes",
+      "tier": "sub",
+      "partNumber": "000.043.210.82",
+      "function": "Hygroscopic hydraulic fluid that fills the brake system and transmits pedal force to the calipers; requires periodic replacement as it absorbs moisture and its boiling point degrades.",
+      "componentId": "rbrakes"
+    },
+    {
+      "id": "rear-brakes-new-007",
+      "node": "brakeHoseRear",
+      "label": "Rear Brake Hose",
+      "assembly": "Hydraulics",
+      "system": "Brakes",
+      "tier": "sub",
+      "partNumber": "970.355.137.00",
+      "function": "Flexible rubber hose that bridges the fixed hard brake line to the rear caliper, accommodating suspension movement while maintaining hydraulic pressure.",
+      "componentId": "rbrakes"
+    },
+    {
+      "id": "rear-brakes-new-008",
+      "node": "padWearSenderWire",
+      "label": "Brake Pad Wear Sender Wire — Rear",
+      "assembly": "Sensors",
+      "system": "Brakes",
+      "tier": "sub",
+      "partNumber": "981.609.163.00",
+      "function": "Electrical lead connecting the rear brake pad wear sensor to the vehicle wiring harness, triggering a dashboard warning when pad material reaches minimum thickness.",
+      "componentId": "rbrakes"
+    }
+  ]
+}

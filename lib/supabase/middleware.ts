@@ -8,8 +8,12 @@ import { DEMO_MODE } from '@/lib/demo';
  * - /api/mcp, /api/sse: the MCP server. Claude authenticates per-request with a
  *   Bearer token (not a session cookie), so it must never be redirected to login.
  *   Open knowledge tools work with no token at all.
+ * - /.well-known, /api/oauth: OAuth discovery + token/register endpoints (no
+ *   session; clients authenticate via the OAuth flow itself).
+ * - /oauth: the authorize/consent page gates itself (redirects to login when
+ *   there is no session), so middleware must let it through to run that logic.
  */
-const PUBLIC_PREFIXES = ['/auth', '/api/mcp', '/api/sse'];
+const PUBLIC_PREFIXES = ['/auth', '/api/mcp', '/api/sse', '/.well-known', '/api/oauth', '/oauth'];
 
 function isPublic(pathname: string): boolean {
   // The marketing landing page and the privacy/terms page are public.

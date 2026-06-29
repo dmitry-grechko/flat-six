@@ -1,0 +1,89 @@
+{
+  "glb": "/models/components/plugs.glb",
+  "parts": [
+    {
+      "id": "eng-ign-001",
+      "node": "ignitionCoils",
+      "label": "Ignition Coils (x6)",
+      "assembly": "Ignition Coils",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1.602.104.05",
+      "function": "Coil-on-plug pencil coils that step up battery voltage to fire each spark plug on demand.",
+      "componentId": "plugs"
+    },
+    {
+      "id": "eng-ign-002",
+      "node": "sparkPlugs",
+      "label": "Spark Plugs (x6)",
+      "assembly": "Spark Plugs",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "eng-ign-001",
+      "partNumber": "999.170.151.90",
+      "function": "NGK laser iridium plugs that ignite the air-fuel mixture in each combustion chamber at 3.0 Nm torque.",
+      "componentId": "plugs"
+    },
+    {
+      "id": "eng-ign-003",
+      "node": "knockSensors",
+      "label": "Knock Sensors (x2)",
+      "assembly": "Sensors",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "997.606.121.00",
+      "function": "Piezoelectric sensors, one per bank, that detect detonation and signal the DME to retard ignition timing."
+    },
+    {
+      "id": "eng-fuel-002",
+      "node": "hpFuelRailBank1",
+      "label": "High-Pressure Fuel Rail Bank 1",
+      "assembly": "Fuel Delivery",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Stainless steel rail distributing high-pressure (~200 bar) DFI fuel to the three direct injectors on Bank 1."
+    },
+    {
+      "id": "eng-fuel-003",
+      "node": "hpFuelRailBank2",
+      "label": "High-Pressure Fuel Rail Bank 2",
+      "assembly": "Fuel Delivery",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Stainless steel rail distributing high-pressure (~200 bar) DFI fuel to the three direct injectors on Bank 2."
+    },
+    {
+      "id": "eng-fuel-004",
+      "node": "directInjectors",
+      "label": "Direct Injectors (x6)",
+      "assembly": "Fuel Delivery",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "eng-fuel-002",
+      "partNumber": "9A1.110.128.20",
+      "function": "Solenoid-type side-mount injectors that spray fuel directly into the combustion chamber at high pressure for DFI operation."
+    },
+    {
+      "id": "ignition---fuel-new-001",
+      "node": "highPressureFuelPump",
+      "label": "High-Pressure Fuel Pump",
+      "assembly": "Fuel Delivery",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1.110.315.06",
+      "function": "Cam-driven high-pressure pump that raises fuel from low-pressure supply to the ~200 bar required for direct injection operation."
+    },
+    {
+      "id": "ignition---fuel-new-002",
+      "node": "lowPressureFuelPump",
+      "label": "Fuel Pump (Low Pressure / Lift Pump)",
+      "assembly": "Fuel Delivery",
+      "system": "Fuel & Exhaust",
+      "tier": "primary",
+      "partNumber": "991.620.141.01",
+      "function": "In-tank electric lift pump that supplies low-pressure fuel from the tank to the high-pressure pump in the engine bay."
+    }
+  ]
+}

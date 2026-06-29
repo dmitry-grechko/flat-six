@@ -13,7 +13,9 @@
     "gen:components": "node tools/gen/build-components.mjs",
     "db:link": "supabase link",
     "db:push": "supabase db push",
-    "db:diff": "supabase db diff"
+    "db:diff": "supabase db diff",
+    "db:import-parts": "node tools/parts/import-parts.mjs",
+    "parts:parse": "node tools/parts/parse-parts.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.26.0",

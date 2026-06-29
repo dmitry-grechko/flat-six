@@ -8,7 +8,7 @@
       "assembly": "Induction",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "9A111011502",
       "function": "Distributes filtered air from the throttle body through twin bridge tubes into both cylinder banks."
     },
     {
@@ -18,7 +18,7 @@
       "assembly": "Induction",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "9A110530403",
       "function": "Regulates the volume of air entering the intake plenum based on driver throttle demand."
     },
     {
@@ -39,7 +39,7 @@
       "assembly": "Induction",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "9A1107042000",
       "function": "Separates oil mist from crankcase blow-by gases and returns clean vapor to the intake."
     },
     {
@@ -49,7 +49,7 @@
       "assembly": "Valvetrain",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "9A1105279020",
       "function": "Open and close the intake valves in time with the crankshaft via cam lobes."
     },
     {
@@ -59,7 +59,7 @@
       "assembly": "Valvetrain",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "9A1105281010",
       "function": "Open and close the exhaust valves in time with the crankshaft via cam lobes."
     },
     {
@@ -69,7 +69,7 @@
       "assembly": "Valvetrain",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": "0PB109508B",
+      "partNumber": "9A1105142020",
       "function": "Links the crankshaft to the camshafts to keep valve timing in sync; the tensioner holds chain tension."
     },
     {
@@ -79,7 +79,7 @@
       "assembly": "Rotating Assembly",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "9A1102072000",
       "function": "Converts the reciprocating motion of the pistons into rotational output torque."
     },
     {
@@ -89,7 +89,7 @@
       "assembly": "Rotating Assembly",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "9A1103926000",
       "function": "Compress the air-fuel mixture and transmit combustion force, via the connecting rods, to the crankshaft."
     },
     {
@@ -99,7 +99,7 @@
       "assembly": "Rotating Assembly",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "9A1375262000",
       "function": "Drives the serpentine belt and damps torsional vibration of the crankshaft."
     },
     {
@@ -109,7 +109,7 @@
       "assembly": "Fuel & Ignition",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": "9A111012815",
+      "partNumber": "9A1110859020",
       "function": "Distributes pressurized fuel to the six injectors, which spray metered fuel into each cylinder."
     },
     {
@@ -161,7 +161,7 @@
       "assembly": "Accessory Drive",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": "0PB121035A",
+      "partNumber": "9A1106048010",
       "function": "Circulates coolant between the engine and radiators to regulate temperature."
     },
     {
@@ -171,7 +171,7 @@
       "assembly": "Accessory Drive",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "9A1102218000",
       "componentId": "belt",
       "function": "Transfers crank rotation to the alternator, A/C compressor and water pump; tensioner and idler pulleys guide it."
     },
@@ -182,7 +182,7 @@
       "assembly": "Lubrication & Cooling",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": "0PB115466A",
+      "partNumber": "9A1107024000",
       "componentId": "oil",
       "function": "Holds the cartridge oil filter that removes contaminants from circulating oil."
     },
@@ -193,7 +193,7 @@
       "assembly": "Lubrication & Cooling",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": "9A110705012",
+      "partNumber": "9A1107050110",
       "function": "Pressurizes and circulates oil through the engine's lubrication galleries."
     },
     {
@@ -203,7 +203,7 @@
       "assembly": "Lubrication & Cooling",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": "0PB121110A",
+      "partNumber": "9A1106226020",
       "function": "Houses the thermostat that regulates coolant flow so the engine reaches operating temperature."
     },
     {
@@ -213,7 +213,7 @@
       "assembly": "Structure",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "9A1104913150",
       "function": "Caps the left bank cylinders, carrying the valves and combustion chambers."
     },
     {
@@ -223,7 +223,7 @@
       "assembly": "Structure",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "9A1104914150",
       "function": "Caps the right bank cylinders, carrying the valves and combustion chambers."
     },
     {
@@ -233,7 +233,7 @@
       "assembly": "Structure",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "9A1101927010",
       "function": "The split-case aluminum block housing the crankshaft, bores and main bearings."
     },
     {
@@ -243,7 +243,7 @@
       "assembly": "Structure",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "9A1107032750",
       "function": "Reservoir at the bottom of the engine that collects and holds the oil supply."
     },
     {
@@ -256,7 +256,6 @@
       "partNumber": null,
       "function": "Cranks the engine over against the flywheel ring gear to start it."
     },
-
     {
       "id": "cam-cover-l",
       "node": "camCover_L",
@@ -265,7 +264,7 @@
       "system": "Engine",
       "tier": "sub",
       "parent": "cylinder-head-l",
-      "partNumber": null,
+      "partNumber": "9A1105231040",
       "function": "Seals the top of the left cylinder head over the camshafts and retains oil in the valvetrain."
     },
     {
@@ -276,7 +275,7 @@
       "system": "Engine",
       "tier": "sub",
       "parent": "cylinder-head-r",
-      "partNumber": null,
+      "partNumber": "9A1105232040",
       "function": "Seals the top of the right cylinder head over the camshafts and retains oil in the valvetrain."
     },
     {
@@ -287,7 +286,7 @@
       "system": "Engine",
       "tier": "sub",
       "parent": "intake-camshaft",
-      "partNumber": null,
+      "partNumber": "9A1105053010",
       "function": "Oil-pressure solenoids that advance and retard intake cam timing for VarioCam variable valve timing."
     },
     {
@@ -298,7 +297,7 @@
       "system": "Engine",
       "tier": "sub",
       "parent": "timing-chain",
-      "partNumber": "0PB109508B",
+      "partNumber": "9A1105157020",
       "function": "Hydraulic plunger and shoe that takes up slack in the timing chain to keep cam/crank timing exact."
     },
     {
@@ -309,7 +308,7 @@
       "system": "Engine",
       "tier": "sub",
       "parent": "timing-chain",
-      "partNumber": null,
+      "partNumber": "9A1105147020",
       "function": "Toothed gear on the crankshaft nose that drives the timing chain."
     },
     {
@@ -320,7 +319,7 @@
       "system": "Engine",
       "tier": "sub",
       "parent": "crankshaft",
-      "partNumber": null,
+      "partNumber": "98111401210",
       "function": "Stores rotational inertia at the crank rear and carries the ring gear the starter engages."
     },
     {
@@ -331,7 +330,7 @@
       "system": "Engine",
       "tier": "sub",
       "parent": "pistons",
-      "partNumber": null,
+      "partNumber": "9A1103914020",
       "function": "Link each piston to its crankpin, transmitting combustion force to the crankshaft."
     },
     {
@@ -342,7 +341,7 @@
       "system": "Engine",
       "tier": "sub",
       "parent": "fuel-rail",
-      "partNumber": "9A111012815",
+      "partNumber": "9A1110128110",
       "function": "Spray finely atomized, metered fuel directly into each combustion chamber for DFI."
     },
     {
@@ -353,7 +352,7 @@
       "system": "Engine",
       "tier": "sub",
       "parent": "alternator",
-      "partNumber": null,
+      "partNumber": "9A1102146020",
       "function": "Belt-driven pulley with one-way clutch that spins the alternator rotor."
     },
     {
@@ -364,7 +363,7 @@
       "system": "Engine",
       "tier": "sub",
       "parent": "serpentine-belt",
-      "partNumber": null,
+      "partNumber": "9A1102212000",
       "componentId": "belt",
       "function": "Spring-loaded pulley that keeps the serpentine belt under constant tension."
     },
@@ -376,7 +375,7 @@
       "system": "Engine",
       "tier": "sub",
       "parent": "serpentine-belt",
-      "partNumber": null,
+      "partNumber": "9A1106248000",
       "componentId": "belt",
       "function": "Smooth pulley that routes and guides the serpentine belt around the accessory drive."
     },
@@ -388,7 +387,7 @@
       "system": "Engine",
       "tier": "sub",
       "parent": "oil-filter-housing",
-      "partNumber": null,
+      "partNumber": "9A1107016220",
       "componentId": "oil",
       "function": "Capped tube where fresh engine oil is poured into the crankcase."
     },
@@ -400,7 +399,7 @@
       "system": "Engine",
       "tier": "sub",
       "parent": "oil-pump",
-      "partNumber": "9A110707510",
+      "partNumber": "9A1107075100",
       "function": "Draws oil from the sump through a strainer screen into the oil pump."
     },
     {
@@ -411,7 +410,7 @@
       "system": "Engine",
       "tier": "sub",
       "parent": "crankcase",
-      "partNumber": null,
+      "partNumber": "9A1375046010",
       "function": "Hydraulic mount that supports the left side of the engine and isolates vibration from the chassis."
     },
     {
@@ -422,7 +421,7 @@
       "system": "Engine",
       "tier": "sub",
       "parent": "crankcase",
-      "partNumber": null,
+      "partNumber": "9A1375046020",
       "function": "Hydraulic mount that supports the right side of the engine and isolates vibration from the chassis."
     },
     {
@@ -444,9 +443,641 @@
       "system": "Engine",
       "tier": "sub",
       "parent": "sump",
-      "partNumber": null,
+      "partNumber": "9A1107264000",
       "componentId": "oil",
       "function": "Guides the oil-level dipstick down into the sump for checking the oil level."
+    },
+    {
+      "id": "eng-block-001",
+      "node": "engineBlock",
+      "label": "Engine Block (Aluminum Alloy, Flat-Six)",
+      "assembly": "Short Block",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1101934070",
+      "function": "Horizontally opposed aluminum alloy block with two cylinder banks and Nikasil-lined bores that forms the structural core of the MA1 engine."
+    },
+    {
+      "id": "eng-block-002",
+      "node": "crankshaftForged",
+      "label": "Crankshaft (Forged Steel)",
+      "assembly": "Short Block",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1102077200",
+      "function": "Forged steel crankshaft with seven main bearings that converts piston reciprocation into rotational torque."
+    },
+    {
+      "id": "eng-block-003",
+      "node": "connectingRods",
+      "label": "Connecting Rods x6 (Forged H-Beam)",
+      "assembly": "Short Block",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1103914020",
+      "function": "Forged steel H-beam connecting rods that transmit combustion force from each piston to the crankshaft."
+    },
+    {
+      "id": "eng-block-004",
+      "node": "pistonsDfi",
+      "label": "Pistons x6 with Piston Rings",
+      "assembly": "Short Block",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1103926000",
+      "function": "Bowl-crown pistons designed for DFI spray pattern, sealing combustion gases and transferring force to the connecting rods."
+    },
+    {
+      "id": "eng-block-005",
+      "node": "mainBearingCaps",
+      "label": "Main Bearing Caps",
+      "assembly": "Short Block",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1101052000",
+      "function": "Structural caps that clamp the six main bearing journals to retain the crankshaft within the block."
+    },
+    {
+      "id": "eng-block-006",
+      "node": "oilPickupStrainer",
+      "label": "Oil Pickup Tube and Oil Strainer",
+      "assembly": "Short Block",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1107075100",
+      "function": "Submerged tube and mesh strainer that draws oil from the wet sump into the oil pump."
+    },
+    {
+      "id": "eng-block-007",
+      "node": "oilPanSump",
+      "label": "Oil Pan / Sump (Lower Crankcase)",
+      "assembly": "Short Block",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1107032750",
+      "function": "Aluminum lower crankcase sump holding 8.75 L of engine oil and sealed by a drain plug boss."
+    },
+    {
+      "id": "eng-block-008",
+      "node": "intermediateShaft",
+      "label": "Intermediate Shaft (IMS)",
+      "assembly": "Short Block",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Shaft inside the block that relays crankshaft drive to both secondary camshaft chains; its bearing is a known service point."
+    },
+    {
+      "id": "eng-block-009",
+      "node": "flexPlate",
+      "label": "Flywheel / PDK Flex Plate Adapter",
+      "assembly": "Short Block",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "98111402000",
+      "function": "Flex plate bolted to the crankshaft rear that connects to the PDK dual-clutch assembly in place of a conventional flywheel."
+    },
+    {
+      "id": "eng-head-001",
+      "node": "cylinderHeadBank1",
+      "label": "Cylinder Head Bank 1 (Driver Side)",
+      "assembly": "Cylinder Heads & Valvetrain",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1104913150",
+      "function": "DOHC aluminum cylinder head for the driver-side bank, housing four valves per cylinder and the combustion chambers."
+    },
+    {
+      "id": "eng-head-002",
+      "node": "cylinderHeadBank2",
+      "label": "Cylinder Head Bank 2 (Passenger Side)",
+      "assembly": "Cylinder Heads & Valvetrain",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1104914150",
+      "function": "Mirror DOHC aluminum cylinder head for the passenger-side bank, housing four valves per cylinder."
+    },
+    {
+      "id": "eng-head-003",
+      "node": "intakeCamBank1",
+      "label": "Intake Camshaft Bank 1",
+      "assembly": "Cylinder Heads & Valvetrain",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1105279020",
+      "function": "VarioCam Plus intake camshaft for Bank 1 providing variable timing and two-stage valve lift."
+    },
+    {
+      "id": "eng-head-004",
+      "node": "exhaustCamBank1",
+      "label": "Exhaust Camshaft Bank 1",
+      "assembly": "Cylinder Heads & Valvetrain",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1105281010",
+      "function": "VarioCam Plus exhaust camshaft for Bank 1 providing variable valve timing on the exhaust side."
+    },
+    {
+      "id": "eng-head-005",
+      "node": "intakeCamBank2",
+      "label": "Intake Camshaft Bank 2",
+      "assembly": "Cylinder Heads & Valvetrain",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1105280020",
+      "function": "VarioCam Plus intake camshaft for Bank 2, same specification as Bank 1."
+    },
+    {
+      "id": "eng-head-006",
+      "node": "exhaustCamBank2",
+      "label": "Exhaust Camshaft Bank 2",
+      "assembly": "Cylinder Heads & Valvetrain",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1105282010",
+      "function": "VarioCam Plus exhaust camshaft for Bank 2, same specification as Bank 1."
+    },
+    {
+      "id": "eng-head-007",
+      "node": "intakeValves",
+      "label": "Intake Valves x12",
+      "assembly": "Cylinder Heads & Valvetrain",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1105312020",
+      "function": "Sodium-filled intake valves that open to admit the air-fuel charge into each combustion chamber while dissipating heat."
+    },
+    {
+      "id": "eng-head-008",
+      "node": "exhaustValves",
+      "label": "Exhaust Valves x12",
+      "assembly": "Cylinder Heads & Valvetrain",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1105322020",
+      "function": "Exhaust valves that open to expel combustion gases from each cylinder after the power stroke."
+    },
+    {
+      "id": "eng-head-009",
+      "node": "hydraulicTappets",
+      "label": "Hydraulic Valve Lifters / Tappets x24",
+      "assembly": "Cylinder Heads & Valvetrain",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1105070040",
+      "function": "Bucket-type hydraulic tappets positioned under each cam lobe that automatically maintain zero valve clearance."
+    },
+    {
+      "id": "eng-head-010",
+      "node": "valveSprings",
+      "label": "Valve Springs x24",
+      "assembly": "Cylinder Heads & Valvetrain",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1105110010",
+      "function": "Coil springs that return each valve to its closed seat after the cam lobe passes."
+    },
+    {
+      "id": "eng-head-011",
+      "node": "camBearingCaps",
+      "label": "Camshaft Bearing Caps",
+      "assembly": "Cylinder Heads & Valvetrain",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Precision caps that clamp the camshaft journals in the cylinder head to retain the cams in position."
+    },
+    {
+      "id": "eng-head-012",
+      "node": "headGaskets",
+      "label": "Cylinder Head Gaskets x2 (MLS)",
+      "assembly": "Cylinder Heads & Valvetrain",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1104142040",
+      "function": "Multi-layer steel head gaskets that seal combustion pressure and coolant passages between each cylinder head and the block."
+    },
+    {
+      "id": "eng-vc-001",
+      "node": "vanosSolenoidB1Intake",
+      "label": "VarioCam Solenoid Bank 1 Intake",
+      "assembly": "VarioCam Plus",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "99860619100",
+      "function": "Electrohydraulic solenoid that controls oil flow to the Bank 1 intake cam phaser for variable timing adjustment."
+    },
+    {
+      "id": "eng-vc-002",
+      "node": "vanosSolenoidB1Exhaust",
+      "label": "VarioCam Solenoid Bank 1 Exhaust",
+      "assembly": "VarioCam Plus",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "94810711311",
+      "function": "Electrohydraulic solenoid that controls oil flow to the Bank 1 exhaust cam phaser for variable timing."
+    },
+    {
+      "id": "eng-vc-003",
+      "node": "vanosSolenoidB2Intake",
+      "label": "VarioCam Solenoid Bank 2 Intake",
+      "assembly": "VarioCam Plus",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Electrohydraulic solenoid for Bank 2 intake cam phasing; susceptible to contamination faults (P0000C area)."
+    },
+    {
+      "id": "eng-vc-004",
+      "node": "vanosSolenoidB2Exhaust",
+      "label": "VarioCam Solenoid Bank 2 Exhaust",
+      "assembly": "VarioCam Plus",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Electrohydraulic solenoid that controls oil flow to the Bank 2 exhaust cam phaser for variable timing."
+    },
+    {
+      "id": "eng-vc-005",
+      "node": "camPositionSensors",
+      "label": "Camshaft Position Sensors x4",
+      "assembly": "VarioCam Plus",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "99760610603",
+      "function": "Hall-effect sensors, one per camshaft, that report cam phase angle to the DME for closed-loop VarioCam control."
+    },
+    {
+      "id": "eng-vc-006",
+      "node": "camPhasers",
+      "label": "Cam Phasers / VVT Actuators x4",
+      "assembly": "VarioCam Plus",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1105053010",
+      "function": "Vane-type hydraulic phasers bolted to each cam nose that rotate the camshaft relative to the drive sprocket."
+    },
+    {
+      "id": "eng-vc-007",
+      "node": "variocamLiftActuators",
+      "label": "VarioCam Plus Lift Actuators x12",
+      "assembly": "VarioCam Plus",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Two-stage lift switching pins, one per cylinder per bank, that engage a second cam lobe profile for high-lift operation."
+    },
+    {
+      "id": "eng-timing-001",
+      "node": "primaryTimingChain",
+      "label": "Primary Timing Chain (Crank to IMS)",
+      "assembly": "Timing System",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1105142020",
+      "function": "Double-row primary chain that transfers drive from the crankshaft sprocket to the intermediate shaft."
+    },
+    {
+      "id": "eng-timing-002",
+      "node": "secondaryTimingChains",
+      "label": "Secondary Timing Chains x2 (IMS to Cams)",
+      "assembly": "Timing System",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1105233020",
+      "function": "One chain per bank driven from the IMS that drives all four camshafts for precise valve timing."
+    },
+    {
+      "id": "eng-timing-003",
+      "node": "chainTensioners",
+      "label": "Chain Tensioners x3",
+      "assembly": "Timing System",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1105157020",
+      "function": "Hydraulic self-adjusting tensioners that maintain correct tension in the primary and secondary timing chains."
+    },
+    {
+      "id": "eng-timing-004",
+      "node": "chainGuides",
+      "label": "Chain Guides and Tensioner Rails",
+      "assembly": "Timing System",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1105153030",
+      "function": "Plastic guide rails that support and direct the timing chains to prevent vibration and wear."
+    },
+    {
+      "id": "eng-timing-005",
+      "node": "timingChainCovers",
+      "label": "Timing Chain Covers x2",
+      "assembly": "Timing System",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1105038000",
+      "function": "Aluminum covers, one per bank, that enclose the secondary timing chain assemblies and retain oil."
+    },
+    {
+      "id": "eng-timing-006",
+      "node": "crankPositionSensor",
+      "label": "Crankshaft Position Sensor (CKP)",
+      "assembly": "Timing System",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "99160610600",
+      "function": "Reads the 60-2 tooth tone wheel on the crankshaft to provide engine speed and crank angle data to the DME."
+    },
+    {
+      "id": "eng-lube-001",
+      "node": "oilPumpGear",
+      "label": "Oil Pump (High-Pressure Gear Pump)",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1107050110",
+      "function": "Crankshaft-driven gear pump that generates high oil pressure to supply all engine lubrication galleries."
+    },
+    {
+      "id": "eng-lube-002",
+      "node": "oilFilterHousingPressure",
+      "label": "Oil Filter Housing with Pressure Relief",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1107020110",
+      "function": "Spin-on cartridge filter housing with an integrated pressure relief valve to protect the lubrication circuit."
+    },
+    {
+      "id": "eng-lube-003",
+      "node": "oilPressureSensor",
+      "label": "Oil Pressure Sensor",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "94860621300",
+      "function": "Sender that monitors engine oil pressure and signals a warning if pressure falls below the safe threshold."
+    },
+    {
+      "id": "eng-lube-004",
+      "node": "oilGalleries",
+      "label": "Oil Galleries (Internal Block Passages)",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Network of internal passages cast into the block and heads that distribute pressurized oil to bearings, cams, and phasers."
+    },
+    {
+      "id": "eng-lube-005",
+      "node": "pistonCoolingJets",
+      "label": "Piston Cooling Jets / Squirters x6",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Oil squirter nozzles in the block galleries that spray engine oil directly onto the underside of each piston crown for thermal management."
+    },
+    {
+      "id": "eng-lube-006",
+      "node": "oilFillerCapDipstick",
+      "label": "Oil Filler Cap and Dipstick",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1107264000",
+      "function": "Sealed filler cap and pull-out dipstick used to add oil and check the engine oil level."
+    },
+    {
+      "id": "eng-ign-001",
+      "node": "ignitionCoils",
+      "label": "Ignition Coils x6 (COP)",
+      "assembly": "Ignition",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A160210407",
+      "function": "Coil-on-plug pencil coils that step up battery voltage to the high voltage required to fire each spark plug."
+    },
+    {
+      "id": "eng-ign-002",
+      "node": "sparkPlugsIridium",
+      "label": "Spark Plugs x6 (NGK Iridium)",
+      "assembly": "Ignition",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "99917015190",
+      "function": "NGK laser iridium spark plugs torqued to 3.0 Nm that initiate combustion in each cylinder."
+    },
+    {
+      "id": "eng-ign-003",
+      "node": "knockSensors",
+      "label": "Knock Sensors x2",
+      "assembly": "Ignition",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "99760612100",
+      "function": "Piezoelectric sensors, one per bank, that detect detonation so the DME can retard ignition timing to protect the engine."
+    },
+    {
+      "id": "eng-mgmt-001",
+      "node": "dmeEcu",
+      "label": "DME / ECU (Bosch ME 9.8.1)",
+      "assembly": "Engine Management",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Bosch ME 9.8.1 engine control unit that manages fuel injection, ignition timing, VarioCam Plus, and drive-by-wire throttle."
+    },
+    {
+      "id": "eng-mgmt-002",
+      "node": "throttlePositionSensors",
+      "label": "Throttle Position Sensors (Dual Track)",
+      "assembly": "Engine Management",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Redundant dual-track TPS sensors integrated in each throttle body that relay throttle plate angle to the DME."
+    },
+    {
+      "id": "eng-mgmt-003",
+      "node": "coolantTempSensor",
+      "label": "Coolant Temperature Sensor (ECT)",
+      "assembly": "Engine Management",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "99760621300",
+      "function": "NTC sensor that monitors engine coolant temperature and enables the DME to adjust fuelling and ignition during warm-up."
+    },
+    {
+      "id": "eng-mgmt-004",
+      "node": "acceleratorPedalSensor",
+      "label": "Accelerator Pedal Position Sensor (APP)",
+      "assembly": "Engine Management",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Drive-by-wire pedal sensor that sends driver throttle demand to the DME for electronic throttle control."
+    },
+    {
+      "id": "eng-mgmt-005",
+      "node": "engineWiringHarness",
+      "label": "Engine Wiring Harness",
+      "assembly": "Engine Management",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Main engine loom that interconnects all sensors, actuators, injectors, coils, and solenoids with the DME."
+    },
+    {
+      "id": "engine-new-001",
+      "node": "airFilterElement",
+      "label": "Air Filter Element",
+      "assembly": "Induction",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "maf-sensor",
+      "partNumber": "98111013000",
+      "function": "Replaceable paper/foam filter element inside the airbox that traps dust and debris before air enters the engine."
+    },
+    {
+      "id": "engine-new-002",
+      "node": "airFilterHousing",
+      "label": "Air Filter Housing",
+      "assembly": "Induction",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "maf-sensor",
+      "partNumber": "98111021101",
+      "function": "Plastic airbox that holds the air filter element and channels filtered air to the throttle body."
+    },
+    {
+      "id": "engine-new-003",
+      "node": "highPressureFuelPump",
+      "label": "High-Pressure Fuel Pump (DFI)",
+      "assembly": "Fuel & Ignition",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1110315060",
+      "function": "Cam-driven high-pressure pump that pressurizes fuel to 150+ bar for direct fuel injection into the combustion chambers."
+    },
+    {
+      "id": "engine-new-004",
+      "node": "oilSumpUpperPart",
+      "label": "Oil Sump Upper Part (Internal Baffle)",
+      "assembly": "Lubrication & Cooling",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "sump",
+      "partNumber": "9A1107031200",
+      "function": "Upper sump section with baffles that prevents oil starvation during high-g cornering in the mid-engine layout."
+    },
+    {
+      "id": "engine-new-005",
+      "node": "oilSumpGasket",
+      "label": "Oil Sump Gasket",
+      "assembly": "Lubrication & Cooling",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "sump",
+      "partNumber": "9A1107315030",
+      "function": "Formed gasket that seals the oil sump to the crankcase to prevent oil leaks at the sump flange."
+    },
+    {
+      "id": "engine-new-006",
+      "node": "oilFilterInsert",
+      "label": "Oil Filter Insert (Cartridge)",
+      "assembly": "Lubrication & Cooling",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "oil-filter-housing",
+      "partNumber": "9A1107224000",
+      "function": "Replaceable cartridge filter element that removes metallic and carbon contaminants from the engine oil circuit."
+    },
+    {
+      "id": "engine-new-007",
+      "node": "crankshaftMainBearings",
+      "label": "Crankshaft Main Bearings",
+      "assembly": "Short Block",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "crankshaft",
+      "partNumber": "9A1101052000",
+      "function": "Plain shell bearings that support the crankshaft main journals inside the crankcase under full oil-film lubrication."
+    },
+    {
+      "id": "engine-new-008",
+      "node": "conRodBearings",
+      "label": "Connecting Rod Bearing Shells",
+      "assembly": "Short Block",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "connecting-rods",
+      "partNumber": "9A1103053000",
+      "function": "Tri-metal shell bearings at the big-end of each connecting rod that ride on the crankshaft rod journals."
+    },
+    {
+      "id": "engine-new-009",
+      "node": "pistonRings",
+      "label": "Piston Ring Sets x6",
+      "assembly": "Short Block",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "pistons",
+      "partNumber": "9A1103050020",
+      "function": "Compression and oil-control rings that seal combustion pressure above each piston and scrape excess oil from the bore walls."
+    },
+    {
+      "id": "engine-new-010",
+      "node": "crankshaftOilSeal",
+      "label": "Crankshaft Oil Seals (Front & Rear)",
+      "assembly": "Short Block",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "crankshaft",
+      "partNumber": "9A1101222020",
+      "function": "Radial shaft seals at the front and rear of the crankshaft that prevent oil leaking out of the crankcase."
+    },
+    {
+      "id": "engine-new-011",
+      "node": "oilHeatExchanger",
+      "label": "Oil-to-Water Heat Exchanger",
+      "assembly": "Lubrication & Cooling",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1107450100",
+      "function": "Engine-mounted oil cooler that transfers heat between engine oil and coolant to maintain optimal oil temperature."
+    },
+    {
+      "id": "engine-new-012",
+      "node": "valveStemSeals",
+      "label": "Valve Stem Seals x24",
+      "assembly": "Cylinder Heads & Valvetrain",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "eng-head-007",
+      "partNumber": "99610511552",
+      "function": "Rubber seals fitted to each valve guide that prevent engine oil from being drawn down the valve stems into the combustion chamber."
+    },
+    {
+      "id": "engine-new-013",
+      "node": "timingChainSprocketCam",
+      "label": "Cam Sprockets x4",
+      "assembly": "Timing System",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "eng-timing-002",
+      "partNumber": "9A1105148020",
+      "function": "Toothed sprockets at each camshaft nose that receive drive from the secondary timing chains."
+    },
+    {
+      "id": "engine-new-014",
+      "node": "oilSeparatorCrankcase",
+      "label": "Crankcase Oil Separator",
+      "assembly": "Induction",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "air-oil-separator",
+      "partNumber": "9A1107380010",
+      "function": "Secondary cyclonic oil separator mounted on the crankcase that scavenges oil mist from blow-by gases before they re-enter the intake."
     }
   ]
 }

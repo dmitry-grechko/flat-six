@@ -8,7 +8,7 @@
       "assembly": "Manifold",
       "system": "Exhaust",
       "tier": "primary",
-      "partNumber": "981113212EX",
+      "partNumber": "981.113.212.01",
       "componentId": "exhaust",
       "function": "Tubular header collecting exhaust from the three right-bank cylinders into a single collector."
     },
@@ -19,7 +19,7 @@
       "assembly": "Manifold",
       "system": "Exhaust",
       "tier": "primary",
-      "partNumber": "981113211EX",
+      "partNumber": "981.113.211.01",
       "function": "Tubular header collecting exhaust from the three left-bank cylinders into a single collector."
     },
     {
@@ -49,7 +49,7 @@
       "assembly": "Silencing",
       "system": "Exhaust",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "981.111.421.00",
       "function": "Rear silencer on the right side that attenuates exhaust noise before the tailpipes."
     },
     {
@@ -59,7 +59,7 @@
       "assembly": "Silencing",
       "system": "Exhaust",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "981.111.431.00",
       "function": "Rear silencer on the left side that attenuates exhaust noise before the tailpipes."
     },
     {
@@ -69,7 +69,7 @@
       "assembly": "Silencing",
       "system": "Exhaust",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "981.111.361.00",
       "function": "Polished right-side tailpipe tip where exhaust exits the system."
     },
     {
@@ -79,7 +79,7 @@
       "assembly": "Silencing",
       "system": "Exhaust",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "981.111.261.00",
       "function": "Polished left-side tailpipe tip where exhaust exits the system."
     },
     {
@@ -89,7 +89,7 @@
       "assembly": "Silencing",
       "system": "Exhaust",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "991.111.381.02",
       "function": "Vacuum-actuated bypass valve that opens the sport exhaust path for a louder note."
     },
     {
@@ -99,7 +99,7 @@
       "assembly": "Mounting",
       "system": "Exhaust",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "981.110.320.00",
       "function": "Rubber hanger that suspends the right side of the exhaust from the body."
     },
     {
@@ -109,8 +109,108 @@
       "assembly": "Mounting",
       "system": "Exhaust",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "981.110.320.00",
       "function": "Rubber hanger that suspends the left side of the exhaust from the body."
+    },
+    {
+      "id": "eng-exh-002",
+      "node": "preCatO2Sensor",
+      "label": "Pre-Cat Oxygen Sensors (x2)",
+      "assembly": "Exhaust System",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": "9A1.606.183.01",
+      "function": "Wideband lambda sensors mounted upstream of each primary catalytic converter to provide closed-loop fueling feedback to the DME."
+    },
+    {
+      "id": "eng-exh-004",
+      "node": "postCatO2Sensor",
+      "label": "Post-Cat Oxygen Sensors (x2)",
+      "assembly": "Exhaust System",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": "9A1.606.193.01",
+      "function": "Downstream oxygen sensors that monitor catalytic converter efficiency and report degradation to the DME."
+    },
+    {
+      "id": "eng-exh-005",
+      "node": "midPipe",
+      "label": "Mid-Pipe / X-Pipe",
+      "assembly": "Exhaust System",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Crossover pipe connecting both exhaust banks downstream of the primary catalytic converters to balance exhaust pulses."
+    },
+    {
+      "id": "eng-exh-006",
+      "node": "secondaryCat",
+      "label": "Secondary Catalytic Converters (x2)",
+      "assembly": "Exhaust System",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Underfloor secondary catalysts providing additional emissions treatment after the close-coupled primary converters."
+    },
+    {
+      "id": "exhaust-new-001",
+      "node": "pseVacuumLine",
+      "label": "PSE Vacuum Line",
+      "assembly": "Silencing",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": "981.111.049.00",
+      "function": "Vacuum supply line that routes actuating vacuum from the intake manifold to the PSE bypass valve actuator."
+    },
+    {
+      "id": "exhaust-new-002",
+      "node": "exhaustClamp",
+      "label": "Exhaust Pipe Clamp",
+      "assembly": "Mounting",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": "981.111.280.00",
+      "function": "Band clamp that secures pipe-to-pipe joints in the exhaust system, preventing leaks and relative movement."
+    },
+    {
+      "id": "exhaust-new-003",
+      "node": "exhaustClampingSleeve",
+      "label": "Exhaust Clamping Sleeve",
+      "assembly": "Mounting",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": "987.111.220.00",
+      "function": "Slip-on clamping sleeve used to join exhaust pipe sections at intermediate connections."
+    },
+    {
+      "id": "exhaust-new-004",
+      "node": "lambdaProbeHolder",
+      "label": "Lambda Probe Holder",
+      "assembly": "Exhaust System",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": "981.606.279.00",
+      "function": "Bracket that supports and positions the lambda probe wiring harness along the exhaust system routing."
+    },
+    {
+      "id": "exhaust-new-005",
+      "node": "silencerBracketPSE",
+      "label": "Exhaust Silencer Bracket (PSE)",
+      "assembly": "Mounting",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": "981.111.271.01",
+      "function": "Steel mounting bracket that attaches the rear silencer to the body structure on PSE-equipped vehicles."
+    },
+    {
+      "id": "exhaust-new-006",
+      "node": "manifoldBracket",
+      "label": "Exhaust Manifold Bracket",
+      "assembly": "Manifold",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": "981.113.313.00",
+      "function": "Support bracket that braces the exhaust manifold against vibration and thermal movement."
     }
   ]
 }

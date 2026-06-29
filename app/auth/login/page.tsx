@@ -24,14 +24,22 @@ function LoginForm() {
     params.get('error') ? 'That link was invalid or expired. Try again.' : '',
   );
 
+  // Where to land after sign-in. Used by the OAuth authorize flow to return the
+  // user to the consent screen. Only allow same-origin relative paths.
+  const rawNext = params.get('next') ?? '';
+  const next = rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '';
+
   async function sendLink(e: React.FormEvent) {
     e.preventDefault();
     if (!email) return;
     setStatus('sending');
     const supabase = createClient();
+    const callback = `${window.location.origin}/auth/callback${
+      next ? `?next=${encodeURIComponent(next)}` : ''
+    }`;
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+      options: { emailRedirectTo: callback },
     });
     if (error) {
       setStatus('error');
