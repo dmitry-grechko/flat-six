@@ -328,7 +328,7 @@ export default function SettingsMcp() {
                     background: t.auth ? 'rgba(213,0,28,.12)' : 'rgba(60,211,122,.12)',
                   }}
                 >
-                  {t.auth ? 'AUTH' : 'OPEN'}
+                  {t.auth ? 'GARAGE' : 'REFERENCE'}
                 </span>
               </div>
               <div style={{ marginTop: 7, font: "400 12px/1.45 'Helvetica Neue',Arial,sans-serif", color: '#8A8A8F' }}>{t.desc}</div>
@@ -376,8 +376,9 @@ export default function SettingsMcp() {
             {`claude mcp add --transport http flatsix ${mcpEndpoint}`}
           </pre>
           <p style={{ margin: '10px 0 0', font: "400 11px/1.5 'Helvetica Neue',Arial,sans-serif", color: '#76767B' }}>
-            Claude Code runs the same OAuth sign-in on first use. To skip OAuth (open knowledge tools only) just add the URL;
-            to force the manual token instead, append{' '}
+            Then run <span style={{ fontFamily: "'JetBrains Mono',monospace", color: '#A8A8AD' }}>/mcp</span> in Claude Code and
+            sign in (it also prompts on first tool use). The server requires a logged-in session, so this is needed before any
+            tool works. To use a manual token instead, append{' '}
             <span style={{ fontFamily: "'JetBrains Mono',monospace", color: '#A8A8AD' }}>--header &quot;Authorization: Bearer &lt;token&gt;&quot;</span>. See MCP_SETUP.md.
           </p>
         </div>

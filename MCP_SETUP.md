@@ -6,12 +6,13 @@ and (with auth) read and write your own service history.
 
 - **Endpoint:** `/api/mcp`
   - Local: `http://localhost:3000/api/mcp`
-  - Deployed: `https://flat-six.org/api/mcp`
+  - Deployed: `https://www.flat-six.org/api/mcp`
 - **Transport:** HTTP (Streamable). Built on [`mcp-handler`](https://github.com/vercel/mcp-handler) `v1.1.0`.
 - **Auth:** **OAuth 2.1** (authorization code + PKCE, dynamic client registration).
-  Just paste the endpoint URL into Claude — it discovers the OAuth server, opens a
-  FLAT·SIX sign-in window, and manages/refreshes the token for you. Knowledge
-  tools also work with **no auth**.
+  Paste the endpoint URL into Claude — it discovers the OAuth server, opens a
+  FLAT·SIX sign-in window, and manages/refreshes the token for you. The server
+  **requires a logged-in session** (it challenges with `401` + `WWW-Authenticate`,
+  which is what triggers the login); after you approve once, **every** tool works.
 
 There's no token to copy by hand anymore. (A manual `Authorization: Bearer
 <supabase-access-token>` still works for the MCP Inspector — get it from
@@ -21,7 +22,10 @@ There's no token to copy by hand anymore. (A manual `Authorization: Bearer
 
 ## Tools
 
-### Open (no auth)
+All tools require a logged-in connection (one OAuth approval). The split below is
+about *what data* a tool returns — shared 981 reference vs. your own garage.
+
+### Reference (shared 981 data)
 | Tool | Purpose |
 | --- | --- |
 | `search_981_knowledge` | Full-text search across the 981 knowledge base (faults, specs, maintenance, known issues, articles). |
@@ -31,22 +35,20 @@ There's no token to copy by hand anymore. (A manual `Authorization: Bearer
 | `list_known_issues` | List documented 981 weak points, optionally by system. |
 | `find_part` | Search the OEM parts catalog (name / part number / keyword) for part numbers and torque. |
 
-### Authenticated (Bearer token required, RLS-scoped to you)
+### Garage (your data, RLS-scoped to you)
 | Tool | Purpose |
 | --- | --- |
 | `get_my_vehicles` | List the vehicles in your garage. |
 | `get_service_history` | List service records for a vehicle (defaults to your primary vehicle). |
 | `log_service_record` | Add a service record to a vehicle. |
-
-If a garage tool is called without a valid token it returns a clear "connect with
-a Bearer token" message; the open tools keep working regardless.
+| `get_service_plans` / `create_service_plan` / `update_service_plan` / `delete_service_plan` | Manage upcoming service plans. |
 
 ---
 
 ## Connect from Claude Desktop / claude.ai
 
 1. **Settings → Connectors → Add custom connector**
-2. URL = `https://flat-six.org/api/mcp`
+2. URL = `https://www.flat-six.org/api/mcp`
 3. Click **Connect** → a FLAT·SIX sign-in window opens → approve.
 
 That's the whole flow. Claude registers itself (DCR), runs the OAuth login, and
@@ -57,22 +59,18 @@ these surfaces don't accept `localhost`.
 
 ## Connect from Claude Code
 
-OAuth (all tools — recommended):
+OAuth (recommended):
 ```bash
-claude mcp add --transport http flatsix https://flat-six.org/api/mcp
+claude mcp add --transport http flatsix https://www.flat-six.org/api/mcp
 ```
-On first use Claude Code runs the same OAuth sign-in in your browser.
-
-Open knowledge tools only (skip the login):
-```bash
-claude mcp add --transport http flatsix https://flat-six.org/api/mcp
-# …then just don't authenticate when prompted
-```
+Then authenticate: run `/mcp` in Claude Code, pick `flatsix`, and complete the
+browser sign-in (Claude Code also prompts automatically on first tool use). The
+server requires auth, so you must complete this step before any tool works.
 
 Manual token instead of OAuth (Inspector-style):
 ```bash
 claude mcp add --transport http flatsix \
-  https://flat-six.org/api/mcp \
+  https://www.flat-six.org/api/mcp \
   --header "Authorization: Bearer <supabase-access-token>"
 ```
 
@@ -107,7 +105,7 @@ The OAuth flow needs two things beyond the base Supabase setup:
 2. **Migration.** Apply `supabase/migrations/0004_oauth.sql` with `npm run db:push`
    (creates those two tables; RLS on, no policies → service-role-only).
 
-That's it — `flat-six.org` already serves the discovery documents at
+That's it — `www.flat-six.org` already serves the discovery documents at
 `/.well-known/oauth-protected-resource` and `/.well-known/oauth-authorization-server`.
 
 ## How auth works (implementation note)
@@ -127,9 +125,10 @@ learns a second identity.
    back the **Supabase access token** as `access_token` and the **Supabase refresh
    token** as `refresh_token`. Refresh grants delegate straight to Supabase.
 5. Claude calls `/api/mcp` with `Authorization: Bearer <access_token>`. The route
-   wraps the handler with `withMcpAuth(handler, verifyToken, { required: false })`;
-   garage tools read `extra.authInfo?.token` → `lib/mcp/auth.ts → resolveUser`
-   builds an RLS-scoped Supabase client. Open tools ignore auth entirely.
+   wraps the handler with `withMcpAuth(handler, verifyToken, { required: true })`,
+   and `verifyToken` validates the token via `resolveUser` — no/invalid token →
+   `401` + `WWW-Authenticate` (the OAuth trigger / refresh signal). Garage tools
+   then read `extra.authInfo?.token` → `resolveUser` builds an RLS-scoped client.
 
 Because the access token is a normal Supabase JWT, nothing in `resolveUser` or the
 tools changed — OAuth just removes the manual copy-paste and the 1-hour cliff
