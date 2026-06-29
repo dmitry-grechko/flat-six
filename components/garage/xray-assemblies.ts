@@ -26,21 +26,40 @@ export interface XrayAssembly {
    */
   bilateral?: boolean;
   lateralOffset?: number;
+  /**
+   * Car-space placement: render at a fixed `worldScale` positioned by hotspot3d
+   * as a pure offset, with NO bounding-box recentering and NO per-assembly size
+   * normalization. The GLB's own coordinates ARE the unified-scene car coordinates,
+   * so a full-width chassis model (suspension, driveline) keeps its 4 corners at
+   * the wheels and stays aligned with the (bilateral) brakes. Ignores displayRadius.
+   */
+  carSpace?: boolean;
+  worldScale?: number;
 }
+
+/**
+ * Canonical wheel-corner coordinates shared by the unified "stripped car" scene.
+ * Brakes (bilateral) and the car-space suspension/driveline models all align to
+ * these so rotors, hubs and springs sit at the same four corners.
+ */
+export const AXLE = { frontZ: 1.5, rearZ: -1.5, halfTrack: 0.82, hubY: -0.35 };
 
 export const XRAY_ASSEMBLIES: XrayAssembly[] = [
   { id: 'engine',    label: 'Engine',           glb: '/models/components/engine.glb',    manifest: '/models/components/engine-parts.json',    hotspot3d: '0 0.2 -0.8',   displayRadius: 0.70 },
   { id: 'trans',     label: 'Transaxle',         glb: '/models/components/trans.glb',     manifest: '/models/components/trans-parts.json',     hotspot3d: '0 -0.1 -1.7',  displayRadius: 0.55 },
   { id: 'exhaust',   label: 'Exhaust',           glb: '/models/components/exhaust.glb',   manifest: '/models/components/exhaust-parts.json',   hotspot3d: '0 -0.7 -1.2',  displayRadius: 0.50 },
-  { id: 'fbrakes',   label: 'Front Brakes',      glb: '/models/components/fbrakes.glb',   manifest: '/models/components/fbrakes-parts.json',   hotspot3d: '0 -0.3 1.5',   displayRadius: 0.22, bilateral: true, lateralOffset: 0.75 },
-  { id: 'rbrakes',   label: 'Rear Brakes',       glb: '/models/components/rbrakes.glb',   manifest: '/models/components/rbrakes-parts.json',   hotspot3d: '0 -0.3 -2.0',  displayRadius: 0.22, bilateral: true, lateralOffset: 0.75 },
+  // Brakes sit at the four wheel corners (AXLE). Suspension & driveline (carSpace) align to the same corners.
+  { id: 'fbrakes',   label: 'Front Brakes',      glb: '/models/components/fbrakes.glb',   manifest: '/models/components/fbrakes-parts.json',   hotspot3d: '0 -0.35 1.5',  displayRadius: 0.30, bilateral: true, lateralOffset: 0.82 },
+  { id: 'rbrakes',   label: 'Rear Brakes',       glb: '/models/components/rbrakes.glb',   manifest: '/models/components/rbrakes-parts.json',   hotspot3d: '0 -0.35 -1.5', displayRadius: 0.30, bilateral: true, lateralOffset: 0.82 },
   { id: 'cooling',   label: 'Cooling System',    glb: '/models/components/cooling.glb',   manifest: '/models/components/cooling-parts.json',   hotspot3d: '0 0.3 1.9',    displayRadius: 0.40 },
   { id: 'oil',       label: 'Oil & Lubrication', glb: '/models/components/oil.glb',       manifest: '/models/components/oil-parts.json',       hotspot3d: '0.6 0.1 -0.9', displayRadius: 0.12 },
   { id: 'airfilter', label: 'Air Intake',        glb: '/models/components/airfilter.glb', manifest: '/models/components/airfilter-parts.json', hotspot3d: '0 0.7 -0.6',   displayRadius: 0.22 },
   { id: 'plugs',     label: 'Ignition & Fuel',   glb: '/models/components/plugs.glb',     manifest: '/models/components/plugs-parts.json',     hotspot3d: '-0.5 0.3 -0.9', displayRadius: 0.10 },
-  { id: 'susp',      label: 'Suspension',       glb: '/models/components/susp.glb',      manifest: '/models/components/susp-parts.json',      hotspot3d: '0 -0.5 0',     displayRadius: 0.55 },
-  { id: 'elec',      label: 'Electrical',        glb: '/models/components/elec.glb',      manifest: '/models/components/elec-parts.json',      hotspot3d: '0 0.2 2.2',    displayRadius: 0.25 },
-  { id: 'driveline', label: 'Driveline / Wheels', glb: '/models/components/driveline.glb', manifest: '/models/components/driveline-parts.json', hotspot3d: '0 -0.4 -0.3',  displayRadius: 0.60, bilateral: true, lateralOffset: 0.95 },
+  // susp & driveline are full-width chassis models authored in car-space (their
+  // own coords = scene coords), placed raw so their 4 corners align with the brakes.
+  { id: 'susp',      label: 'Suspension',        glb: '/models/components/susp.glb',      manifest: '/models/components/susp-parts.json',      hotspot3d: '0 0 0', carSpace: true, worldScale: 1 },
+  { id: 'elec',      label: 'Electrical',        glb: '/models/components/elec.glb',      manifest: '/models/components/elec-parts.json',      hotspot3d: '0 0.25 0.4',  displayRadius: 0.9 },
+  { id: 'driveline', label: 'Driveline',         glb: '/models/components/driveline.glb', manifest: '/models/components/driveline-parts.json', hotspot3d: '0 0 0', carSpace: true, worldScale: 1 },
 ];
 
 /**

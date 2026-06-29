@@ -1,1 +1,65 @@
-{"glb":"/models/components/driveline.glb","parts":[{"id":"DL-001","node":"engineToPdkAdapter","label":"Engine-to-PDK Adapter / Bellhousing Interface","assembly":"Engine Mounts","system":"Driveline","tier":"primary","partNumber":null,"function":"Adapter plate and bellhousing interface that mates the flat-six engine block to the PDK transaxle, aligning input shaft and locating the dual-clutch housing."},{"id":"DL-002","node":"engineMounts","label":"Engine Mounts x2 — Hydraulic Rubber Mounts","assembly":"Engine Mounts","system":"Driveline","tier":"primary","partNumber":"98137511205","function":"Pair of hydraulic rubber engine mounts, one on each side of the mid-mounted flat-six, that isolate engine vibration from the chassis and carry vertical and lateral engine loads."},{"id":"DL-003","node":"pdkTransmissionMount","label":"PDK / Transmission Mount","assembly":"Engine Mounts","system":"Driveline","tier":"primary","partNumber":null,"function":"Hydraulic rubber mount that supports the tail of the PDK transaxle against the rear subframe, isolating driveline torque reaction and vibration from the chassis."},{"id":"DL-WHL-001","node":"frontWheels","label":"Front Wheels 8Jx19 ET57 Sport Chrome (x2)","assembly":"Wheels & Tires","system":"Driveline","tier":"primary","partNumber":null,"function":"19-inch front alloy wheels in Sport Chrome finish, 8J wide with ET57 offset, fitted to front hubs of the staggered 19-inch setup."},{"id":"DL-WHL-002","node":"rearWheels","label":"Rear Wheels 10Jx19 ET45 (x2)","assembly":"Wheels & Tires","system":"Driveline","tier":"primary","partNumber":null,"function":"19-inch rear alloy wheels, 10J wide with ET45 offset, providing a wider rear stance as part of the staggered fitment to suit the 265-section rear tire."},{"id":"DL-WHL-003","node":"frontTires","label":"Front Tires 235/40ZR19 (x2)","assembly":"Wheels & Tires","system":"Driveline","tier":"primary","partNumber":null,"function":"235/40ZR19 high-performance front tires matched to the 8J front wheels, providing front-axle grip and steering response for the staggered 19-inch setup."},{"id":"DL-WHL-004","node":"rearTires","label":"Rear Tires 265/40ZR19 (x2)","assembly":"Wheels & Tires","system":"Driveline","tier":"primary","partNumber":null,"function":"265/40ZR19 high-performance rear tires on the wider 10J rear wheels, delivering rear traction and lateral stability with a larger contact patch than the front."},{"id":"DL-WHL-005","node":"lugBolts","label":"Lug Bolts M14x1.5 Ball-Seat x20","assembly":"Wheels & Tires","system":"Driveline","tier":"primary","partNumber":"99936101704","function":"Set of 20 M14x1.5 ball-seat lug bolts (5 per wheel) that secure all four wheels to the Porsche hub flanges at the specified torque."}]}
+{
+"glb": "/models/components/driveline.glb",
+"parts": [
+{
+"id": "DL-001",
+"node": "engineToPdkAdapter",
+"label": "Engine-to-PDK Adapter / Bellhousing Interface",
+"assembly": "Engine Mounts",
+"system": "Driveline",
+"tier": "primary",
+"partNumber": null,
+"function": "Adapter plate and bellhousing interface that mates the flat-six engine block to the PDK transaxle, aligning input shaft and locating the dual-clutch housing."
+},
+{
+"id": "DL-002",
+"node": "engineMounts",
+"label": "Engine Mounts x2 \u2014 Hydraulic Rubber Mounts",
+"assembly": "Engine Mounts",
+"system": "Driveline",
+"tier": "primary",
+"partNumber": "98137511205",
+"function": "Pair of hydraulic rubber engine mounts, one on each side of the mid-mounted flat-six, that isolate engine vibration from the chassis and carry vertical and lateral engine loads."
+},
+{
+"id": "DL-003",
+"node": "pdkTransmissionMount",
+"label": "PDK / Transmission Mount",
+"assembly": "Engine Mounts",
+"system": "Driveline",
+"tier": "primary",
+"partNumber": null,
+"function": "Hydraulic rubber mount that supports the tail of the PDK transaxle against the rear subframe, isolating driveline torque reaction and vibration from the chassis."
+},
+{
+"id": "DL-WHL-001",
+"node": "frontWheels",
+"label": "Front Wheels 8Jx19 ET57 Sport Chrome (x2)",
+"assembly": "Wheels & Hubs",
+"system": "Driveline",
+"tier": "primary",
+"partNumber": null,
+"function": "19-inch front alloy wheels in Sport Chrome finish, 8J wide with ET57 offset, fitted to front hubs of the staggered 19-inch setup."
+},
+{
+"id": "DL-WHL-002",
+"node": "rearWheels",
+"label": "Rear Wheels 10Jx19 ET45 (x2)",
+"assembly": "Wheels & Hubs",
+"system": "Driveline",
+"tier": "primary",
+"partNumber": null,
+"function": "19-inch rear alloy wheels, 10J wide with ET45 offset, providing a wider rear stance as part of the staggered fitment to suit the 265-section rear tire."
+},
+{
+"id": "DL-WHL-005",
+"node": "lugBolts",
+"label": "Lug Bolts M14x1.5 Ball-Seat x20",
+"assembly": "Wheels & Hubs",
+"system": "Driveline",
+"tier": "primary",
+"partNumber": "99936101704",
+"function": "Set of 20 M14x1.5 ball-seat lug bolts (5 per wheel) that secure all four wheels to the Porsche hub flanges at the specified torque."
+}
+]
+}

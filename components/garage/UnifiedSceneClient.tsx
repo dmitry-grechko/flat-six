@@ -1,5 +1,6 @@
 'use client';
 
+// Unified "stripped car" X-RAY scene: every assembly GLB placed at its hotspot.
 import { Suspense, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Environment, useGLTF, ContactShadows, Html, Line } from '@react-three/drei';
@@ -114,6 +115,22 @@ function AssemblyMesh({ assembly, isSelected, anySelected, onSelect }: {
   const targetRadius = assembly.displayRadius ?? 0.65;
   const bilateral = assembly.bilateral ?? false;
   const lateralOffset = assembly.lateralOffset ?? 0.75;
+  const carSpace = assembly.carSpace ?? false;
+  const worldScale = assembly.worldScale ?? 1;
+
+  // ── Car-space: the model's own coordinates ARE scene coordinates. Render at a
+  // fixed scale + hotspot offset, no recentering/normalization, so full-width
+  // chassis models keep their 4 corners aligned with the brakes.
+  const carClone = useMemo(() => (carSpace ? cloneWithMaterials(scene) : null), [scene, carSpace]);
+  const carLabelY = useMemo(() => {
+    if (!carClone) return 0;
+    const box = new THREE.Box3().setFromObject(carClone);
+    return box.max.y * worldScale + py + 0.25;
+  }, [carClone, worldScale, py]);
+
+  useEffect(() => {
+    if (carClone) applyMaterialState(carClone, isSelected, anySelected);
+  }, [carClone, isSelected, anySelected]);
 
   const { clones, scale, rightX, centerY, centerZ } = useMemo(() => {
     // Create 1 or 2 clones (bilateral needs independent Three.js objects)
@@ -155,6 +172,26 @@ function AssemblyMesh({ assembly, isSelected, anySelected, onSelect }: {
       </div>
     </Html>
   );
+
+  if (carSpace && carClone) {
+    return (
+      <>
+        <group position={[px, py, pz]} scale={worldScale} {...interactiveProps}>
+          <primitive object={carClone} />
+        </group>
+        <Html position={[0, carLabelY, 0]} center style={{ pointerEvents: 'none', userSelect: 'none' }}>
+          <div style={{
+            color: isSelected ? '#D5001C' : '#9A9AA0',
+            fontSize: 9, fontFamily: "'JetBrains Mono',monospace",
+            letterSpacing: '.1em', textTransform: 'uppercase',
+            whiteSpace: 'nowrap', textShadow: '0 1px 4px rgba(0,0,0,0.6)', fontWeight: 600,
+          }}>
+            {assembly.label}
+          </div>
+        </Html>
+      </>
+    );
+  }
 
   if (bilateral) {
     return (

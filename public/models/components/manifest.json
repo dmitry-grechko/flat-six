@@ -21,11 +21,11 @@
     "system": "Exhaust",
     "glb": "/models/components/exhaust.glb",
     "node": "exhaust",
-    "hotspot3d": "0 -0.6 -1.6"
+    "hotspot3d": "0 -0.7 -1.6"
   },
   {
     "id": "fbrakes",
-    "label": "Front Brake (315mm)",
+    "label": "Front Brake (318mm)",
     "system": "Brakes",
     "glb": "/models/components/fbrakes.glb",
     "node": "frontBrake",
@@ -49,26 +49,50 @@
   },
   {
     "id": "oil",
-    "label": "Oil Filter Element",
+    "label": "Oil & Lubrication",
     "system": "Engine",
     "glb": "/models/components/oil.glb",
-    "node": "oilFilter",
-    "hotspot3d": "0 0 0"
+    "node": "oilSystem",
+    "hotspot3d": "0 -0.4 0"
   },
   {
     "id": "airfilter",
-    "label": "Panel Air Filter",
+    "label": "Air Intake",
     "system": "Engine",
     "glb": "/models/components/airfilter.glb",
-    "node": "airFilter",
-    "hotspot3d": "0 0 0"
+    "node": "airIntake",
+    "hotspot3d": "0 0.5 0"
   },
   {
     "id": "plugs",
-    "label": "Spark Plugs & Coils",
+    "label": "Ignition & Fuel",
     "system": "Engine",
     "glb": "/models/components/plugs.glb",
-    "node": "coilPlug",
-    "hotspot3d": "0 0.1 0"
+    "node": "ignitionFuel",
+    "hotspot3d": "0 0.2 0"
+  },
+  {
+    "id": "susp",
+    "label": "Suspension & Steering",
+    "system": "Suspension",
+    "glb": "/models/components/susp.glb",
+    "node": "suspension",
+    "hotspot3d": "0 0 0"
+  },
+  {
+    "id": "elec",
+    "label": "Electrical System",
+    "system": "Electrical",
+    "glb": "/models/components/elec.glb",
+    "node": "electrical",
+    "hotspot3d": "0 0.2 0"
+  },
+  {
+    "id": "driveline",
+    "label": "Driveline",
+    "system": "Transmission",
+    "glb": "/models/components/driveline.glb",
+    "node": "driveline",
+    "hotspot3d": "0 0 0"
   }
 ]

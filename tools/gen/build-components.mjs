@@ -22,7 +22,12 @@ import * as exhaust from './components/exhaust.mjs';
 import * as frontBrake from './components/frontBrake.mjs';
 import * as rearBrake from './components/rearBrake.mjs';
 import * as coolingRadiator from './components/coolingRadiator.mjs';
-import { oilFilter, airFilter, coilPlug } from './components/smallParts.mjs';
+import * as oilSystem from './components/oilSystem.mjs';
+import * as airIntake from './components/airIntake.mjs';
+import * as ignitionFuel from './components/ignitionFuel.mjs';
+import * as suspension from './components/suspension.mjs';
+import * as electrical from './components/electrical.mjs';
+import * as driveline from './components/driveline.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_DIR = join(__dirname, '..', '..', 'public', 'models', 'components');
@@ -36,9 +41,12 @@ const COMPONENTS = [
   frontBrake,
   rearBrake,
   coolingRadiator,
-  oilFilter,
-  airFilter,
-  coilPlug,
+  oilSystem,
+  airIntake,
+  ignitionFuel,
+  suspension,
+  electrical,
+  driveline,
 ];
 
 // ---- Verify a written GLB by re-parsing it. ----
