@@ -2,8 +2,15 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Privacy & Terms — FLAT·SIX',
+  title: 'Privacy & Terms',
   description: 'Privacy policy and terms of use for FLAT·SIX, an open-source DIY maintenance app for the Porsche 981 Boxster / Cayman.',
+  alternates: { canonical: '/legal' },
+  openGraph: {
+    title: 'Privacy & Terms · FLAT·SIX',
+    description: 'Privacy policy and terms of use for FLAT·SIX — a free, open-source Porsche 981 garage.',
+    url: '/legal',
+    type: 'article',
+  },
 };
 
 const mono = "'JetBrains Mono',monospace";

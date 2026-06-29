@@ -35,13 +35,66 @@
       "function": "Piezoelectric sensors, one per bank, that detect detonation and signal the DME to retard ignition timing."
     },
     {
+      "id": "eng-ign-004",
+      "node": "ignitionCoilMountingHardware",
+      "label": "Ignition Coil Mounting Hardware (x6)",
+      "assembly": "Ignition Coils",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "eng-ign-001",
+      "partNumber": "900.074.006.30",
+      "function": "M6 bolts and retaining brackets that secure each coil-on-plug unit to the camshaft cover. Torque to 10 Nm."
+    },
+    {
+      "id": "eng-ign-005",
+      "node": "sparkPlugThreadRepairKit",
+      "label": "Spark Plug Thread Repair Kit (M14×1.25)",
+      "assembly": "Spark Plugs",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "eng-ign-002",
+      "partNumber": "000.721.954.40",
+      "function": "Heli-Coil/Time-Sert M14×1.25 thread insert kit for repair of stripped spark plug threads in the 9A1 aluminum cylinder head — a known service item on high-mileage examples."
+    },
+    {
+      "id": "eng-ign-006",
+      "node": "sparkPlugGapSpec",
+      "label": "Spark Plug Gap Specification",
+      "assembly": "Spark Plugs",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "eng-ign-002",
+      "partNumber": "N/A",
+      "function": "Factory gap specification for 981 Boxster S (9A1): 0.7 mm ± 0.05 mm (do not regap iridium tip plugs; replace if gap exceeds 0.9 mm). Reference: Porsche Workshop Manual WKD60063DE section 28-21."
+    },
+    {
+      "id": "eng-ign-007",
+      "node": "crankshaftPositionSensor",
+      "label": "Crankshaft Position Sensor (CKP)",
+      "assembly": "Sensors",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "991.606.112.00",
+      "function": "Inductive speed/position sensor reading the 60-2 tooth flywheel reluctor ring to supply engine speed and TDC reference to the DME for ignition timing and fuel injection control."
+    },
+    {
+      "id": "eng-ign-008",
+      "node": "camPositionSensors",
+      "label": "Camshaft Position Sensors (x4)",
+      "assembly": "Sensors",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "997.606.106.03",
+      "function": "Hall-effect sensors — one per camshaft (intake/exhaust, Bank 1/Bank 2) — that report cam phase angle to the DME for VarioCam Plus timing and sequential injection sequencing. Four sensors total on the 9A1 flat-six."
+    },
+    {
       "id": "eng-fuel-002",
       "node": "hpFuelRailBank1",
       "label": "High-Pressure Fuel Rail Bank 1",
       "assembly": "Fuel Delivery",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "9A1.110.859.02",
       "function": "Stainless steel rail distributing high-pressure (~200 bar) DFI fuel to the three direct injectors on Bank 1."
     },
     {
@@ -51,7 +104,7 @@
       "assembly": "Fuel Delivery",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "9A1.110.860.03",
       "function": "Stainless steel rail distributing high-pressure (~200 bar) DFI fuel to the three direct injectors on Bank 2."
     },
     {
@@ -84,6 +137,70 @@
       "tier": "primary",
       "partNumber": "991.620.141.01",
       "function": "In-tank electric lift pump that supplies low-pressure fuel from the tank to the high-pressure pump in the engine bay."
+    },
+    {
+      "id": "eng-fuel-005",
+      "node": "fuelPressureRegulator",
+      "label": "Fuel Pressure Regulator",
+      "assembly": "Fuel Delivery",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "ignition---fuel-new-001",
+      "partNumber": "9A1.110.315.05",
+      "function": "Mechanical pressure-limiting valve integrated into the high-pressure pump circuit that returns excess fuel to the low-pressure side, maintaining rail pressure within the DME-commanded target range (50–200 bar)."
+    },
+    {
+      "id": "eng-fuel-006",
+      "node": "fuelRailPressureSensor",
+      "label": "Fuel Rail Pressure Sensor (High-Side, ~200 bar)",
+      "assembly": "Fuel Delivery",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "eng-fuel-002",
+      "partNumber": "9A1.110.881.00",
+      "function": "Piezoresistive sensor threaded into the high-pressure fuel rail that reports instantaneous rail pressure (0–200 bar) to the DME for closed-loop injection pressure control."
+    },
+    {
+      "id": "eng-fuel-007",
+      "node": "fuelFilter",
+      "label": "Fuel Filter / In-Tank Filter Module",
+      "assembly": "Fuel Delivery",
+      "system": "Fuel & Exhaust",
+      "tier": "sub",
+      "parent": "ignition---fuel-new-002",
+      "partNumber": "991.620.141.01",
+      "function": "The 981 uses a lifetime in-tank filter integrated into the fuel pump/sender module — there is no external serviceable fuel filter. The entire pump module is replaced as an assembly if filtration is compromised. Service interval: inspect at 120,000 km or upon fuel contamination."
+    },
+    {
+      "id": "eng-fuel-008",
+      "node": "fuelPumpRelay",
+      "label": "Fuel Pump Relay",
+      "assembly": "Fuel Delivery",
+      "system": "Electrical",
+      "tier": "primary",
+      "partNumber": "958.615.010.00",
+      "function": "ISO-micro relay in the front trunk fuse/relay carrier that controls power to the in-tank lift pump. The DME energizes it on key-on for pre-priming and de-energizes it on engine-off or crash signal from the airbag ECU."
+    },
+    {
+      "id": "eng-fuel-009",
+      "node": "injectorSeals",
+      "label": "Injector Seals / O-Rings (x6 sets)",
+      "assembly": "Fuel Delivery",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "eng-fuel-004",
+      "partNumber": "9A1.110.319.00",
+      "function": "High-temp PTFE/Viton combustion-side seal and upper O-ring for each DFI injector (one seal set per injector, six sets total). Must be replaced whenever injectors are removed to prevent combustion gas blow-by and fuel seep."
+    },
+    {
+      "id": "eng-fuel-010",
+      "node": "fuelTankFillerNeckCheckValve",
+      "label": "Fuel Tank Filler Neck Check Valve",
+      "assembly": "Fuel Delivery",
+      "system": "Fuel & Exhaust",
+      "tier": "primary",
+      "partNumber": "991.201.044.06",
+      "function": "Spring-loaded one-way valve at the base of the filler neck that prevents backflow and fuel vapour escape through the filler pipe when the cap is removed. Also prevents siphoning through the filler neck."
     }
   ]
 }

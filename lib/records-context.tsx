@@ -5,6 +5,7 @@ import { useVehicle } from './vehicle-context';
 import {
   listRecords,
   addRecord as dbAdd,
+  updateRecord as dbUpdate,
   deleteRecord as dbDelete,
   type NewServiceRecord,
 } from './db/service-records';
@@ -14,6 +15,7 @@ interface RecordsCtx {
   records: ServiceRecord[];
   loading: boolean;
   add: (rec: NewServiceRecord) => Promise<ServiceRecord>;
+  update: (id: string, rec: NewServiceRecord) => Promise<ServiceRecord>;
   remove: (id: string) => Promise<void>;
 }
 
@@ -55,12 +57,18 @@ export function RecordsProvider({ children }: { children: React.ReactNode }) {
     [activeId],
   );
 
+  const update = useCallback(async (id: string, rec: NewServiceRecord) => {
+    const updated = await dbUpdate(id, rec);
+    setRecords((rs) => rs.map((r) => (r.id === id ? updated : r)));
+    return updated;
+  }, []);
+
   const remove = useCallback(async (id: string) => {
     await dbDelete(id);
     setRecords((rs) => rs.filter((r) => r.id !== id));
   }, []);
 
-  return <Ctx.Provider value={{ records, loading, add, remove }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ records, loading, add, update, remove }}>{children}</Ctx.Provider>;
 }
 
 export function useServiceRecords(): RecordsCtx {

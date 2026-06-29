@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { fmtMiles } from '@/lib/data';
 import { useVehicle } from '@/lib/vehicle-context';
 import { useServiceRecords } from '@/lib/records-context';
@@ -74,11 +76,37 @@ function EmptyState({ text }: { text: string }) {
 }
 
 function ServiceRow({ rec }: { rec: ServiceRecord }) {
+  const router = useRouter();
+  const { remove } = useServiceRecords();
+  const [confirming, setConfirming] = useState(false);
+  const [busy, setBusy] = useState(false);
+
   const d = new Date(rec.date + 'T00:00:00');
   const dateTop = MONTHS[d.getMonth()];
   const dateDay = String(d.getDate()).padStart(2, '0');
   const dateYear = d.getFullYear();
   const tag = rec.diy ? 'DIY' : 'SHOP';
+
+  async function onDelete() {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await remove(rec.id);
+    } catch (e) {
+      console.error('Failed to delete service record', e);
+      setBusy(false);
+      setConfirming(false);
+    }
+  }
+
+  const actionBtn: React.CSSProperties = {
+    font: "500 10px/1 'JetBrains Mono',monospace",
+    letterSpacing: '.06em',
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    padding: 0,
+  };
 
   const tagStyle: React.CSSProperties = {
     font: "600 9px/1 'JetBrains Mono',monospace",
@@ -162,6 +190,32 @@ function ServiceRow({ rec }: { rec: ServiceRecord }) {
       <div style={{ flexShrink: 0, textAlign: 'right' }}>
         <div style={{ font: "500 13px/1 'JetBrains Mono',monospace", color: '#0B0B0C' }}>{rec.cost}</div>
         <div style={{ font: "500 10px/1 'JetBrains Mono',monospace", color: '#9A9AA0', marginTop: 5 }}>{fmtMiles(rec.mileage)}</div>
+
+        <div style={{ marginTop: 12, display: 'flex', gap: 12, justifyContent: 'flex-end', alignItems: 'center' }}>
+          {confirming ? (
+            <>
+              <span style={{ font: "400 11px/1 'Helvetica Neue',Arial,sans-serif", color: '#6E6E73' }}>Delete?</span>
+              <button onClick={onDelete} disabled={busy} style={{ ...actionBtn, color: 'var(--red, #D5001C)', opacity: busy ? 0.5 : 1 }}>
+                {busy ? '…' : 'YES'}
+              </button>
+              <button onClick={() => setConfirming(false)} disabled={busy} style={{ ...actionBtn, color: '#9A9AA0' }}>
+                NO
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => router.push(`/history/new?edit=${rec.id}`)}
+                style={{ ...actionBtn, color: '#6E6E73' }}
+              >
+                EDIT
+              </button>
+              <button onClick={() => setConfirming(true)} style={{ ...actionBtn, color: '#B4262F' }}>
+                DELETE
+              </button>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

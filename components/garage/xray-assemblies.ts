@@ -2,7 +2,7 @@ import type { EnginePart, PartsManifest } from '@/lib/types';
 
 /** The inspectable assemblies available in the X-RAY view. */
 export interface XrayAssembly {
-  id: 'engine' | 'trans' | 'exhaust' | 'fbrakes' | 'rbrakes' | 'cooling' | 'oil' | 'airfilter' | 'plugs';
+  id: 'engine' | 'trans' | 'exhaust' | 'fbrakes' | 'rbrakes' | 'cooling' | 'oil' | 'airfilter' | 'plugs' | 'susp' | 'elec' | 'driveline';
   label: string;
   /** GLB rendered by <GLBViewer src>. */
   glb: string;
@@ -38,6 +38,9 @@ export const XRAY_ASSEMBLIES: XrayAssembly[] = [
   { id: 'oil',       label: 'Oil & Lubrication', glb: '/models/components/oil.glb',       manifest: '/models/components/oil-parts.json',       hotspot3d: '0.6 0.1 -0.9', displayRadius: 0.12 },
   { id: 'airfilter', label: 'Air Intake',        glb: '/models/components/airfilter.glb', manifest: '/models/components/airfilter-parts.json', hotspot3d: '0 0.7 -0.6',   displayRadius: 0.22 },
   { id: 'plugs',     label: 'Ignition & Fuel',   glb: '/models/components/plugs.glb',     manifest: '/models/components/plugs-parts.json',     hotspot3d: '-0.5 0.3 -0.9', displayRadius: 0.10 },
+  { id: 'susp',      label: 'Suspension',       glb: '/models/components/susp.glb',      manifest: '/models/components/susp-parts.json',      hotspot3d: '0 -0.5 0',     displayRadius: 0.55 },
+  { id: 'elec',      label: 'Electrical',        glb: '/models/components/elec.glb',      manifest: '/models/components/elec-parts.json',      hotspot3d: '0 0.2 2.2',    displayRadius: 0.25 },
+  { id: 'driveline', label: 'Driveline / Wheels', glb: '/models/components/driveline.glb', manifest: '/models/components/driveline-parts.json', hotspot3d: '0 -0.4 -0.3',  displayRadius: 0.60, bilateral: true, lateralOffset: 0.95 },
 ];
 
 /**

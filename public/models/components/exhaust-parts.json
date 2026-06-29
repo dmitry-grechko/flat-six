@@ -23,13 +23,77 @@
       "function": "Tubular header collecting exhaust from the three left-bank cylinders into a single collector."
     },
     {
+      "id": "manifold-gasket-r",
+      "node": "manifoldGasket_R",
+      "label": "Exhaust Manifold Gasket (Right)",
+      "assembly": "Manifold",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": "9A1.113.111.01",
+      "parent": "header-r",
+      "function": "Metal-elastomer gasket sealing the right-bank exhaust manifold-to-cylinder-head joint against combustion gas leakage."
+    },
+    {
+      "id": "manifold-gasket-l",
+      "node": "manifoldGasket_L",
+      "label": "Exhaust Manifold Gasket (Left)",
+      "assembly": "Manifold",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": "9A1.113.112.01",
+      "parent": "header-l",
+      "function": "Metal-elastomer gasket sealing the left-bank exhaust manifold-to-cylinder-head joint against combustion gas leakage."
+    },
+    {
+      "id": "manifold-stud-r",
+      "node": "manifoldStuds_R",
+      "label": "Exhaust Manifold Studs & Nuts (Right, x3)",
+      "assembly": "Manifold",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": "900.910.003.03",
+      "parent": "header-r",
+      "function": "M8 threaded studs pressed into the right cylinder head with self-locking nuts that clamp the exhaust manifold flange."
+    },
+    {
+      "id": "manifold-stud-l",
+      "node": "manifoldStuds_L",
+      "label": "Exhaust Manifold Studs & Nuts (Left, x3)",
+      "assembly": "Manifold",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": "900.910.003.03",
+      "parent": "header-l",
+      "function": "M8 threaded studs pressed into the left cylinder head with self-locking nuts that clamp the exhaust manifold flange."
+    },
+    {
+      "id": "flex-pipe-r",
+      "node": "flexPipe_R",
+      "label": "Flex Pipe / Bellows (Right)",
+      "assembly": "Manifold",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": "981.113.231.00",
+      "function": "Corrugated stainless-steel flexible section between the right manifold collector and the primary cat, absorbing engine movement and thermal expansion."
+    },
+    {
+      "id": "flex-pipe-l",
+      "node": "flexPipe_L",
+      "label": "Flex Pipe / Bellows (Left)",
+      "assembly": "Manifold",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": "981.113.232.00",
+      "function": "Corrugated stainless-steel flexible section between the left manifold collector and the primary cat, absorbing engine movement and thermal expansion."
+    },
+    {
       "id": "cat-r",
       "node": "cat_R",
       "label": "Catalytic Converter (Right)",
       "assembly": "Aftertreatment",
       "system": "Exhaust",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "981.113.021.00",
       "function": "Converts harmful right-bank exhaust gases into less-toxic emissions over a ceramic catalyst."
     },
     {
@@ -39,8 +103,143 @@
       "assembly": "Aftertreatment",
       "system": "Exhaust",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "981.113.022.00",
       "function": "Converts harmful left-bank exhaust gases into less-toxic emissions over a ceramic catalyst."
+    },
+    {
+      "id": "heat-shield-cat-r",
+      "node": "heatShield_catR",
+      "label": "Heat Shield — Primary Cat (Right)",
+      "assembly": "Aftertreatment",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": "981.113.261.00",
+      "parent": "cat-r",
+      "function": "Stamped aluminium heat shield wrapped around the right primary catalytic converter to protect the mid-engine bay components from radiant heat."
+    },
+    {
+      "id": "heat-shield-cat-l",
+      "node": "heatShield_catL",
+      "label": "Heat Shield — Primary Cat (Left)",
+      "assembly": "Aftertreatment",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": "981.113.262.00",
+      "parent": "cat-l",
+      "function": "Stamped aluminium heat shield wrapped around the left primary catalytic converter to protect the mid-engine bay components from radiant heat."
+    },
+    {
+      "id": "heat-shield-underbody",
+      "node": "heatShield_underbody",
+      "label": "Heat Shield — Underbody / Mid-Section",
+      "assembly": "Aftertreatment",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": "981.113.271.00",
+      "function": "Large underbody heat shield spanning the mid-engine section, critical on the Boxster mid-engine layout to protect fuel lines, wiring, and the centre tunnel from exhaust heat."
+    },
+    {
+      "id": "eng-exh-002",
+      "node": "preCatO2Sensor_R",
+      "label": "Pre-Cat Oxygen Sensor (Right, Upstream)",
+      "assembly": "Aftertreatment",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": "9A1.606.183.01",
+      "function": "Wideband lambda sensor mounted upstream of the right primary catalytic converter to provide closed-loop fuelling feedback to the DME."
+    },
+    {
+      "id": "eng-exh-002b",
+      "node": "preCatO2Sensor_L",
+      "label": "Pre-Cat Oxygen Sensor (Left, Upstream)",
+      "assembly": "Aftertreatment",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": "9A1.606.183.01",
+      "function": "Wideband lambda sensor mounted upstream of the left primary catalytic converter to provide closed-loop fuelling feedback to the DME."
+    },
+    {
+      "id": "eng-exh-004",
+      "node": "postCatO2Sensor_R",
+      "label": "Post-Cat Oxygen Sensor (Right, Downstream)",
+      "assembly": "Aftertreatment",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": "9A1.606.193.01",
+      "function": "Downstream oxygen sensor on the right bank that monitors catalytic converter efficiency and reports degradation to the DME."
+    },
+    {
+      "id": "eng-exh-004b",
+      "node": "postCatO2Sensor_L",
+      "label": "Post-Cat Oxygen Sensor (Left, Downstream)",
+      "assembly": "Aftertreatment",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": "9A1.606.193.01",
+      "function": "Downstream oxygen sensor on the left bank that monitors catalytic converter efficiency and reports degradation to the DME."
+    },
+    {
+      "id": "eng-exh-005",
+      "node": "midPipe",
+      "label": "Mid-Pipe / X-Pipe",
+      "assembly": "Mid-Section",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": "981.111.011.00",
+      "function": "Crossover pipe connecting both exhaust banks downstream of the primary catalytic converters to balance exhaust pulses."
+    },
+    {
+      "id": "eng-exh-006",
+      "node": "secondaryCat",
+      "label": "Secondary Catalytic Converters (x2)",
+      "assembly": "Aftertreatment",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": "981.111.021.00",
+      "function": "Underfloor secondary catalysts providing additional emissions treatment after the close-coupled primary converters."
+    },
+    {
+      "id": "heat-shield-midpipe",
+      "node": "heatShield_midPipe",
+      "label": "Heat Shield — Mid-Pipe",
+      "assembly": "Mid-Section",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": "981.111.081.00",
+      "parent": "eng-exh-005",
+      "function": "Wraparound heat shield protecting the underbody and luggage compartment floor from the radiant heat of the mid-pipe / X-pipe section."
+    },
+    {
+      "id": "resonator",
+      "node": "resonator",
+      "label": "Centre Section Resonator",
+      "assembly": "Mid-Section",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": "981.111.031.00",
+      "function": "Tuned resonator canister in the centre section that attenuates specific exhaust frequencies before the gases reach the rear mufflers."
+    },
+    {
+      "id": "muffler-inlet-gasket-r",
+      "node": "mufflerInletGasket_R",
+      "label": "Muffler Inlet Gasket (Right)",
+      "assembly": "Silencing",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": "981.111.181.00",
+      "parent": "muffler-r",
+      "function": "Flat metal gasket sealing the inlet flange joint between the connecting pipe and the right rear muffler."
+    },
+    {
+      "id": "muffler-inlet-gasket-l",
+      "node": "mufflerInletGasket_L",
+      "label": "Muffler Inlet Gasket (Left)",
+      "assembly": "Silencing",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": "981.111.182.00",
+      "parent": "muffler-l",
+      "function": "Flat metal gasket sealing the inlet flange joint between the connecting pipe and the left rear muffler."
     },
     {
       "id": "muffler-r",
@@ -63,6 +262,27 @@
       "function": "Rear silencer on the left side that attenuates exhaust noise before the tailpipes."
     },
     {
+      "id": "pse-valve",
+      "node": "pseValve",
+      "label": "PSE Sport Exhaust Bypass Valve",
+      "assembly": "Silencing",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": "991.111.381.02",
+      "function": "Vacuum-actuated bypass valve integrated into the rear muffler assembly that opens an alternative exhaust path for a louder, sportier exhaust note."
+    },
+    {
+      "id": "pse-actuator",
+      "node": "pseActuator",
+      "label": "PSE Valve Actuator (Vacuum Unit)",
+      "assembly": "Silencing",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": "991.111.385.01",
+      "parent": "pse-valve",
+      "function": "Pneumatic actuator canister that translates intake-manifold vacuum into mechanical displacement to open and close the PSE bypass valve flap."
+    },
+    {
       "id": "tailpipe-r",
       "node": "tip_R_0",
       "label": "Tailpipe Tip (Right)",
@@ -81,16 +301,6 @@
       "tier": "primary",
       "partNumber": "981.111.261.00",
       "function": "Polished left-side tailpipe tip where exhaust exits the system."
-    },
-    {
-      "id": "pse-valve",
-      "node": "pseValve",
-      "label": "PSE Sport Exhaust Valve",
-      "assembly": "Silencing",
-      "system": "Exhaust",
-      "tier": "primary",
-      "partNumber": "991.111.381.02",
-      "function": "Vacuum-actuated bypass valve that opens the sport exhaust path for a louder note."
     },
     {
       "id": "hanger-r",
@@ -113,46 +323,6 @@
       "function": "Rubber hanger that suspends the left side of the exhaust from the body."
     },
     {
-      "id": "eng-exh-002",
-      "node": "preCatO2Sensor",
-      "label": "Pre-Cat Oxygen Sensors (x2)",
-      "assembly": "Exhaust System",
-      "system": "Exhaust",
-      "tier": "primary",
-      "partNumber": "9A1.606.183.01",
-      "function": "Wideband lambda sensors mounted upstream of each primary catalytic converter to provide closed-loop fueling feedback to the DME."
-    },
-    {
-      "id": "eng-exh-004",
-      "node": "postCatO2Sensor",
-      "label": "Post-Cat Oxygen Sensors (x2)",
-      "assembly": "Exhaust System",
-      "system": "Exhaust",
-      "tier": "primary",
-      "partNumber": "9A1.606.193.01",
-      "function": "Downstream oxygen sensors that monitor catalytic converter efficiency and report degradation to the DME."
-    },
-    {
-      "id": "eng-exh-005",
-      "node": "midPipe",
-      "label": "Mid-Pipe / X-Pipe",
-      "assembly": "Exhaust System",
-      "system": "Exhaust",
-      "tier": "primary",
-      "partNumber": null,
-      "function": "Crossover pipe connecting both exhaust banks downstream of the primary catalytic converters to balance exhaust pulses."
-    },
-    {
-      "id": "eng-exh-006",
-      "node": "secondaryCat",
-      "label": "Secondary Catalytic Converters (x2)",
-      "assembly": "Exhaust System",
-      "system": "Exhaust",
-      "tier": "primary",
-      "partNumber": null,
-      "function": "Underfloor secondary catalysts providing additional emissions treatment after the close-coupled primary converters."
-    },
-    {
       "id": "exhaust-new-001",
       "node": "pseVacuumLine",
       "label": "PSE Vacuum Line",
@@ -160,6 +330,7 @@
       "system": "Exhaust",
       "tier": "sub",
       "partNumber": "981.111.049.00",
+      "parent": "pse-actuator",
       "function": "Vacuum supply line that routes actuating vacuum from the intake manifold to the PSE bypass valve actuator."
     },
     {
@@ -186,7 +357,7 @@
       "id": "exhaust-new-004",
       "node": "lambdaProbeHolder",
       "label": "Lambda Probe Holder",
-      "assembly": "Exhaust System",
+      "assembly": "Aftertreatment",
       "system": "Exhaust",
       "tier": "sub",
       "partNumber": "981.606.279.00",

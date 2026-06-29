@@ -8,12 +8,32 @@ export const runtime = 'nodejs';
 // MCP requests are dynamic; never cache or statically optimise them.
 export const dynamic = 'force-dynamic';
 
+// Canonical deployed origin (apex redirects here). Used for the absolute icon
+// URLs advertised to MCP clients so the connector shows the FLAT·SIX mark.
+const SITE = 'https://www.flat-six.org';
+
+// `serverInfo` is forwarded verbatim to the SDK's McpServer (Implementation),
+// which supports title / websiteUrl / icons beyond mcp-handler's narrow types —
+// hence the cast. Clients (Claude Desktop / claude.ai) render `icons` as the
+// connector's icon.
+const serverInfo = {
+  name: 'flatsix-981-garage',
+  title: 'FLAT·SIX · 981 Garage',
+  version: '0.1.0',
+  websiteUrl: SITE,
+  icons: [
+    { src: `${SITE}/icon.svg`, mimeType: 'image/svg+xml', sizes: ['any'] },
+    { src: `${SITE}/icon`, mimeType: 'image/png', sizes: ['96x96'] },
+    { src: `${SITE}/apple-icon`, mimeType: 'image/png', sizes: ['180x180'] },
+  ],
+} as { name: string; version: string };
+
 const handler = createMcpHandler(
   (server) => {
     registerTools(server);
   },
   {
-    serverInfo: { name: 'flatsix-981-garage', version: '0.1.0' },
+    serverInfo,
   },
   {
     // The dynamic route lives at app/api/[transport]/route.ts, so the transport

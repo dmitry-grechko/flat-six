@@ -27,40 +27,124 @@ function blankItem(): ItemRow {
   return { id: uid(), name: '' };
 }
 
+/** Initial form values resolved by the wrapper for create / from-plan / edit. */
+interface FormInitial {
+  type: string;
+  title: string;
+  date: string;
+  mileage: string;
+  diy: boolean;
+  cost: string;
+  notes: string;
+  items: ItemRow[];
+}
+
+/**
+ * Wrapper: resolves which record we're working on (new, started-from-plan, or
+ * editing an existing one) and only mounts the form once the initial values are
+ * ready. The `key` forces a fresh form when switching target.
+ */
 export default function NewServiceRecord() {
-  const router = useRouter();
   const params = useSearchParams();
   const { vehicle } = useVehicle();
-  const { add } = useServiceRecords();
+  const { records, loading } = useServiceRecords();
   const { plans } = useServicePlans();
 
-  // If we arrived from "Start service" on a plan, pre-fill from that plan.
+  const editId = params.get('edit');
   const fromPlanId = params.get('fromPlan');
-  const sourcePlan = useMemo(
-    () => (fromPlanId ? plans.find((p) => p.id === fromPlanId) : undefined),
-    [fromPlanId, plans],
-  );
+  const editing = editId ? records.find((r) => r.id === editId) : undefined;
+  const sourcePlan = fromPlanId ? plans.find((p) => p.id === fromPlanId) : undefined;
 
-  const initialType = sourcePlan ? 'Custom' : 'Oil & Filter';
-  const [type, setType] = useState<string>(initialType);
-  const [title, setTitle] = useState<string>(sourcePlan ? sourcePlan.title : 'Oil & Filter');
-  const [date, setDate] = useState<string>(() => new Date().toISOString().slice(0, 10));
-  const [mileage, setMileage] = useState<string>(
-    sourcePlan?.targetMileage ? String(sourcePlan.targetMileage) : vehicle.mileage,
-  );
-  const [diy, setDiy] = useState<boolean>(true);
-  const [cost, setCost] = useState<string>('');
-  const [notes, setNotes] = useState<string>(sourcePlan?.notes ?? '');
-  const [items, setItems] = useState<ItemRow[]>(() =>
-    sourcePlan
-      ? sourcePlan.items.map((it) => ({
-          id: uid(),
-          name: it.name,
-          description: it.description,
-          partNumber: it.partNumber,
-        }))
-      : seedItems('Oil & Filter'),
-  );
+  const today = useMemo(() => new Date().toISOString().slice(0, 10), []);
+
+  // --- Edit mode: wait for the record, or report if it's gone. ---
+  if (editId) {
+    if (!editing) {
+      return (
+        <Shell>
+          <Banner>{loading ? 'Loading record…' : 'That record could not be found — it may have been deleted.'}</Banner>
+        </Shell>
+      );
+    }
+    const initial: FormInitial = {
+      type: 'Custom',
+      title: editing.title,
+      date: editing.date,
+      mileage: editing.mileage ? String(editing.mileage) : '',
+      diy: editing.diy,
+      cost: editing.cost ?? '',
+      notes: editing.notes ?? '',
+      items: editing.items.map((it) => ({ id: uid(), ...it })),
+    };
+    return <RecordForm key={`edit:${editId}`} mode="edit" editId={editId} heading="EDIT SERVICE RECORD" initial={initial} />;
+  }
+
+  // --- From a plan: prefill from the plan. ---
+  if (sourcePlan) {
+    const initial: FormInitial = {
+      type: 'Custom',
+      title: sourcePlan.title,
+      date: today,
+      mileage: sourcePlan.targetMileage ? String(sourcePlan.targetMileage) : vehicle.mileage,
+      diy: true,
+      cost: '',
+      notes: sourcePlan.notes ?? '',
+      items: sourcePlan.items.map((it) => ({
+        id: uid(),
+        name: it.name,
+        description: it.description,
+        partNumber: it.partNumber,
+      })),
+    };
+    return (
+      <RecordForm
+        key={`plan:${fromPlanId}`}
+        mode="create"
+        heading="START SERVICE FROM PLAN"
+        planTitle={sourcePlan.title}
+        initial={initial}
+      />
+    );
+  }
+
+  // --- Brand-new record. ---
+  const initial: FormInitial = {
+    type: 'Oil & Filter',
+    title: 'Oil & Filter',
+    date: today,
+    mileage: vehicle.mileage,
+    diy: true,
+    cost: '',
+    notes: '',
+    items: seedItems('Oil & Filter'),
+  };
+  return <RecordForm key="new" mode="create" heading="NEW SERVICE RECORD" initial={initial} />;
+}
+
+function RecordForm({
+  initial,
+  mode,
+  heading,
+  planTitle,
+  editId,
+}: {
+  initial: FormInitial;
+  mode: 'create' | 'edit';
+  heading: string;
+  planTitle?: string;
+  editId?: string;
+}) {
+  const router = useRouter();
+  const { add, update } = useServiceRecords();
+
+  const [type, setType] = useState<string>(initial.type);
+  const [title, setTitle] = useState<string>(initial.title);
+  const [date, setDate] = useState<string>(initial.date);
+  const [mileage, setMileage] = useState<string>(initial.mileage);
+  const [diy, setDiy] = useState<boolean>(initial.diy);
+  const [cost, setCost] = useState<string>(initial.cost);
+  const [notes, setNotes] = useState<string>(initial.notes);
+  const [items, setItems] = useState<ItemRow[]>(initial.items);
   const [saving, setSaving] = useState(false);
 
   function selectType(next: string) {
@@ -98,7 +182,7 @@ export default function NewServiceRecord() {
     setSaving(true);
     try {
       const mi = parseInt(mileage.replace(/[^0-9]/g, ''), 10) || 0;
-      await add({
+      const payload = {
         date,
         mileage: mi,
         title: title.trim() || type,
@@ -107,7 +191,12 @@ export default function NewServiceRecord() {
         cost: cost.trim() || undefined,
         notes: notes.trim() || undefined,
         items: clean,
-      });
+      };
+      if (mode === 'edit' && editId) {
+        await update(editId, payload);
+      } else {
+        await add(payload);
+      }
       router.push('/history');
     } catch (e) {
       console.error('Failed to save service record', e);
@@ -173,10 +262,10 @@ export default function NewServiceRecord() {
     <div style={{ padding: 28, maxWidth: 820 }} className="fadeUp padView">
       <div style={{ background: '#fff', border: '1px solid #E3E3E5', borderRadius: 4, padding: 26 }}>
         <div style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.16em', color: RED, marginBottom: 18 }}>
-          {sourcePlan ? 'START SERVICE FROM PLAN' : 'NEW SERVICE RECORD'}
+          {heading}
         </div>
 
-        {sourcePlan && (
+        {planTitle && (
           <div
             style={{
               marginBottom: 20,
@@ -188,7 +277,7 @@ export default function NewServiceRecord() {
               color: '#6E6E73',
             }}
           >
-            Pre-filled from your plan <strong style={{ color: '#1A1A1E' }}>{sourcePlan.title}</strong>. Tick off, edit
+            Pre-filled from your plan <strong style={{ color: '#1A1A1E' }}>{planTitle}</strong>. Tick off, edit
             what actually got done, add costs, then save it to history.
           </div>
         )}
@@ -377,7 +466,7 @@ export default function NewServiceRecord() {
               opacity: saving || namedCount === 0 ? 0.5 : 1,
             }}
           >
-            {saving ? 'Saving…' : 'Save record'}
+            {saving ? 'Saving…' : mode === 'edit' ? 'Save changes' : 'Save record'}
           </button>
           <button
             onClick={cancel}
@@ -402,5 +491,20 @@ export default function NewServiceRecord() {
         </div>
       </div>
     </div>
+  );
+}
+
+/** Minimal card shell for the loading / not-found states in edit mode. */
+function Shell({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ padding: 28, maxWidth: 820 }} className="padView">
+      <div style={{ background: '#fff', border: '1px solid #E3E3E5', borderRadius: 4, padding: 26 }}>{children}</div>
+    </div>
+  );
+}
+
+function Banner({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ font: "400 14px/1.6 'Helvetica Neue',Arial,sans-serif", color: '#6E6E73' }}>{children}</div>
   );
 }

@@ -141,7 +141,7 @@
       "assembly": "Accessory Drive",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "9A160301600",
       "function": "Generates electrical power and charges the battery while the engine runs."
     },
     {
@@ -253,7 +253,7 @@
       "assembly": "Structure",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "9A160410900",
       "function": "Cranks the engine over against the flywheel ring gear to start it."
     },
     {
@@ -432,7 +432,7 @@
       "system": "Engine",
       "tier": "sub",
       "parent": "crankcase",
-      "partNumber": null,
+      "partNumber": "9A1101022010",
       "function": "Bolts to the rear of the crankcase and mates the engine to the transaxle, enclosing the flywheel."
     },
     {
@@ -524,7 +524,7 @@
       "assembly": "Short Block",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "9A1105183010",
       "function": "Shaft inside the block that relays crankshaft drive to both secondary camshaft chains; its bearing is a known service point."
     },
     {
@@ -644,7 +644,7 @@
       "assembly": "Cylinder Heads & Valvetrain",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "9A1105275070",
       "function": "Precision caps that clamp the camshaft journals in the cylinder head to retain the cams in position."
     },
     {
@@ -684,7 +684,7 @@
       "assembly": "VarioCam Plus",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "99860619100",
       "function": "Electrohydraulic solenoid for Bank 2 intake cam phasing; susceptible to contamination faults (P0000C area)."
     },
     {
@@ -694,7 +694,7 @@
       "assembly": "VarioCam Plus",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "94810711311",
       "function": "Electrohydraulic solenoid that controls oil flow to the Bank 2 exhaust cam phaser for variable timing."
     },
     {
@@ -724,7 +724,7 @@
       "assembly": "VarioCam Plus",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "9A1105053050",
       "function": "Two-stage lift switching pins, one per cylinder per bank, that engage a second cam lobe profile for high-lift operation."
     },
     {
@@ -788,94 +788,57 @@
       "function": "Reads the 60-2 tooth tone wheel on the crankshaft to provide engine speed and crank angle data to the DME."
     },
     {
-      "id": "eng-lube-001",
-      "node": "oilPumpGear",
-      "label": "Oil Pump (High-Pressure Gear Pump)",
-      "assembly": "Lubrication",
+      "id": "eng-fuel-hpfp",
+      "node": "highPressureFuelPump",
+      "label": "High-Pressure Fuel Pump (DFI)",
+      "assembly": "Fuel System",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": "9A1107050110",
-      "function": "Crankshaft-driven gear pump that generates high oil pressure to supply all engine lubrication galleries."
+      "partNumber": "9A111050101",
+      "function": "Camshaft-driven high-pressure pump that pressurises DFI fuel to ~200 bar for direct injection into combustion chambers."
     },
     {
-      "id": "eng-lube-002",
-      "node": "oilFilterHousingPressure",
-      "label": "Oil Filter Housing with Pressure Relief",
-      "assembly": "Lubrication",
+      "id": "eng-fuel-portinj",
+      "node": "portInjectors",
+      "label": "Port Injectors x6 (PFI)",
+      "assembly": "Fuel System",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": "9A1107020110",
-      "function": "Spin-on cartridge filter housing with an integrated pressure relief valve to protect the lubrication circuit."
+      "partNumber": "9A160760200",
+      "function": "Low-pressure port fuel injectors that supplement DFI at high load/rpm for improved mixture and emissions."
     },
     {
-      "id": "eng-lube-003",
-      "node": "oilPressureSensor",
-      "label": "Oil Pressure Sensor",
-      "assembly": "Lubrication",
+      "id": "eng-fuel-lowline",
+      "node": "fuelLineLow",
+      "label": "Low-Pressure Fuel Lines (Tank→HPFP)",
+      "assembly": "Fuel System",
       "system": "Engine",
-      "tier": "primary",
-      "partNumber": "94860621300",
-      "function": "Sender that monitors engine oil pressure and signals a warning if pressure falls below the safe threshold."
+      "tier": "sub",
+      "parent": "eng-fuel-hpfp",
+      "partNumber": "9A111090614",
+      "function": "Rubber/metal fuel delivery lines from the fuel tank to the high-pressure pump inlet."
     },
     {
-      "id": "eng-lube-004",
-      "node": "oilGalleries",
-      "label": "Oil Galleries (Internal Block Passages)",
-      "assembly": "Lubrication",
+      "id": "eng-fuel-hpsen",
+      "node": "fuelPressureSensorHP",
+      "label": "Fuel Pressure Sensor (High-Side)",
+      "assembly": "Fuel System",
       "system": "Engine",
-      "tier": "primary",
-      "partNumber": null,
-      "function": "Network of internal passages cast into the block and heads that distribute pressurized oil to bearings, cams, and phasers."
+      "tier": "sub",
+      "parent": "eng-fuel-hpfp",
+      "partNumber": "99360612300",
+      "function": "Reports high-pressure rail pressure to the DME for closed-loop fuel delivery control."
     },
     {
-      "id": "eng-lube-005",
-      "node": "pistonCoolingJets",
-      "label": "Piston Cooling Jets / Squirters x6",
-      "assembly": "Lubrication",
+      "id": "eng-fuel-regreg",
+      "node": "fuelPressureRegLow",
+      "label": "Fuel Pressure Regulator (Low-Side)",
+      "assembly": "Fuel System",
       "system": "Engine",
-      "tier": "primary",
-      "partNumber": null,
-      "function": "Oil squirter nozzles in the block galleries that spray engine oil directly onto the underside of each piston crown for thermal management."
-    },
-    {
-      "id": "eng-lube-006",
-      "node": "oilFillerCapDipstick",
-      "label": "Oil Filler Cap and Dipstick",
-      "assembly": "Lubrication",
-      "system": "Engine",
-      "tier": "primary",
-      "partNumber": "9A1107264000",
-      "function": "Sealed filler cap and pull-out dipstick used to add oil and check the engine oil level."
-    },
-    {
-      "id": "eng-ign-001",
-      "node": "ignitionCoils",
-      "label": "Ignition Coils x6 (COP)",
-      "assembly": "Ignition",
-      "system": "Engine",
-      "tier": "primary",
-      "partNumber": "9A160210407",
-      "function": "Coil-on-plug pencil coils that step up battery voltage to the high voltage required to fire each spark plug."
-    },
-    {
-      "id": "eng-ign-002",
-      "node": "sparkPlugsIridium",
-      "label": "Spark Plugs x6 (NGK Iridium)",
-      "assembly": "Ignition",
-      "system": "Engine",
-      "tier": "primary",
-      "partNumber": "99917015190",
-      "function": "NGK laser iridium spark plugs torqued to 3.0 Nm that initiate combustion in each cylinder."
-    },
-    {
-      "id": "eng-ign-003",
-      "node": "knockSensors",
-      "label": "Knock Sensors x2",
-      "assembly": "Ignition",
-      "system": "Engine",
-      "tier": "primary",
-      "partNumber": "99760612100",
-      "function": "Piezoelectric sensors, one per bank, that detect detonation so the DME can retard ignition timing to protect the engine."
+      "tier": "sub",
+      "parent": "eng-fuel-hpfp",
+      "partNumber": "9A1110414100",
+      "function": "Maintains constant low-side delivery pressure from the in-tank pump to the high-pressure pump."
     },
     {
       "id": "eng-mgmt-001",
@@ -884,7 +847,7 @@
       "assembly": "Engine Management",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "9A1618641100",
       "function": "Bosch ME 9.8.1 engine control unit that manages fuel injection, ignition timing, VarioCam Plus, and drive-by-wire throttle."
     },
     {
@@ -894,7 +857,7 @@
       "assembly": "Engine Management",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "9A1110530600",
       "function": "Redundant dual-track TPS sensors integrated in each throttle body that relay throttle plate angle to the DME."
     },
     {
@@ -914,7 +877,7 @@
       "assembly": "Engine Management",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "98112301200",
       "function": "Drive-by-wire pedal sensor that sends driver throttle demand to the DME for electronic throttle control."
     },
     {
@@ -924,7 +887,7 @@
       "assembly": "Engine Management",
       "system": "Engine",
       "tier": "primary",
-      "partNumber": null,
+      "partNumber": "9A1612201300",
       "function": "Main engine loom that interconnects all sensors, actuators, injectors, coils, and solenoids with the DME."
     },
     {
@@ -1078,6 +1041,112 @@
       "parent": "air-oil-separator",
       "partNumber": "9A1107380010",
       "function": "Secondary cyclonic oil separator mounted on the crankcase that scavenges oil mist from blow-by gases before they re-enter the intake."
+    },
+    {
+      "id": "eng-new-015",
+      "node": "headBolts",
+      "label": "Cylinder Head Bolts (TTY) x12 per Bank",
+      "assembly": "Cylinder Heads & Valvetrain",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "cylinder-head-l",
+      "partNumber": "9A1104213020",
+      "function": "Torque-to-yield head bolts that clamp each cylinder head to the block; single-use fasteners replaced at every head-off service."
+    },
+    {
+      "id": "eng-new-016",
+      "node": "valveCoverGasketL",
+      "label": "Valve Cover Gasket (Left Bank)",
+      "assembly": "Valvetrain",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "cam-cover-l",
+      "partNumber": "9A1105441140",
+      "function": "Formed rubber gasket that seals the left cam cover to the cylinder head to prevent oil leaks."
+    },
+    {
+      "id": "eng-new-017",
+      "node": "valveCoverGasketR",
+      "label": "Valve Cover Gasket (Right Bank)",
+      "assembly": "Valvetrain",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "cam-cover-r",
+      "partNumber": "9A1105441150",
+      "function": "Formed rubber gasket that seals the right cam cover to the cylinder head to prevent oil leaks."
+    },
+    {
+      "id": "eng-new-018",
+      "node": "knockSensors",
+      "label": "Knock Sensors x2",
+      "assembly": "Engine Management",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "99760627200",
+      "function": "Piezoelectric sensors, one per cylinder bank, that detect combustion knock and signal the DME to retard ignition timing."
+    },
+    {
+      "id": "eng-new-019",
+      "node": "lambdaSensors",
+      "label": "Lambda / O2 Sensors x4",
+      "assembly": "Engine Management",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A160618301",
+      "function": "Wideband lambda sensors upstream and downstream of each catalytic converter for closed-loop AFR and OBD monitoring."
+    },
+    {
+      "id": "eng-new-020",
+      "node": "mapSensor",
+      "label": "MAP Sensor (Manifold Absolute Pressure)",
+      "assembly": "Engine Management",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "99760613502",
+      "function": "Measures intake manifold pressure so the DME can calculate air-charge density for accurate fuelling at all load points."
+    },
+    {
+      "id": "eng-new-021",
+      "node": "imsBearing",
+      "label": "IMS Bearing (Intermediate Shaft Bearing)",
+      "assembly": "Short Block",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "eng-block-008",
+      "partNumber": "9A1105183060",
+      "function": "Ball or roller bearing supporting the rear of the intermediate shaft; the known 9A1 wear item replaced as a preventive measure."
+    },
+    {
+      "id": "eng-new-022",
+      "node": "harmonicBalancer",
+      "label": "Harmonic Balancer / Vibration Damper",
+      "assembly": "Rotating Assembly",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "crank-pulley",
+      "partNumber": "9A1375262000",
+      "function": "Rubber-bonded inertia ring on the crank pulley that damps high-frequency torsional vibrations in the crankshaft."
+    },
+    {
+      "id": "eng-new-023",
+      "node": "intakeAirBypassActuator",
+      "label": "Intake Air Bypass / Resonance Flap Actuator",
+      "assembly": "Induction",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "intake-manifold",
+      "partNumber": "9A1111185200",
+      "function": "Electric actuator that opens and closes the resonance flap inside the intake manifold to tune volumetric efficiency across the rev range."
+    },
+    {
+      "id": "eng-new-024",
+      "node": "exhaustGasTempSensor",
+      "label": "Exhaust Gas Temperature Sensors x2",
+      "assembly": "Engine Management",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A160621200",
+      "function": "Thermocouple sensors upstream of each catalytic converter that monitor exhaust temperature for catalyst protection and OBD compliance."
     }
   ]
 }

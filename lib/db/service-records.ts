@@ -113,6 +113,43 @@ export async function addRecord(
   return rowToRecord(data as RecordRow);
 }
 
+export async function updateRecord(
+  id: string,
+  rec: NewServiceRecord,
+): Promise<ServiceRecord> {
+  if (DEMO_MODE) {
+    const s = demoStore();
+    for (const k of Object.keys(s.records)) {
+      const idx = s.records[k].findIndex((r) => r.id === id);
+      if (idx >= 0) {
+        const updated: ServiceRecord = { ...rec, id, items: rec.items ?? [] };
+        s.records[k][idx] = updated;
+        return { ...updated };
+      }
+    }
+    throw new Error('Record not found');
+  }
+  const supabase = createClient();
+  // RLS limits the update to the owner; vehicle_id / user_id stay immutable.
+  const { data, error } = await supabase
+    .from('service_records')
+    .update({
+      date: rec.date,
+      mileage: rec.mileage || null,
+      title: rec.title,
+      system: rec.system || null,
+      diy: rec.diy,
+      cost: rec.cost || null,
+      notes: rec.notes || null,
+      items: rec.items ?? [],
+    })
+    .eq('id', id)
+    .select('*')
+    .single();
+  if (error) throw error;
+  return rowToRecord(data as RecordRow);
+}
+
 export async function deleteRecord(id: string): Promise<void> {
   if (DEMO_MODE) {
     const s = demoStore();
