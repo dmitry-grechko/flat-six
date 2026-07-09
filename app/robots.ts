@@ -9,7 +9,7 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: '*',
         allow: '/',
         // Auth-gated app routes, auth flow, OAuth and APIs shouldn't be indexed.
-        disallow: ['/garage', '/history', '/plans', '/faults', '/settings', '/auth/', '/api/', '/oauth/'],
+        disallow: ['/garage', '/history', '/plans', '/faults', '/ai', '/settings', '/auth/', '/api/', '/oauth/'],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,

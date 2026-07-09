@@ -156,7 +156,7 @@ export const MCP_TOOLS: McpTool[] = [
   { name: 'log_service_record', desc: 'Add a service record to a vehicle.', auth: true },
 ];
 
-// (RAG sources are now computed from real data in components/views/SettingsMcp.tsx
+// (RAG sources are now computed from real data in components/views/AiConnect.tsx
 // using KNOWLEDGE_SOURCES + the live parts/service-history counts.)
 
 export const DIFF_LABELS = ['Beginner', 'Beginner', 'Intermediate', 'Advanced', 'Specialist'];

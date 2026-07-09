@@ -14,7 +14,7 @@ export interface AuthedUser {
 /** Error message shown by garage tools when no/invalid token is supplied. */
 export const AUTH_REQUIRED_MESSAGE =
   'This tool needs your garage account. Connect with an Authorization: Bearer <token> ' +
-  'header (your Supabase access token — copy it from Settings → MCP). Knowledge tools work without it.';
+  'header (your Supabase access token — connect your AI assistant on the AI tab). Knowledge tools work without it.';
 
 /**
  * Build a Supabase client authenticated as the bearer-token holder and confirm

@@ -14,7 +14,8 @@ const PAGE_META: Record<string, [string, string]> = {
   '/plans': ['MAINTENANCE', 'Service Plans'],
   '/faults': ['DIAGNOSTICS', 'Fault Finding'],
   '/manual': ['REFERENCE', 'Documents'],
-  '/settings': ['CONFIGURATION', 'Settings & MCP'],
+  '/ai': ['INTEGRATION', 'AI Assistant'],
+  '/settings': ['CONFIGURATION', 'Settings'],
   '/admin': ['ADMIN', 'Usage Overview'],
 };
 

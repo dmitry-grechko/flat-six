@@ -21,7 +21,7 @@ export function protectedResourceMetadata(origin: string) {
     authorization_servers: [origin],
     scopes_supported: [...SCOPES],
     bearer_methods_supported: ['header'],
-    resource_documentation: `${origin}/settings`,
+    resource_documentation: `${origin}/ai`,
   };
 }
 

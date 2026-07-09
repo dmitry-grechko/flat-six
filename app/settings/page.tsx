@@ -1,10 +1,10 @@
 import AppShell from '@/components/shell/AppShell';
-import SettingsMcp from '@/components/views/SettingsMcp';
+import Settings from '@/components/views/Settings';
 
 export default function SettingsPage() {
   return (
     <AppShell>
-      <SettingsMcp />
+      <Settings />
     </AppShell>
   );
 }
