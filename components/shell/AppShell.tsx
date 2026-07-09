@@ -13,6 +13,7 @@ const PAGE_META: Record<string, [string, string]> = {
   '/history/new': ['MAINTENANCE', 'New Service Record'],
   '/plans': ['MAINTENANCE', 'Service Plans'],
   '/faults': ['DIAGNOSTICS', 'Fault Finding'],
+  '/manual': ['REFERENCE', 'Documents'],
   '/settings': ['CONFIGURATION', 'Settings & MCP'],
   '/admin': ['ADMIN', 'Usage Overview'],
 };

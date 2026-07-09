@@ -12,7 +12,7 @@ import type { Component, SystemName, Vehicle, EnginePart } from '@/lib/types';
 // GLBViewer is a forwardRef wrapper; it dynamically imports the R3F Canvas
 // (ssr:false) internally so we can keep a working ref through it.
 import GLBViewer, { type GLBViewerHandle } from './GLBViewer';
-import UnifiedViewer from './UnifiedViewer';
+import UnifiedViewer, { type UnifiedViewerHandle } from './UnifiedViewer';
 import { XRAY_ASSEMBLIES, type XrayAssembly, loadAssemblyParts, isPrimary, childrenOf } from './xray-assemblies';
 import { FLOW_SYSTEMS, XRAY_LAYERS, flowsForLayer, type FlowSystem, type XrayLayer } from './flow-systems';
 
@@ -23,6 +23,7 @@ export default function ComponentExplorer() {
   const router = useRouter();
   const { vehicle } = useVehicle();
   const viewerRef = useRef<GLBViewerHandle | null>(null);
+  const unifiedRef = useRef<UnifiedViewerHandle | null>(null);
 
   const [view, setView] = useState<'3d' | 'front' | 'rear'>('3d');
   const [showPins, setShowPins] = useState(true);
@@ -115,7 +116,8 @@ export default function ComponentExplorer() {
   const exitDrill = () => { setDrillId(null); setSelectedPartId(null); };
 
   // Paint is now applied inside GLBViewer (R3F) via the paintHex prop.
-  const resetView = () => viewerRef.current?.reset();
+  // Reset whichever viewer is mounted (unified stripped scene or focused GLB).
+  const resetView = () => { viewerRef.current?.reset(); unifiedRef.current?.reset(); };
 
   const selected = COMPONENTS.find((c) => c.id === selectedId) || null;
   const isImage = view === 'front' || view === 'rear';
@@ -215,6 +217,7 @@ export default function ComponentExplorer() {
               {xray && assemblyId === null ? (
                 /* ── All-systems unified / stripped view ── */
                 <UnifiedViewer
+                  ref={unifiedRef}
                   selectedAssemblyId={null}
                   onSelectAssembly={(id) => { if (id) switchAssembly(id as XrayAssembly['id']); }}
                   layer={layer}

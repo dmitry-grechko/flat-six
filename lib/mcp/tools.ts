@@ -12,6 +12,7 @@ import { searchCatalog, formatPartNumber } from '@/lib/catalog';
 import { GENERATIONS, generationForBody } from '@/lib/models';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { resolveUser, AUTH_REQUIRED_MESSAGE, publicClient } from './auth';
+import { manualHitHref } from '@/lib/documents';
 
 /** Optional generation arg shared by the knowledge tools. */
 const GENERATION_ARG = z
@@ -231,6 +232,108 @@ export function registerTools(server: McpServer): void {
         return err(`No part matching "${query}" was found.`);
       }
       return json({ parts, catalog: fromCatalog, knowledge: fromKnowledge });
+    },
+  );
+
+  server.registerTool(
+    'search_workshop_manual',
+    {
+      title: 'Search workshop manuals & tech library',
+      description:
+        'Full-text search over factory reference docs: the 981 workshop manual plus Mobile Tech Library ' +
+        'diagnostics, Service Information Technik, and training books for 981/987. ' +
+        'Returns ranked sections with codes/snippets — fetch full text with get_manual_procedure. ' +
+        'Requires your garage login (licensed content, not public).',
+      inputSchema: {
+        query: z.string().min(2).describe('e.g. "bleeding the cooling system", "P0562 PDK", "WM 197019"'),
+        limit: z.number().int().min(1).max(20).optional().describe('Max sections (default 8)'),
+        generation: GENERATION_ARG,
+      },
+    },
+    async ({ query, limit, generation }, extra) => {
+      const user = await resolveUser(extra.authInfo?.token);
+      if (!user) return err(AUTH_REQUIRED_MESSAGE);
+      const gen = await resolveGeneration(generation, extra.authInfo?.token);
+      const { data, error } = await user.supabase.rpc('search_manual', {
+        q: query,
+        lim: limit ?? 8,
+        gen,
+        src: null,
+      });
+      if (error) return err(`Manual search failed: ${error.message}`);
+      if (!Array.isArray(data) || data.length === 0) {
+        return err(`No manual/tech-library section matches "${query}". Import with npm run db:import-manual / db:import-mtl.`);
+      }
+      return json(
+        (data as any[]).map((r) => {
+          const hit = {
+            source: r.source,
+            generation: r.generation,
+            title: r.title as string,
+            docId: r.doc_id,
+            page: r.page as number,
+          };
+          return {
+            id: r.id,
+            wmCode: r.wm_code,
+            group: r.group_label,
+            title: r.title,
+            subsection: r.subsection,
+            models: r.models,
+            sourcePage: r.page,
+            source: r.source,
+            generation: r.generation,
+            docId: r.doc_id,
+            viewerUrl: manualHitHref(hit),
+            snippet: (r.snippet ?? '').replace(/<\/?b>/g, '**'),
+          };
+        }),
+      );
+    },
+  );
+
+  server.registerTool(
+    'get_manual_procedure',
+    {
+      title: 'Get a workshop-manual procedure',
+      description:
+        'Fetch the full text of one workshop-manual section by the id returned from search_workshop_manual ' +
+        '(complete steps, torque values, warnings, figure captions). Requires your garage login.',
+      inputSchema: {
+        id: z.string().min(1).describe('Section id from search_workshop_manual'),
+      },
+    },
+    async ({ id }, extra) => {
+      const user = await resolveUser(extra.authInfo?.token);
+      if (!user) return err(AUTH_REQUIRED_MESSAGE);
+      const { data, error } = await user.supabase
+        .from('manual_sections')
+        .select('id, wm_code, group_label, title, subsection, models, page, content, source, generation, doc_id')
+        .eq('id', id)
+        .maybeSingle();
+      if (error) return err(`Lookup failed: ${error.message}`);
+      if (!data) return err(`No manual section with id "${id}".`);
+      const hit = {
+        source: data.source,
+        generation: data.generation,
+        title: data.title as string,
+        docId: data.doc_id,
+        page: data.page as number,
+      };
+      return json({
+        id: data.id,
+        wmCode: data.wm_code,
+        group: data.group_label,
+        title: data.title,
+        subsection: data.subsection,
+        models: data.models,
+        sourcePage: data.page,
+        source: data.source,
+        generation: data.generation,
+        docId: data.doc_id,
+        viewerUrl: manualHitHref(hit),
+        content: data.content,
+      });
     },
   );
 

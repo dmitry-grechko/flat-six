@@ -136,13 +136,15 @@ export function build() {
   // MID-SECTION — X-pipe / mid-pipe crossover joining both banks, a centre
   // resonator, and heat shields (mid-pipe + large underbody).
   // ====================================================================
-  // ---- pipes carrying gas rearward & down from each cat toward the mufflers
+  // ---- pipes carrying gas rearward & OUTBOARD from each cat toward the
+  // corner-mounted silencers (factory WM 263319 Fig 1: silencers sit at the
+  // rear corners, not near the centre).
   for (const [dir, sk] of [[1, 'R'], [-1, 'L']]) {
     add(tube(`connectingPipe_${sk}`, [
       [dir * 0.85, -1.0, -1.95],
-      [dir * 0.6, -1.05, -2.4],
-      [dir * 0.5, -1.08, -2.75],
-      [dir * 0.45, -1.05, -3.0],
+      [dir * 1.1, -1.05, -2.45],
+      [dir * 1.45, -1.08, -2.85],
+      [dir * 1.7, -1.05, -3.05],
     ], 0.1, 'exhaustD', 18, 12));
   }
 
@@ -177,23 +179,33 @@ export function build() {
   // PSE bypass valve + vacuum actuator + vacuum line, dual CENTRE-EXIT tips,
   // and the PSE silencer mounting bracket.
   // ====================================================================
+  // Factory layout (WM 263319 Fig 1): one big silencer per REAR CORNER, canister
+  // lying TRANSVERSE (axis ≈ X), angled so the inboard outlet points at the
+  // centre twin tailpipes.
   function makeMuffler(dir, side) {
     const sk = side;
-    const mx = dir * 0.55, my = -1.05, mz = -3.25;
+    const mx = dir * 1.75, my = -1.05, mz = -3.3;
     const muffler = group(`muffler_${sk}`);
-    add(rot(at(cyl(`mufflerBody_${sk}`, 0.4, 0.4, 0.95, 'exhaustD', 24), mx, my, mz), HALF_PI, 0, 0), muffler);
-    add(rot(at(cyl(`mufflerEndFront_${sk}`, 0.42, 0.4, 0.06, 'exhaustD', 24), mx, my, mz + 0.48), HALF_PI, 0, 0), muffler);
-    add(rot(at(cyl(`mufflerEndRear_${sk}`, 0.4, 0.42, 0.06, 'exhaustD', 24), mx, my, mz - 0.48), HALF_PI, 0, 0), muffler);
-    // inlet pipe stub into the front face
-    add(rot(at(cyl(`mufflerInlet_${sk}`, 0.1, 0.1, 0.2, 'exhaustD', 14), mx + dir * 0.15, my + 0.15, mz + 0.55), HALF_PI, 0, 0), muffler);
+    // canister along local X (cyl axis Y → rot z by HALF_PI), then the whole
+    // group is yawed so the inboard end trails toward the centre outlets.
+    add(rot(cyl(`mufflerBody_${sk}`, 0.36, 0.36, 1.05, 'exhaustD', 24), 0, 0, HALF_PI), muffler);
+    add(rot(at(cyl(`mufflerEndOut_${sk}`, 0.38, 0.36, 0.06, 'exhaustD', 24), 0.53, 0, 0), 0, 0, HALF_PI), muffler);
+    add(rot(at(cyl(`mufflerEndIn_${sk}`, 0.36, 0.38, 0.06, 'exhaustD', 24), -0.53, 0, 0), 0, 0, HALF_PI), muffler);
+    // inlet pipe stub on the inboard/front face
+    add(rot(at(cyl(`mufflerInlet_${sk}`, 0.1, 0.1, 0.22, 'exhaustD', 14), -0.35, 0.1, 0.42), HALF_PI, 0, 0), muffler);
+    at(muffler, mx, my, mz);
+    // mirror the local X for the left side so inboard stays inboard, then yaw
+    // the canister so the inner end angles rearward toward the tips.
+    muffler.scale.x = dir;
+    muffler.rotation.y = dir * -0.28;
     exhaust.add(muffler);
 
     // ---- muffler inlet gasket (flat ring at the inlet flange)
-    add(rot(at(torus(`mufflerInletGasket_${sk}`, 0.12, 0.025, { color: 0x9aa0a6, metalness: 0.6, roughness: 0.7 }, 8, 20), mx + dir * 0.15, my + 0.15, mz + 0.62), HALF_PI, 0, 0));
+    add(rot(at(torus(`mufflerInletGasket_${sk}`, 0.12, 0.025, { color: 0x9aa0a6, metalness: 0.6, roughness: 0.7 }, 8, 20), mx - dir * 0.3, my + 0.1, mz + 0.52), HALF_PI, 0, 0));
 
     // ---- PSE silencer mounting bracket (R side carries the named node)
     if (sk === 'R') {
-      add(at(box('silencerBracketPSE', 0.12, 0.3, 0.15, 'steel'), mx + dir * 0.25, my + 0.3, mz));
+      add(at(box('silencerBracketPSE', 0.12, 0.3, 0.15, 'steel'), mx - dir * 0.25, my + 0.3, mz));
     }
   }
   makeMuffler(1, 'R');
@@ -201,7 +213,7 @@ export function build() {
 
   // ---- PSE bypass valve (integrated into a muffler, outboard) + actuator + line
   const pseValve = group('pseValve');
-  const pvx = 0.85, pvy = -0.85, pvz = -3.2;
+  const pvx = 1.45, pvy = -0.85, pvz = -3.1;
   add(at(box('pseValveBody', 0.2, 0.2, 0.24, 'exhaustD'), pvx, pvy, pvz), pseValve);
   add(rot(at(cyl('pseValveFlap', 0.1, 0.1, 0.06, 'steel', 14), pvx, pvy, pvz), HALF_PI, 0, 0), pseValve);
   exhaust.add(pseValve);
@@ -227,9 +239,9 @@ export function build() {
     add(rot(at(cyl(`tipOuter_${sk}_0`, 0.13, 0.12, 0.42, 'exhaustC', 20), xoff, -1.0, -3.85), HALF_PI, 0, 0), tip);
     add(rot(at(cyl(`tipInner_${sk}_0`, 0.1, 0.1, 0.3, { color: 0x1a1a1a, metalness: 0.7, roughness: 0.4 }, 18), xoff, -1.0, -3.95), HALF_PI, 0, 0), tip);
     add(rot(at(torus(`tipRim_${sk}_0`, 0.13, 0.02, 'exhaustC', 8, 22), xoff, -1.0, -4.05), HALF_PI, 0, 0), tip);
-    // short connector pipe from the muffler rear to the tip
+    // connector pipe from the corner silencer's inboard outlet to the centre tip
     add(tube(`tipPipe_${sk}_0`, [
-      [dir * 0.55, -1.05, -3.7], [dir * 0.35, -1.02, -3.78], [xoff, -1.0, -3.85],
+      [dir * 1.3, -1.05, -3.55], [dir * 0.7, -1.02, -3.72], [xoff, -1.0, -3.85],
     ], 0.085, 'exhaustC', 14, 12), tip);
     exhaust.add(tip);
   }
@@ -240,8 +252,8 @@ export function build() {
   // ====================================================================
   for (const [dir, sk] of [[1, 'R'], [-1, 'L']]) {
     const hanger = group(`hanger_${sk}`);
-    add(at(box(`hangerBracket_${sk}`, 0.06, 0.2, 0.08, 'steel'), dir * 0.6, -0.78, -2.95), hanger);
-    add(at(box(`hangerRubber_${sk}`, 0.08, 0.16, 0.1, 'rubber'), dir * 0.6, -0.92, -2.95), hanger);
+    add(at(box(`hangerBracket_${sk}`, 0.06, 0.2, 0.08, 'steel'), dir * 1.55, -0.78, -3.15), hanger);
+    add(at(box(`hangerRubber_${sk}`, 0.08, 0.16, 0.1, 'rubber'), dir * 1.55, -0.92, -3.15), hanger);
     exhaust.add(hanger);
   }
 

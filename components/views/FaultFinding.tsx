@@ -8,6 +8,9 @@ import {
 } from '@/lib/knowledge';
 import type { FaultCode, KnownIssue, Severity } from '@/lib/knowledge';
 import { searchParts, type CatalogPartRow } from '@/lib/parts-lookup';
+import { searchManual, getManualSection, type ManualHit } from '@/lib/manual-lookup';
+import { manualHitHref, resolveDocumentForManualHit } from '@/lib/documents';
+import Link from 'next/link';
 import { useVehicle } from '@/lib/vehicle-context';
 import { generationForBody } from '@/lib/models';
 
@@ -71,6 +74,7 @@ export default function FaultFinding() {
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [parts, setParts] = useState<CatalogPartRow[]>([]);
   const [partsLoading, setPartsLoading] = useState(false);
+  const [manualHits, setManualHits] = useState<ManualHit[]>([]);
 
   // Knowledge lookup maps for the active car's generation.
   const faultByCode = useMemo(
@@ -106,6 +110,24 @@ export default function FaultFinding() {
         }
       });
     }, 220);
+    return () => {
+      active = false;
+      clearTimeout(t);
+    };
+  }, [trimmed, generation]);
+
+  // Factory docs (workshop manual + MTL) — authed-only; empty when signed out.
+  useEffect(() => {
+    if (!trimmed || (generation !== '981' && generation !== '987')) {
+      setManualHits([]);
+      return;
+    }
+    let active = true;
+    const t = setTimeout(() => {
+      searchManual(trimmed, 6, { generation }).then((rows) => {
+        if (active) setManualHits(rows);
+      });
+    }, 260);
     return () => {
       active = false;
       clearTimeout(t);
@@ -186,7 +208,7 @@ export default function FaultFinding() {
             Search the knowledge base by OBD-II fault code, symptom, or OEM part number to see causes, diagnostic steps, known issues and parts.
           </div>
         </div>
-      ) : results.length === 0 && parts.length === 0 && !partsLoading ? (
+      ) : results.length === 0 && parts.length === 0 && manualHits.length === 0 && !partsLoading ? (
         <div style={{ background: '#fff', border: '1px solid #E3E3E5', borderRadius: 4, padding: '40px 20px', textAlign: 'center', font: "400 13px/1.6 'Helvetica Neue',Arial,sans-serif", color: '#9A9AA0' }}>
           Nothing matches &ldquo;{trimmed}&rdquo;.<br />
           Try a symptom, a system name (e.g. cooling, brakes), an OBD-II code, or an OEM part number.
@@ -201,8 +223,117 @@ export default function FaultFinding() {
             ),
           )}
           {trimmed && (parts.length > 0 || partsLoading) && <PartsResults parts={parts} loading={partsLoading} />}
+          {trimmed && manualHits.length > 0 && <ManualResults hits={manualHits} />}
         </>
       )}
+    </div>
+  );
+}
+
+/** Factory docs (workshop + MTL) — expand for text, deep-link into the PDF viewer. */
+function ManualResults({ hits }: { hits: ManualHit[] }) {
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [content, setContent] = useState<Record<string, string>>({});
+
+  function toggle(id: string) {
+    setOpenId((cur) => (cur === id ? null : id));
+    if (!content[id]) {
+      getManualSection(id).then((s) => {
+        if (s) setContent((m) => ({ ...m, [id]: s.content }));
+      });
+    }
+  }
+
+  return (
+    <div style={{ marginTop: 22 }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 10 }}>
+        <SectionLabel>FACTORY DOCS</SectionLabel>
+        <span style={{ font: "400 12px/1 'Helvetica Neue',Arial,sans-serif", color: '#B4B4B8' }}>
+          981 / 987 workshop & tech library
+        </span>
+      </div>
+      {hits.map((h) => {
+        const open = openId === h.id;
+        const href = manualHitHref(h);
+        const doc = resolveDocumentForManualHit(h);
+        const codeLabel = h.wmCode
+          ? (h.source === 'workshop' || /^[0-9]/.test(h.wmCode) ? `WM ${h.wmCode}` : h.wmCode)
+          : null;
+        return (
+          <div key={h.id} style={{ background: '#fff', border: '1px solid #E3E3E5', borderRadius: 4, marginBottom: 10, overflow: 'hidden' }}>
+            <div onClick={() => toggle(h.id)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', cursor: 'pointer' }}>
+              {codeLabel && (
+                <span style={{ flexShrink: 0, font: `700 9px/1 ${mono}`, letterSpacing: '.08em', padding: '6px 8px', borderRadius: 2, color: '#6E6E73', background: '#F0F0F1' }}>
+                  {codeLabel}
+                </span>
+              )}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ font: "400 14px/1.3 'Helvetica Neue',Arial,sans-serif", color: '#0B0B0C' }}>
+                  {h.title}{h.subsection ? ` — ${h.subsection}` : ''}
+                </div>
+                {!open && h.snippet && (
+                  <div
+                    style={{ font: "400 12px/1.5 'Helvetica Neue',Arial,sans-serif", color: '#9A9AA0', marginTop: 4 }}
+                    // ts_headline output over our own imported text; only <b> tags.
+                    dangerouslySetInnerHTML={{ __html: `…${h.snippet}…` }}
+                  />
+                )}
+              </div>
+              <span style={{ flexShrink: 0, font: `600 8px/1 ${mono}`, letterSpacing: '.12em', color: '#B4B4B8' }}>
+                {h.groupLabel?.toUpperCase() ?? 'MANUAL'} · P.{h.page}
+              </span>
+              <span style={{ flexShrink: 0, font: `500 18px/1 ${mono}`, color: '#B4B4B8', width: 16, textAlign: 'center' }}>{open ? '–' : '+'}</span>
+            </div>
+            {open && (
+              <div style={{ borderTop: '1px solid #F0F0F1', padding: '14px 16px', maxHeight: 420, overflowY: 'auto' }}>
+                {href && (
+                  <div style={{ marginBottom: 12 }}>
+                    <Link
+                      href={href}
+                      onClick={(e) => e.stopPropagation()}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        height: 34,
+                        padding: '0 12px',
+                        borderRadius: 2,
+                        background: 'var(--red, #D5001C)',
+                        color: '#fff',
+                        font: "600 10px/1 'Helvetica Neue',Arial,sans-serif",
+                        letterSpacing: '.06em',
+                        textTransform: 'uppercase',
+                        textDecoration: 'none',
+                      }}
+                    >
+                      Open PDF{doc ? ` · ${doc.title}` : ''} · p.{h.page || 1}
+                    </Link>
+                  </div>
+                )}
+                <pre style={{ margin: 0, whiteSpace: 'pre-wrap', font: "400 12.5px/1.6 'Helvetica Neue',Arial,sans-serif", color: '#2A2A2E' }}>
+                  {content[h.id] ?? 'Loading…'}
+                </pre>
+              </div>
+            )}
+            {!open && href && (
+              <div style={{ borderTop: '1px solid #F5F5F6', padding: '8px 16px', display: 'flex', justifyContent: 'flex-end' }}>
+                <Link
+                  href={href}
+                  onClick={(e) => e.stopPropagation()}
+                  style={{
+                    font: `500 10px/1 ${mono}`,
+                    letterSpacing: '.08em',
+                    color: 'var(--red, #D5001C)',
+                    textDecoration: 'none',
+                  }}
+                >
+                  OPEN IN DOCUMENTS →
+                </Link>
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

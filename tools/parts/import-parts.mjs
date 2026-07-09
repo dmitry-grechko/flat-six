@@ -7,6 +7,7 @@
 // The service role key is in Supabase → Project Settings → API ("service_role").
 // It is a secret — never commit it or expose it to the browser.
 
+import '../load-env.mjs';
 import { createClient } from '@supabase/supabase-js';
 import fs from 'node:fs';
 

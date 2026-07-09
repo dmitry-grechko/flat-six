@@ -14,7 +14,8 @@ const NAV: { no: string; label: string; href: string }[] = [
   { no: '02', label: 'Service History', href: '/history' },
   { no: '03', label: 'Service Plans', href: '/plans' },
   { no: '04', label: 'Fault Finding', href: '/faults' },
-  { no: '05', label: 'Settings & MCP', href: '/settings' },
+  { no: '05', label: 'Documents', href: '/manual' },
+  { no: '06', label: 'Settings & MCP', href: '/settings' },
 ];
 
 const mono = "'JetBrains Mono',monospace";
@@ -38,7 +39,7 @@ export default function Sidebar({
     if (DEMO_MODE) return;
     createClient().auth.getUser().then(({ data }) => setIsAdmin(isAdminEmail(data.user?.email)));
   }, []);
-  const items = isAdmin ? [...NAV, { no: '06', label: 'Admin', href: '/admin' }] : NAV;
+  const items = isAdmin ? [...NAV, { no: '07', label: 'Admin', href: '/admin' }] : NAV;
 
   return (
     <aside
@@ -73,7 +74,8 @@ export default function Sidebar({
           const on =
             pathname === it.href ||
             (it.href === '/history' && pathname.startsWith('/history')) ||
-            (it.href === '/plans' && pathname.startsWith('/plans'));
+            (it.href === '/plans' && pathname.startsWith('/plans')) ||
+            (it.href === '/manual' && pathname.startsWith('/manual'));
           return (
             <Link
               key={it.href}

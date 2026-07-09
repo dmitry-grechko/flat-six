@@ -72,7 +72,8 @@ export const XRAY_ASSEMBLIES: XrayAssembly[] = [
   // legible ~0.31 core height. The engine-bay bits compress toward mid-car — fine.
   { id: 'cooling',   label: 'Cooling System',    glb: '/models/components/cooling.glb',   manifest: '/models/components/cooling-parts.json',   hotspot3d: '0 -0.05 1.45', displayRadius: 0.80 },
   { id: 'oil',       label: 'Oil & Lubrication', glb: '/models/components/oil.glb',       manifest: '/models/components/oil-parts.json',       hotspot3d: '0.6 0.1 -0.9', displayRadius: 0.12 },
-  { id: 'airfilter', label: 'Air Intake',        glb: '/models/components/airfilter.glb', manifest: '/models/components/airfilter-parts.json', hotspot3d: '0 0.7 -0.6',   displayRadius: 0.22 },
+  // Airbox sits centre-LEFT (fed by the left scoop only — WM 242519).
+  { id: 'airfilter', label: 'Air Intake',        glb: '/models/components/airfilter.glb', manifest: '/models/components/airfilter-parts.json', hotspot3d: '-0.12 0.62 -0.6', displayRadius: 0.22 },
   { id: 'plugs',     label: 'Ignition & Fuel',   glb: '/models/components/plugs.glb',     manifest: '/models/components/plugs-parts.json',     hotspot3d: '-0.5 0.3 -0.9', displayRadius: 0.10 },
   // susp & driveline are full-width chassis models authored in car-space (their
   // own coords = scene coords), placed raw so their 4 corners align with the brakes.

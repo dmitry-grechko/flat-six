@@ -57,33 +57,40 @@ export function build() {
   // ---------------------------------------------------------------------------
   const RZ = 2.2;          // front radiator plane (z)
   const LX = -1.6, RX = 1.6; // left / right corner x
+  // Factory mounting (WM 197019 Fig 1): each corner radiator is ANGLED so its
+  // face points forward-outboard into the corner air inlet (~35°). Fans sit
+  // behind the core along the rotated normal.
+  const YAW = 0.6; // ≈35°; left = -YAW, right = +YAW
+  const NX = Math.sin(YAW) * 0.2, NZ = Math.cos(YAW) * 0.2;   // fan offset (0.20 behind)
+  const FX = Math.sin(YAW) * 0.34, FZ = Math.cos(YAW) * 0.34; // left fan node (0.34 behind)
 
   // PRIMARY: both front radiators. The JSON has a single combined node for the
   // pair, so this group spans both corners; the two cores live inside it.
   const radsLR = group('radiatorsLeftRight');
-  radsLR.add(at(radiatorUnit('radLeftCore'), LX, 0, RZ));
-  radsLR.add(at(radiatorUnit('radRightCore'), RX, 0, RZ));
+  radsLR.add(rot(at(radiatorUnit('radLeftCore'), LX, 0, RZ), 0, -YAW, 0));
+  radsLR.add(rot(at(radiatorUnit('radRightCore'), RX, 0, RZ), 0, YAW, 0));
   add(radsLR);
 
-  // PRIMARY: radiator fan modules (the pair) — group spanning both fans.
+  // PRIMARY: radiator fan modules (the pair) — behind each angled core.
   const fanModules = group('radiatorFanModules');
-  fanModules.add(at(fanUnit('fanModuleLeft'), LX, 0, RZ - 0.2));
-  fanModules.add(at(fanUnit('fanModuleRight'), RX, 0, RZ - 0.2));
+  fanModules.add(rot(at(fanUnit('fanModuleLeft'), LX + NX, 0, RZ - NZ), 0, -YAW, 0));
+  fanModules.add(rot(at(fanUnit('fanModuleRight'), RX - NX, 0, RZ - NZ), 0, YAW, 0));
   add(fanModules);
 
   // PRIMARY: dedicated left electric fan node (distinct from the module pair).
-  add(at(fanUnit('radiatorFanLeft'), LX, 0, RZ - 0.34));
+  add(rot(at(fanUnit('radiatorFanLeft'), LX + FX, 0, RZ - FZ), 0, -YAW, 0));
 
   // SUB: secondary / centre radiator + its fan, between the corners.
   add(at(radiatorUnit('radiatorFanSecondary', true), 0, -0.1, RZ + 0.05));
 
-  // SUB: air guides flanking the radiators.
-  add(at(box('radiatorAirGuideLeft', 0.2, 1.3, 0.5, 'plastic'), LX - 0.7, 0, RZ));
-  add(at(box('radiatorAirGuideRight', 0.2, 1.3, 0.5, 'plastic'), RX + 0.7, 0, RZ));
+  // SUB: air guides flanking the radiators (angled with the cores).
+  add(rot(at(box('radiatorAirGuideLeft', 0.2, 1.3, 0.5, 'plastic'), LX - 0.6, 0, RZ + 0.25), 0, -YAW, 0));
+  add(rot(at(box('radiatorAirGuideRight', 0.2, 1.3, 0.5, 'plastic'), RX + 0.6, 0, RZ + 0.25), 0, YAW, 0));
 
-  // SUB: A/C condenser thin panel ahead of the right radiator + its air guide.
-  add(at(box('acCondenser', 1.1, 1.05, 0.08, 'plastic'), RX, 0, RZ + 0.18));
-  add(at(box('acCondenserAirGuide', 1.15, 1.1, 0.06, 'plastic'), RX, 0, RZ + 0.26));
+  // SUB: A/C condenser thin panel ahead of the right radiator + its air guide,
+  // stacked along the rotated face normal.
+  add(rot(at(box('acCondenser', 1.1, 1.05, 0.08, 'plastic'), RX + Math.sin(YAW) * 0.18, 0, RZ + Math.cos(YAW) * 0.18), 0, YAW, 0));
+  add(rot(at(box('acCondenserAirGuide', 1.15, 1.1, 0.06, 'plastic'), RX + Math.sin(YAW) * 0.26, 0, RZ + Math.cos(YAW) * 0.26), 0, YAW, 0));
 
   // SUB: fan control module — a box near the left fan.
   add(at(box('fanControlModule', 0.26, 0.2, 0.12, 'cover'), LX + 0.55, -0.5, RZ - 0.3));

@@ -3,46 +3,60 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { MCP_TOOLS, ENGINES, TRANS, COLORS } from '@/lib/data';
-import { knowledgeSources } from '@/lib/knowledge';
 import { generationForBody } from '@/lib/models';
 import { useVehicle, MODEL_OPTIONS } from '@/lib/vehicle-context';
-import { useServiceRecords } from '@/lib/records-context';
 import { createClient } from '@/lib/supabase/client';
-import { DEMO_MODE, DEMO_EMAIL, DEMO_TOKEN } from '@/lib/demo';
+import { DEMO_MODE, DEMO_EMAIL } from '@/lib/demo';
+
+type RagSource = {
+  name: string;
+  detail: string;
+  status: 'INDEXED' | 'LIVE' | 'EMPTY';
+  group: 'curated' | 'factory' | 'garage';
+};
+
 export default function SettingsMcp() {
   const router = useRouter();
   const { vehicle, update, reset } = useVehicle();
-  const { records } = useServiceRecords();
   const [email, setEmail] = useState<string>('');
   const [endpoint, setEndpoint] = useState<string>('/api/mcp');
-  const [token, setToken] = useState<string>('');
-  const [tokenShown, setTokenShown] = useState<boolean>(false);
   const [copied, setCopied] = useState<string>('');
-  const [partsCount, setPartsCount] = useState<number | null>(null);
+  const [ragGen, setRagGen] = useState<string>('');
+  const [ragSources, setRagSources] = useState<RagSource[]>([]);
+  const [ragMeta, setRagMeta] = useState<{ documentCount: number; factorySections: number } | null>(null);
 
   // Delete-account flow state.
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState('');
 
+  const generation = generationForBody(vehicle.body);
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setEndpoint(`${window.location.origin}/api/mcp`);
     }
-    // Live count of the shared OEM parts catalog (public read; works in demo too).
-    createClient()
-      .from('parts')
-      .select('*', { count: 'exact', head: true })
-      .then(
-        ({ count }) => setPartsCount(count ?? 0),
-        () => setPartsCount(null),
-      );
-
-    if (DEMO_MODE) { setEmail(DEMO_EMAIL); setToken(DEMO_TOKEN); return; }
+    if (DEMO_MODE) { setEmail(DEMO_EMAIL); return; }
     const supabase = createClient();
     supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? ''));
-    supabase.auth.getSession().then(({ data }) => setToken(data.session?.access_token ?? ''));
   }, []);
+
+  useEffect(() => {
+    let active = true;
+    fetch('/api/knowledge/overview')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!active || !data) return;
+        setRagGen(data.generation ?? generation);
+        setRagSources(data.sources ?? []);
+        setRagMeta({
+          documentCount: data.documentCount ?? 0,
+          factorySections: data.factorySections ?? 0,
+        });
+      })
+      .catch(() => {});
+    return () => { active = false; };
+  }, [generation, vehicle.body]);
 
   async function deleteAccount() {
     setDeleting(true);
@@ -60,38 +74,12 @@ export default function SettingsMcp() {
     }
   }
 
-  // Real RAG sources Claude searches: the bundled knowledge base for the active
-  // vehicle's generation, the OEM parts catalog (live DB count) and the
-  // signed-in user's own service history.
-  const generation = generationForBody(vehicle.body);
-  const ragSources: { name: string; detail: string; live: boolean }[] = [
-    ...knowledgeSources(generation).map((s) => ({
-      name: s.name,
-      detail: `${s.count} ${s.count === 1 ? 'entry' : 'entries'}`,
-      live: false,
-    })),
-    {
-      name: 'OEM Parts Catalog',
-      detail: partsCount === null ? 'counting…' : `${partsCount.toLocaleString()} parts`,
-      live: false,
-    },
-    {
-      name: 'Your service history',
-      detail: `${records.length} ${records.length === 1 ? 'record' : 'records'}`,
-      live: true,
-    },
-  ];
-
   const copy = (value: string, key: string) => {
     if (!value) return;
     navigator.clipboard?.writeText(value);
     setCopied(key);
     setTimeout(() => setCopied(''), 1400);
   };
-
-  const maskedToken = token
-    ? `${token.slice(0, 8)}…${token.slice(-6)}`
-    : 'Sign in to reveal your token';
 
   const mcpEndpoint = endpoint;
 
@@ -269,44 +257,6 @@ export default function SettingsMcp() {
           </span>
         </div>
 
-        {/* access token — for testing with a Bearer header */}
-        <div
-          style={{
-            background: '#141416',
-            border: '1px solid #232327',
-            borderRadius: 3,
-            padding: '14px 16px',
-            marginBottom: 16,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-          }}
-        >
-          <span style={{ font: "500 10px/1 'JetBrains Mono',monospace", color: '#76767B' }}>TOKEN</span>
-          <span style={{ font: "500 13px/1 'JetBrains Mono',monospace", color: '#fff', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {tokenShown && token ? token : maskedToken}
-          </span>
-          {token && (
-            <span
-              onClick={() => setTokenShown((v) => !v)}
-              style={{ font: "500 10px/1 'JetBrains Mono',monospace", color: '#76767B', cursor: 'pointer' }}
-            >
-              {tokenShown ? 'HIDE' : 'SHOW'}
-            </span>
-          )}
-          <span
-            onClick={() => copy(token, 'token')}
-            style={{ font: "500 10px/1 'JetBrains Mono',monospace", color: 'var(--red, #D5001C)', cursor: token ? 'pointer' : 'default', opacity: token ? 1 : 0.4 }}
-          >
-            {copied === 'token' ? 'COPIED' : 'COPY'}
-          </span>
-        </div>
-        <p style={{ margin: '-6px 0 16px', font: "400 11px/1.5 'Helvetica Neue',Arial,sans-serif", color: '#76767B', maxWidth: 560 }}>
-          Manual fallback only. Claude Desktop / claude.ai and Claude Code sign in via the one-click OAuth
-          connector below — no token needed. This raw Supabase token (≈1 hr) is just for the MCP Inspector or a
-          hand-set Bearer header.
-        </p>
-
         <div className="stackSm" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           {MCP_TOOLS.map((t) => (
             <div key={t.name} style={{ background: '#141416', border: '1px solid #232327', borderRadius: 3, padding: '13px 14px' }}>
@@ -374,8 +324,7 @@ export default function SettingsMcp() {
           <p style={{ margin: '10px 0 0', font: "400 11px/1.5 'Helvetica Neue',Arial,sans-serif", color: '#76767B' }}>
             Then run <span style={{ fontFamily: "'JetBrains Mono',monospace", color: '#A8A8AD' }}>/mcp</span> in Claude Code and
             sign in (it also prompts on first tool use). The server requires a logged-in session, so this is needed before any
-            tool works. To use a manual token instead, append{' '}
-            <span style={{ fontFamily: "'JetBrains Mono',monospace", color: '#A8A8AD' }}>--header &quot;Authorization: Bearer &lt;token&gt;&quot;</span>. See MCP_SETUP.md.
+            tool works.
           </p>
         </div>
 
@@ -387,30 +336,66 @@ export default function SettingsMcp() {
 
       {/* RAG */}
       <div style={{ background: '#fff', border: '1px solid #E3E3E5', borderRadius: 4, padding: 24 }}>
-        <div style={{ font: "500 10px/1 'JetBrains Mono',monospace", letterSpacing: '.16em', color: '#9A9AA0', marginBottom: 6 }}>
-          KNOWLEDGE BASE (RAG)
-        </div>
-        <p style={{ margin: '0 0 18px', font: "400 13px/1.55 'Helvetica Neue',Arial,sans-serif", color: '#6E6E73', maxWidth: 560 }}>
-          The sources Claude searches when answering questions about your car, via the MCP tools above.
-        </p>
-        {ragSources.map((r) => (
-          <div key={r.name} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '13px 0', borderTop: '1px solid #F0F0F1' }}>
-            <span style={{ font: "500 11px/1 'JetBrains Mono',monospace", color: '#6E6E73', flex: 1 }}>{r.name}</span>
-            <span style={{ font: "500 10px/1 'JetBrains Mono',monospace", color: '#9A9AA0' }}>{r.detail}</span>
-            <span
-              style={{
-                font: "600 9px/1 'JetBrains Mono',monospace",
-                letterSpacing: '.1em',
-                padding: '4px 7px',
-                borderRadius: 2,
-                color: r.live ? 'var(--red, #D5001C)' : '#1E8E4E',
-                background: r.live ? 'rgba(213,0,28,.1)' : 'rgba(30,142,78,.1)',
-              }}
-            >
-              {r.live ? 'LIVE' : 'INDEXED'}
-            </span>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 6, flexWrap: 'wrap' }}>
+          <div style={{ font: "500 10px/1 'JetBrains Mono',monospace", letterSpacing: '.16em', color: '#9A9AA0' }}>
+            KNOWLEDGE BASE (RAG)
           </div>
-        ))}
+          <span style={{ font: "600 9px/1 'JetBrains Mono',monospace", letterSpacing: '.1em', padding: '4px 7px', borderRadius: 2, color: 'var(--red, #D5001C)', background: 'rgba(213,0,28,.08)' }}>
+            {(ragGen || generation).toUpperCase()}
+          </span>
+        </div>
+        <p style={{ margin: '0 0 8px', font: "400 13px/1.55 'Helvetica Neue',Arial,sans-serif", color: '#6E6E73', maxWidth: 560 }}>
+          What Fault Finding and Claude (MCP) search for your garage vehicle. Counts update when you change the model above.
+        </p>
+        {ragMeta && (
+          <p style={{ margin: '0 0 18px', font: "500 11px/1.4 'JetBrains Mono',monospace", color: '#9A9AA0' }}>
+            {ragMeta.documentCount} PDFs in Documents · {ragMeta.factorySections.toLocaleString()} searchable factory sections
+          </p>
+        )}
+
+        {(['curated', 'factory', 'garage'] as const).map((group) => {
+          const rows = ragSources.filter((r) => r.group === group);
+          if (!rows.length) return null;
+          const label =
+            group === 'curated' ? 'CURATED REFERENCE' :
+            group === 'factory' ? 'FACTORY DOCS (SEARCHABLE)' :
+            'YOUR GARAGE';
+          return (
+            <div key={group} style={{ marginBottom: group === 'garage' ? 0 : 8 }}>
+              <div style={{ font: "500 9px/1 'JetBrains Mono',monospace", letterSpacing: '.12em', color: '#B4B4B8', margin: '12px 0 4px' }}>
+                {label}
+              </div>
+              {rows.map((r) => (
+                <div key={r.name} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 0', borderTop: '1px solid #F0F0F1' }}>
+                  <span style={{ font: "500 11px/1 'JetBrains Mono',monospace", color: '#6E6E73', flex: 1 }}>{r.name}</span>
+                  <span style={{ font: "500 10px/1 'JetBrains Mono',monospace", color: '#9A9AA0' }}>{r.detail}</span>
+                  <span
+                    style={{
+                      font: "600 9px/1 'JetBrains Mono',monospace",
+                      letterSpacing: '.1em',
+                      padding: '4px 7px',
+                      borderRadius: 2,
+                      color:
+                        r.status === 'LIVE' ? 'var(--red, #D5001C)' :
+                        r.status === 'EMPTY' ? '#9A9AA0' : '#1E8E4E',
+                      background:
+                        r.status === 'LIVE' ? 'rgba(213,0,28,.1)' :
+                        r.status === 'EMPTY' ? '#EEEEF0' : 'rgba(30,142,78,.1)',
+                    }}
+                  >
+                    {r.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          );
+        })}
+
+        {!ragSources.length && (
+          <div style={{ padding: '16px 0', color: '#9A9AA0', font: "400 13px 'Helvetica Neue',Arial,sans-serif" }}>
+            Loading knowledge overview…
+          </div>
+        )}
       </div>
 
       {/* DANGER ZONE — delete account */}

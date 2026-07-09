@@ -86,14 +86,13 @@ export const FLOW_SYSTEMS: FlowSystem[] = [
     pipe: { color: '#23262b', metalness: 0.3, roughness: 0.6 },   // black plastic ducting
     radius: 0.05,
     speed: 0.16,
-    desc: 'Ambient air enters through the side intake scoops behind the doors, feeds the airbox and filter above the engine, then passes the throttle body into the intake plenum.',
+    desc: 'Intake air enters through the LEFT side scoop only (the right scoop just ventilates the engine bay): a corrugated duct runs inboard to the airbox and filter, then through the throttle body into the plenum.',
     relatedAssembly: 'airfilter',
-    labelAt: [-1.05, 0.5, -0.1],
+    labelAt: [-1.05, 0.45, -0.05],
+    // Factory routing (WM 242519 Fig 2): a single near-horizontal duct from the
+    // left scoop to the airbox — the right side has NO intake duct.
     paths: [
-      // Left scoop (mid-height, just behind the door) → airbox → throttle → plenum
-      { points: [[-1.0, 0.4, -0.15], [-0.65, 0.52, -0.4], [-0.28, 0.62, -0.55], [-0.05, 0.66, -0.6], [0, 0.5, -0.72], [0, 0.34, -0.8]] },
-      // Right scoop → engine-bay feed converging on the airbox
-      { points: [[1.0, 0.4, -0.15], [0.65, 0.52, -0.4], [0.28, 0.62, -0.55], [0.05, 0.66, -0.6]] },
+      { points: [[-1.0, 0.35, -0.12], [-0.62, 0.46, -0.35], [-0.25, 0.56, -0.52], [-0.02, 0.6, -0.62], [0, 0.42, -0.75], [0, 0.32, -0.82]] },
     ],
   },
   {
@@ -108,10 +107,11 @@ export const FLOW_SYSTEMS: FlowSystem[] = [
     relatedAssembly: 'exhaust',
     labelAt: [0, -0.2, -2.0],
     // Waypoints trace the exhaust GLB at its unified placement (scale ≈0.28 at
-    // hotspot 0 -0.34 -1.29): ports → collectors → cats → mid-pipe → mufflers → tips.
+    // hotspot 0 -0.34 -1.29): ports → collectors → cats → out to the CORNER
+    // silencers (factory layout) → back inboard to the centre twin tips.
     paths: [
-      { points: [[-0.45, 0.0, -0.72], [-0.52, -0.17, -0.85], [-0.27, -0.38, -1.13], [-0.24, -0.45, -1.33], [-0.14, -0.48, -1.6], [-0.15, -0.48, -1.77], [-0.05, -0.47, -1.95], [-0.05, -0.46, -2.02]] },
-      { points: [[0.45, 0.0, -0.72], [0.52, -0.17, -0.85], [0.27, -0.38, -1.13], [0.24, -0.45, -1.33], [0.14, -0.48, -1.6], [0.15, -0.48, -1.77], [0.05, -0.47, -1.95], [0.05, -0.46, -2.02]] },
+      { points: [[-0.45, 0.0, -0.72], [-0.52, -0.17, -0.85], [-0.27, -0.38, -1.13], [-0.24, -0.45, -1.33], [-0.36, -0.48, -1.6], [-0.49, -0.48, -1.77], [-0.25, -0.47, -1.9], [-0.05, -0.46, -2.0]] },
+      { points: [[0.45, 0.0, -0.72], [0.52, -0.17, -0.85], [0.27, -0.38, -1.13], [0.24, -0.45, -1.33], [0.36, -0.48, -1.6], [0.49, -0.48, -1.77], [0.25, -0.47, -1.9], [0.05, -0.46, -2.0]] },
     ],
   },
   // ── LINES ────────────────────────────────────────────────────────────────

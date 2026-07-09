@@ -11,12 +11,19 @@ export interface AdminUser {
   joined: string;        // ISO date
   vehicleCount: number;
   vehicles: string[];    // model names
+  recordCount: number;
+  planCount: number;
+  /** true if the user has completed OAuth at least once (MCP connector). */
+  mcpConnected: boolean;
 }
 
 export interface AdminOverview {
   totalUsers: number;
   usersWithCar: number;
   totalVehicles: number;
+  totalRecords: number;
+  totalPlans: number;
+  mcpConnectedUsers: number;
   users: AdminUser[];
   /** true when served from demo placeholder data rather than the real DB. */
   demo?: boolean;
