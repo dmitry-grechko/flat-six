@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { COMPONENTS, SYSTEMS, COLORS, diffDots, DIFF_LABELS } from '@/lib/data';
 import { catalogForSystem, formatPartNumber } from '@/lib/catalog';
 import { lookupPart, type CatalogPartRow } from '@/lib/parts-lookup';
+import { exteriorPartsFor } from '@/lib/exterior-parts';
 import { useVehicle, modelGlb } from '@/lib/vehicle-context';
 import { getVariant } from '@/lib/models';
 import { MODEL_CREDITS, CUTAWAY_CREDIT, ENGINE_CUTAWAY_CREDIT } from '@/lib/credits';
@@ -27,7 +28,7 @@ export default function ComponentExplorer() {
 
   const [view, setView] = useState<'3d' | 'front' | 'rear'>('3d');
   const [showPins, setShowPins] = useState(true);
-  const [activeSystem, setActiveSystem] = useState<SystemName | 'All'>('All');
+  const [activeSystem, setActiveSystem] = useState<SystemName | 'All' | 'None'>('All');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [paint, setPaint] = useState<string | null>(null);
   const [xray, setXray] = useState(false);
@@ -85,6 +86,25 @@ export default function ComponentExplorer() {
       setActiveSystem('All');
     }
   }, [hasInternals]);
+
+  // Exterior panel pins (3D view, X-RAY off) — panels / lamps / lids, not internals.
+  const exteriorParts = exteriorPartsFor(vehicle.body);
+  const exteriorVisible = activeSystem === 'None'
+    ? []
+    : activeSystem === 'All'
+      ? exteriorParts
+      : exteriorParts.filter((p) => p.system === activeSystem);
+  const selectedExterior = exteriorParts.find((p) => p.id === selectedPartId) || null;
+
+  // Clear exterior selection when entering X-RAY or leaving 3D.
+  useEffect(() => {
+    if (xray || view !== '3d') {
+      if (selectedPartId && exteriorParts.some((p) => p.id === selectedPartId)) {
+        setSelectedPartId(null);
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [xray, view, vehicle.body]);
 
   // The parts currently visible as pins/rows: primary tier by default; when a
   // primary with children is drilled into, its sub-parts.
@@ -190,7 +210,7 @@ export default function ComponentExplorer() {
           )}
 
           <div style={{ marginLeft: 'auto', font: `500 10px/1 ${mono}`, letterSpacing: '.12em', color: '#9A9AA0' }}>
-            {view === '3d' ? (xray ? (assemblyId ? 'X-RAY · DRAG TO ORBIT · CLICK A PART' : (layer === 'air' || layer === 'lines' ? `${layer.toUpperCase()} LAYER · CLICK A FLOW TO INSPECT` : 'ALL SYSTEMS · DRAG TO ORBIT · CLICK A SYSTEM')) : 'DRAG TO ORBIT · RECOLOR LIVE') : `${viewComponents.length} COMPONENTS · CLICK A NODE`}
+            {view === '3d' ? (xray ? (assemblyId ? 'X-RAY · DRAG TO ORBIT · CLICK A PART' : (layer === 'air' || layer === 'lines' ? `${layer.toUpperCase()} LAYER · CLICK A FLOW TO INSPECT` : 'ALL SYSTEMS · DRAG TO ORBIT · CLICK A SYSTEM')) : 'DRAG TO ORBIT · CLICK A PANEL DOT') : `${viewComponents.length} COMPONENTS · CLICK A NODE`}
           </div>
         </div>
 
@@ -231,9 +251,9 @@ export default function ComponentExplorer() {
                   src={xray && assembly ? assembly.glb : modelGlb(vehicle.body)}
                   paintHex={xray ? undefined : activePaint}
                   autoRotate={!xray && autoSpin}
-                  parts={xray ? visibleParts : undefined}
-                  selectedPartId={xray ? selectedPartId : null}
-                  onSelectPart={handleSelectPart}
+                  parts={xray ? visibleParts : exteriorVisible}
+                  selectedPartId={selectedPartId}
+                  onSelectPart={xray ? handleSelectPart : (id) => { setSelectedId(null); setSelectedPartId(id); }}
                 />
               )}
 
@@ -301,16 +321,16 @@ export default function ComponentExplorer() {
                   alt="Porsche 981 factory cutaway"
                   style={{ width: '100%', display: 'block', filter: 'drop-shadow(0 24px 36px rgba(0,0,0,.24))' }}
                 />
-                {showPins && viewComponents.map((c) => {
+                {showPins && activeSystem !== 'None' && viewComponents.map((c) => {
                   const n = COMPONENTS.indexOf(c) + 1;
-                  const dim = activeSystem !== 'All' && c.system !== activeSystem;
+                  const dim = activeSystem !== 'All' && activeSystem !== 'None' && c.system !== activeSystem;
                   const active = c.id === selectedId;
                   const dotBg = active ? RED : dim ? '#9A9AA0' : '#0B0B0C';
                   return (
                     <button
                       key={c.id}
                       className="hs"
-                      onClick={() => setSelectedId(c.id)}
+                      onClick={() => { setSelectedPartId(null); setSelectedId(c.id); }}
                       style={{
                         position: 'absolute', left: `${c.ix}%`, top: `${c.iy}%`, transform: 'translate(-50%,-50%)',
                         background: 'transparent', border: 'none', padding: 0, cursor: 'pointer',
@@ -358,32 +378,52 @@ export default function ComponentExplorer() {
           />
         ) : (
         <>
-        {hasInternals && (
         <div style={{ padding: '20px 22px', borderBottom: '1px solid #EEEEF0' }}>
           <div style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.16em', color: '#9A9AA0', marginBottom: 12 }}>SYSTEMS</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
-            {SYSTEMS.map((name) => {
-              const count = name === 'All' ? COMPONENTS.length : COMPONENTS.filter((c) => c.system === name).length;
+            {(['None', ...SYSTEMS] as const).map((name) => {
+              const pool = view === '3d' && !xray ? exteriorParts : COMPONENTS;
+              const count = name === 'None'
+                ? 0
+                : name === 'All'
+                  ? pool.length
+                  : pool.filter((c) => c.system === name).length;
+              if (name !== 'All' && name !== 'None' && count === 0 && view === '3d' && !xray) return null;
               const on = activeSystem === name;
               return (
                 <button
                   key={name}
-                  onClick={() => setActiveSystem(name)}
+                  onClick={() => {
+                    setActiveSystem(name);
+                    if (name === 'None') {
+                      setSelectedId(null);
+                      setSelectedPartId(null);
+                    }
+                  }}
                   style={{
                     display: 'inline-flex', gap: 6, alignItems: 'center', padding: '7px 10px', borderRadius: 2, cursor: 'pointer',
                     font: `500 10px/1 ${mono}`, letterSpacing: '.04em',
                     background: on ? '#0B0B0C' : '#F6F6F7', color: on ? '#fff' : '#6E6E73', border: `1px solid ${on ? '#0B0B0C' : '#E6E6E8'}`,
                   }}
                 >
-                  {name.toUpperCase()} <span style={{ opacity: .5 }}>{count}</span>
+                  {name.toUpperCase()}{name !== 'None' && <span style={{ opacity: .5 }}>{count}</span>}
                 </button>
               );
             })}
           </div>
         </div>
-        )}
 
-        {selected ? (
+        {view === '3d' && !xray && selectedExterior ? (
+          <PartDetailCard
+            key={selectedExterior.id}
+            part={selectedExterior}
+            vehicle={vehicle}
+            assemblyLabel="Exterior"
+            onClose={() => setSelectedPartId(null)}
+            onLog={() => router.push('/history/new')}
+            onAsk={(p) => setAiPrompt(p)}
+          />
+        ) : selected ? (
           <DetailPanel
             key={selected.id}
             comp={selected}
@@ -397,9 +437,13 @@ export default function ComponentExplorer() {
           <div style={{ padding: '40px 22px', textAlign: 'center', color: '#B4B4B8' }}>
             <div style={{ width: 46, height: 46, border: '2px dashed #D2D2D6', borderRadius: '50%', margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', font: `500 16px ${mono}`, color: '#C4C4C8' }}>?</div>
             <div style={{ font: "400 14px/1.6 'Helvetica Neue',Arial,sans-serif", color: '#9A9AA0', maxWidth: 250, margin: '0 auto' }}>
-              {!hasInternals
-                ? `Interactive internals aren't available for the ${variant.label} yet — showing the exterior model. Recolor it live below, or open Fault Finding for ${variant.generation} fault codes and known issues.`
-                : view === '3d' ? 'Toggle X-RAY to see through the body, or switch to FRONT / ENGINE and select a numbered node.' : 'Select a numbered node on the diagram to see part numbers, specs, torque values and the DIY procedure.'}
+              {activeSystem === 'None'
+                ? 'Pins hidden — pick ALL or a system above to show panel dots again.'
+                : view === '3d'
+                  ? (hasInternals
+                    ? 'Click a numbered panel dot on the exterior, or filter by system above. Toggle X-RAY for mechanical internals.'
+                    : `Click a numbered panel dot on the ${variant.label} exterior, or filter by system above. Mechanical X-RAY isn’t available for this generation yet.`)
+                  : 'Select a numbered node on the diagram to see part numbers, specs, torque values and the DIY procedure.'}
             </div>
           </div>
         )}

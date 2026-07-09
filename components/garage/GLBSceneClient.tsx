@@ -76,13 +76,31 @@ function Model({ src, paintHex, parts, selectedPartId, onSelectPart }: {
   }, [cloned, paintHex]);
 
   // Map part node names → objects, and compute hotspot centroids.
+  // Parts with `hotspotNorm` place pins as fractions of the model AABB
+  // (exterior models); otherwise use the named node's bounding-box center.
   const hotspots = useMemo(() => {
     if (!parts?.length) return [] as { part: EnginePart; pos: THREE.Vector3; n: number }[];
     const byName = new Map<string, THREE.Object3D>();
     cloned.traverse((o) => { if (o.name && !byName.has(o.name)) byName.set(o.name, o); });
+    const box = new THREE.Box3().setFromObject(cloned);
+    const center = box.getCenter(new THREE.Vector3());
+    const half = box.getSize(new THREE.Vector3()).multiplyScalar(0.5);
     const out: { part: EnginePart; pos: THREE.Vector3; n: number }[] = [];
     parts.forEach((part, i) => {
-      const node = byName.get(part.node);
+      if (part.hotspotNorm) {
+        const [nx, ny, nz] = part.hotspotNorm.split(' ').map(Number);
+        out.push({
+          part,
+          pos: new THREE.Vector3(
+            center.x + (nx || 0) * half.x,
+            center.y + (ny || 0) * half.y,
+            center.z + (nz || 0) * half.z,
+          ),
+          n: i + 1,
+        });
+        return;
+      }
+      const node = part.node ? byName.get(part.node) : undefined;
       if (!node) return;
       const c = new THREE.Box3().setFromObject(node).getCenter(new THREE.Vector3());
       out.push({ part, pos: c, n: i + 1 });
@@ -91,8 +109,11 @@ function Model({ src, paintHex, parts, selectedPartId, onSelectPart }: {
   }, [cloned, parts]);
 
   // Highlight the selected part; ghost the rest.
+  // Skip ghosting for exterior-style parts (hotspotNorm) — those pins annotate
+  // panels without isolating a single mesh.
   useEffect(() => {
     if (!parts?.length) return;
+    if (parts.some((p) => p.hotspotNorm)) return;
     const selected = selectedPartId ? cloned.getObjectByName(parts.find((p) => p.id === selectedPartId)?.node ?? '') : null;
     const selectedSet = new Set<THREE.Object3D>();
     if (selected) selected.traverse((o) => selectedSet.add(o));

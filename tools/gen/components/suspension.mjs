@@ -9,7 +9,7 @@
 // WM Tier A (981): front-strut-3339 Overview Of Front Spring Strut; rear-strut-5542
 // Overview Of Rear Spring Strut; wheel-bearing-3295…3304 hub/bearing unit.
 
-import { group, box, cyl, torus, tube, at, rot, capsule } from '../lib/primitives.mjs';
+import { group, box, cyl, torus, tube, at, rot, capsule, THREE } from '../lib/primitives.mjs';
 
 export const meta = {
   id: 'susp',
@@ -251,24 +251,47 @@ export function build() {
   add(rot(at(cyl('rearAntiRollBar', 0.022, 0.022, TRACK * 1.8, 'steel', 12), 0, HUB_Y + 0.05, REAR_Z + 0.22), 0, 0, Math.PI / 2));
   add(at(box('rearSubframe', TRACK * 1.95, 0.09, 0.5, 'castDark'), 0, HUB_Y - 0.12, REAR_Z));
 
-  // ── Steering (front) — LHD column on driver (−X), visible wheel + shaft ──
+  // ── Steering (front) — LHD column on driver (+X), wheel → down/forward → rack ──
   add(rot(at(cyl('steeringRack', 0.035, 0.035, TRACK * 1.7, 'cast', 12), 0, HUB_Y + 0.16, FRONT_Z - 0.2), 0, 0, Math.PI / 2));
   for (const [side, sx] of [['Left', -1], ['Right', 1]]) {
     add(at(cyl(`tieRod${side}`, 0.016, 0.016, 0.3, 'steel', 8), sx * TRACK * 0.78, HUB_Y + 0.05, FRONT_Z - 0.12), susp);
   }
-  // PRIMARY steeringColumn — driver side (+X) with wheel rim for LHD packaging.
+  // PRIMARY steeringColumn — shafts run from the wheel downward/forward to the rack.
   {
     const col = group('steeringColumn');
     const cx = 0.38;
-    // Lower intermediate shaft → rack pinion
-    col.add(rot(at(cyl('steeringColumnLower', 0.022, 0.022, 0.35, 'castDark', 12), cx, HUB_Y + 0.22, FRONT_Z - 0.35), 0.35, 0, 0));
-    col.add(at(box('steeringUJoint', 0.05, 0.05, 0.05, 'cast'), cx, HUB_Y + 0.38, FRONT_Z - 0.55));
-    // Upper column toward wheel
-    col.add(rot(at(cyl('steeringColumnUpper', 0.028, 0.028, 0.55, 'castDark', 12), cx, 0.35, 0.95), 0.55, 0, 0));
-    // Steering wheel (rim + hub) — driver side landmark
-    col.add(rot(at(torus('steeringWheelRim', 0.17, 0.016, 'castDark', 10, 28), cx, 0.58, 0.72), 0.55, 0, 0));
-    col.add(at(cyl('steeringWheelHub', 0.045, 0.045, 0.04, 'cast', 14), cx, 0.52, 0.78));
-    col.add(at(box('steeringWheelSpoke', 0.22, 0.02, 0.03, 'castDark'), cx, 0.55, 0.75));
+    // Rack pinion (front axle) and cabin wheel (rearward + up).
+    const rackY = HUB_Y + 0.18;
+    const rackZ = FRONT_Z - 0.2;
+    const wheelY = 0.62;
+    const wheelZ = 0.48;
+    const ujY = 0.22;
+    const ujZ = 0.95;
+
+    const shaftBetween = (name, r, ax, ay, az, bx, by, bz, mat) => {
+      const dir = new THREE.Vector3(bx - ax, by - ay, bz - az);
+      const len = dir.length();
+      const mesh = cyl(name, r, r, len, mat, 12);
+      mesh.position.set((ax + bx) / 2, (ay + by) / 2, (az + bz) / 2);
+      mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.normalize());
+      return mesh;
+    };
+
+    col.add(shaftBetween('steeringColumnLower', 0.022, cx, ujY, ujZ, cx, rackY, rackZ, 'castDark'));
+    col.add(at(box('steeringUJoint', 0.05, 0.05, 0.05, 'cast'), cx, ujY, ujZ));
+    col.add(shaftBetween('steeringColumnUpper', 0.028, cx, wheelY, wheelZ, cx, ujY, ujZ, 'castDark'));
+
+    // Wheel plane faces along the upper column (driver looks toward +Z / front).
+    const colDir = new THREE.Vector3(0, ujY - wheelY, ujZ - wheelZ).normalize();
+    const rim = torus('steeringWheelRim', 0.17, 0.016, 'castDark', 10, 28);
+    rim.position.set(cx, wheelY, wheelZ);
+    rim.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), colDir);
+    col.add(rim);
+    col.add(at(cyl('steeringWheelHub', 0.045, 0.045, 0.04, 'cast', 14), cx, wheelY, wheelZ));
+    const spoke = box('steeringWheelSpoke', 0.22, 0.02, 0.03, 'castDark');
+    spoke.position.set(cx, wheelY, wheelZ);
+    spoke.quaternion.copy(rim.quaternion);
+    col.add(spoke);
     add(col);
   }
 

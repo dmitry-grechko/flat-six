@@ -189,6 +189,12 @@ export interface EnginePart {
   parent?: string;
   /** optional link to a COMPONENTS entry (enables Log service / Ask Claude deep-link). */
   componentId?: string;
+  /**
+   * Optional pin position as fractions of the model AABB half-extents from its
+   * center: "nx ny nz" in roughly −1…1. Used when the GLB has no stable named
+   * node (exterior models) or when a fixed pin is preferred over the mesh centroid.
+   */
+  hotspotNorm?: string;
 }
 
 /** Parts manifest for one assembled model (e.g. the engine). */
