@@ -18,7 +18,7 @@ const SITE = 'https://www.flat-six.org';
 // connector's icon.
 const serverInfo = {
   name: 'flatsix-981-garage',
-  title: 'FLAT·SIX · 981 Garage',
+  title: 'FLAT·SIX · Porsche Garage',
   version: '0.1.0',
   websiteUrl: SITE,
   icons: [

@@ -7,7 +7,24 @@ interface CatalogFile {
   systems: { id: string; label: string; components: CatalogPart[] }[];
 }
 
-const CATALOG = catalogJson as CatalogFile;
+// OEM catalog is keyed by car generation. Only the 981 is populated today; add a
+// generation by dropping a catalog JSON and registering it here. Unknown
+// generations resolve to an empty catalog. No-arg callers default to the 981.
+export const DEFAULT_GENERATION = '981';
+
+const CATALOGS: Record<string, CatalogFile> = {
+  '981': catalogJson as CatalogFile,
+};
+
+/** Generations we have an OEM catalog for. */
+export const CATALOG_GENERATIONS = Object.keys(CATALOGS);
+
+function catalogFor(generation: string = DEFAULT_GENERATION): CatalogFile | null {
+  return CATALOGS[generation] ?? null;
+}
+
+// Back-compat alias for the default (981) catalog.
+const CATALOG = CATALOGS[DEFAULT_GENERATION];
 
 /** Format a packed Porsche part number into dotted form when it looks like one. */
 export function formatPartNumber(pn: string | null | undefined): string {
@@ -20,25 +37,25 @@ export function formatPartNumber(pn: string | null | undefined): string {
 }
 
 /** Real OEM parts for a given system, sourced from porscheontario.com. */
-export function catalogForSystem(system: SystemName): CatalogPart[] {
+export function catalogForSystem(system: SystemName, generation: string = DEFAULT_GENERATION): CatalogPart[] {
   const id = system.toLowerCase();
-  return CATALOG.systems.find((s) => s.id === id)?.components ?? [];
+  return catalogFor(generation)?.systems.find((s) => s.id === id)?.components ?? [];
 }
 
 /** Every part in the catalog, flattened across all systems. */
-export function allCatalogParts(): CatalogPart[] {
-  return CATALOG.systems.flatMap((s) => s.components);
+export function allCatalogParts(generation: string = DEFAULT_GENERATION): CatalogPart[] {
+  return catalogFor(generation)?.systems.flatMap((s) => s.components) ?? [];
 }
 
 /**
  * Free-text search over the OEM catalog. Matches name, system, notes, function
  * and part numbers (raw + dotted form), ranked by where the hit landed.
  */
-export function searchCatalog(query: string, limit = 10): CatalogPart[] {
+export function searchCatalog(query: string, limit = 10, generation: string = DEFAULT_GENERATION): CatalogPart[] {
   const q = query.trim().toLowerCase();
   if (!q) return [];
   const scored: { part: CatalogPart; score: number }[] = [];
-  for (const part of allCatalogParts()) {
+  for (const part of allCatalogParts(generation)) {
     const numbers = [part.partNumber, ...(part.alternateNumbers ?? [])]
       .filter(Boolean)
       .flatMap((n) => [String(n).toLowerCase(), formatPartNumber(n).toLowerCase()]);

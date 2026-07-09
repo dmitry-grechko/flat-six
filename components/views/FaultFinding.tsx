@@ -8,6 +8,8 @@ import {
 } from '@/lib/knowledge';
 import type { FaultCode, KnownIssue, Severity } from '@/lib/knowledge';
 import { searchParts, type CatalogPartRow } from '@/lib/parts-lookup';
+import { useVehicle } from '@/lib/vehicle-context';
+import { generationForBody } from '@/lib/models';
 
 const mono = "'JetBrains Mono',monospace";
 
@@ -18,25 +20,29 @@ const SEV_MAP: Record<Severity, [string, string]> = {
   HIGH: ['var(--red, #D5001C)', 'rgba(213,0,28,.1)'],
 };
 
-// Build lookup maps once — searchKnowledge returns lossy chunks, so we map its
-// ranked hits back to the full structured records to render rich cards.
-const FAULT_BY_CODE = new Map(getFaultCodes().map((f) => [f.code.toUpperCase(), f]));
-const ISSUE_BY_ID = new Map(getKnownIssues().map((k) => [k.id, k]));
-
 type Result =
   | { key: string; kind: 'fault'; data: FaultCode }
   | { key: string; kind: 'issue'; data: KnownIssue };
 
-/** Map ranked knowledge chunks (faults + known issues) back to full records. */
-function runSearch(query: string): Result[] {
-  const hits = searchKnowledge(query, { kinds: ['fault', 'issue'], limit: 30 });
+/**
+ * Map ranked knowledge chunks (faults + known issues) back to full records,
+ * scoped to a car generation. The lookup maps are built from that generation's
+ * knowledge so results always match the active vehicle.
+ */
+function runSearch(
+  query: string,
+  faultByCode: Map<string, FaultCode>,
+  issueById: Map<string, KnownIssue>,
+  generation: string,
+): Result[] {
+  const hits = searchKnowledge(query, { kinds: ['fault', 'issue'], limit: 30, generation });
   const out: Result[] = [];
   for (const h of hits) {
     if (h.kind === 'fault') {
-      const f = FAULT_BY_CODE.get(h.source.toUpperCase());
+      const f = faultByCode.get(h.source.toUpperCase());
       if (f) out.push({ key: `fault:${f.code}`, kind: 'fault', data: f });
     } else if (h.kind === 'issue') {
-      const k = ISSUE_BY_ID.get(h.source);
+      const k = issueById.get(h.source);
       if (k) out.push({ key: `issue:${k.id}`, kind: 'issue', data: k });
     }
   }
@@ -58,17 +64,30 @@ function looksLikePartNumber(q: string): boolean {
 const EXAMPLES = ['P0301', 'P000C', 'rough idle', 'coolant leak', 'water pump', '99710764340'];
 
 export default function FaultFinding() {
+  const { vehicle } = useVehicle();
+  const generation = generationForBody(vehicle.body);
+
   const [query, setQuery] = useState('');
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [parts, setParts] = useState<CatalogPartRow[]>([]);
   const [partsLoading, setPartsLoading] = useState(false);
 
+  // Knowledge lookup maps for the active car's generation.
+  const faultByCode = useMemo(
+    () => new Map(getFaultCodes(generation).map((f) => [f.code.toUpperCase(), f])),
+    [generation],
+  );
+  const issueById = useMemo(
+    () => new Map(getKnownIssues(generation).map((k) => [k.id, k])),
+    [generation],
+  );
+
   const trimmed = query.trim();
   const results = useMemo(() => {
     if (!trimmed) return []; // no default list — prompt to search instead
     if (looksLikePartNumber(trimmed)) return []; // part-number query → parts only
-    return runSearch(trimmed);
-  }, [trimmed]);
+    return runSearch(trimmed, faultByCode, issueById, generation);
+  }, [trimmed, faultByCode, issueById, generation]);
 
   // Parts come from the central Supabase catalog (debounced). Empty query → no parts.
   useEffect(() => {
@@ -80,7 +99,7 @@ export default function FaultFinding() {
     let active = true;
     setPartsLoading(true);
     const t = setTimeout(() => {
-      searchParts(trimmed, 25).then((rows) => {
+      searchParts(trimmed, 25, generation).then((rows) => {
         if (active) {
           setParts(rows);
           setPartsLoading(false);
@@ -91,7 +110,7 @@ export default function FaultFinding() {
       active = false;
       clearTimeout(t);
     };
-  }, [trimmed]);
+  }, [trimmed, generation]);
 
   function toggle(key: string) {
     setOpenKey((cur) => (cur === key ? null : key));
@@ -107,7 +126,7 @@ export default function FaultFinding() {
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search a fault code (P0301), symptom (rough idle), or part number (981.351…)"
+            placeholder={`Search a fault code (P0301), symptom (rough idle), or part number (${generation}.xxx…)`}
             style={{
               flex: 1,
               height: 40,
@@ -162,7 +181,7 @@ export default function FaultFinding() {
 
       {!trimmed ? (
         <div style={{ background: '#fff', border: '1px solid #E3E3E5', borderRadius: 4, padding: '52px 24px', textAlign: 'center' }}>
-          <div style={{ font: `500 11px/1 ${mono}`, letterSpacing: '.16em', color: '#6E6E73', marginBottom: 12 }}>981 DIAGNOSTIC SEARCH</div>
+          <div style={{ font: `500 11px/1 ${mono}`, letterSpacing: '.16em', color: '#6E6E73', marginBottom: 12 }}>{generation} DIAGNOSTIC SEARCH</div>
           <div style={{ font: "400 14px/1.7 'Helvetica Neue',Arial,sans-serif", color: '#9A9AA0', maxWidth: 400, margin: '0 auto' }}>
             Search the knowledge base by OBD-II fault code, symptom, or OEM part number to see causes, diagnostic steps, known issues and parts.
           </div>

@@ -27,6 +27,16 @@ export const MODEL_CREDITS: Record<BodyType, ModelCredit> = {
     license: CC_BY,
     licenseUrl: CC_BY_URL,
   },
+  // TODO(attribution): confirm the 987 model's author + licence before publishing.
+  // The GLB was supplied without source/licence metadata — most free car models
+  // are CC-BY and REQUIRE attribution, so this must be filled in to stay compliant.
+  'cayman-987': {
+    title: 'Porsche Cayman (987)',
+    author: 'Attribution pending — confirm source',
+    source: '',
+    license: 'Unknown — verify before publishing',
+    licenseUrl: '',
+  },
 };
 
 export const MODEL_CREDIT_LIST = Object.values(MODEL_CREDITS);

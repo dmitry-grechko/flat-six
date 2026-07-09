@@ -3,11 +3,11 @@ import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Privacy & Terms',
-  description: 'Privacy policy and terms of use for FLAT·SIX, an open-source DIY maintenance app for the Porsche 981 Boxster / Cayman.',
+  description: 'Privacy policy and terms of use for FLAT·SIX, an open-source DIY maintenance app for the Porsche Boxster & Cayman (987, 981, and more).',
   alternates: { canonical: '/legal' },
   openGraph: {
     title: 'Privacy & Terms · FLAT·SIX',
-    description: 'Privacy policy and terms of use for FLAT·SIX — a free, open-source Porsche 981 garage.',
+    description: 'Privacy policy and terms of use for FLAT·SIX — a free, open-source Porsche Boxster & Cayman garage.',
     url: '/legal',
     type: 'article',
   },

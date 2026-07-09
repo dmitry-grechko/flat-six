@@ -2,10 +2,10 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'FLAT·SIX — Porsche 981 Garage',
+    name: 'FLAT·SIX — Porsche Garage',
     short_name: 'FLAT·SIX',
     description:
-      'A free, open-source garage for the Porsche 981 Boxster & Cayman: 3D inspector, part numbers, torque specs, service history and an AI assistant.',
+      'A free, open-source garage for the Porsche Boxster & Cayman (987, 981, and more): 3D inspector, generation-specific specs, service history and an AI assistant.',
     start_url: '/',
     display: 'standalone',
     background_color: '#0B0B0C',

@@ -35,6 +35,13 @@ export interface XrayAssembly {
    */
   carSpace?: boolean;
   worldScale?: number;
+  /**
+   * Named GLB nodes hidden in the UNIFIED scene only (still visible + pinnable
+   * in the focused single-assembly view). Used for chassis-mounted hardware
+   * baked into a bilateral corner GLB — rendering it mirrored on both sides
+   * would duplicate one-per-car parts (master cylinder, ABS unit…).
+   */
+  hideInUnified?: string[];
 }
 
 /**
@@ -47,11 +54,23 @@ export const AXLE = { frontZ: 1.5, rearZ: -1.5, halfTrack: 0.82, hubY: -0.35 };
 export const XRAY_ASSEMBLIES: XrayAssembly[] = [
   { id: 'engine',    label: 'Engine',           glb: '/models/components/engine.glb',    manifest: '/models/components/engine-parts.json',    hotspot3d: '0 0.2 -0.8',   displayRadius: 0.70 },
   { id: 'trans',     label: 'Transaxle',         glb: '/models/components/trans.glb',     manifest: '/models/components/trans-parts.json',     hotspot3d: '0 -0.1 -1.7',  displayRadius: 0.55 },
-  { id: 'exhaust',   label: 'Exhaust',           glb: '/models/components/exhaust.glb',   manifest: '/models/components/exhaust-parts.json',   hotspot3d: '0 -0.7 -1.2',  displayRadius: 0.50 },
-  // Rotors are the OUTERMOST station of the radial stack (driveshaft ≈0.87 → suspension ≈1.05 → rotor 1.3).
-  { id: 'fbrakes',   label: 'Front Brakes',      glb: '/models/components/fbrakes.glb',   manifest: '/models/components/fbrakes-parts.json',   hotspot3d: '0 -0.35 1.5',  displayRadius: 0.30, bilateral: true, lateralOffset: 1.3 },
-  { id: 'rbrakes',   label: 'Rear Brakes',       glb: '/models/components/rbrakes.glb',   manifest: '/models/components/rbrakes-parts.json',   hotspot3d: '0 -0.35 -1.5', displayRadius: 0.30, bilateral: true, lateralOffset: 1.3 },
-  { id: 'cooling',   label: 'Cooling System',    glb: '/models/components/cooling.glb',   manifest: '/models/components/cooling-parts.json',   hotspot3d: '0 0.3 1.9',    displayRadius: 0.40 },
+  // Exhaust spans engine headers (z≈-0.85) to the rear tips (z≈-2.0): sized so the
+  // native span (ports z0 → tips z-4.05, sphere r≈3.33) lands at scale ≈0.28 and
+  // the flow-systems 'exhaust-flow' tubes thread through headers→cats→X-pipe→tips.
+  { id: 'exhaust',   label: 'Exhaust',           glb: '/models/components/exhaust.glb',   manifest: '/models/components/exhaust-parts.json',   hotspot3d: '0 -0.34 -1.29', displayRadius: 0.93 },
+  // Brake GLBs include the chassis hydraulics (MC/booster/ABS at native y≈2.1),
+  // which drag the bbox centre ~0.7 above the rotor — so the hotspot y sits HIGH
+  // so the ROTOR (native origin) lands at the hub (y≈-0.33), and displayRadius is
+  // sized for a ~0.2-radius rotor. Rotors sit just outboard of the suspension
+  // knuckles (driveshaft ≈0.87 → suspension ≈1.05 → rotor 1.15).
+  { id: 'fbrakes',   label: 'Front Brakes',      glb: '/models/components/fbrakes.glb',   manifest: '/models/components/fbrakes-parts.json',   hotspot3d: '0 -0.17 1.5',  displayRadius: 0.49, bilateral: true, lateralOffset: 1.15,
+    hideInUnified: ['brakeMasterCylinder', 'brakeBooster', 'absHydraulicControlUnit'] },
+  { id: 'rbrakes',   label: 'Rear Brakes',       glb: '/models/components/rbrakes.glb',   manifest: '/models/components/rbrakes-parts.json',   hotspot3d: '0 -0.2 -1.34', displayRadius: 0.46, bilateral: true, lateralOffset: 1.15,
+    hideInUnified: ['absPsmHydraulicUnit', 'brakeFluidReservoir'] },
+  // Cooling GLB spans radiators (native x ±1.6, z 2.2) AND engine-bay pumps: sized
+  // so the front cores land at the bumper corners (±0.41, -0.07, ~1.89) at a
+  // legible ~0.31 core height. The engine-bay bits compress toward mid-car — fine.
+  { id: 'cooling',   label: 'Cooling System',    glb: '/models/components/cooling.glb',   manifest: '/models/components/cooling-parts.json',   hotspot3d: '0 -0.05 1.45', displayRadius: 0.80 },
   { id: 'oil',       label: 'Oil & Lubrication', glb: '/models/components/oil.glb',       manifest: '/models/components/oil-parts.json',       hotspot3d: '0.6 0.1 -0.9', displayRadius: 0.12 },
   { id: 'airfilter', label: 'Air Intake',        glb: '/models/components/airfilter.glb', manifest: '/models/components/airfilter-parts.json', hotspot3d: '0 0.7 -0.6',   displayRadius: 0.22 },
   { id: 'plugs',     label: 'Ignition & Fuel',   glb: '/models/components/plugs.glb',     manifest: '/models/components/plugs-parts.json',     hotspot3d: '-0.5 0.3 -0.9', displayRadius: 0.10 },

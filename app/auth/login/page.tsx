@@ -88,7 +88,7 @@ function LoginForm() {
             marginBottom: 26,
           }}
         >
-          981 GARAGE
+          BOXSTER &amp; CAYMAN
         </div>
 
         {status === 'sent' ? (

@@ -5,12 +5,12 @@ import Providers from './providers';
 const SITE_URL = 'https://www.flat-six.org';
 const SITE_NAME = 'FLAT·SIX';
 const DESCRIPTION =
-  'A free, open-source garage for the Porsche 981 Boxster & Cayman. Explore your car in 3D and factory cutaways, look up real part numbers and torque specs, keep a full service history, plan maintenance, and let an AI assistant help — all in one place.';
+  'A free, open-source garage for the Porsche Boxster & Cayman — 987, 981, and more. Explore your car in 3D, look up generation-specific fault codes and torque specs, keep a full service history, plan maintenance, and let an AI assistant help — all in one place.';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'FLAT·SIX — Free Porsche 981 Boxster & Cayman garage',
+    default: 'FLAT·SIX — Free Porsche Boxster & Cayman garage',
     template: '%s · FLAT·SIX',
   },
   description: DESCRIPTION,
@@ -19,9 +19,11 @@ export const metadata: Metadata = {
   creator: 'Dmitry Grechko',
   publisher: SITE_NAME,
   keywords: [
+    'Porsche 987',
     'Porsche 981',
     'Boxster',
     'Cayman',
+    '987 maintenance',
     '981 maintenance',
     'DIY maintenance',
     'service history',
@@ -29,6 +31,7 @@ export const metadata: Metadata = {
     'part numbers',
     'oil change',
     'flat-six',
+    'IMS bearing',
     'PDK',
     'fault finding',
     'open source',
@@ -40,13 +43,13 @@ export const metadata: Metadata = {
     type: 'website',
     siteName: SITE_NAME,
     url: SITE_URL,
-    title: 'FLAT·SIX — Free Porsche 981 Boxster & Cayman garage',
+    title: 'FLAT·SIX — Free Porsche Boxster & Cayman garage',
     description: DESCRIPTION,
     locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'FLAT·SIX — Free Porsche 981 Boxster & Cayman garage',
+    title: 'FLAT·SIX — Free Porsche Boxster & Cayman garage',
     description: DESCRIPTION,
   },
   robots: {

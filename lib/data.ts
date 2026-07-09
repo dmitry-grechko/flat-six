@@ -145,7 +145,7 @@ export const REC_TEMPLATES: Record<string, string[]> = {
  * `auth: true` tools need a Supabase Bearer token; the rest are open.
  */
 export const MCP_TOOLS: McpTool[] = [
-  { name: 'search_981_knowledge', desc: 'Search the 981 knowledge base (faults, specs, issues, articles).' },
+  { name: 'search_knowledge', desc: 'Search the knowledge base (faults, specs, issues, articles) for your car generation.' },
   { name: 'lookup_fault_code', desc: 'Resolve an OBD / fault code to causes and fixes.' },
   { name: 'get_spec', desc: 'Look up a torque value, capacity or fluid spec.' },
   { name: 'get_maintenance_schedule', desc: 'List maintenance items by system or mileage.' },

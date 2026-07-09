@@ -3,18 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { MCP_TOOLS, ENGINES, TRANS, COLORS } from '@/lib/data';
-import { KNOWLEDGE_SOURCES } from '@/lib/knowledge';
+import { knowledgeSources } from '@/lib/knowledge';
+import { generationForBody } from '@/lib/models';
 import { useVehicle, MODEL_OPTIONS } from '@/lib/vehicle-context';
 import { useServiceRecords } from '@/lib/records-context';
 import { createClient } from '@/lib/supabase/client';
 import { DEMO_MODE, DEMO_EMAIL, DEMO_TOKEN } from '@/lib/demo';
-import type { BodyType } from '@/lib/types';
-
-const DEFAULT_MODEL_NAME: Record<BodyType, string> = {
-  boxster: 'Boxster S (981)',
-  cayman: 'Cayman S (981)',
-};
-
 export default function SettingsMcp() {
   const router = useRouter();
   const { vehicle, update, reset } = useVehicle();
@@ -66,10 +60,12 @@ export default function SettingsMcp() {
     }
   }
 
-  // Real RAG sources Claude searches: the bundled 981 knowledge base, the OEM
-  // parts catalog (live DB count) and the signed-in user's own service history.
+  // Real RAG sources Claude searches: the bundled knowledge base for the active
+  // vehicle's generation, the OEM parts catalog (live DB count) and the
+  // signed-in user's own service history.
+  const generation = generationForBody(vehicle.body);
   const ragSources: { name: string; detail: string; live: boolean }[] = [
-    ...KNOWLEDGE_SOURCES.map((s) => ({
+    ...knowledgeSources(generation).map((s) => ({
       name: s.name,
       detail: `${s.count} ${s.count === 1 ? 'entry' : 'entries'}`,
       live: false,
@@ -159,7 +155,7 @@ export default function SettingsMcp() {
           {MODEL_OPTIONS.map((m) => (
             <button
               key={m.id}
-              onClick={() => update({ body: m.id, model: DEFAULT_MODEL_NAME[m.id] })}
+              onClick={() => update({ body: m.id, model: m.modelName })}
               style={chip(vehicle.body === m.id)}
             >
               {m.label}

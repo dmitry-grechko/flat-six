@@ -1,4 +1,4 @@
-// FLAT·SIX 981 knowledge base — public API.
+// FLAT·SIX knowledge base — public API (generation-keyed: 981, 987, …).
 // Loads the JSON data + markdown articles and exposes typed getters plus a
 // dependency-free full-text search used by the RAG assistant and MCP tools.
 
@@ -7,6 +7,11 @@ import specsJson from './specs.json';
 import maintenanceJson from './maintenance.json';
 import knownIssuesJson from './known-issues.json';
 import { ARTICLES } from './articles';
+import faultCodes987Json from './fault-codes-987.json';
+import specs987Json from './specs-987.json';
+import maintenance987Json from './maintenance-987.json';
+import knownIssues987Json from './known-issues-987.json';
+import { ARTICLES_987 } from './articles-987';
 import type {
   FaultCode,
   Spec,
@@ -19,26 +24,70 @@ import type {
 
 export * from './types';
 
-// ---- Typed getters -------------------------------------------------------
+// ---- Generation registry -------------------------------------------------
+// Knowledge is keyed by car generation (981 and 987 populated today). Add a
+// generation by registering its bundle here (specs/maintenance/etc.). Unknown
+// generations resolve to an EMPTY bundle (honest "no data" rather than showing
+// the wrong generation's figures). No-arg callers default to the 981.
 
-export function getFaultCodes(): FaultCode[] {
-  return faultCodesJson as FaultCode[];
+export const DEFAULT_GENERATION = '981';
+
+export interface KnowledgeBundle {
+  faultCodes: FaultCode[];
+  specs: Spec[];
+  maintenance: MaintenanceItem[];
+  knownIssues: KnownIssue[];
+  articles: KnowledgeArticle[];
 }
 
-export function getSpecs(): Spec[] {
-  return specsJson as Spec[];
+const EMPTY_BUNDLE: KnowledgeBundle = {
+  faultCodes: [], specs: [], maintenance: [], knownIssues: [], articles: [],
+};
+
+const GENERATION_KB: Record<string, KnowledgeBundle> = {
+  '981': {
+    faultCodes: faultCodesJson as FaultCode[],
+    specs: specsJson as Spec[],
+    maintenance: maintenanceJson as MaintenanceItem[],
+    knownIssues: knownIssuesJson as KnownIssue[],
+    articles: ARTICLES,
+  },
+  '987': {
+    faultCodes: faultCodes987Json as FaultCode[],
+    specs: specs987Json as Spec[],
+    maintenance: maintenance987Json as MaintenanceItem[],
+    knownIssues: knownIssues987Json as KnownIssue[],
+    articles: ARTICLES_987,
+  },
+};
+
+/** Generations we have a knowledge bundle for. */
+export const KNOWLEDGE_GENERATIONS = Object.keys(GENERATION_KB);
+
+function bundle(generation: string = DEFAULT_GENERATION): KnowledgeBundle {
+  return GENERATION_KB[generation] ?? EMPTY_BUNDLE;
 }
 
-export function getMaintenance(): MaintenanceItem[] {
-  return maintenanceJson as MaintenanceItem[];
+// ---- Typed getters (generation-aware; default 981) -----------------------
+
+export function getFaultCodes(generation: string = DEFAULT_GENERATION): FaultCode[] {
+  return bundle(generation).faultCodes;
 }
 
-export function getKnownIssues(): KnownIssue[] {
-  return knownIssuesJson as KnownIssue[];
+export function getSpecs(generation: string = DEFAULT_GENERATION): Spec[] {
+  return bundle(generation).specs;
 }
 
-export function getArticles(): KnowledgeArticle[] {
-  return ARTICLES;
+export function getMaintenance(generation: string = DEFAULT_GENERATION): MaintenanceItem[] {
+  return bundle(generation).maintenance;
+}
+
+export function getKnownIssues(generation: string = DEFAULT_GENERATION): KnownIssue[] {
+  return bundle(generation).knownIssues;
+}
+
+export function getArticles(generation: string = DEFAULT_GENERATION): KnowledgeArticle[] {
+  return bundle(generation).articles;
 }
 
 // ---- Chunk index ---------------------------------------------------------
@@ -62,14 +111,15 @@ function chunkArticleBody(body: string, wordsPerChunk = 200): string[] {
   return chunks;
 }
 
-let CHUNK_CACHE: KnowledgeChunk[] | null = null;
+const CHUNK_CACHE = new Map<string, KnowledgeChunk[]>();
 
-/** Build (and memoize) one searchable chunk per knowledge item. */
-function buildChunks(): KnowledgeChunk[] {
-  if (CHUNK_CACHE) return CHUNK_CACHE;
+/** Build (and memoize per generation) one searchable chunk per knowledge item. */
+function buildChunks(generation: string = DEFAULT_GENERATION): KnowledgeChunk[] {
+  const cached = CHUNK_CACHE.get(generation);
+  if (cached) return cached;
   const chunks: KnowledgeChunk[] = [];
 
-  for (const f of getFaultCodes()) {
+  for (const f of getFaultCodes(generation)) {
     const text = [
       `${f.code} ${f.title}`,
       `System: ${f.system}. Severity: ${f.severity}.`,
@@ -83,7 +133,7 @@ function buildChunks(): KnowledgeChunk[] {
     chunks.push({ id: `fault:${f.code}`, source: f.code, kind: 'fault', title: `${f.code} — ${f.title}`, text });
   }
 
-  for (const s of getSpecs()) {
+  for (const s of getSpecs(generation)) {
     const text = [
       `${s.name}: ${s.value}.`,
       `Category: ${s.category}.`,
@@ -93,7 +143,7 @@ function buildChunks(): KnowledgeChunk[] {
     chunks.push({ id: `spec:${s.id}`, source: s.id, kind: 'spec', title: s.name, text });
   }
 
-  for (const m of getMaintenance()) {
+  for (const m of getMaintenance(generation)) {
     const interval = [
       m.intervalMiles ? `${m.intervalMiles.toLocaleString()} mi` : '',
       m.intervalMonths ? `${m.intervalMonths} months` : '',
@@ -107,7 +157,7 @@ function buildChunks(): KnowledgeChunk[] {
     chunks.push({ id: `maint:${m.id}`, source: m.id, kind: 'maintenance', title: m.task, text });
   }
 
-  for (const k of getKnownIssues()) {
+  for (const k of getKnownIssues(generation)) {
     const text = [
       `${k.title}.`,
       `System: ${k.system}. Severity: ${k.severity}. Affected: ${k.affected}.`,
@@ -119,7 +169,7 @@ function buildChunks(): KnowledgeChunk[] {
     chunks.push({ id: `issue:${k.id}`, source: k.id, kind: 'issue', title: k.title, text });
   }
 
-  for (const a of getArticles()) {
+  for (const a of getArticles(generation)) {
     const parts = chunkArticleBody(a.body);
     parts.forEach((part, i) => {
       chunks.push({
@@ -132,7 +182,7 @@ function buildChunks(): KnowledgeChunk[] {
     });
   }
 
-  CHUNK_CACHE = chunks;
+  CHUNK_CACHE.set(generation, chunks);
   return chunks;
 }
 
@@ -149,7 +199,7 @@ function tokenize(s: string): string[] {
  */
 export function searchKnowledge(
   query: string,
-  opts?: { limit?: number; kinds?: KnowledgeKind[] }
+  opts?: { limit?: number; kinds?: KnowledgeKind[]; generation?: string }
 ): KnowledgeChunk[] {
   const limit = opts?.limit ?? 8;
   const kinds = opts?.kinds;
@@ -162,7 +212,7 @@ export function searchKnowledge(
     .match(/[PBCU]\d{4}/g)
     ?.map((c) => c.toUpperCase()) ?? [];
 
-  let chunks = buildChunks();
+  let chunks = buildChunks(opts?.generation ?? DEFAULT_GENERATION);
   if (kinds && kinds.length > 0) {
     chunks = chunks.filter((c) => kinds.includes(c.kind));
   }
@@ -195,10 +245,18 @@ export function searchKnowledge(
 
 // ---- Source manifest (for UI / status display) --------------------------
 
-export const KNOWLEDGE_SOURCES: { name: string; kind: KnowledgeKind; count: number; statusLabel: string }[] = [
-  { name: 'Fault Codes', kind: 'fault', count: getFaultCodes().length, statusLabel: 'INDEXED' },
-  { name: 'Specifications', kind: 'spec', count: getSpecs().length, statusLabel: 'INDEXED' },
-  { name: 'Maintenance Schedule', kind: 'maintenance', count: getMaintenance().length, statusLabel: 'INDEXED' },
-  { name: 'Known Issues', kind: 'issue', count: getKnownIssues().length, statusLabel: 'INDEXED' },
-  { name: 'Reference Articles', kind: 'article', count: getArticles().length, statusLabel: 'INDEXED' },
-];
+export interface KnowledgeSource { name: string; kind: KnowledgeKind; count: number; statusLabel: string }
+
+/** Source manifest with live counts for a given generation (defaults to 981). */
+export function knowledgeSources(generation: string = DEFAULT_GENERATION): KnowledgeSource[] {
+  return [
+    { name: 'Fault Codes', kind: 'fault', count: getFaultCodes(generation).length, statusLabel: 'INDEXED' },
+    { name: 'Specifications', kind: 'spec', count: getSpecs(generation).length, statusLabel: 'INDEXED' },
+    { name: 'Maintenance Schedule', kind: 'maintenance', count: getMaintenance(generation).length, statusLabel: 'INDEXED' },
+    { name: 'Known Issues', kind: 'issue', count: getKnownIssues(generation).length, statusLabel: 'INDEXED' },
+    { name: 'Reference Articles', kind: 'article', count: getArticles(generation).length, statusLabel: 'INDEXED' },
+  ];
+}
+
+/** Back-compat: the default (981) source manifest. */
+export const KNOWLEDGE_SOURCES: KnowledgeSource[] = knowledgeSources();

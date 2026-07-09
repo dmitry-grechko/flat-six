@@ -131,7 +131,7 @@ export default async function AuthorizePage({ searchParams }: { searchParams: SP
       <ul style={{ margin: '20px 0 0', padding: 0, listStyle: 'none', display: 'grid', gap: 10 }}>
         <Grant text="Read your vehicles, service history and plans" />
         <Grant text="Add and update service records and plans" />
-        <Grant text="Look up 981 specs, fault codes and parts (open data)" />
+        <Grant text="Look up generation-specific specs, fault codes and parts (open data)" />
       </ul>
 
       <div style={{ marginTop: 14, font: `400 12px/1.5 ${sans}`, color: '#9A9AA0' }}>

@@ -19,6 +19,13 @@ if (!url || !key) {
   process.exit(1);
 }
 
+// Generation this catalog belongs to: explicit override, else inferred from the
+// filename (parts-981.json → "981", parts-991.json → "991"), else "981".
+const generation =
+  process.env.PARTS_GENERATION ||
+  (file.match(/parts-([a-z0-9]+)\.json/i)?.[1]) ||
+  '981';
+
 const parts = JSON.parse(fs.readFileSync(file, 'utf8'));
 const rows = parts.map((p) => ({
   part_number: p.partNumber,
@@ -26,7 +33,14 @@ const rows = parts.map((p) => ({
   system: p.system ?? null,
   groups: p.groups ?? [],
   models: p.models ?? [],
+  // Prefer an explicit generations[] in the data; else tag with this catalog's generation.
+  generations: p.generations ?? [generation],
 }));
+
+console.log(`Importing ${rows.length} parts for generation "${generation}" from ${file}`);
+// NOTE: a part shared across generations lands in whichever catalog is imported
+// last (upsert overwrites generations[]). When a 2nd generation's catalog shares
+// part numbers, union the arrays instead so the row is tagged with both.
 
 const supabase = createClient(url, key, { auth: { persistSession: false } });
 

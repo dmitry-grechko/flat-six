@@ -126,7 +126,9 @@ export interface ServicePlan {
   createdAt: string;
 }
 
-export type BodyType = 'boxster' | 'cayman';
+// Selectable car-variant ids (also stored as vehicle.body). Legacy 981 values
+// stay 'boxster'/'cayman'; newer generations are suffixed. See lib/models.ts.
+export type BodyType = 'boxster' | 'cayman' | 'cayman-987';
 
 export interface Vehicle {
   /** which 3D model to render */

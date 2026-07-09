@@ -1,4 +1,4 @@
-# Supabase setup — FLAT·SIX 981 Garage
+# Supabase setup — FLAT·SIX Porsche Garage
 
 The app is a Next.js monolith. The only external dependency is **Supabase**
 (Postgres + Auth). Everything below is a one-time setup; the schema, auth wiring,

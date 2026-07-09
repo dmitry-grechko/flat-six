@@ -11,14 +11,14 @@ import {
   type StoredVehicle,
 } from './db/vehicles';
 import type { Vehicle, BodyType } from './types';
+import { CAR_VARIANTS, variantGlb } from './models';
 
-export const MODEL_OPTIONS: { id: BodyType; label: string; glb: string }[] = [
-  { id: 'boxster', label: 'Boxster', glb: '/models/boxster-real.glb' },
-  { id: 'cayman', label: 'Cayman', glb: '/models/cayman.glb' },
-];
+// Derived from the car-variant registry (lib/models.ts) — add generations there.
+export const MODEL_OPTIONS: { id: BodyType; label: string; glb: string; modelName: string }[] =
+  CAR_VARIANTS.map((v) => ({ id: v.id, label: v.label, glb: v.glb, modelName: v.modelName }));
 
 export function modelGlb(body: BodyType): string {
-  return MODEL_OPTIONS.find((m) => m.id === body)?.glb ?? MODEL_OPTIONS[0].glb;
+  return variantGlb(body);
 }
 
 interface VehicleCtx {

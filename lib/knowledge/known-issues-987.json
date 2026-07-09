@@ -1,0 +1,459 @@
+[
+  {
+    "id": "issue-ims-bearing",
+    "title": "IMS (intermediate shaft) bearing failure",
+    "system": "Engine",
+    "severity": "HIGH",
+    "affected": "987.1 M96/M97 (2005–2008). Highest risk: early MY2005 Boxster with the small single-row bearing (~8–15% failure). Mid/late-2005-on and ALL Caymans (launched MY2006) got the larger non-serviceable single-row bearing (<1%). 987.2 9A1 has NO IMS — not affected.",
+    "symptoms": [
+      "Metal shavings / debris in the engine oil or filter",
+      "Rattle or knock from the rear of the engine",
+      "Oil leak near the IMS flange",
+      "Sudden catastrophic engine failure with no warning"
+    ],
+    "description": "The intermediate shaft is supported by a sealed ball bearing whose grease seal degrades, letting the grease wash out and the bearing starve and disintegrate; debris then circulates and can allow the shaft to skew, throwing valve timing and destroying the engine. LN Engineering (Charles Navarro) and Flat 6 Innovations (Jake Raby) are the recognized authorities. The early single-row bearing in some 2005 Boxsters is the worst; the larger 2006–2008 bearing is 'non-serviceable' (cannot be swapped with the engine in the car by the classic retrofit) and has a very low failure rate.",
+    "fix": "For pre-mid-2005 single/dual-row bearings, install an LN Engineering IMS Retrofit (ceramic-hybrid bearing, oil-fed). For the 2006–2008 non-serviceable bearing there is no simple retrofit — options are the IMS Solution (case split), specialist engine-in-car kits (e.g. EPS), or simply removing the grease seal per Navarro; most owners monitor oil for debris.",
+    "estCost": "~$1,500–$3,500 retrofit with clutch/RMS (approximate); engine replacement if it fails ~$15,000–$25,000+",
+    "source": "https://lnengineering.com/products/the-definitive-guide-and-faq-for-porsche-ims-bearings/porsche-ims-bearing-problem-years/"
+  },
+  {
+    "id": "issue-bore-scoring",
+    "title": "Cylinder bore scoring (M96/M97)",
+    "system": "Engine",
+    "severity": "HIGH",
+    "affected": "987.1 M96/M97 (2005–2008); markedly higher on the M97 3.4 S engines (Cayman S, Boxster S 2007+). Base 2.7 far lower risk. Cold starts / cold climates raise the odds; typically appears 30k–80k miles.",
+    "symptoms": [
+      "Rhythmic ticking or knocking, worst at cold idle (often mistaken for lifter/injector noise)",
+      "Elevated oil consumption",
+      "Sooty / smoky exhaust (often driver's-side heavier)",
+      "Piston-slap knock"
+    ],
+    "description": "The M96/M97 open-deck crankcase uses Lokasil (metal-matrix composite) cylinder liners that are not rigidly supported; under thermal and combustion load the piston/liner contact breaks down and the bore scores vertically. It commonly starts low in the cylinder (hidden from a borescope at BDC), so early cases are best confirmed by an experienced ear/'electronic ear' or oil analysis rather than by scope. Severe cases progress toward the well-known 'D-chunk' / block failure. Hartech (UK) and Flat 6 Innovations are the reference authorities.",
+    "fix": "No repair short of an engine rebuild with re-linered/Nickies cylinders or a replacement long block.",
+    "estCost": "Bore-scoring-only rebuild ~$5,000–$6,000 in parts-equivalent; full engine reconstruction/long block often ~$15,000–$25,000+ (approximate)",
+    "source": "https://flat6innovations.com/cylinder-bore-scoring/"
+  },
+  {
+    "id": "issue-rms",
+    "title": "Rear main seal (RMS) leak",
+    "system": "Engine",
+    "severity": "MED",
+    "affected": "987.1 M96/M97 (2005–2008); manual cars worse (leak can foul the clutch). Also seen on 987.2 but less discussed.",
+    "symptoms": [
+      "Oil weeping/dripping at the engine-to-transmission bellhousing joint",
+      "Oil on the clutch or bellhousing"
+    ],
+    "description": "The crankshaft rear main seal weeps at the bellhousing. It is frequently aggravated by a failing air-oil separator raising crankcase pressure. On manual cars the oil can contaminate and destroy the clutch. AOS failure, IMS flange seeps and valve-cover leaks are commonly misdiagnosed as RMS, so confirm the source first.",
+    "fix": "Remove the transmission and replace the seal (and the clutch on manuals); address the AOS if crankcase pressure is high.",
+    "estCost": "~$1,200–$3,000+ (labor-driven; more with clutch) (approximate)",
+    "source": "https://www.pcarwise.com/local-help/porsche-common-problems/porsche-cayman-common-problems/"
+  },
+  {
+    "id": "issue-aos",
+    "title": "Air-oil separator (AOS) failure",
+    "system": "Engine",
+    "severity": "MED",
+    "affected": "987.1 M96/M97 (2005–2008) primarily; the flat-six AOS is a shared 996/997/987 design",
+    "symptoms": [
+      "White/blue smoke from the exhaust, especially at cold startup",
+      "Rough idle",
+      "High oil consumption",
+      "Oil in the intake",
+      "Strong suction at the oil filler when opened at idle"
+    ],
+    "description": "The AOS diaphragm/membrane fails and the crankcase-ventilation system pulls engine oil into the intake to be burned. A failed AOS also raises crankcase vacuum/pressure abnormally, which is a leading contributor to rear-main-seal failure. It is one of the most common causes of startup smoke and oil consumption on these cars.",
+    "fix": "Replace the AOS (a reinforced Porsche Motorsport unit exists for hard/track use).",
+    "estCost": "~$400–$900 (approximate)",
+    "source": "https://motronix.net/blog/porsche-aos-failure-symptoms-diagnosis-repair/"
+  },
+  {
+    "id": "issue-coolant-distribution-pipe",
+    "title": "Front plastic coolant pipe / distribution pipe leak",
+    "system": "Cooling",
+    "severity": "MED",
+    "affected": "987.1 2.7 / 3.4 (2005–2008); the plastic pipe and its seals degrade with age/heat",
+    "symptoms": [
+      "Minor coolant leak running down the front of the engine",
+      "Slow coolant loss",
+      "Coolant smell"
+    ],
+    "description": "A plastic coolant pipe connects the front of the engine to the main cooling-outlet hose, sealed to the block with rubber O-rings that harden and leak. Porsche revised the part several times. On the wider M96/M97 family the plastic coolant-distribution pipes/manifolds are a known weak point that can eventually fail more seriously.",
+    "fix": "Replace the pipe and seals with the updated part; some owners fit aluminium replacements on the wider distribution pipes.",
+    "estCost": "~$300–$800 (approximate)",
+    "source": "https://www.pcarwise.com/local-help/porsche-common-problems/porsche-cayman-common-problems/"
+  },
+  {
+    "id": "issue-oil-cooler-seal",
+    "title": "Engine oil cooler seal failure (oil in coolant)",
+    "system": "Cooling",
+    "severity": "MED",
+    "affected": "987.1 M96/M97 (2005–2008); the cooler stack shares oil and coolant paths",
+    "symptoms": [
+      "Oily film in the coolant expansion tank progressing to a 'peanut butter' emulsion",
+      "Coolant in the oil / milky oil",
+      "Fluid cross-contamination"
+    ],
+    "description": "The internal barrier in the engine oil cooler (which sits in the coolant path) can fail and let oil and coolant mix. It is the first thing to check when oil appears in the coolant; if replacing the cooler does not cure it, investigate more serious causes such as a cracked cylinder head or liner.",
+    "fix": "Replace the oil cooler and its seals; pressure-test and flush the system afterwards.",
+    "estCost": "~$400–$900 (approximate); much more if the cause is a cracked head/liner",
+    "source": "https://www.pcarwise.com/local-help/porsche-common-problems/porsche-cayman-common-problems/"
+  },
+  {
+    "id": "issue-cracked-liner-head",
+    "title": "Cracked cylinder liner / cylinder head (rare)",
+    "system": "Engine",
+    "severity": "HIGH",
+    "affected": "987.1 M96/M97 (2005–2008); uncommon but documented",
+    "symptoms": [
+      "Random / intermittent overheating",
+      "Unexplained coolant consumption with no visible external leak",
+      "Loss of compression on a cylinder",
+      "Combustion gases in the coolant"
+    ],
+    "description": "A crack can develop in a cylinder liner or head, letting coolant and combustion gases cross over. It is relatively rare but serious and is easily confused with a failing oil cooler or head gasket. Diagnosis needs a specialist (compression/leak-down, combustion-gas test, pressure test).",
+    "fix": "Engine rebuild with liner/head replacement — no lasting fix short of that.",
+    "estCost": "Expensive — typically a full rebuild ~$15,000–$25,000+ (approximate)",
+    "source": "https://www.pcarwise.com/local-help/porsche-common-problems/porsche-cayman-common-problems/"
+  },
+  {
+    "id": "issue-spark-plug-tube-seals",
+    "title": "Spark plug tube / valve-cover seal oil leaks",
+    "system": "Engine",
+    "severity": "LOW",
+    "affected": "987.1 M96/M97 (2005–2008); shared flat-six weak point",
+    "symptoms": [
+      "Oil in the spark-plug wells / oily plugs",
+      "Misfires",
+      "Check-engine light",
+      "Burning-oil smell"
+    ],
+    "description": "The seals around the spark-plug tubes and the valve-cover gaskets harden and leak, letting oil pool around the plugs and coils and causing misfires. Upper seals are reachable with the valve cover off; the lower tube seals are a much bigger job requiring camshaft removal.",
+    "fix": "Replace the valve-cover gaskets and spark-plug tube seals (upper straightforward; lower is labor-intensive).",
+    "estCost": "Upper ~$300–$700; lower seals significantly more (approximate)",
+    "source": "https://www.pcarwise.com/local-help/porsche-common-problems/porsche-cayman-common-problems/"
+  },
+  {
+    "id": "issue-oil-consumption",
+    "title": "High oil consumption",
+    "system": "Engine",
+    "severity": "MED",
+    "affected": "987.1 M96/M97 (2005–2008); variable engine-to-engine",
+    "symptoms": [
+      "Elevated oil consumption (severe cases approaching ~1 qt / 1,000 mi)",
+      "Startup smoke"
+    ],
+    "description": "Some consumption is normal for these flat-sixes; heavy consumption usually traces to the AOS/PCV system or, more seriously, to bore scoring or worn rings/valve guides. Establish a baseline, then diagnose the AOS first before assuming internal wear.",
+    "fix": "Diagnose and replace the AOS first, run a used-oil analysis, and pursue internal engine work only if severe/confirmed.",
+    "estCost": "Diagnosis modest; internal repair/replacement can reach ~$15,000+ (approximate)",
+    "source": "https://www.pcarwise.com/local-help/porsche-common-problems/porsche-cayman-common-problems/"
+  },
+  {
+    "id": "issue-variocam-solenoid",
+    "title": "VarioCam actuator / cam-adjust solenoid faults",
+    "system": "Engine",
+    "severity": "LOW",
+    "affected": "987.1 M96/M97 with VarioCam / VarioCam Plus (2005–2008)",
+    "symptoms": [
+      "Check-engine light with camshaft-timing/deviation codes",
+      "Rough running",
+      "Reduced power",
+      "Sometimes a rattle from the cam area"
+    ],
+    "description": "The variable-valve-timing (and, on M97, VarioCam Plus lift) system relies on electro-hydraulic cam-adjust solenoids and actuators. Solenoids can stick or fail (check for oil-fouled connectors and wiring corrosion), setting cam-timing-deviation codes. Keeping oil fresh and at level helps the system operate correctly.",
+    "fix": "Replace the failed solenoid(s)/actuator; correct any oil-fouling of the connectors.",
+    "estCost": "Modest — solenoids are inexpensive; labor varies (approximate)",
+    "source": "https://www.pcarwise.com/local-help/porsche-common-problems/porsche-cayman-common-problems/"
+  },
+  {
+    "id": "issue-intake-lifter",
+    "title": "Two-stage intake / VarioCam lifter failure (misfire above ~4k rpm)",
+    "system": "Engine",
+    "severity": "MED",
+    "affected": "987.1 M97 (VarioCam Plus, 2005–2008)",
+    "symptoms": [
+      "Runs perfectly below ~4,000 rpm, misfires above it",
+      "Single-cylinder misfire code that only appears at higher rpm",
+      "Loss of top-end power"
+    ],
+    "description": "A failing two-stage/switchable valve lifter (part of the VarioCam Plus high-lift mechanism) causes a characteristic misfire that appears only above roughly 4,000 rpm on the affected cylinder while low-rpm running is normal. It is easy to misdiagnose as coils or plugs.",
+    "fix": "Replace the affected lifter(s) — often the whole bank — which requires cam timing knowledge; best left to a specialist.",
+    "estCost": "Expensive (labor-intensive) (approximate)",
+    "source": "https://www.pcarwise.com/local-help/porsche-common-problems/porsche-cayman-common-problems/"
+  },
+  {
+    "id": "issue-tiptronic-valve-body",
+    "title": "Tiptronic S harsh/delayed shifts (valve body wear)",
+    "system": "Transmission",
+    "severity": "MED",
+    "affected": "987.1 with 5-speed Tiptronic S automatic (2005–2008); NOT PDK",
+    "symptoms": [
+      "Delayed and harsh gear changes, worse when cold",
+      "Intermittent flare/slip",
+      "Eventual limp-home / emergency-run mode",
+      "Stored TCU fault codes"
+    ],
+    "description": "The 987.1 uses a 5-speed Tiptronic S (torque-converter automatic, the pre-PDK unit). Worn bores in the hydraulic valve body cause pressure loss and erratic, harsh or delayed shifts that worsen over time; a glazed/slipping torque converter or a faulty Tip selector switch can present similarly. Read TCU codes and check fluid/pressure before major work.",
+    "fix": "Service the fluid, then repair the valve body (upgraded bore/sleeve kits exist) or replace it; occasionally just the selector switch; rarely the full transmission.",
+    "estCost": "Valve-body repair moderate; full transmission replacement several thousand USD (approximate)",
+    "source": "https://www.youcanic.com/porsche-transmission-problems/"
+  },
+  {
+    "id": "issue-no-ims",
+    "title": "No IMS bearing (DFI 9A1 reassurance)",
+    "system": "Engine",
+    "severity": "LOW",
+    "affected": "All 987.2 (2009–2012): 2.9 base and 3.4 S, 9A1 engine",
+    "symptoms": [
+      "None — this is a reassurance note, not a fault"
+    ],
+    "description": "The 987.2 switched to the DFI 9A1 flat-six, which has NO intermediate shaft and therefore no IMS bearing; the camshafts are chain-driven directly off the crankshaft. The IMS bearing failures that affect the older M96/M97 (986/987.1) simply do not exist on the 987.2, and bore scoring is far rarer as well.",
+    "fix": "Nothing to do — there is no IMS bearing to service or worry about.",
+    "estCost": "N/A",
+    "source": "https://www.718forum.com/threads/9a1-engine-tech.16228/"
+  },
+  {
+    "id": "issue-bore-scoring-dfi",
+    "title": "Bore / cylinder scoring on the DFI 9A1 (rare)",
+    "system": "Engine",
+    "severity": "LOW",
+    "affected": "987.2 9A1 (2009–2012); much rarer than on the M96/M97, but still worth a used-oil check",
+    "symptoms": [
+      "Cold-start rattle/tick",
+      "Elevated oil consumption",
+      "Ticking hard to distinguish from the normal DFI injector tick"
+    ],
+    "description": "The redesigned 9A1 largely resolved the epidemic bore-scoring of the M96/M97, and cases on the 987.2 are uncommon. Because the noise hides under the normal direct-injection tick, suspected cases are best confirmed with a borescope and used-oil analysis rather than by ear.",
+    "fix": "No fix short of an engine rebuild or replacement if it genuinely occurs.",
+    "estCost": "Engine replacement ~$15,000+ if it occurs (approximate)",
+    "source": "https://sscarsnh.com/porsche-987-bore-scoring-causes-symptoms-how-to-prevent-it/"
+  },
+  {
+    "id": "issue-hpfp",
+    "title": "High-pressure fuel pump (HPFP) failure",
+    "system": "Fuel",
+    "severity": "HIGH",
+    "affected": "987.2 9A1 (2009–2011 build; Boxster S / Cayman S most cited). Bosch pump shared with 997.2. Multiple revisions (…-02 through -06).",
+    "symptoms": [
+      "Long / sluggish cranking and hard starting",
+      "Stalling",
+      "Check-engine light with fuel-pressure codes",
+      "Reduced-power / limp-home mode"
+    ],
+    "description": "A batch of Bosch high-pressure DFI pumps was prone to internal failure (the integral pressure-relief valve, which cannot be serviced separately), causing hard starts, stalling and limp mode; the same defective pump batch affected other makes. Porsche revised the pump part number several times and covered many failures under warranty / a service action. Treat as HIGH because it can strand the car.",
+    "fix": "Replace the HPFP with the latest revision (roughly a few hours' labor); confirm the current part number.",
+    "estCost": "~$700–$1,500+ parts and labor (approximate); often covered under warranty/campaign when it applied",
+    "source": "https://www.6speedonline.com/forums/boxster-cayman/241033-high-pressure-fuel-pump-hpfp-failures-987-2-boxster-s-cayman-s.html"
+  },
+  {
+    "id": "issue-dfi-injectors",
+    "title": "DFI fuel injector issues",
+    "system": "Fuel",
+    "severity": "MED",
+    "affected": "987.2 9A1 direct-injection (2009–2012)",
+    "symptoms": [
+      "Cold-start smoke / puff on startup",
+      "Rough idle or misfire",
+      "Check-engine light",
+      "Slightly elevated fuel consumption"
+    ],
+    "description": "The 9A1's direct injectors can leak or foul, causing cold-start smoke, misfires and rough running. Because DFI runs high fuel pressure, injector faults are best confirmed by scan data rather than assumed; cold-start smoke on these cars can be injectors or AOS/valve-seal related.",
+    "fix": "Diagnose by cylinder and replace the affected injector(s); address any related PCV/AOS fault.",
+    "estCost": "~$200–$500 per injector plus labor (approximate)",
+    "source": "https://www.pcarwise.com/local-help/porsche-common-problems/porsche-cayman-common-problems/"
+  },
+  {
+    "id": "issue-pdk-mechatronic",
+    "title": "PDK Mechatronic unit / sensor faults",
+    "system": "Transmission",
+    "severity": "MED",
+    "affected": "987.2 with PDK dual-clutch (2009–2012); replaced the Tiptronic",
+    "symptoms": [
+      "Rough or delayed shifts",
+      "Transmission fault / 'emergency run' warning",
+      "Gear-selection faults",
+      "Fluid leaks"
+    ],
+    "description": "The PDK gearset itself is robust; the concern is the electro-hydraulic Mechatronic unit and its internal sensors, whose failures are common (Porsche early on replaced wiring and the transmission-temperature sensor). Dealers often replace the whole unit or transmission, but specialists can repair sensors, leaks and clutch packs for far less. Regular fluid service (roughly every 30k miles) is key preventive maintenance.",
+    "fix": "Repair or replace the Mechatronic, its sensors, or the clutch pack; rarely the full transmission.",
+    "estCost": "Sensor/repair moderate; Mechatronic/transmission replacement several thousand USD (approximate)",
+    "source": "https://www.pcarwise.com/local-help/porsche-common-problems/porsche-pdk-transmission-problems/"
+  },
+  {
+    "id": "issue-water-pump",
+    "title": "Water pump failure (plastic impeller)",
+    "system": "Cooling",
+    "severity": "MED",
+    "affected": "All 987 (2005–2012); the plastic-impeller design is the concern, especially 987.1. Risk rises with age/mileage.",
+    "symptoms": [
+      "Knocking or whirring noise",
+      "Wobbling pulley",
+      "Coolant leak from the weep hole",
+      "Rising coolant temperature"
+    ],
+    "description": "The pump-shaft bearing wears and the shaft wobbles, developing into noise and/or a coolant leak. Many pumps use a plastic impeller that can shatter and send debris through the cooling passages, risking blockage and overheating; a common recommendation is to stay with a quality plastic impeller rather than a metal one, since a metal impeller can damage the block if the bearing fails.",
+    "fix": "Replace the water pump (usually with the thermostat and coolant) as preventive maintenance.",
+    "estCost": "~$600–$1,200 (approximate)",
+    "source": "https://rennlist.com/forums/987-forum/1361309-987-1-base-water-pump-plastic-impeller-failure.html"
+  },
+  {
+    "id": "issue-coolant-tank",
+    "title": "Coolant expansion tank cracking",
+    "system": "Cooling",
+    "severity": "MED",
+    "affected": "All 987 (2005–2012); the plastic tank embrittles with age and heat",
+    "symptoms": [
+      "Coolant smell",
+      "Slow coolant loss / low-coolant warning",
+      "Sudden split and rapid coolant dump",
+      "Coolant pooling in the trunk area"
+    ],
+    "description": "The plastic coolant expansion/reservoir tank develops cracks (often around the seams and cap area) that progress from a slow seep to a sudden failure that can dump coolant and overheat the engine if not caught. Multiple hoses feed the tank, some internal, so a cracked tank is a common cooling-system failure point on these cars.",
+    "fix": "Replace the reservoir (OEM recommended) and inspect the cap.",
+    "estCost": "~$300–$700 (approximate)",
+    "source": "https://www.pelicanparts.com/techarticles/Boxster_Tech/33-WATER-Coolant_Tank/33-WATER-Coolant_Tank.htm"
+  },
+  {
+    "id": "issue-coils",
+    "title": "Ignition coil failure",
+    "system": "Electrical",
+    "severity": "LOW",
+    "affected": "All 987 (2005–2012), both M96/M97 and 9A1 (coil-on-plug)",
+    "symptoms": [
+      "Misfires",
+      "Rough running",
+      "Check-engine light with misfire codes",
+      "Stumble under load"
+    ],
+    "description": "The coil-on-plug ignition coils are prone to cracking and failure and were revised by Porsche several times. Oil leaking from spark-plug tube seals accelerates their demise. When one fails it is standard practice to replace all six with the updated version, ideally with fresh plugs.",
+    "fix": "Replace all six coils with the latest version, ideally together with spark plugs; fix any plug-tube oil leak.",
+    "estCost": "Coils modest each aftermarket + light labor; ~$300–$700 for a full set with plugs (approximate)",
+    "source": "https://www.pcarwise.com/local-help/porsche-common-problems/porsche-cayman-common-problems/"
+  },
+  {
+    "id": "issue-control-arm",
+    "title": "Front control-arm / thrust-arm bushing wear ('coffin arm')",
+    "system": "Suspension",
+    "severity": "MED",
+    "affected": "All 987 (2005–2012); a wear item shared across 986/987/981/718",
+    "symptoms": [
+      "Clunk / knock / click over bumps",
+      "Vague or shaking steering",
+      "Wander",
+      "Uneven front tire wear"
+    ],
+    "description": "The front lower control-arm (the large A-shaped 'coffin arm') and its rubber thrust-arm bushing wear out, giving a mushy, disconnected front end, clunks and imprecise steering. Aftermarket solid/polyurethane or monoball options (Powerflex, Tarett, Elephant Racing, EPS) are available as upgrades to the OEM arms. Torque bushing bolts at ride height to avoid premature failure.",
+    "fix": "Replace the control/thrust arms, or just the bushings; upgrade options available.",
+    "estCost": "~$400–$1,200 depending on arms vs bushings and labor (approximate)",
+    "source": "https://flat6motorsports.com/products/powerflex-lower-control-arm-thrust-bushing-987"
+  },
+  {
+    "id": "issue-strut-mount",
+    "title": "Strut / shock mount knock (incl. PASM)",
+    "system": "Suspension",
+    "severity": "LOW",
+    "affected": "All 987 (2005–2012); PASM-equipped cars add electronic complexity",
+    "symptoms": [
+      "Knock / low thud over bumps (front or rear)",
+      "PASM cars: chassis/PASM warning, uneven damping"
+    ],
+    "description": "The upper shock/strut mount rubber dries out and fails, producing a knock over bumps. On PASM cars, faults can also stem from ride-height sensors, a leaking adaptive strut or the control system and require electronic diagnosis rather than a simple mount replacement.",
+    "fix": "Replace the mounts/struts; diagnose PASM faults electronically.",
+    "estCost": "Mounts modest; PASM strut/diagnosis variable (approximate)",
+    "source": "https://www.pcarwise.com/local-help/porsche-common-problems/porsche-cayman-common-problems/"
+  },
+  {
+    "id": "issue-ac-condenser",
+    "title": "Front A/C condenser failure (road debris / corrosion)",
+    "system": "HVAC",
+    "severity": "MED",
+    "affected": "All 987 (Boxster 2005–2012, Cayman 2006–2012); twin front-mounted condensers",
+    "symptoms": [
+      "A/C blows warm / weak",
+      "Gradual refrigerant loss",
+      "Visible damage or oily residue at the lower corners of the condensers"
+    ],
+    "description": "The twin condensers sit low behind the front bumper grilles, directly exposed to rocks and road debris that puncture the aluminium fins/tubes. Leaves, dirt and salt also pack between the condensers and the radiators, trapping moisture that corrodes through the aluminium — most often at the extreme lower corners. On many cars this is a when-not-if failure, sometimes within a few years.",
+    "fix": "Replace the leaking condenser(s), clear trapped debris, and recharge; consider protective grilles/screens to prevent recurrence.",
+    "estCost": "~$500–$1,200 per side with recharge (approximate)",
+    "source": "https://www.go-parts.com/garage/a-c-condenser-porsche-911-porsche-boxster-porsche-cayman-2001-2013"
+  },
+  {
+    "id": "issue-clutch-slave",
+    "title": "Clutch slave cylinder failure (early plastic unit)",
+    "system": "Transmission",
+    "severity": "MED",
+    "affected": "987 manual cars, chiefly earlier 987.1 (2005–2008) with the original plastic slave cylinder",
+    "symptoms": [
+      "Clutch pedal stuck to the floor / won't return",
+      "Loss of clutch hydraulic pressure",
+      "Fluid leak at the bellhousing"
+    ],
+    "description": "Early cars used a plastic-bodied clutch slave cylinder that can crack and fail, dropping hydraulic pressure and leaving the pedal on the floor. Porsche updated to a metal-bodied unit. It is often replaced together with the clutch when the transmission is out.",
+    "fix": "Replace with the updated metal slave cylinder and bleed/flush the hydraulic system.",
+    "estCost": "~$300–$700 (approximate); more if done with a clutch job",
+    "source": "https://www.pcarwise.com/local-help/porsche-common-problems/porsche-cayman-common-problems/"
+  },
+  {
+    "id": "issue-top-microswitch",
+    "title": "Convertible top microswitch / drive-cable / transmission faults",
+    "system": "Body",
+    "severity": "MED",
+    "affected": "987 Boxster (2005–2012)",
+    "symptoms": [
+      "Top stops mid-cycle or won't fully cycle",
+      "Persistent top-warning light",
+      "Motor whirs/strains but top doesn't move (or only one side moves)",
+      "Cracked plastic transmission gears"
+    ],
+    "description": "A single motor drives two flexible cables to a gearbox ('transmission') on each side, with microswitches reporting top position; a failed microswitch leaves a persistent warning that the top isn't latched, while worn/binding drive cables or cracked brittle plastic transmission gears stop the top moving. Microswitches are only sold as part of a bracket assembly, and reaching some switches is labor-intensive.",
+    "fix": "Diagnose motor vs cables vs microswitches vs transmissions; replace the failed microswitch bracket, drive cables, transmission gears or motor as needed.",
+    "estCost": "Motor/switch modest; full cable/transmission repair moderate–high depending on access (approximate)",
+    "source": "https://www.go-parts.com/garage/convertible-top-motor-porsche-boxster-porsche-911-1990-2012"
+  },
+  {
+    "id": "issue-interior-water-module",
+    "title": "Interior water ingress damaging control modules",
+    "system": "Electrical",
+    "severity": "MED",
+    "affected": "All 987 (2005–2012); modules under the seats / cabin floor",
+    "symptoms": [
+      "Random electrical faults (windows, seats, airbag light)",
+      "Musty/damp smell",
+      "Corroded connectors on floor-mounted modules"
+    ],
+    "description": "Water entering the cabin (window left down in rain, blocked drains, etc.) can reach control modules mounted low under the seats/floor and cause corrosion, producing seemingly random electrical faults. Drying and cleaning may recover a module, but a corroded unit must be replaced along with fixing the water source.",
+    "fix": "Find and fix the water entry, dry/clean the module and connectors, and replace corroded modules.",
+    "estCost": "Modest if caught early; module replacement moderate–expensive (approximate)",
+    "source": "https://www.pcarwise.com/local-help/porsche-common-problems/porsche-cayman-common-problems/"
+  },
+  {
+    "id": "issue-pcm",
+    "title": "PCM / infotainment failure",
+    "system": "Electrical",
+    "severity": "MED",
+    "affected": "All 987 (2005–2012)",
+    "symptoms": [
+      "Screen blanking or dropouts",
+      "Radio/navigation not booting",
+      "Unresponsive controls"
+    ],
+    "description": "The PCM (Porsche Communication Management) head unit / infotainment board can fail with age. Specifics and costs vary widely by unit and repair path, so treat figures here as approximate — LOW-CONFIDENCE — and confirm the exact unit before quoting. Board-level repair is usually far cheaper than a dealer replacement.",
+    "fix": "Board-level repair where available, or replace the unit.",
+    "estCost": "Board repair a few hundred USD to dealer replacement well over $1,000 (approximate; low confidence)",
+    "source": "https://rpmtechnik.co.uk/blog/common-porsche-cayman-and-boxster-servicing-issues-across-the-987-981-and-718-models/"
+  },
+  {
+    "id": "issue-recall-seatbelt-anchor",
+    "title": "RECALL: Seat-belt anchor plate mounting holes undersized",
+    "system": "Body",
+    "severity": "HIGH",
+    "affected": "MY2012 987.2 Boxster/Boxster S/Spyder and Cayman/Cayman S/Cayman R built 31 May–10 Jun 2011 (NHTSA 11V409000 / Porsche AB02); also affected some 2011–2012 911s. Verify by VIN.",
+    "symptoms": [
+      "None visible; the belt anchor plate may not rotate/seat correctly and could loosen over time"
+    ],
+    "description": "Undersized mounting holes in the seat-belt anchor plates can prevent the plate from rotating on its fastening bolt as designed, so the belt may not route optimally around the occupant and the anchor could loosen over time, increasing injury risk in a crash. This is a narrow-build-window safety recall; 987.1 (2005–2008) US models had very few recalls, so always verify applicability by VIN at the NHTSA site or recall.porsche.com.",
+    "fix": "Dealer inspects the anchor plate and fastening screw and replaces the seat belt if necessary, free of charge.",
+    "estCost": "Free (recall)",
+    "source": "https://static.nhtsa.gov/odi/rcl/2011/RCRIT-11V409-5689.pdf"
+  }
+]

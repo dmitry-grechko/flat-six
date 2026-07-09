@@ -39,7 +39,9 @@ export function build() {
     // Vent / hold-down detail.
     add2(at(box('holdDown', 0.78, 0.05, 0.08, M_RELAY), 0, 0.36, -0.18));
   }
-  add(at(battery, 0.0, 0.0, 2.0));
+  // Offset right + slightly raised so the (unified-scene) fuel tank sits clear
+  // at the frunk centre-line below it.
+  add(at(battery, 0.5, 0.1, 2.0));
 
   // ---------------------------------------------------------------------------
   // Alternator (alternator) — rear engine, right side, belt pulley on its face.
@@ -145,7 +147,7 @@ export function build() {
   // ---------------------------------------------------------------------------
   // Battery (+) -> junction box.
   add(tube('harnessBatteryToJunction', [
-    [0.22, 0.45, 2.0], [0.0, 0.3, 1.2], [-0.4, 0.2, 0.6], [-0.55, 0.2, 0.4],
+    [0.72, 0.55, 2.0], [0.1, 0.35, 1.2], [-0.4, 0.25, 0.6], [-0.55, 0.2, 0.4],
   ], 0.02, M_WIRE));
   // Junction box -> starter motor (heavy starter feed).
   add(tube('harnessJunctionToStarter', [

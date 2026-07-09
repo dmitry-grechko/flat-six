@@ -6,10 +6,41 @@ import {
   getMaintenance,
   getKnownIssues,
   searchKnowledge,
+  DEFAULT_GENERATION,
 } from '@/lib/knowledge';
 import { searchCatalog, formatPartNumber } from '@/lib/catalog';
+import { GENERATIONS, generationForBody } from '@/lib/models';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { resolveUser, AUTH_REQUIRED_MESSAGE, publicClient } from './auth';
+
+/** Optional generation arg shared by the knowledge tools. */
+const GENERATION_ARG = z
+  .string()
+  .optional()
+  .describe(`Car generation, e.g. ${GENERATIONS.map((g) => `"${g}"`).join(' / ')}. Defaults to your garage vehicle, else ${DEFAULT_GENERATION}.`);
+
+/**
+ * Resolve which generation a knowledge/catalog lookup should use:
+ * explicit arg (if a known generation) → the caller's primary vehicle (if
+ * authenticated) → the default (981).
+ */
+async function resolveGeneration(explicit: string | undefined, token: string | undefined): Promise<string> {
+  if (explicit && GENERATIONS.includes(explicit)) return explicit;
+  if (token) {
+    const user = await resolveUser(token);
+    if (user) {
+      const { data } = await user.supabase
+        .from('vehicles')
+        .select('body, is_primary, created_at')
+        .order('is_primary', { ascending: false })
+        .order('created_at', { ascending: true })
+        .limit(1);
+      const body = (data as { body: string }[] | null)?.[0]?.body;
+      if (body) return generationForBody(body);
+    }
+  }
+  return DEFAULT_GENERATION;
+}
 
 /** Wrap a JSON-serialisable value as an MCP text content result. */
 function json(value: unknown) {
@@ -35,18 +66,23 @@ export function registerTools(server: McpServer): void {
   // ---------------------------------------------------------------------------
 
   server.registerTool(
-    'search_981_knowledge',
+    'search_knowledge',
     {
-      title: 'Search 981 knowledge base',
+      title: 'Search the Porsche knowledge base',
       description:
-        'Full-text search across the Porsche 981 knowledge base: fault codes, specs, ' +
-        'maintenance items, known issues and articles. Use for general "how/why/what" questions.',
+        'Full-text search across the Porsche knowledge base: fault codes, specs, ' +
+        'maintenance items, known issues and articles. Use for general "how/why/what" questions. ' +
+        'Scoped to the car generation (defaults to your garage vehicle).',
       inputSchema: {
         query: z.string().min(1).describe('What to search for, e.g. "AOS failure symptoms"'),
         limit: z.number().int().min(1).max(25).optional().describe('Max results (default 8)'),
+        generation: GENERATION_ARG,
       },
     },
-    async ({ query, limit }) => json(searchKnowledge(query, { limit: limit ?? 8 })),
+    async ({ query, limit, generation }, extra) => {
+      const gen = await resolveGeneration(generation, extra.authInfo?.token);
+      return json(searchKnowledge(query, { limit: limit ?? 8, generation: gen }));
+    },
   );
 
   server.registerTool(
@@ -56,11 +92,13 @@ export function registerTools(server: McpServer): void {
       description: 'Resolve a fault or OBD-II code (e.g. P0011) to its meaning, causes and fixes.',
       inputSchema: {
         code: z.string().min(1).describe('The fault code, e.g. "P0011" (case-insensitive)'),
+        generation: GENERATION_ARG,
       },
     },
-    async ({ code }) => {
+    async ({ code, generation }, extra) => {
+      const gen = await resolveGeneration(generation, extra.authInfo?.token);
       const needle = code.trim().toLowerCase();
-      const faults = getFaultCodes();
+      const faults = getFaultCodes(gen);
       const exact = faults.find((f) => f.code?.toLowerCase() === needle);
       if (exact) return json(exact);
       const fuzzy = faults.filter(
@@ -78,16 +116,18 @@ export function registerTools(server: McpServer): void {
     'get_spec',
     {
       title: 'Get a specification',
-      description: 'Look up a torque value, capacity, fluid grade or other 981 spec.',
+      description: 'Look up a torque value, capacity, fluid grade or other spec for the car generation.',
       inputSchema: {
         query: z.string().min(1).describe('What spec you need, e.g. "wheel bolt torque"'),
         category: z.string().optional().describe('Optional category filter, e.g. "torque"'),
+        generation: GENERATION_ARG,
       },
     },
-    async ({ query, category }) => {
+    async ({ query, category, generation }, extra) => {
+      const gen = await resolveGeneration(generation, extra.authInfo?.token);
       const q = query.trim().toLowerCase();
       const cat = category?.trim().toLowerCase();
-      const specs = getSpecs().filter((s) => {
+      const specs = getSpecs(gen).filter((s) => {
         const inCat = !cat || s.category?.toLowerCase() === cat;
         const text = [s.name, s.value, s.category, s.notes, ...(s.appliesTo ?? [])]
           .filter(Boolean)
@@ -113,11 +153,13 @@ export function registerTools(server: McpServer): void {
           .min(0)
           .optional()
           .describe('Only items due at or before this mileage'),
+        generation: GENERATION_ARG,
       },
     },
-    async ({ system, dueByMiles }) => {
+    async ({ system, dueByMiles, generation }, extra) => {
+      const gen = await resolveGeneration(generation, extra.authInfo?.token);
       const sys = system?.trim().toLowerCase();
-      const items = getMaintenance().filter((m) => {
+      const items = getMaintenance(gen).filter((m) => {
         const bySystem = !sys || m.system?.toLowerCase() === sys;
         const byMiles =
           dueByMiles == null ||
@@ -132,15 +174,17 @@ export function registerTools(server: McpServer): void {
   server.registerTool(
     'list_known_issues',
     {
-      title: 'List known 981 issues',
-      description: 'List documented common problems / weak points, optionally filtered by system.',
+      title: 'List known issues',
+      description: 'List documented common problems / weak points for the car generation, optionally filtered by system.',
       inputSchema: {
         system: z.string().optional().describe('Filter by system, e.g. "Cooling"'),
+        generation: GENERATION_ARG,
       },
     },
-    async ({ system }) => {
+    async ({ system, generation }, extra) => {
+      const gen = await resolveGeneration(generation, extra.authInfo?.token);
       const sys = system?.trim().toLowerCase();
-      const issues = getKnownIssues().filter((i) => !sys || i.system?.toLowerCase() === sys);
+      const issues = getKnownIssues(gen).filter((i) => !sys || i.system?.toLowerCase() === sys);
       return json(issues);
     },
   );
@@ -150,20 +194,22 @@ export function registerTools(server: McpServer): void {
     {
       title: 'Find an OEM part',
       description:
-        'Search the full Porsche 981 OEM parts catalog (~4,100 parts) by part number or keyword, ' +
+        'Search the full Porsche OEM parts catalog by part number or keyword, ' +
         'plus the curated catalog (torque/notes) and knowledge base. Returns part numbers, ' +
-        'descriptions and the assembly system.',
+        'descriptions and the assembly system. Scoped to the car generation (defaults to your vehicle).',
       inputSchema: {
         query: z.string().min(1).describe('Part name or number, e.g. "oil filter", "9A1 105", "981.351"'),
+        generation: GENERATION_ARG,
       },
     },
-    async ({ query }) => {
+    async ({ query, generation }, extra) => {
+      const gen = await resolveGeneration(generation, extra.authInfo?.token);
       // 1) Full PET parts catalog in Supabase (part-number + full-text search).
       //    Falls back gracefully if env/table is absent.
       let parts: unknown[] = [];
       const pub = publicClient();
       if (pub) {
-        const { data, error } = await pub.rpc('search_parts', { q: query, lim: 15 });
+        const { data, error } = await pub.rpc('search_parts', { q: query, lim: 15, gen });
         if (!error && Array.isArray(data)) {
           parts = data.map((r: any) => ({
             partNumber: r.part_number,
@@ -174,13 +220,13 @@ export function registerTools(server: McpServer): void {
         }
       }
       // 2) Curated catalog (adds torque/notes the PET catalog lacks).
-      const fromCatalog = searchCatalog(query, 10).map((p) => ({
+      const fromCatalog = searchCatalog(query, 10, gen).map((p) => ({
         ...p,
         partNumber: p.partNumber,
         partNumberFormatted: formatPartNumber(p.partNumber),
       }));
       // 3) Parts mentioned in the knowledge base (specs/articles).
-      const fromKnowledge = searchKnowledge(query, { limit: 5, kinds: ['spec', 'article'] });
+      const fromKnowledge = searchKnowledge(query, { limit: 5, kinds: ['spec', 'article'], generation: gen });
       if (parts.length === 0 && fromCatalog.length === 0 && fromKnowledge.length === 0) {
         return err(`No part matching "${query}" was found.`);
       }

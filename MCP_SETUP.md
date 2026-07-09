@@ -1,7 +1,7 @@
 # FLAT·SIX MCP Server
 
-FLAT·SIX exposes a real **Streamable-HTTP MCP server** so you can drive your 981
-garage from Claude — look up specs and fault codes, search the OEM parts catalog,
+FLAT·SIX exposes a real **Streamable-HTTP MCP server** so you can drive your
+Boxster / Cayman garage (987, 981, …) from Claude — look up specs and fault codes, search the OEM parts catalog,
 and (with auth) read and write your own service history.
 
 - **Endpoint:** `/api/mcp`
@@ -25,14 +25,16 @@ There's no token to copy by hand anymore. (A manual `Authorization: Bearer
 All tools require a logged-in connection (one OAuth approval). The split below is
 about *what data* a tool returns — shared 981 reference vs. your own garage.
 
-### Reference (shared 981 data)
+### Reference (per-generation data)
+Knowledge tools are scoped by car generation — pass a `generation` arg (e.g. `"981"`, `"987"`) or omit it to use your garage vehicle's generation (defaults to `981`).
+
 | Tool | Purpose |
 | --- | --- |
-| `search_981_knowledge` | Full-text search across the 981 knowledge base (faults, specs, maintenance, known issues, articles). |
+| `search_knowledge` | Full-text search across the knowledge base (faults, specs, maintenance, known issues, articles) for a generation. |
 | `lookup_fault_code` | Resolve an OBD / fault code (e.g. `P0011`) to meaning, causes and fixes. |
 | `get_spec` | Look up a torque value, capacity, fluid grade or other spec. |
 | `get_maintenance_schedule` | List maintenance items, optionally filtered by system or due mileage. |
-| `list_known_issues` | List documented 981 weak points, optionally by system. |
+| `list_known_issues` | List documented weak points for a generation, optionally by system. |
 | `find_part` | Search the OEM parts catalog (name / part number / keyword) for part numbers and torque. |
 
 ### Garage (your data, RLS-scoped to you)

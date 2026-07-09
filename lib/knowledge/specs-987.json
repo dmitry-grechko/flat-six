@@ -1,0 +1,626 @@
+[
+  {
+    "id": "torque-wheel-bolt",
+    "category": "torque",
+    "name": "Wheel bolt (lug)",
+    "value": "130 Nm (96 lb-ft)",
+    "notes": "987.1 and 987.2 up to MY2011 use 130 Nm. IMPORTANT: as of MY2012 (e.g. Cayman R, Boxster Spyder, Black Edition) Porsche raised silver bolts to 160 Nm (118 lb-ft) — the same figure the 981 uses. Apply a thin film of aluminium paste to the threads and spherical seat, NOT to the wheel-contact face. Tighten diagonally.",
+    "appliesTo": [
+      "987.1",
+      "987.2 up to MY2011"
+    ],
+    "source": "https://www.planet-9.com/threads/wheel-bolt-torque-987-1-vs-987-2.63498/"
+  },
+  {
+    "id": "torque-oil-drain-plug",
+    "category": "torque",
+    "name": "Engine oil drain plug",
+    "value": "50 Nm (37 lb-ft)",
+    "notes": "Fit a new aluminium sealing/crush ring each time. Same figure across the M96/M97 (987.1) and 9A1/DFI (987.2) engines.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "https://rennlist.com/forums/boxster-and-boxster-s-986-forum/343643-torque-spec-oil-drain-plug.html"
+  },
+  {
+    "id": "torque-oil-filter-cap",
+    "category": "torque",
+    "name": "Oil filter cap / housing cover",
+    "value": "25 Nm (18 lb-ft)",
+    "notes": "Cartridge filter. Replace the cap O-ring at each service.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "https://www.planet-9.com/threads/porsche-cayman-987-2-major-maintenance-torque-specs.93778/"
+  },
+  {
+    "id": "torque-spark-plug-987-1",
+    "category": "torque",
+    "name": "Spark plug (M96/M97)",
+    "value": "30 Nm (22 lb-ft)",
+    "notes": "MEDIUM-CONFIDENCE: M96/M97 sources cluster 20-30 Nm; 30 Nm is the widely used target. No anti-seize.",
+    "appliesTo": [
+      "987.1 2.7",
+      "987.1 3.4 S"
+    ],
+    "source": "https://www.pca.org/tech/spark-plug-torque--1583459634"
+  },
+  {
+    "id": "torque-spark-plug-987-2",
+    "category": "torque",
+    "name": "Spark plug (9A1 DFI)",
+    "value": "New 33 Nm (24 lb-ft); reused 30 Nm (22 lb-ft)",
+    "notes": "DFI 9A1 spec distinguishes a new plug (24 lb-ft) from a reinstalled plug (22 lb-ft). Do not overtighten in the aluminium head.",
+    "appliesTo": [
+      "987.2 2.9",
+      "987.2 3.4 S"
+    ],
+    "source": "https://rennlist.com/forums/987-forum/795973-987-2-diy-spark-plug-change.html"
+  },
+  {
+    "id": "torque-caliper-bolt-front",
+    "category": "torque",
+    "name": "Brake caliper mounting bolt (front)",
+    "value": "85 Nm (63 lb-ft)",
+    "notes": "MEDIUM-CONFIDENCE: M12 caliper-to-upright bolts, shared 986/987/996/997 value. Some workshop docs call these single-use — inspect/replace on removal. Front and rear identical.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "https://www.lindseyracing.com/LR/Parts/TORQUESPEC.html"
+  },
+  {
+    "id": "torque-caliper-bolt-rear",
+    "category": "torque",
+    "name": "Brake caliper mounting bolt (rear)",
+    "value": "85 Nm (63 lb-ft)",
+    "notes": "MEDIUM-CONFIDENCE: same M12 value as the front.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "https://www.lindseyracing.com/LR/Parts/TORQUESPEC.html"
+  },
+  {
+    "id": "torque-axle-nut",
+    "category": "torque",
+    "name": "Drive-shaft / rear axle (hub) nut",
+    "value": "460 Nm (340 lb-ft)",
+    "notes": "M22x1.5 self-locking collar nut — very high; loosen/tighten with the car on the ground, in gear, handbrake on. Use a new nut. Shared 986/987 figure.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "http://www.rockfordcv.com/Porsche_torque.htm"
+  },
+  {
+    "id": "torque-disc-retaining-screw",
+    "category": "torque",
+    "name": "Brake disc retaining (countersunk) screw",
+    "value": "~10 Nm (7 lb-ft)",
+    "notes": "LOW-CONFIDENCE: M6/M8 countersunk screw, value from a shared older-Porsche chart, not 987-verified.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "https://www.lindseyracing.com/LR/Parts/TORQUESPEC.html"
+  },
+  {
+    "id": "torque-coolant-drain",
+    "category": "torque",
+    "name": "Coolant drain plug",
+    "value": "~10 Nm (7 lb-ft)",
+    "notes": "LOW-CONFIDENCE: value from a shared 986/996/997 chart, not 987-verified.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "https://www.lindseyracing.com/LR/Parts/TORQUESPEC.html"
+  },
+  {
+    "id": "torque-pdk-gear-plug",
+    "category": "torque",
+    "name": "PDK gear-oil drain & fill plug",
+    "value": "27 Nm (20 lb-ft)",
+    "notes": "MEDIUM-CONFIDENCE: 8mm hex. The 987.2 uses the same 7-speed PDK (7DT) family as the 981, so 981 plug torques transfer; confirm against the workshop manual.",
+    "appliesTo": [
+      "987.2 PDK"
+    ],
+    "source": "https://rennlist.com/forums/987-forum/1078012-pdk-gear-oil-change-not-clutch-fluid.html"
+  },
+  {
+    "id": "torque-pdk-clutch-plug",
+    "category": "torque",
+    "name": "PDK clutch-oil pan drain plug",
+    "value": "~15 Nm (11 lb-ft)",
+    "notes": "LOW-CONFIDENCE: mirrors the identical-family 981 PDK (Porsche docs cite 15-18 Nm). Clutch fill requires PIWIS temperature-controlled fill mode.",
+    "appliesTo": [
+      "987.2 PDK"
+    ],
+    "source": "https://rennlist.com/forums/987-forum/1078012-pdk-gear-oil-change-not-clutch-fluid.html"
+  },
+  {
+    "id": "fluid-engine-oil-approval",
+    "category": "fluid",
+    "name": "Engine oil approval",
+    "value": "Porsche A40",
+    "notes": "A40-approved oils only (HTHS >= 3.5). Applies to both the M96/M97 and the 9A1 DFI engines.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "https://www.planet-9.com/threads/porsche-approved-engine-oils-can-we-cut-to-the-chase.83525/"
+  },
+  {
+    "id": "fluid-engine-oil-viscosity",
+    "category": "fluid",
+    "name": "Engine oil viscosity",
+    "value": "0W-40 (factory fill)",
+    "notes": "Factory fill is Mobil 1 0W-40. 5W-40 and 5W-50 are also A40-approved alternatives; some owners prefer 5W-50 for hot-climate/track use.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "https://www.suncoastparts.com/product/0W40M1ESP.html"
+  },
+  {
+    "id": "fluid-coolant-type",
+    "category": "fluid",
+    "name": "Coolant type",
+    "value": "Porsche G40 (pink/violet Si-OAT)",
+    "notes": "Same pink Porsche coolant family used across the 986/987/981. Concentrate P/N 00004330149; Zerex G40 (861526) is an OEM-equivalent. The 'G40' brand name was formalised later — earlier 987.1 fill is the same pink coolant.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "https://lufteknic.myshopify.com/products/porsche-genuine-g40-91-ef-engine-coolant-anti-freeze-00004330149"
+  },
+  {
+    "id": "fluid-brake",
+    "category": "fluid",
+    "name": "Brake fluid",
+    "value": "DOT 4 (Super DOT 4 / Low Viscosity)",
+    "notes": "Porsche specifies DOT 4. Flush every 2 years regardless of mileage.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "https://www.planet-9.com/threads/brake-fluid-brake-fluid.47162/"
+  },
+  {
+    "id": "fluid-manual-gear",
+    "category": "fluid",
+    "name": "Manual transmission / transaxle oil",
+    "value": "SAE 75W-90 (GL-5)",
+    "notes": "G87 6-speed (and G87/01 5-speed base). The transaxle integrates the differential, so gearbox and diff share this single oil fill on the manual car.",
+    "appliesTo": [
+      "987 manual"
+    ],
+    "source": "https://www.pelicanparts.com/techarticles/Boxster_Tech/38-TRANS-Manual_Fluid/38-TRANS-Manual_Fluid.htm"
+  },
+  {
+    "id": "fluid-tiptronic-atf",
+    "category": "fluid",
+    "name": "Tiptronic S automatic transmission fluid (ATF)",
+    "value": "Pentosin ATF-1 / ZF Lifeguard 5",
+    "notes": "987.1 Tiptronic S is the ZF 5HP19 5-speed (A5/50). Porsche P/N 000-043-207-00. This is the 987.1 auto; the 987.2 uses PDK instead.",
+    "appliesTo": [
+      "987.1 Tiptronic"
+    ],
+    "source": "https://ecarguides.com/maintenance-guides/how-to-change-automatic-transmission-fluid-on-porsche-boxster-cayman-2005-2008/"
+  },
+  {
+    "id": "fluid-pdk-gear",
+    "category": "fluid",
+    "name": "PDK gear oil",
+    "value": "SAE 75W-90 (GL-4/5)",
+    "notes": "Factory fill Mobilube PTX Formula A 75W-90. Separate circuit from the PDK clutch/control fluid. 987.2 only.",
+    "appliesTo": [
+      "987.2 PDK"
+    ],
+    "source": "https://rennlist.com/forums/987-forum/1078012-pdk-gear-oil-change-not-clutch-fluid.html"
+  },
+  {
+    "id": "fluid-pdk-clutch",
+    "category": "fluid",
+    "name": "PDK clutch / control fluid",
+    "value": "Pentosin FFL-3",
+    "notes": "Porsche P/N 00004330513. This is the clutch/actuation fluid (often mislabeled 'PDK transmission fluid'), distinct from the 75W-90 gear oil. 987.2 only.",
+    "appliesTo": [
+      "987.2 PDK"
+    ],
+    "source": "https://www.design911.com/p/porsche-dual-clutch---pdk--transmission-fluid---pentosin-ffl3-1-litre/"
+  },
+  {
+    "id": "fluid-power-steering",
+    "category": "fluid",
+    "name": "Power steering fluid",
+    "value": "Pentosin CHF 11S (or CHF 202)",
+    "notes": "KEY DIFFERENCE vs the 981: the 987 uses HYDRAULIC power steering (a pump + reservoir), so it DOES take fluid. CHF 11S and CHF 202 are interchangeable. Porsche P/N 000-043-206-56.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "https://crpautomotive.com/wp-content/uploads/2020/06/Pentosin-Product-Data-Sheet-Hydraulic-Fluid-CHF-11S.pdf"
+  },
+  {
+    "id": "fluid-ac-refrigerant",
+    "category": "fluid",
+    "name": "A/C refrigerant type",
+    "value": "R134a",
+    "notes": "MEDIUM-CONFIDENCE: the entire 987 run predates the R1234yf transition. Verify against the engine-bay refrigerant label.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "https://database26.com/porsche-refrigerant-capacity-chart/"
+  },
+  {
+    "id": "cap-oil-27-987-1",
+    "category": "capacity",
+    "name": "Engine oil capacity (2.7 M96, 987.1)",
+    "value": "~7.75 L (~8.2 US qt)",
+    "notes": "MEDIUM-CONFIDENCE: with filter. Grouped with the 3.4 figure by capacity databases; confirm with the electronic oil-level gauge after fill.",
+    "appliesTo": [
+      "987.1 2.7"
+    ],
+    "source": "https://oil-change.info/porsche-cayman-987-2005-2012-engine-oil-capacity/"
+  },
+  {
+    "id": "cap-oil-34-987-1",
+    "category": "capacity",
+    "name": "Engine oil capacity (3.4 M97, 987.1)",
+    "value": "7.75 L (~8.2 US qt)",
+    "notes": "With filter, per the Porsche workshop-manual capacity table for Cayman S (987) F6-3.4L. After a long hot drain owners top up to ~7.8 L (8.25 qt).",
+    "appliesTo": [
+      "987.1 3.4 S"
+    ],
+    "source": "https://workshop-manuals.com/porsche/cayman_s_(987)/f6-3.4l/maintenance/fluids/engine_oil/component_information/specifications/capacity_specifications/"
+  },
+  {
+    "id": "cap-oil-29-987-2",
+    "category": "capacity",
+    "name": "Engine oil capacity (2.9 9A1, 987.2)",
+    "value": "~7.5 L (~7.9 US qt)",
+    "notes": "MEDIUM-CONFIDENCE: with filter, DFI MA1.20 engine. From a capacity database; verify with the on-board oil-level gauge.",
+    "appliesTo": [
+      "987.2 2.9"
+    ],
+    "source": "https://oil-change.info/porsche-cayman-987-2005-2012-engine-oil-capacity/"
+  },
+  {
+    "id": "cap-oil-34-987-2",
+    "category": "capacity",
+    "name": "Engine oil capacity (3.4 9A1, 987.2)",
+    "value": "~7.5 L (~7.9 US qt)",
+    "notes": "MEDIUM-CONFIDENCE: with filter, DFI MA1.21 engine (Cayman S / R). From a capacity database; verify with the on-board oil-level gauge.",
+    "appliesTo": [
+      "987.2 3.4 S",
+      "987.2 3.4 R"
+    ],
+    "source": "https://oil-change.info/porsche-cayman-987-2005-2012-engine-oil-capacity/"
+  },
+  {
+    "id": "cap-coolant-manual",
+    "category": "capacity",
+    "name": "Coolant total system capacity (manual)",
+    "value": "~22.3 L",
+    "notes": "MEDIUM-CONFIDENCE: total system fill, not a drain-and-fill volume. Manual-transmission cars.",
+    "appliesTo": [
+      "987 manual"
+    ],
+    "source": "https://rennlist.com/forums/987-forum/1287203-full-cooling-system-capacity.html"
+  },
+  {
+    "id": "cap-coolant-auto",
+    "category": "capacity",
+    "name": "Coolant total system capacity (Tiptronic)",
+    "value": "~24.3 L",
+    "notes": "MEDIUM-CONFIDENCE: total system fill for Tiptronic cars (extra ATF cooler circuit). Verify against the manual.",
+    "appliesTo": [
+      "987.1 Tiptronic"
+    ],
+    "source": "https://www.excellence-mag.com/resources/specs/216"
+  },
+  {
+    "id": "cap-fuel",
+    "category": "capacity",
+    "name": "Fuel tank capacity",
+    "value": "64 L (~16.9 US gal)",
+    "notes": "MEDIUM-CONFIDENCE: 64 L is quoted consistently across 987.1/987.2 spec sheets. Some references list a 54 L base tank with 64 L as the common fitment — verify against the specific car.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "https://www.excellence-mag.com/resources/specs/216"
+  },
+  {
+    "id": "cap-manual-gear",
+    "category": "capacity",
+    "name": "Manual gearbox oil capacity (refill)",
+    "value": "~2.8 L (~2.95 US qt)",
+    "notes": "MEDIUM-CONFIDENCE: G87/20 6-speed refill; fill plug is a 10mm hex on the LH side. Full changes can take ~2.9-3.0 L.",
+    "appliesTo": [
+      "987 manual"
+    ],
+    "source": "https://www.planet-9.com/threads/gear-oil-capacity.114130/"
+  },
+  {
+    "id": "cap-tiptronic",
+    "category": "capacity",
+    "name": "Tiptronic ATF capacity",
+    "value": "Total ~9 L; drain & fill ~3.5 L",
+    "notes": "Most of the fluid stays in the torque converter, so a service exchanges only ~3.5 L. 987.1 ZF 5HP19.",
+    "appliesTo": [
+      "987.1 Tiptronic"
+    ],
+    "source": "https://ecarguides.com/maintenance-guides/how-to-change-automatic-transmission-fluid-on-porsche-boxster-cayman-2005-2008/"
+  },
+  {
+    "id": "cap-pdk-gear",
+    "category": "capacity",
+    "name": "PDK gear oil capacity (drain & fill)",
+    "value": "~2.95 L (~3.12 US qt)",
+    "notes": "Service volume of the 75W-90 gear oil (separate from the clutch fluid). 987.2 only.",
+    "appliesTo": [
+      "987.2 PDK"
+    ],
+    "source": "https://www.planet-9.com/threads/987-2-pdk-fluid-replacement.93530/"
+  },
+  {
+    "id": "cap-pdk-clutch",
+    "category": "capacity",
+    "name": "PDK clutch fluid capacity",
+    "value": "Total ~5.2 L; ~2-2.5 L exchanged per service",
+    "notes": "MEDIUM-CONFIDENCE: total system holds ~5.2 L of Pentosin FFL-3 but a service exchanges only ~2-2.5 L and requires PIWIS temperature-controlled fill. 987.2 only.",
+    "appliesTo": [
+      "987.2 PDK"
+    ],
+    "source": "https://www.planet-9.com/threads/987-2-pdk-fluid-replacement.93530/"
+  },
+  {
+    "id": "cap-power-steering",
+    "category": "capacity",
+    "name": "Power steering fluid capacity",
+    "value": "~1.0 L (~1.1 US qt)",
+    "notes": "MEDIUM-CONFIDENCE: hydraulic PS system fill (987 has hydraulic, not electric, steering). CHF 11S / CHF 202.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "http://www.autoatlanta.com/Porsche-987-Power-Steering-Fluid-srch.html"
+  },
+  {
+    "id": "tyre-17-987-1",
+    "category": "tyre",
+    "name": "Tyre size (17 inch, 987.1 base)",
+    "value": "F 205/55 ZR17, R 235/50 ZR17",
+    "notes": "Base Cayman/Boxster entry wheel. Rims 6.5Jx17 ET55 front / 8Jx17 ET40 rear.",
+    "appliesTo": [
+      "987.1 2.7 base"
+    ],
+    "source": "https://www.wheel-size.com/size/porsche/cayman/987-2005-2009/"
+  },
+  {
+    "id": "tyre-18-987-1",
+    "category": "tyre",
+    "name": "Tyre size (18 inch, 987.1 base/S)",
+    "value": "F 235/40 ZR18, R 265/40 ZR18",
+    "notes": "Standard on Cayman S; optional on base. Rims 8Jx18 ET57 front / 9Jx18 ET43 rear.",
+    "appliesTo": [
+      "987.1 2.7 base",
+      "987.1 3.4 S"
+    ],
+    "source": "https://www.wheel-size.com/size/porsche/cayman/987-2005-2009/"
+  },
+  {
+    "id": "tyre-19-987-1",
+    "category": "tyre",
+    "name": "Tyre size (19 inch, 987.1 base/S)",
+    "value": "F 235/35 ZR19, R 265/35 ZR19",
+    "notes": "Optional 19-inch fitment. Rims 8Jx19 ET57 front / 9.5Jx19 ET46 rear.",
+    "appliesTo": [
+      "987.1 2.7 base",
+      "987.1 3.4 S"
+    ],
+    "source": "https://www.wheel-size.com/size/porsche/cayman/987-2005-2009/"
+  },
+  {
+    "id": "tyre-17-987-2",
+    "category": "tyre",
+    "name": "Tyre size (17 inch, 987.2 base)",
+    "value": "F 205/55 ZR17, R 235/50 ZR17",
+    "notes": "Base 2.9 entry wheel. Rims 7Jx17 ET55 front / 8.5Jx17 ET40 rear.",
+    "appliesTo": [
+      "987.2 2.9 base"
+    ],
+    "source": "https://www.wheel-size.com/size/porsche/cayman/987-2009-2013/"
+  },
+  {
+    "id": "tyre-18-987-2",
+    "category": "tyre",
+    "name": "Tyre size (18 inch, 987.2)",
+    "value": "F 235/40 ZR18, R 255/40 ZR18",
+    "notes": "Note the 987.2 18-inch rear is 255 (vs 265 on the 987.1). Rims 8Jx18 ET57 front / 9Jx18 ET43 rear.",
+    "appliesTo": [
+      "987.2 2.9 base",
+      "987.2 3.4 S"
+    ],
+    "source": "https://www.wheel-size.com/size/porsche/cayman/987-2009-2013/"
+  },
+  {
+    "id": "tyre-19-987-2",
+    "category": "tyre",
+    "name": "Tyre size (19 inch, 987.2 S/R)",
+    "value": "F 235/35 ZR19, R 265/35 ZR19",
+    "notes": "Standard on Cayman S / R. Rims 8.5Jx19 ET55 front / 10Jx19 ET42 rear.",
+    "appliesTo": [
+      "987.2 3.4 S",
+      "987.2 3.4 R"
+    ],
+    "source": "https://www.wheel-size.com/size/porsche/cayman/987-2009-2013/"
+  },
+  {
+    "id": "tyre-20-987-2",
+    "category": "tyre",
+    "name": "Tyre size (20 inch, 987.2 R / option)",
+    "value": "F 235/30 ZR20, R 275/30 ZR20",
+    "notes": "MEDIUM-CONFIDENCE: 20-inch fitment (Cayman R option). Rims 8.5Jx20 front / 10Jx20 rear.",
+    "appliesTo": [
+      "987.2 3.4 R"
+    ],
+    "source": "https://www.wheel-size.com/size/porsche/cayman/987-2009-2013/"
+  },
+  {
+    "id": "tyre-pressure-987-1",
+    "category": "tyre",
+    "name": "Cold tyre pressure (987.1)",
+    "value": "F 2.0 bar (29 psi) / R 2.5 bar (36 psi)",
+    "notes": "LOW-CONFIDENCE: database value; the high rear figure is likely the full-load spec — normal-load is lower. 19-inch front is ~2.2 bar (32 psi). ALWAYS defer to the door-jamb / fuel-flap placard for the definitive normal vs full-load figures.",
+    "appliesTo": [
+      "987.1"
+    ],
+    "source": "https://www.wheel-size.com/size/porsche/cayman/987-2005-2009/"
+  },
+  {
+    "id": "tyre-pressure-987-2",
+    "category": "tyre",
+    "name": "Cold tyre pressure (987.2)",
+    "value": "F 2.0 bar (29 psi) / R 2.1 bar (30 psi) on 17-18 in; F 2.2 (32) / R 2.3 (33) on 19-20 in",
+    "notes": "LOW-CONFIDENCE: database baseline. ALWAYS defer to the door-jamb / fuel-flap placard for the definitive normal vs full-load figures.",
+    "appliesTo": [
+      "987.2"
+    ],
+    "source": "https://www.wheel-size.com/size/porsche/cayman/987-2009-2013/"
+  },
+  {
+    "id": "elec-battery",
+    "category": "electrical",
+    "name": "Battery type",
+    "value": "Group 48 / H6, ~70-80 Ah, ~640-760 CCA",
+    "notes": "KEY DIFFERENCE vs the 981: the 987 has NO start-stop, so a standard flooded (SLI) battery is acceptable and was often OEM — AGM is a fine upgrade but not required. Replacement does NOT need PIWIS coding on the 987. Located in the front trunk.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "https://www.pca.org/tech/what-is-the-correct-battery-replacement-for-a-2015-cayman-boxster"
+  },
+  {
+    "id": "elec-battery-location",
+    "category": "electrical",
+    "name": "Battery location",
+    "value": "Front trunk (frunk), under a cover",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "https://www.planet-9.com/threads/replacing-battery-does-it-need-to-be-re-coded.247586/"
+  },
+  {
+    "id": "elec-voltage",
+    "category": "electrical",
+    "name": "System voltage",
+    "value": "12 V",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "https://www.design911.com/p/alternator-porsche-997---987-boxster---987c-cayman/"
+  },
+  {
+    "id": "elec-alternator",
+    "category": "electrical",
+    "name": "Alternator output",
+    "value": "150 A (Bosch)",
+    "notes": "OEM Bosch 150 A (P/N 99760302205 / 99760301209). A 180 A unit exists as an upgrade / for high-load option cars.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "https://www.design911.com/p/alternator-porsche-997---987-boxster---987c-cayman/"
+  },
+  {
+    "id": "elec-spark-plug-987-1",
+    "category": "electrical",
+    "name": "Spark plug type (M96/M97)",
+    "value": "Bosch FGR5KQE0 (4-electrode)",
+    "notes": "OEM plug for the 987.1 M96/M97 engines. Porsche P/N 99917022390. Pre-gapped; do not re-gap the multi-ground design.",
+    "appliesTo": [
+      "987.1 2.7",
+      "987.1 3.4 S"
+    ],
+    "source": "https://www.fcpeuro.com/products/porsche-bosch-spark-plug-911-boxster-cayman-bosch-fgr5kqe0"
+  },
+  {
+    "id": "elec-spark-plug-987-2",
+    "category": "electrical",
+    "name": "Spark plug type (9A1 DFI)",
+    "value": "Bosch FGR5NQE04",
+    "notes": "OEM plug for the 987.2 DFI 9A1 engines. Porsche P/N 99917013090. Different from the 987.1 plug — do not interchange.",
+    "appliesTo": [
+      "987.2 2.9",
+      "987.2 3.4 S"
+    ],
+    "source": "https://www.fcpeuro.com/products/porsche-spark-plug-911-boxster-cayman-cayenne-fgr5nqe0"
+  },
+  {
+    "id": "elec-key-fob",
+    "category": "electrical",
+    "name": "Key fob battery",
+    "value": "CR2032 (3V lithium)",
+    "notes": "MEDIUM-CONFIDENCE: standard for the era; confirm the coin cell in your specific fob before buying.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "https://www.pelicanparts.com/More_Info/99961110800.htm"
+  },
+  {
+    "id": "tol-front-disc-base",
+    "category": "tolerance",
+    "name": "Front disc thickness (base)",
+    "value": "New 24 mm / min 22 mm",
+    "notes": "MEDIUM-CONFIDENCE: base Cayman/Boxster front rotor. Minimum is also stamped on the disc hub.",
+    "appliesTo": [
+      "987 base"
+    ],
+    "source": "https://www.planet-9.com/threads/minimum-rotor-thickness-non-s.69088/"
+  },
+  {
+    "id": "tol-rear-disc-base",
+    "category": "tolerance",
+    "name": "Rear disc thickness (base)",
+    "value": "New 20 mm / min 18 mm",
+    "notes": "MEDIUM-CONFIDENCE: base rear rotor.",
+    "appliesTo": [
+      "987 base"
+    ],
+    "source": "https://www.planet-9.com/threads/minimum-rotor-thickness-non-s.69088/"
+  },
+  {
+    "id": "tol-front-disc-s",
+    "category": "tolerance",
+    "name": "Front disc thickness (S)",
+    "value": "New 28 mm / min 26 mm",
+    "notes": "MEDIUM-CONFIDENCE: Cayman S / Boxster S front rotor (larger vented disc).",
+    "appliesTo": [
+      "987 S"
+    ],
+    "source": "https://www.planet-9.com/threads/987-2-brake-rotor-measurements.85102/"
+  },
+  {
+    "id": "tol-rear-disc-s",
+    "category": "tolerance",
+    "name": "Rear disc thickness (S)",
+    "value": "New 24 mm / min 22 mm",
+    "notes": "MEDIUM-CONFIDENCE: Cayman S / Boxster S rear rotor.",
+    "appliesTo": [
+      "987 S"
+    ],
+    "source": "https://www.planet-9.com/threads/987-2-brake-rotor-measurements.85102/"
+  },
+  {
+    "id": "tol-pad-min",
+    "category": "tolerance",
+    "name": "Brake pad minimum thickness",
+    "value": "~2-3 mm friction material",
+    "notes": "MEDIUM-CONFIDENCE: replace around 2-3 mm remaining; not a factory table figure.",
+    "appliesTo": [
+      "all 987 front & rear"
+    ],
+    "source": "https://www.planet-9.com/threads/brake-rotor-wear-limits.106090/"
+  },
+  {
+    "id": "tol-oil-interval",
+    "category": "tolerance",
+    "name": "Engine oil service interval",
+    "value": "2 years / 20,000 km (~12,000 mi)",
+    "notes": "MEDIUM-CONFIDENCE: factory long-life interval; databases cite up to 30,000 km/24 mo (EU). Many owners shorten to 5,000-7,500 mi given the M96/M97 durability history.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "https://oil-change.info/porsche-cayman-987-2005-2012-engine-oil-capacity/"
+  }
+]

@@ -1,9 +1,6 @@
-# FLAT·SIX — 981 Garage
+# FLAT·SIX — Porsche Garage
 
-A DIY maintenance OS for the **Porsche Boxster / Cayman (981)**: an interactive
-component explorer, a curated 981 knowledge base (fault codes, torque specs, known
-issues), a personal service log + planner, and an **AI workshop assistant** exposed
-to Claude over the Model Context Protocol (MCP).
+A DIY maintenance OS for the **Porsche Boxster / Cayman** — **987 and 981 today**, with more generations on the way: an interactive component explorer, a generation-scoped knowledge base (fault codes, torque specs, known issues), a personal service log + planner, and an **AI workshop assistant** exposed to Claude over the Model Context Protocol (MCP).
 
 Built as a single Next.js app that deploys for free on **Vercel + Supabase**.
 

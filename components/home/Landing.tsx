@@ -43,10 +43,10 @@ const PREVIEW: Record<'front' | 'engine', Pin[]> = {
 const COLORS = ['#C6C8CA', '#E8E8EA', '#131316', '#D5001C', '#27364E', '#EFC03B'];
 
 const STATS = [
-  { k: '16', label: 'systems mapped' },
-  { k: '7.5 L', label: '0W-40 oil capacity' },
+  { k: '2+', label: 'generations supported' },
+  { k: '987 · 981', label: 'Boxster & Cayman' },
   { k: '130 Nm', label: 'wheel-bolt torque' },
-  { k: '2012–16', label: '981 generation' },
+  { k: 'More', label: 'models coming' },
 ];
 
 // Faithful sample data for the in-page "screenshots" of the real app screens.
@@ -134,17 +134,18 @@ export default function Landing() {
 
       {/* ===== HERO ===== */}
       <section style={{ position: 'relative', background: '#0B0B0C', color: '#fff', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', right: -60, top: 40, font: `700 420px/.8 ${mono}`, color: '#121214', letterSpacing: '-.04em', userSelect: 'none', pointerEvents: 'none' }}>981</div>
+        <div style={{ position: 'absolute', right: -40, top: 48, font: `700 280px/.8 ${mono}`, color: '#121214', letterSpacing: '-.04em', userSelect: 'none', pointerEvents: 'none' }}>FLAT</div>
         <div style={{ position: 'relative', maxWidth: 1200, margin: '0 auto', padding: '84px 28px 92px', display: 'grid', gridTemplateColumns: '1.05fr .95fr', gap: 56, alignItems: 'center' }} className="heroGrid landingHero">
           {/* copy */}
           <div style={{ animation: 'fadeUp .5s ease' }}>
-            <div style={{ font: `500 12px/1 ${mono}`, letterSpacing: '.26em', color: RED, marginBottom: 22 }}>FREE &amp; OPEN SOURCE · PORSCHE 981</div>
+            <div style={{ font: `500 12px/1 ${mono}`, letterSpacing: '.26em', color: RED, marginBottom: 22 }}>FREE &amp; OPEN SOURCE · BOXSTER &amp; CAYMAN</div>
             <h1 style={{ margin: 0, font: `300 56px/1.04 ${sans}`, letterSpacing: '-.02em' }}>
-              Every component<br />of your Boxster.<br />
+              Every component<br />of your mid-engine<br />Porsche.
+              <br />
               <span style={{ fontWeight: 500 }}>One garage.</span>
             </h1>
             <p style={{ maxWidth: 468, margin: '26px 0 0', font: `400 16px/1.65 ${sans}`, color: '#9A9AA0' }}>
-              Explore your Boxster or Cayman in 3D and factory cutaways, keep a full service history, plan what&rsquo;s next — and let an AI assistant help with all of it. Free, and open source.
+              Built for the 987 and 981 — with more generations on the way. Explore your car in 3D, look up faults and specs for your generation, keep a full service history, and let an AI assistant help with all of it. Free, and open source.
             </p>
             <div style={{ marginTop: 34, display: 'flex', gap: 13, flexWrap: 'wrap' }}>
               <Link href={GARAGE} className="cta" style={{ ...ctaStyle, height: 50, display: 'flex', alignItems: 'center', gap: 10, padding: '0 26px' }}>
@@ -155,9 +156,9 @@ export default function Landing() {
               </a>
             </div>
             <div style={{ marginTop: 46, display: 'flex', gap: 30, flexWrap: 'wrap', font: `500 11px/1 ${mono}`, letterSpacing: '.14em', color: '#5C5C61' }}>
-              <span>2.7 / 3.4 / 3.8 FLAT-6</span>
-              <span>PDK · MANUAL</span>
-              <span>2012–2016</span>
+              <span>987 · 981</span>
+              <span>BOXSTER · CAYMAN</span>
+              <span>MORE COMING</span>
             </div>
           </div>
 
@@ -271,8 +272,8 @@ export default function Landing() {
             </h2>
           </div>
           <p style={{ maxWidth: 380, margin: 0, font: `400 15px/1.65 ${sans}`, color: '#6E6E73' }}>
-            A real 3D model you can orbit, zoom and repaint to your colour — then X-ray it or drop into factory cutaways to
-            see exactly where every part lives.
+            A real 3D model you can orbit, zoom and repaint to your colour. On the 981, X-ray the assemblies or drop into
+            factory cutaways to see exactly where every part lives.
           </p>
         </div>
 
@@ -280,7 +281,7 @@ export default function Landing() {
           {/* 3D model — real render */}
           <div style={{ background: '#0B0B0C', borderRadius: 8, overflow: 'hidden', color: '#fff', display: 'flex', flexDirection: 'column' }}>
             <div style={{ flex: 1, background: 'radial-gradient(120% 100% at 50% 30%,#1A1A1D,#0B0B0C)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px 20px 0' }}>
-              <img src="/assets/boxster-poster.png" alt="Porsche 981 Boxster 3D model" style={{ width: '92%', maxWidth: 420, display: 'block', filter: 'drop-shadow(0 24px 40px rgba(0,0,0,.55))' }} />
+              <img src="/assets/boxster-poster.png" alt="Porsche Boxster 3D model" style={{ width: '92%', maxWidth: 420, display: 'block', filter: 'drop-shadow(0 24px 40px rgba(0,0,0,.55))' }} />
             </div>
             <div style={{ padding: '20px 26px 24px' }}>
               <div style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.16em', color: '#76767B' }}>LAYER 01 · 3D MODEL</div>
@@ -302,10 +303,10 @@ export default function Landing() {
               <img src="/assets/xray-internals.png" alt="Porsche 981 internals X-ray view" style={{ width: '100%', maxWidth: 520, display: 'block', filter: 'drop-shadow(0 16px 26px rgba(0,0,0,.16))' }} />
             </div>
             <div style={{ padding: '20px 26px 24px' }}>
-              <div style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.16em', color: '#9A9AA0' }}>LAYER 02 · X-RAY &amp; CUTAWAY</div>
+              <div style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.16em', color: '#9A9AA0' }}>LAYER 02 · X-RAY &amp; CUTAWAY · 981</div>
               <h3 style={{ margin: '12px 0 8px', font: `400 22px/1.15 ${sans}`, color: '#0B0B0C' }}>See what&rsquo;s underneath</h3>
               <p style={{ margin: 0, font: `400 14px/1.6 ${sans}`, color: '#6E6E73' }}>
-                Engine, oil filter, plugs, transaxle — every system pinned to a real part number, torque and interval.
+                On the 981: engine, oil filter, plugs, transaxle — every system pinned to a real part number, torque and interval. Generation-specific knowledge for every supported car.
               </p>
             </div>
           </div>
@@ -339,7 +340,7 @@ export default function Landing() {
       <FeatureRow
         kicker="FAULT FINDING"
         title="Track a fault to its cause."
-        body="Pick a symptom and get the likely causes ranked, what to check, and the exact parts to order — from coolant pipes to the AOS."
+        body="Pick a symptom and get the likely causes ranked for your generation — IMS and bore scoring on a 987.1, AOS and coolant pipes on a 981 — plus what to check and the parts to order."
         visual={<FaultPanel />}
       />
 
@@ -417,10 +418,10 @@ export default function Landing() {
       {/* ===== CTA ===== */}
       <section style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 28px 90px' }}>
         <div style={{ position: 'relative', background: '#0B0B0C', borderRadius: 8, overflow: 'hidden', padding: '64px 28px', textAlign: 'center' }}>
-          <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)', font: `700 320px/.8 ${mono}`, color: '#121214', userSelect: 'none', pointerEvents: 'none' }}>981</div>
+          <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)', font: `700 220px/.8 ${mono}`, color: '#121214', userSelect: 'none', pointerEvents: 'none' }}>FLAT</div>
           <div style={{ position: 'relative' }}>
-            <h2 style={{ margin: 0, font: `300 40px/1.1 ${sans}`, letterSpacing: '-.02em', color: '#fff' }}>Know your 981 inside out.</h2>
-            <p style={{ margin: '18px auto 0', maxWidth: 440, font: `400 15px/1.6 ${sans}`, color: '#9A9AA0' }}>It&rsquo;s free. Add your car, pick your spec, and open the garage.</p>
+            <h2 style={{ margin: 0, font: `300 40px/1.1 ${sans}`, letterSpacing: '-.02em', color: '#fff' }}>Know your car inside out.</h2>
+            <p style={{ margin: '18px auto 0', maxWidth: 460, font: `400 15px/1.6 ${sans}`, color: '#9A9AA0' }}>It&rsquo;s free. Add a 987 or 981, pick your spec, and open the garage — more models are on the way.</p>
             <Link href={GARAGE} className="cta" style={{ ...ctaStyle, marginTop: 30, height: 52, display: 'inline-flex', alignItems: 'center', gap: 10, padding: '0 30px' }}>
               Start your garage <span style={{ fontFamily: mono }}>→</span>
             </Link>
@@ -433,7 +434,7 @@ export default function Landing() {
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '30px 28px', display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
           <div style={{ width: 10, height: 10, background: RED }} />
           <div style={{ font: `700 12px/1 ${mono}`, letterSpacing: '.28em', color: '#0B0B0C' }}>FLAT·SIX</div>
-          <div style={{ font: `400 12px/1 ${sans}`, color: '#9A9AA0' }}>Free &amp; open-source DIY maintenance for the Porsche 981 Boxster &amp; Cayman</div>
+          <div style={{ font: `400 12px/1 ${sans}`, color: '#9A9AA0' }}>Free &amp; open-source DIY maintenance for the Porsche Boxster &amp; Cayman — 987, 981 &amp; more</div>
           <a href={GITHUB_REPO} target="_blank" rel="noopener noreferrer" style={{ font: `400 12px/1 ${sans}`, color: '#6E6E73', transition: 'color .15s' }}>GitHub</a>
           <Link href="/legal" style={{ font: `400 12px/1 ${sans}`, color: '#6E6E73', transition: 'color .15s' }}>Privacy &amp; Terms</Link>
           <div style={{ marginLeft: 'auto', font: `500 10px/1 ${mono}`, letterSpacing: '.1em', color: '#B4B4B8' }}>NOT AFFILIATED WITH PORSCHE AG</div>

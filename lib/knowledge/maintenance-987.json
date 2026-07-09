@@ -1,0 +1,210 @@
+[
+  {
+    "id": "maint-oil-service",
+    "task": "Engine oil & filter change",
+    "intervalMiles": 10000,
+    "intervalMonths": 12,
+    "system": "Engine",
+    "notes": "Factory interval annual / 10,000 mi for both eras (987.1 M96/M97 and 987.2 9A1 DFI). Given the cars' age most owners shorten to 5,000-7,500 mi. Use Porsche A40-approved 0W-40.",
+    "source": "https://www.pcarwise.com/local-help/porsche-maintenance-schedules/boxster-maintenance/987-boxster-maintenance-schedule/"
+  },
+  {
+    "id": "maint-annual-inspection",
+    "task": "Multipoint vehicle inspection & maintenance-indicator reset",
+    "intervalMiles": 10000,
+    "intervalMonths": 12,
+    "system": "Body",
+    "notes": "The general annual service (minor/'A' service). Applies to all 987.1 and 987.2 model years. Intervals are cumulative - the 2yr/4yr services include the annual items.",
+    "source": "https://www.pcarwise.com/local-help/porsche-maintenance-schedules/boxster-maintenance/987-boxster-maintenance-schedule/"
+  },
+  {
+    "id": "maint-brake-fluid",
+    "task": "Brake fluid flush",
+    "intervalMonths": 24,
+    "system": "Brakes",
+    "notes": "Every 2 years regardless of mileage (fluid is hygroscopic). All 987.1/987.2, manual/Tiptronic/PDK. Use DOT 4 (later cars DOT 4 Low Viscosity).",
+    "source": "https://houseautogroup.com/porsche-boxster-cayman-maintenance-guide/"
+  },
+  {
+    "id": "maint-brake-inspection",
+    "task": "Brake pad / disc inspection",
+    "intervalMiles": 10000,
+    "intervalMonths": 12,
+    "system": "Brakes",
+    "notes": "Inspect pad and rotor wear at each annual service; replace on wear. Applies to all 987 years.",
+    "source": "https://www.pcarwise.com/local-help/porsche-maintenance-schedules/cayman-maintenance/987-cayman-maintenance-schedule/"
+  },
+  {
+    "id": "maint-air-filter",
+    "task": "Engine air intake filter replacement",
+    "intervalMiles": 20000,
+    "intervalMonths": 24,
+    "system": "Engine",
+    "notes": "Part of the minor/intermediate (2yr) service. Applies to all 987.1 and 987.2.",
+    "source": "https://www.pcarwise.com/local-help/porsche-maintenance-schedules/boxster-maintenance/987-boxster-maintenance-schedule/"
+  },
+  {
+    "id": "maint-cabin-filter",
+    "task": "Cabin / pollen filter replacement",
+    "intervalMiles": 20000,
+    "intervalMonths": 24,
+    "system": "HVAC",
+    "notes": "Part of the 2yr service. Applies to all 987.1 and 987.2.",
+    "source": "https://www.pcarwise.com/local-help/porsche-maintenance-schedules/boxster-maintenance/987-boxster-maintenance-schedule/"
+  },
+  {
+    "id": "maint-spark-plugs-987-1",
+    "task": "Spark plug replacement (987.1)",
+    "intervalMiles": 40000,
+    "intervalMonths": 48,
+    "system": "Engine",
+    "notes": "987.1 only (M96/M97, 2005-2008). Six plugs. Commonly cited as 4yr/40k; some sources/owners cite the earlier 987.1 figure as 36k mi - treat exact mileage as MEDIUM confidence, but the 4-year time limit is firm. Replace even on low-mileage cars to avoid seizing in the alloy head.",
+    "source": "https://rennlist.com/forums/981-forum/1140352-spark-plug-replace-time-or-mileage-dependent.html"
+  },
+  {
+    "id": "maint-spark-plugs-987-2",
+    "task": "Spark plug replacement (987.2)",
+    "intervalMiles": 40000,
+    "intervalMonths": 48,
+    "system": "Engine",
+    "notes": "987.2 only (9A1 DFI, 2009-2012). Six plugs. Factory 4yr / 40,000 mi. DFI engines are sensitive to plug condition (cold-start/misfire), so keep to the 4-year limit even at low mileage.",
+    "source": "https://houseautogroup.com/porsche-boxster-cayman-maintenance-guide/"
+  },
+  {
+    "id": "maint-spark-plug-tubes",
+    "task": "Spark plug tube / seal inspection",
+    "intervalMiles": 40000,
+    "intervalMonths": 48,
+    "system": "Engine",
+    "notes": "Inspect spark-plug tube seals for oil seepage whenever plugs are changed (~4yr/40k). Weeping seals are common on M96/M97 (987.1). Applies to all 987; inspection only, replace on leakage.",
+    "source": "https://www.pcarwise.com/local-help/porsche-maintenance-schedules/cayman-maintenance/987-cayman-maintenance-schedule/"
+  },
+  {
+    "id": "maint-coolant",
+    "task": "Coolant inspection / replacement",
+    "intervalMonths": 72,
+    "system": "Cooling",
+    "notes": "No factory drain/refill interval - Porsche G40 is a lifetime fill. Inspect condition/level at each service; common owner practice is a fresh drain-and-refill every ~4-6 years (interval shown is that owner practice, LOW confidence as factory value). System must be vacuum-filled / properly bled to avoid air pockets. Use G40 (silicate-free).",
+    "source": "https://www.pelicanparts.com/techarticles/Porsche-987-Cayman/08-WATER-Coolant_Flush_and_Replacement/08-WATER-Coolant_Flush_and_Replacement.htm"
+  },
+  {
+    "id": "maint-drive-belt",
+    "task": "Accessory / serpentine (poly-V) drive belt replacement",
+    "intervalMiles": 60000,
+    "intervalMonths": 72,
+    "system": "Engine",
+    "notes": "Inspect at each service; replace around 6yr / 60k. Applies to all 987.1 and 987.2.",
+    "source": "https://www.pcarwise.com/local-help/porsche-maintenance-schedules/boxster-maintenance/987-boxster-maintenance-schedule/"
+  },
+  {
+    "id": "maint-throttle-body",
+    "task": "Throttle body cleaning",
+    "intervalMiles": 60000,
+    "intervalMonths": 72,
+    "system": "Engine",
+    "notes": "At about 6yr / 60k. Applies to all 987 years.",
+    "source": "https://www.pcarwise.com/local-help/porsche-maintenance-schedules/cayman-maintenance/987-cayman-maintenance-schedule/"
+  },
+  {
+    "id": "maint-manual-trans-oil",
+    "task": "Manual transaxle oil change",
+    "intervalMiles": 120000,
+    "intervalMonths": 144,
+    "system": "Transmission",
+    "notes": "Manual cars only (both 987.1 and 987.2). Factory 12yr / 120k. The mid-engine transaxle integrates the differential, so this one fill covers the diff - there is no separate diff service on manual cars. Use 75W-90 GL-5. Many owners change earlier (~60k).",
+    "source": "https://www.pcarwise.com/local-help/porsche-maintenance-schedules/boxster-maintenance/987-boxster-maintenance-schedule/"
+  },
+  {
+    "id": "maint-clutch-fluid",
+    "task": "Manual clutch hydraulic fluid flush",
+    "intervalMonths": 24,
+    "system": "Transmission",
+    "notes": "Manual cars only. The hydraulic clutch shares the brake reservoir / DOT 4 fluid and is bled during the 2-year brake fluid flush - no separate interval.",
+    "source": "https://revolution-porsche.co.uk/frequently-asked-questions/how-often-does-my-porsches-transmission-fluid-need-to-be-changed/"
+  },
+  {
+    "id": "maint-tiptronic-atf",
+    "task": "Tiptronic S automatic transmission fluid (ATF) service",
+    "intervalMiles": 60000,
+    "intervalMonths": 72,
+    "system": "Transmission",
+    "notes": "987.1 Tiptronic S only (ZF 5HP19 5-speed auto, 2005-2008). Porsche officially calls this a lifetime/'fill-for-life' fluid (no scheduled change), which is heavily debated - specialists and owners strongly recommend servicing every ~4-6yr / 40-60k (interval shown reflects that recommendation, MEDIUM confidence; there is NO firm factory mileage). A drain-and-fill only recovers ~3.5 L because the torque converter retains the rest. Use ZF Lifeguard 5 ATF.",
+    "source": "https://www.pelicanparts.com/techarticles/Boxster_Tech/35-TRANS-Auto_Fluid_Change/35-TRANS-Auto_Fluid_Change.htm"
+  },
+  {
+    "id": "maint-tiptronic-final-drive",
+    "task": "Tiptronic S final-drive (differential) oil change",
+    "intervalMiles": 60000,
+    "intervalMonths": 72,
+    "system": "Transmission",
+    "notes": "987.1 Tiptronic only. On the auto the final drive is SEPARATE from the ATF (~0.8 L of 75W-90). There is no drain plug - old oil is suctioned out and refilled via the fill plug. No official interval; service alongside the ATF (LOW confidence on interval).",
+    "source": "https://www.pca.org/tech/2008-base-boxster-9871-tiptronic-does-the-differential-final-drive-contain-approximately-08liters-of-75w90-gear-oil-can-i-change-this-oil-by-suctionin"
+  },
+  {
+    "id": "maint-pdk-service",
+    "task": "PDK transmission oil & filter service",
+    "intervalMiles": 120000,
+    "intervalMonths": 144,
+    "system": "Transmission",
+    "notes": "987.2 PDK only (2009-2012). Factory PDK gear oil + filter interval is 12yr / 120k, but specialists and owners strongly recommend ~40k / 4yr to protect the Mechatronic unit. Requires PIWIS-guided fill procedure.",
+    "source": "https://rennlist.com/forums/987-forum/1165369-frequency-of-pdk-fluid-change-on-987-2-2-9-a.html"
+  },
+  {
+    "id": "maint-pdk-clutch-fluid",
+    "task": "PDK clutch fluid service",
+    "intervalMiles": 60000,
+    "intervalMonths": 72,
+    "system": "Transmission",
+    "notes": "987.2 PDK only. Separate from the PDK gear oil. Factory cadence 6yr / 60k; many specialists do it earlier (~40k) with the transmission service. Requires PIWIS fill mode.",
+    "source": "https://www.pcarwise.com/local-help/porsche-maintenance-schedules/boxster-maintenance/987-boxster-maintenance-schedule/"
+  },
+  {
+    "id": "maint-transmission-software",
+    "task": "PDK / Tiptronic control-unit software update",
+    "system": "Transmission",
+    "notes": "No fixed interval. Check for the latest Porsche PIWIS transmission software / applicable TSBs at major services - updates can resolve PDK shift-quality and Tiptronic adaptation complaints. 987.2 PDK and 987.1 Tiptronic. LOW confidence (as-needed, not a scheduled item).",
+    "source": "https://www.planet-9.com/threads/987-2-official-service-intervals-too-long.251257/"
+  },
+  {
+    "id": "maint-dfi-fuel-system",
+    "task": "DFI fuel-system check (no serviceable fuel filter)",
+    "system": "Fuel",
+    "notes": "987.2 9A1 DFI only. There is NO scheduled/serviceable fuel filter - the filter is integrated in the in-tank pump module (lifetime). The camshaft-driven high-pressure fuel pump (HPFP) is a known wear item; not a scheduled service, but inspect if you see rough hot-starts, misfires or fuel-trim/pressure faults. LOW confidence (condition-based, not interval-based).",
+    "source": "https://www.planet-9.com/threads/987-2-fuel-pump-failures.37833/"
+  },
+  {
+    "id": "maint-tyres",
+    "task": "Tyre inspection & rotation",
+    "intervalMiles": 10000,
+    "intervalMonths": 12,
+    "system": "Wheels",
+    "notes": "Inspect tread, age (replace ~6yr regardless of tread) and pressures at every service. All 987 run staggered fitment, so front-to-rear rotation is not possible; rotate side-to-side only if directional pattern allows.",
+    "source": "https://www.pcarwise.com/local-help/porsche-maintenance-schedules/cayman-maintenance/987-cayman-maintenance-schedule/"
+  },
+  {
+    "id": "maint-tire-sealant",
+    "task": "Tyre mobility sealant replacement",
+    "intervalMiles": 40000,
+    "intervalMonths": 48,
+    "system": "Wheels",
+    "notes": "987 ships with a tyre mobility (sealant) kit instead of a spare. The sealant bottle expires and is a listed replacement item at ~4yr / 40k. All 987 years.",
+    "source": "https://www.pcarwise.com/local-help/porsche-maintenance-schedules/boxster-maintenance/987-boxster-maintenance-schedule/"
+  },
+  {
+    "id": "maint-battery",
+    "task": "Battery test (CCA) & charge check",
+    "intervalMiles": 10000,
+    "intervalMonths": 12,
+    "system": "Electrical",
+    "notes": "Load/CCA-tested at each annual service. All 987 years. A trickle/maintenance charger is recommended for low-use cars.",
+    "source": "https://www.pcarwise.com/local-help/porsche-maintenance-schedules/boxster-maintenance/987-boxster-maintenance-schedule/"
+  },
+  {
+    "id": "maint-ac-service",
+    "task": "Air-conditioning operation check / service",
+    "intervalMonths": 24,
+    "system": "HVAC",
+    "notes": "No fixed factory A/C service interval. Operation and vent temperature are checked at scheduled services; recharge R134a and service the receiver/drier only as needed (interval shown is a practical check cadence, LOW confidence). All 987 years.",
+    "source": "https://houseautogroup.com/porsche-boxster-cayman-maintenance-guide/"
+  }
+]
