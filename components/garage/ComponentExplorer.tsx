@@ -323,7 +323,7 @@ export default function ComponentExplorer() {
                 />
                 {showPins && activeSystem !== 'None' && viewComponents.map((c) => {
                   const n = COMPONENTS.indexOf(c) + 1;
-                  const dim = activeSystem !== 'All' && activeSystem !== 'None' && c.system !== activeSystem;
+                  const dim = activeSystem !== 'All' && c.system !== activeSystem;
                   const active = c.id === selectedId;
                   const dotBg = active ? RED : dim ? '#9A9AA0' : '#0B0B0C';
                   return (
