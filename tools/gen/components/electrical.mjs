@@ -5,12 +5,10 @@
 //   +X = right (passenger on LHD), −X = left (driver), +Y = up, +Z = front.
 // Unified scene places this GLB with carSpace: true (no normalize/recenter).
 //
-// Layout:
-//   - Battery (batteryAgm) — front trunk, passenger side (+X), well forward.
-//   - Fuse/relay carrier (junctionBox) — driver side (−X) frunk / kick panel
-//     (WM 978409: left fuse box is the primary service panel on LHD cars).
-//   - Cabin particle filter (cabinParticleFilter) — HVAC, passenger footwell
-//     (WM 851819).
+// Layout (unified scene: +X = screen-right when viewed from the front):
+//   - Battery (batteryAgm) — front trunk, passenger side (−X), well forward.
+//   - Fuse/relay carrier (junctionBox) — driver side (+X) kick panel near column.
+//   - Cabin particle filter — next to the battery (−X) in the HVAC / frunk bulkhead.
 //   - Alternator + Starter on the engine at the REAR.
 //   - Control modules / instrument cluster / Sport Chrono spread plausibly.
 
@@ -38,7 +36,7 @@ export function build() {
   const add = (m) => { elec.add(m); return m; };
 
   // ---------------------------------------------------------------------------
-  // Battery — passenger frunk (+X), forward.
+  // Battery — passenger frunk (−X). Cabin filter sits adjacent.
   // ---------------------------------------------------------------------------
   const battery = group('batteryAgm');
   {
@@ -49,7 +47,9 @@ export function build() {
     add2(at(cyl('postNegative', 0.025, 0.028, 0.05, M_NEG, 16), -0.09, 0.165, 0.06));
     add2(at(box('holdDown', 0.31, 0.02, 0.03, M_RELAY), 0, 0.145, -0.07));
   }
-  add(at(battery, 0.55, 0.12, 1.85));
+  // Frunk bulkhead, aft of left radiator/fan (~z 1.7–1.9) and clear of the
+  // expansion-tank zone — outboard so it does not sit in the rad pack.
+  add(at(battery, -0.62, 0.22, 1.05));
 
   // ---------------------------------------------------------------------------
   // Alternator — rear engine, right side.
@@ -80,45 +80,41 @@ export function build() {
   add(at(starter, -0.35, -0.2, -1.15));
 
   // ---------------------------------------------------------------------------
-  // Fuse / relay carrier — DRIVER side (−X).
+  // Fuse / relay carrier — DRIVER side (+X), small panel at the A-pillar /
+  // kick panel near the steering column.
   // ---------------------------------------------------------------------------
   const junction = group('junctionBox');
   {
     const add2 = (m) => { junction.add(m); return m; };
-    add2(at(box('housing', 0.22, 0.08, 0.16, M_RELAY), 0, 0, 0));
-    add2(at(box('lid', 0.23, 0.02, 0.17, M_CASE), 0, 0.05, 0));
-    add2(at(box('relayBlockA', 0.05, 0.04, 0.05, M_MODULE), -0.055, 0.07, 0.03));
-    add2(at(box('relayBlockB', 0.05, 0.04, 0.05, M_MODULE), 0.01, 0.07, 0.03));
-    add2(at(box('maxiFuse', 0.12, 0.025, 0.04, M_POS), 0.02, 0.07, -0.04));
+    add2(at(box('housing', 0.14, 0.06, 0.1, M_RELAY), 0, 0, 0));
+    add2(at(box('lid', 0.145, 0.015, 0.105, M_CASE), 0, 0.038, 0));
+    add2(at(box('relayBlockA', 0.035, 0.03, 0.035, M_MODULE), -0.035, 0.055, 0.02));
+    add2(at(box('relayBlockB', 0.035, 0.03, 0.035, M_MODULE), 0.01, 0.055, 0.02));
+    add2(at(box('maxiFuse', 0.08, 0.018, 0.028, M_POS), 0.01, 0.055, -0.025));
   }
-  add(at(junction, -0.55, 0.18, 1.25));
+  // Outboard / lower than the master cylinder (~0.35, 0.33, 1.15) so the
+  // kick-panel fuse box does not merge with the brake MC on the cowl.
+  add(at(junction, 0.62, 0.18, 0.95));
 
   // ---------------------------------------------------------------------------
-  // Cabin particle filter (WM 851819) — passenger footwell HVAC.
-  // "behind the dashboard in the heater/AC unit in the right footwell"
-  // (LHD passenger = +X). Long thin rectangular cartridge + slatted cover
-  // with three clip tabs (Figs 4810–4812), pulled down to service.
+  // Cabin particle filter — passenger HVAC, adjacent to battery (−X).
   // ---------------------------------------------------------------------------
   const cabinFilter = group('cabinParticleFilter');
   {
     const add2 = (m) => { cabinFilter.add(m); return m; };
-    // Elongated cartridge — long axis across the car (X), thin in Y (drop-out).
-    const element = makePanel({ node: 'cabinFilterElement', w: 0.38, h: 0.11, d: 0.045 });
+    const element = makePanel({ node: 'cabinFilterElement', w: 0.32, h: 0.1, d: 0.04 });
     add2(at(element, 0, 0, 0));
-    // Slatted service cover (WM Fig 1 cover -1-) under the element.
-    add2(at(box('cabinFilterCover', 0.4, 0.012, 0.12, M_CASE), 0, -0.04, 0));
+    add2(at(box('cabinFilterCover', 0.34, 0.012, 0.11, M_CASE), 0, -0.035, 0));
     for (let i = 0; i < 5; i++) {
-      add2(at(box(`cabinFilterSlat_${i}`, 0.36, 0.004, 0.012, M_RELAY), 0, -0.048, -0.04 + i * 0.02));
+      add2(at(box(`cabinFilterSlat_${i}`, 0.3, 0.004, 0.01, M_RELAY), 0, -0.042, -0.035 + i * 0.018));
     }
-    // Three clip tabs along the cover (WM yellow callouts).
     for (let i = 0; i < 3; i++) {
-      add2(at(box(`cabinFilterClip_${i}`, 0.04, 0.02, 0.015, M_MODULE), -0.12 + i * 0.12, -0.055, 0.05));
+      add2(at(box(`cabinFilterClip_${i}`, 0.035, 0.018, 0.012, M_MODULE), -0.1 + i * 0.1, -0.048, 0.045));
     }
-    // HVAC slot / housing lip the cartridge slides into.
-    add2(at(box('cabinFilterSlot', 0.42, 0.06, 0.08, M_RELAY), 0, 0.02, 0.02));
+    add2(at(box('cabinFilterSlot', 0.36, 0.05, 0.07, M_RELAY), 0, 0.015, 0.015));
   }
-  // Passenger (+X) footwell, under dash / ahead of seat toe-board.
-  add(at(cabinFilter, 0.48, 0.22, 0.85));
+  // Adjacent to battery, still clear of the radiator pack.
+  add(at(cabinFilter, -0.68, 0.28, 0.92));
 
   // ---------------------------------------------------------------------------
   // Control modules
@@ -167,19 +163,19 @@ export function build() {
   add(at(chronoSwitch, 0.12, 0.4, 0.4));
 
   // ---------------------------------------------------------------------------
-  // Wiring harness (sub detail — wiring layer uses flow-systems tubes instead)
+  // Wiring harness
   // ---------------------------------------------------------------------------
   add(tube('harnessBatteryToJunction', [
-    [0.55, 0.28, 1.85], [0.15, 0.22, 1.55], [-0.25, 0.2, 1.35], [-0.55, 0.22, 1.25],
+    [-0.62, 0.32, 1.05], [-0.2, 0.26, 1.0], [0.25, 0.22, 0.98], [0.62, 0.22, 0.95],
   ], 0.008, M_WIRE));
   add(tube('harnessJunctionToStarter', [
-    [-0.55, 0.16, 1.25], [-0.45, -0.05, 0.4], [-0.4, -0.15, -0.5], [-0.35, -0.2, -1.15],
+    [0.62, 0.16, 0.95], [0.45, -0.05, 0.35], [0.38, -0.15, -0.5], [0.35, -0.2, -1.15],
   ], 0.009, M_WIRE));
   add(tube('harnessAlternatorToJunction', [
-    [0.35, 0.05, -0.7], [0.1, 0.08, 0.2], [-0.3, 0.12, 0.85], [-0.55, 0.16, 1.25],
+    [0.35, 0.05, -0.7], [0.15, 0.1, 0.15], [0.35, 0.15, 0.65], [0.62, 0.18, 0.95],
   ], 0.007, M_WIRE));
   add(tube('harnessJunctionToModules', [
-    [-0.55, 0.14, 1.25], [-0.25, 0.08, 0.75], [0.15, 0.04, 0.5], [0.4, 0.0, -0.25],
+    [0.62, 0.16, 0.95], [0.25, 0.1, 0.65], [-0.1, 0.04, 0.4], [-0.4, 0.0, -0.25],
   ], 0.006, M_WIRE));
 
   return elec;

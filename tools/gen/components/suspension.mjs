@@ -251,12 +251,26 @@ export function build() {
   add(rot(at(cyl('rearAntiRollBar', 0.022, 0.022, TRACK * 1.8, 'steel', 12), 0, HUB_Y + 0.05, REAR_Z + 0.22), 0, 0, Math.PI / 2));
   add(at(box('rearSubframe', TRACK * 1.95, 0.09, 0.5, 'castDark'), 0, HUB_Y - 0.12, REAR_Z));
 
-  // ── Steering (front) ──
+  // ── Steering (front) — LHD column on driver (−X), visible wheel + shaft ──
   add(rot(at(cyl('steeringRack', 0.035, 0.035, TRACK * 1.7, 'cast', 12), 0, HUB_Y + 0.16, FRONT_Z - 0.2), 0, 0, Math.PI / 2));
   for (const [side, sx] of [['Left', -1], ['Right', 1]]) {
     add(at(cyl(`tieRod${side}`, 0.016, 0.016, 0.3, 'steel', 8), sx * TRACK * 0.78, HUB_Y + 0.05, FRONT_Z - 0.12), susp);
   }
-  add(rot(at(cyl('steeringColumn', 0.02, 0.02, 0.6, 'castDark', 10), -0.34, HUB_Y + 0.4, FRONT_Z - 0.5), 0.7, 0, 0));
+  // PRIMARY steeringColumn — driver side (+X) with wheel rim for LHD packaging.
+  {
+    const col = group('steeringColumn');
+    const cx = 0.38;
+    // Lower intermediate shaft → rack pinion
+    col.add(rot(at(cyl('steeringColumnLower', 0.022, 0.022, 0.35, 'castDark', 12), cx, HUB_Y + 0.22, FRONT_Z - 0.35), 0.35, 0, 0));
+    col.add(at(box('steeringUJoint', 0.05, 0.05, 0.05, 'cast'), cx, HUB_Y + 0.38, FRONT_Z - 0.55));
+    // Upper column toward wheel
+    col.add(rot(at(cyl('steeringColumnUpper', 0.028, 0.028, 0.55, 'castDark', 12), cx, 0.35, 0.95), 0.55, 0, 0));
+    // Steering wheel (rim + hub) — driver side landmark
+    col.add(rot(at(torus('steeringWheelRim', 0.17, 0.016, 'castDark', 10, 28), cx, 0.58, 0.72), 0.55, 0, 0));
+    col.add(at(cyl('steeringWheelHub', 0.045, 0.045, 0.04, 'cast', 14), cx, 0.52, 0.78));
+    col.add(at(box('steeringWheelSpoke', 0.22, 0.02, 0.03, 'castDark'), cx, 0.55, 0.75));
+    add(col);
+  }
 
   return susp;
 }

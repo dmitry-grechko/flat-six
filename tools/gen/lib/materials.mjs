@@ -54,6 +54,9 @@ export const MATERIALS = {
   hose:     { color: 0x202225, metalness: 0.2,  roughness: 0.8  },
   plastic:  { color: 0x3b3f45, metalness: 0.2,  roughness: 0.75 }, // expansion tank / housings
   translucent: { color: 0xd7dbe0, metalness: 0.1, roughness: 0.5, opacity: 0.6 },
+  // X-RAY shells — see through housings to filters / internals
+  intakeShell: { color: 0x9aa1ab, metalness: 0.15, roughness: 0.55, opacity: 0.28 },
+  plenumShell: { color: 0x7a8088, metalness: 0.2,  roughness: 0.5,  opacity: 0.32 },
 
   // --- Generic small parts ---
   paper:    { color: 0xd9c79a, metalness: 0.0,  roughness: 0.9  }, // filter media (pleats)

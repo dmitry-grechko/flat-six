@@ -43,6 +43,20 @@ function isStd(m: THREE.Material): m is THREE.MeshStandardMaterial {
   return (m as THREE.MeshStandardMaterial).isMeshStandardMaterial === true;
 }
 
+type MatOrig = { opacity: number; transparent: boolean; depthWrite: boolean };
+
+function bakeOrig(mat: THREE.MeshStandardMaterial) {
+  const u = mat.userData as { __xrayOrig?: MatOrig };
+  if (!u.__xrayOrig) {
+    u.__xrayOrig = {
+      opacity: mat.opacity,
+      transparent: mat.transparent || mat.opacity < 1,
+      depthWrite: mat.depthWrite,
+    };
+  }
+  return u.__xrayOrig;
+}
+
 function applyMaterialState(obj: THREE.Object3D, isSelected: boolean, anySelected: boolean, ghosted: boolean) {
   obj.traverse((child) => {
     const mesh = child as THREE.Mesh;
@@ -50,17 +64,25 @@ function applyMaterialState(obj: THREE.Object3D, isSelected: boolean, anySelecte
     const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
     mats.forEach((mat) => {
       if (!isStd(mat)) return;
+      const orig = bakeOrig(mat);
       if (isSelected) {
-        mat.opacity = 1; mat.transparent = false; mat.depthWrite = true;
+        // Keep shell translucency so internals stay visible while highlighted.
+        mat.opacity = Math.min(orig.opacity, 0.85);
+        mat.transparent = orig.transparent || mat.opacity < 1;
+        mat.depthWrite = !mat.transparent;
         mat.emissive.set('#D5001C'); mat.emissiveIntensity = 0.14;
       } else if (ghosted) {
-        mat.opacity = 0.1; mat.transparent = true; mat.depthWrite = false;
+        mat.opacity = Math.min(0.1, orig.opacity);
+        mat.transparent = true; mat.depthWrite = false;
         mat.emissive.set('#000000'); mat.emissiveIntensity = 0;
       } else if (anySelected) {
-        mat.opacity = 0.18; mat.transparent = true; mat.depthWrite = false;
+        mat.opacity = Math.min(0.18, orig.opacity);
+        mat.transparent = true; mat.depthWrite = false;
         mat.emissive.set('#000000'); mat.emissiveIntensity = 0;
       } else {
-        mat.opacity = 1; mat.transparent = false; mat.depthWrite = true;
+        mat.opacity = orig.opacity;
+        mat.transparent = orig.transparent;
+        mat.depthWrite = orig.depthWrite && !orig.transparent;
         mat.emissive.set('#000000'); mat.emissiveIntensity = 0;
       }
       mat.needsUpdate = true;
@@ -76,6 +98,16 @@ function cloneWithMaterials(scene: THREE.Object3D): THREE.Object3D {
     mesh.material = Array.isArray(mesh.material)
       ? mesh.material.map((m) => m.clone())
       : mesh.material.clone();
+    // Honour GLB alphaMode=BLEND shells (intake/plenum housings).
+    const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+    mats.forEach((mat) => {
+      if (!isStd(mat)) return;
+      if (mat.opacity < 1) {
+        mat.transparent = true;
+        mat.depthWrite = false;
+      }
+      bakeOrig(mat);
+    });
   });
   return c;
 }
@@ -469,11 +501,14 @@ export default function UnifiedSceneClient({ selectedAssemblyId, onSelectAssembl
   // so the tubes read against the ghosted mechanicals.
   const ghosted = (layer !== 'all' && layer !== 'mechanical') || anyFlowSelected;
 
+  // Front-biased view: car −X (LHD driver / wheel / fuse) on the LEFT of the
+  // screen, +X (passenger battery + cabin filter) on the RIGHT. Cameras on the
+  // driver flank mirrored L/R and looked like RHD.
   return (
     <Canvas
       gl={{ preserveDrawingBuffer: true, antialias: true }}
       shadows
-      camera={{ position: [0, 3.5, 9], fov: 42, near: 0.1, far: 200 }}
+      camera={{ position: [1.5, 3.5, 8], fov: 42, near: 0.1, far: 200 }}
       dpr={[1, 2]}
       style={{ width: '100%', height: '100%' }}
       onPointerMissed={() => { if (anyFlowSelected) onSelectFlow(null); else onSelectAssembly(null); }}

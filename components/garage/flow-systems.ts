@@ -88,11 +88,12 @@ export const FLOW_SYSTEMS: FlowSystem[] = [
     speed: 0.16,
     desc: 'Intake air enters through BOTH side scoops into dual air cleaner housings, merges at a single central throttle housing, then feeds the intake-air distributors / plenums.',
     relatedAssembly: 'airfilter',
-    labelAt: [0, 0.5, -0.7],
-    // Car-space (airfilter is carSpace:true): scoops → housings → throttle → plenum.
+    labelAt: [0, 0.45, -0.7],
     paths: [
-      { points: [[-1.05, 0.36, -0.5], [-0.78, 0.36, -0.55], [-0.42, 0.34, -0.62], [-0.2, 0.4, -0.8], [0, 0.42, -0.95], [0, 0.4, -1.15], [0, 0.35, -1.3]] },
-      { points: [[1.05, 0.36, -0.5], [0.78, 0.36, -0.55], [0.42, 0.34, -0.62], [0.2, 0.4, -0.8], [0, 0.42, -0.95], [0, 0.4, -1.15], [0, 0.35, -1.3]] },
+      // Left scoop → L housing → throttle → L head ports
+      { points: [[-1.05, 0.36, -0.5], [-0.78, 0.36, -0.55], [-0.42, 0.34, -0.62], [-0.2, 0.35, -0.58], [0, 0.35, -0.55], [-0.22, 0.32, -0.69], [-0.355, 0.2, -0.69]] },
+      // Right scoop → R housing → throttle → R head ports
+      { points: [[1.05, 0.36, -0.5], [0.78, 0.36, -0.55], [0.42, 0.34, -0.62], [0.2, 0.35, -0.58], [0, 0.35, -0.55], [0.22, 0.32, -0.69], [0.355, 0.2, -0.69]] },
     ],
   },
   {
@@ -185,22 +186,22 @@ export const FLOW_SYSTEMS: FlowSystem[] = [
     speed: 0.08,
     desc: 'The master cylinder at the cowl drops the hydraulic lines straight to the floor pan — short runs along the front subframe to the front calipers, long runs down the tunnel to the rears.',
     relatedAssembly: 'fbrakes',
-    labelAt: [-0.62, 0.52, 1.25],
+    labelAt: [0.62, 0.52, 1.25],
     // All four lines drop from the MC to floor level (~y -0.5) and stay low —
     // no aerial runs. Caliper ends match the resized rotors (x ±1.14, z ±1.4).
     paths: [
-      // Front-left
-      { points: [[-0.35, 0.3, 1.15], [-0.4, -0.35, 1.3], [-0.8, -0.45, 1.4], [-1.08, -0.36, 1.4]] },
-      // Front-right (crosses low under the frunk floor)
-      { points: [[-0.35, 0.3, 1.15], [-0.35, -0.4, 1.3], [0.2, -0.52, 1.38], [0.8, -0.45, 1.4], [1.08, -0.36, 1.4]] },
-      // Rear-left (down the tunnel)
-      { points: [[-0.35, 0.3, 1.15], [-0.3, -0.45, 0.9], [-0.25, -0.52, 0.2], [-0.3, -0.52, -0.7], [-0.7, -0.5, -1.25], [-1.08, -0.36, -1.38]] },
+      // Front-left (passenger side of car in this packaging)
+      { points: [[0.35, 0.3, 1.15], [0.35, -0.4, 1.3], [-0.2, -0.52, 1.38], [-0.8, -0.45, 1.4], [-1.08, -0.36, 1.4]] },
+      // Front-right (driver / MC side)
+      { points: [[0.35, 0.3, 1.15], [0.4, -0.35, 1.3], [0.8, -0.45, 1.4], [1.08, -0.36, 1.4]] },
+      // Rear-left
+      { points: [[0.35, 0.3, 1.15], [0.3, -0.45, 0.9], [0.25, -0.52, 0.2], [-0.1, -0.52, -0.7], [-0.7, -0.5, -1.25], [-1.08, -0.36, -1.38]] },
       // Rear-right
-      { points: [[-0.35, 0.3, 1.15], [-0.3, -0.45, 0.9], [-0.25, -0.52, 0.2], [0.1, -0.52, -0.7], [0.7, -0.5, -1.25], [1.08, -0.36, -1.38]] },
+      { points: [[0.35, 0.3, 1.15], [0.3, -0.45, 0.9], [0.25, -0.52, 0.2], [0.3, -0.52, -0.7], [0.7, -0.5, -1.25], [1.08, -0.36, -1.38]] },
     ],
     nodes: [
-      // Tandem master cylinder + booster on the cowl, driver's side.
-      { id: 'master-cyl', label: 'Master Cylinder', at: [-0.35, 0.33, 1.15], size: [0.16, 0.12, 0.22], color: '#8b8e93' },
+      // Tandem master cylinder + booster on the cowl, driver's side (+X).
+      { id: 'master-cyl', label: 'Master Cylinder', at: [0.35, 0.33, 1.15], size: [0.16, 0.12, 0.22], color: '#8b8e93' },
     ],
   },
   // ── WIRING ───────────────────────────────────────────────────────────────
@@ -214,21 +215,16 @@ export const FLOW_SYSTEMS: FlowSystem[] = [
     speed: 0.3,
     desc: 'Power runs from the front-trunk battery (passenger side) through the driver-side fuse and relay panel, then the main loom follows the tunnel to the DME, alternator and starter at the back.',
     relatedAssembly: 'elec',
-    labelAt: [-0.7, 0.35, 1.0],
-    // Battery + fuse box live in the elec GLB — do not re-draw them as FlowNodes
-    // (that was the duplicate pair). Only the DME (not in elec) is a flow node.
+    labelAt: [0.7, 0.4, 0.9],
+    // Battery + fuse box live in the elec GLB — do not re-draw them as FlowNodes.
     paths: [
-      // B+ cable: passenger-front battery → tunnel → starter/alternator
-      { points: [[0.55, 0.22, 1.85], [0.35, -0.15, 0.8], [0.25, -0.3, 0.1], [0.3, -0.05, -0.7], [0.35, 0.05, -0.95]] },
-      // Battery → driver-side fuse/relay panel
-      { points: [[0.55, 0.26, 1.85], [0.15, 0.22, 1.55], [-0.25, 0.2, 1.35], [-0.55, 0.22, 1.25]] },
-      // Fuse panel → tunnel loom → DME
-      { points: [[-0.55, 0.18, 1.25], [-0.5, -0.15, 0.5], [-0.45, -0.3, -0.35], [-0.5, 0.0, -0.8], [-0.55, 0.3, -1.02]] },
-      // DME → engine harness
-      { points: [[-0.55, 0.3, -1.0], [-0.3, 0.35, -0.9], [-0.05, 0.3, -0.85]] },
+      { points: [[-0.62, 0.22, 1.05], [-0.3, -0.1, 0.65], [-0.25, -0.25, 0.05], [-0.3, -0.05, -0.7], [-0.35, 0.05, -0.95]] },
+      { points: [[-0.62, 0.28, 1.05], [-0.2, 0.24, 1.0], [0.25, 0.22, 0.97], [0.62, 0.2, 0.95]] },
+      { points: [[0.62, 0.18, 0.95], [0.5, -0.1, 0.45], [0.45, -0.25, -0.35], [0.5, 0.0, -0.8], [0.55, 0.3, -1.02]] },
+      { points: [[0.55, 0.3, -1.0], [0.3, 0.35, -0.9], [0.05, 0.3, -0.85]] },
     ],
     nodes: [
-      { id: 'dme', label: 'DME · ECU', at: [-0.55, 0.32, -1.05], size: [0.3, 0.08, 0.24], color: '#33414d' },
+      { id: 'dme', label: 'DME · ECU', at: [0.55, 0.32, -1.05], size: [0.3, 0.08, 0.24], color: '#33414d' },
     ],
   },
 ];

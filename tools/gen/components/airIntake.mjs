@@ -81,12 +81,15 @@ export function build() {
 
   // Inline sensor material (dark grey moulded connector body).
   const sensorMat = { color: 0x2a2d33, metalness: 0.35, roughness: 0.55 };
-  // Three cylinder Z positions per bank (rear engine bay).
-  const cylZ = [0.55, 0.0, -0.55];
+  // Central throttle — ahead of the engine plenum (engine hotspot ~ z=-0.8).
+  const TB = { x: 0, y: 0.35, z: -0.55 };
 
-  // Central throttle housing (WM 244601: singular "throttle housing" fed by
-  // plural "air cleaner housings" via rubber sleeve) — car-space, mid/rear bay.
-  const TB = { x: 0, y: 0.42, z: -0.95 };
+  // Engine head intake ports in car-space (from engine.glb normalize mapping).
+  // Runners must terminate here so manifolds don't float in empty air.
+  const HEAD_PORTS = {
+    R: [[0.355, 0.2, -0.823], [0.355, 0.2, -0.692], [0.355, 0.2, -0.561]],
+    L: [[-0.355, 0.2, -0.823], [-0.355, 0.2, -0.692], [-0.355, 0.2, -0.561]],
+  };
 
   // ====================================================================
   // AIR CLEANER HOUSINGS — WM 242519 elongated curved ducts at the rear
@@ -118,22 +121,23 @@ export function build() {
 
     const box1 = group(`airbox_${sk}`);
 
+    // Housings use intakeShell (translucent) so the cylindrical filter reads inside.
     // 1) Wide vertical rectangular scoop mouth (outboard) — WM CAD.
-    add(at(box(`airboxMouth_${sk}`, 0.1, 0.2, 0.14, 'intake'), mouthX, hyMouth, hz), box1);
+    add(at(box(`airboxMouth_${sk}`, 0.1, 0.2, 0.14, 'intakeShell'), mouthX, hyMouth, hz), box1);
 
     // 2) Transition duct (mouth → filter section), slightly tapered inboard.
-    add(at(box(`airboxTransition_${sk}`, 0.2, 0.16, 0.13, 'intake'), dir * 0.92, hyTransition + 0.01, hz - 0.02), box1);
+    add(at(box(`airboxTransition_${sk}`, 0.2, 0.16, 0.13, 'intakeShell'), dir * 0.92, hyTransition + 0.01, hz - 0.02), box1);
 
     // 3) Expanding filter housing — holds the cylindrical cartridge (axis ≈ X).
-    add(at(box(`airboxHousing_${sk}`, 0.28, 0.2, 0.22, 'intake'), filterX, hyFilter + 0.02, hz - 0.03), box1);
+    add(at(box(`airboxHousing_${sk}`, 0.28, 0.2, 0.22, 'intakeShell'), filterX, hyFilter + 0.02, hz - 0.03), box1);
     // Access / luggage-compartment face (circular port the element pulls through).
-    add(rot(at(cyl(`airboxLid_${sk}`, 0.11, 0.11, 0.04, 'cover', 20), filterX + dir * 0.12, hyFilter + 0.02, hz - 0.03), 0, 0, HALF_PI), box1);
+    add(rot(at(cyl(`airboxLid_${sk}`, 0.11, 0.11, 0.04, 'intakeShell', 20), filterX + dir * 0.12, hyFilter + 0.02, hz - 0.03), 0, 0, HALF_PI), box1);
 
     // 4) Taper toward circular outlet neck.
-    add(at(box(`airboxTaper_${sk}`, 0.16, 0.14, 0.14, 'intake'), dir * 0.58, hyTaper + 0.01, hz - 0.06), box1);
+    add(at(box(`airboxTaper_${sk}`, 0.16, 0.14, 0.14, 'intakeShell'), dir * 0.58, hyTaper + 0.01, hz - 0.06), box1);
 
     // 5) Circular neck + screw-type clamp + rubber sleeve (WM yellow callout).
-    add(rot(at(cyl(`airboxNeck_${sk}`, 0.055, 0.06, 0.08, 'intake', 18), neckX, hyNeck, hz - 0.08), 0, 0, HALF_PI), box1);
+    add(rot(at(cyl(`airboxNeck_${sk}`, 0.055, 0.06, 0.08, 'intakeShell', 18), neckX, hyNeck, hz - 0.08), 0, 0, HALF_PI), box1);
     add(rot(at(torus(`airboxClamp_${sk}`, 0.065, 0.01, 'steel', 10, 20), neckX - dir * 0.01, hyNeck, hz - 0.08), 0, 0, HALF_PI), box1);
     add(rot(at(cyl(`airboxRubberSleeve_${sk}`, 0.058, 0.058, 0.06, 'rubber', 16), neckX - dir * 0.07, hyNeck, hz - 0.09), 0, 0, HALF_PI), box1);
 
@@ -222,16 +226,16 @@ export function build() {
 
   add(tube('airboxToThrottleBodyDuctBank1', [
     [0.34, neckDroopBySide.R, -0.68],
-    [0.22, 0.4, -0.78],
-    [0.1, 0.42, -0.88],
-    [0.04, TB.y, TB.z + 0.05],
+    [0.2, 0.36, -0.62],
+    [0.08, 0.35, -0.58],
+    [0.03, TB.y, TB.z + 0.04],
   ], 0.05, 'rubber', 24, 14));
 
   add(tube('airboxToThrottleBodyDuctBank2', [
     [-0.34, neckDroopBySide.L, -0.68],
-    [-0.22, 0.4, -0.78],
-    [-0.1, 0.42, -0.88],
-    [-0.04, TB.y, TB.z + 0.05],
+    [-0.2, 0.36, -0.62],
+    [-0.08, 0.35, -0.58],
+    [-0.03, TB.y, TB.z + 0.04],
   ], 0.05, 'rubber', 24, 14));
 
   // ====================================================================
@@ -253,36 +257,41 @@ export function build() {
   add(rot(at(torus('throttleBodyAdapterBank1', 0.072, 0.014, 'cast', 10, 20), TB.x, TB.y, TB.z - 0.14), HALF_PI, 0, 0));
 
   // ====================================================================
-  // INTAKE MANIFOLD / PLENUM
+  // INTAKE MANIFOLD / PLENUM — runners terminate on engine head ports
+  // (car-space portBoss_* from engine.glb).
   // ====================================================================
   function makeManifold(node, dir, sk) {
-    const px = dir * 0.28, py = 0.4, pz = -1.25;
+    const ports = HEAD_PORTS[sk];
+    const px = dir * 0.22;
+    const py = 0.32;
+    const pz = -0.69;
     const man = group(node);
-    add(at(box(`plenumBody_${sk}`, 0.22, 0.16, 0.7, 'plenum'), px, py, pz), man);
-    add(at(box(`plenumPlChamber_${sk}`, 0.18, 0.13, 0.65, 'intake'), px, py + 0.01, pz), man);
+    add(at(box(`plenumBody_${sk}`, 0.18, 0.14, 0.55, 'plenumShell'), px, py, pz), man);
+    add(at(box(`plenumPlChamber_${sk}`, 0.15, 0.11, 0.5, 'intakeShell'), px, py + 0.01, pz), man);
 
     add(tube(`throttleToDistributor_${sk}`, [
-      [dir * 0.03, TB.y, TB.z - 0.12],
-      [dir * 0.12, py + 0.01, -1.05],
-      [px, py + 0.02, pz + 0.28],
+      [dir * 0.03, TB.y, TB.z - 0.08],
+      [dir * 0.1, 0.34, -0.6],
+      [px, py + 0.02, pz + 0.2],
     ], 0.04, 'rubber', 18, 12), man);
 
     for (let i = 0; i < 3; i++) {
-      const z = cylZ[i] * 0.55 - 1.15;
+      const [hx, hy, hz] = ports[i];
       add(tube(`intakeRunner_${sk}_${i}`, [
-        [px, py + 0.02, z],
-        [px + dir * 0.1, py - 0.02, z],
-        [px + dir * 0.18, py - 0.1, z],
-        [px + dir * 0.24, py - 0.2, z],
-      ], 0.03, 'runner', 18, 12), man);
-      add(rot(at(torus(`runnerPort_${sk}_${i}`, 0.035, 0.009, 'intake', 8, 16), px + dir * 0.24, py - 0.2, z), 0, 0, HALF_PI), man);
+        [px, py - 0.02, hz],
+        [px + dir * 0.05, py - 0.04, hz],
+        [(px + hx) * 0.5, (py + hy) * 0.5, hz],
+        [hx - dir * 0.02, hy, hz],
+        [hx, hy, hz],
+      ], 0.028, 'runner', 18, 12), man);
+      add(rot(at(torus(`runnerPort_${sk}_${i}`, 0.032, 0.008, 'intake', 8, 16), hx, hy, hz), 0, 0, HALF_PI), man);
     }
     air.add(man);
   }
   makeManifold('intakeManifoldBank1', 1, 'R');
   makeManifold('intakeManifoldBank2', -1, 'L');
 
-  add(at(box('intakeManifoldSeal', 0.02, 0.01, 0.7, { color: 0x9aa0a6, metalness: 0.4, roughness: 0.7 }), 0, 0.08, -1.4));
+  add(at(box('intakeManifoldSeal', 0.02, 0.01, 0.55, { color: 0x9aa0a6, metalness: 0.4, roughness: 0.7 }), 0, 0.12, -0.69));
 
   // ====================================================================
   // RESONANCE / TUNING FLAP
@@ -290,48 +299,40 @@ export function build() {
 
   const resFlap = group('intakeManifoldResonanceFlapActuator');
   for (const [dir, sk] of [[1, 'R'], [-1, 'L']]) {
-    add(at(box(`resonanceFlapActuator_${sk}`, 0.08, 0.06, 0.07, sensorMat), dir * 0.28, 0.52, -1.55), resFlap);
-    add(at(cyl(`resonanceFlapLever_${sk}`, 0.01, 0.01, 0.08, 'steel', 8), dir * 0.28, 0.48, -1.45), resFlap);
+    add(at(box(`resonanceFlapActuator_${sk}`, 0.08, 0.06, 0.07, sensorMat), dir * 0.22, 0.42, -0.95), resFlap);
+    add(at(cyl(`resonanceFlapLever_${sk}`, 0.01, 0.01, 0.08, 'steel', 8), dir * 0.22, 0.38, -0.85), resFlap);
   }
   air.add(resFlap);
 
   const vacUnit = group('resonanceFlapVacuumUnit');
-  add(rot(at(cyl('resonanceVacuumCan', 0.045, 0.045, 0.07, sensorMat, 16), 0, 0.55, -1.55), 0, 0, HALF_PI), vacUnit);
-  add(at(cyl('resonanceVacuumRod', 0.01, 0.01, 0.06, 'steel', 8), 0.05, 0.55, -1.55), vacUnit);
+  add(rot(at(cyl('resonanceVacuumCan', 0.045, 0.045, 0.07, sensorMat, 16), 0, 0.45, -0.95), 0, 0, HALF_PI), vacUnit);
+  add(at(cyl('resonanceVacuumRod', 0.01, 0.01, 0.06, 'steel', 8), 0.05, 0.45, -0.95), vacUnit);
   air.add(vacUnit);
 
-  // ====================================================================
-  // PRESSURE / TEMP SENSORS
-  // ====================================================================
-
   const mapSensor = group('mapSensorBoostPressure');
-  add(at(cyl('mapSensorBody', 0.02, 0.02, 0.06, sensorMat, 12), 0.15, 0.5, -1.25), mapSensor);
-  add(at(box('mapSensorConnector', 0.03, 0.025, 0.025, sensorMat), 0.15, 0.54, -1.25), mapSensor);
+  add(at(cyl('mapSensorBody', 0.02, 0.02, 0.06, sensorMat, 12), 0.12, 0.4, -0.69), mapSensor);
+  add(at(box('mapSensorConnector', 0.03, 0.025, 0.025, sensorMat), 0.12, 0.44, -0.69), mapSensor);
   air.add(mapSensor);
 
-  add(at(cyl('intakeManifoldPressureSensor', 0.018, 0.018, 0.05, sensorMat, 12), -0.15, 0.5, -1.25));
-  add(at(cyl('intakeManifoldTempSensor', 0.015, 0.015, 0.05, sensorMat, 10), 0.0, 0.5, -1.15));
-
-  // ====================================================================
-  // CRANKCASE VENTILATION
-  // ====================================================================
+  add(at(cyl('intakeManifoldPressureSensor', 0.018, 0.018, 0.05, sensorMat, 12), -0.12, 0.4, -0.69));
+  add(at(cyl('intakeManifoldTempSensor', 0.015, 0.015, 0.05, sensorMat, 10), 0.0, 0.4, -0.6));
 
   const pcv = group('crankcaseBretherPcvValve');
-  add(at(cyl('pcvValveBody', 0.025, 0.025, 0.07, 'cover', 14), 0, 0.25, -1.4), pcv);
+  add(at(cyl('pcvValveBody', 0.025, 0.025, 0.07, 'cover', 14), 0, 0.22, -0.85), pcv);
   add(tube('pcvHose', [
-    [0, 0.25, -1.38],
-    [0.05, 0.32, -1.3],
-    [0.12, 0.4, -1.25],
+    [0, 0.22, -0.83],
+    [0.05, 0.28, -0.75],
+    [0.1, 0.34, -0.69],
   ], 0.012, 'hose2', 22, 8), pcv);
   air.add(pcv);
 
-  add(at(box('oilSeparatorCrankcase', 0.09, 0.11, 0.08, 'cover'), 0, 0.18, -1.55));
+  add(at(box('oilSeparatorCrankcase', 0.09, 0.11, 0.08, 'cover'), 0, 0.15, -1.0));
 
   add(tube('crankvcaseCvLineSecondary', [
-    [0, 0.18, -1.55],
-    [0.2, 0.25, -1.1],
-    [0.4, 0.32, -0.8],
-    [0.7, 0.36, -0.6],
+    [0, 0.15, -1.0],
+    [0.2, 0.22, -0.85],
+    [0.4, 0.3, -0.7],
+    [0.7, 0.34, -0.58],
   ], 0.011, 'hose2', 28, 8));
 
   return air;

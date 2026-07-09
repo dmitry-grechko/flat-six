@@ -44,6 +44,10 @@ function Model({ src, paintHex, parts, selectedPartId, onSelectPart }: {
       const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
       mats.forEach((mat) => {
         if (!mat || !isStandardMat(mat)) return;
+        if (mat.opacity < 1) {
+          mat.transparent = true;
+          mat.depthWrite = false;
+        }
         const name = mat.name || '';
         if (TYRE_MAT.test(name)) {
           mat.map = null; mat.color = new THREE.Color('#1a1a1c'); mat.metalness = 0.05; mat.roughness = 0.85; mat.needsUpdate = true;
@@ -101,17 +105,34 @@ function Model({ src, paintHex, parts, selectedPartId, onSelectPart }: {
         if (!mat || !isStandardMat(mat)) return;
         const u = mesh.userData as { __orig?: Orig };
         if (!u.__orig) {
-          u.__orig = { emissive: mat.emissive.getHex(), emissiveIntensity: mat.emissiveIntensity, opacity: mat.opacity, transparent: mat.transparent };
+          u.__orig = {
+            emissive: mat.emissive.getHex(),
+            emissiveIntensity: mat.emissiveIntensity,
+            opacity: mat.opacity,
+            transparent: mat.transparent || mat.opacity < 1,
+          };
         }
         const o = u.__orig;
         if (!selected) {
-          mat.emissive.setHex(o.emissive); mat.emissiveIntensity = o.emissiveIntensity; mat.opacity = o.opacity; mat.transparent = o.transparent;
+          mat.emissive.setHex(o.emissive);
+          mat.emissiveIntensity = o.emissiveIntensity;
+          mat.opacity = o.opacity;
+          mat.transparent = o.transparent;
+          mat.depthWrite = !o.transparent;
         } else if (selectedSet.has(mesh)) {
-          mat.emissive.copy(HILITE); mat.emissiveIntensity = 0.45; mat.opacity = 1; mat.transparent = false;
+          mat.emissive.copy(HILITE);
+          mat.emissiveIntensity = 0.45;
+          // Keep shell translucency so filter media stays visible.
+          mat.opacity = Math.min(o.opacity, 0.85);
+          mat.transparent = o.transparent || mat.opacity < 1;
+          mat.depthWrite = !mat.transparent;
         } else {
-          mat.emissive.setHex(o.emissive); mat.emissiveIntensity = o.emissiveIntensity; mat.opacity = 0.14; mat.transparent = true;
+          mat.emissive.setHex(o.emissive);
+          mat.emissiveIntensity = o.emissiveIntensity;
+          mat.opacity = Math.min(0.14, o.opacity);
+          mat.transparent = true;
+          mat.depthWrite = false;
         }
-        mat.depthWrite = !(selected && !selectedSet.has(mesh));
         mat.needsUpdate = true;
       });
     });
