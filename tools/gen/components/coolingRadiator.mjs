@@ -15,7 +15,8 @@
 // PRIMARY part from cooling-parts.json is exposed as a child mesh/group whose
 // name exactly equals that part's `node` field, so the app can pin it.
 
-import { group, box, cyl, tube, sphere, at, rot } from '../lib/primitives.mjs';
+import { group, box, cyl, tube, sphere, torus, roundBox, at, rot } from '../lib/primitives.mjs';
+import { centerline } from '../lib/wm-traces.mjs';
 
 export const meta = {
   id: 'cooling',
@@ -26,6 +27,14 @@ export const meta = {
 };
 
 const HALF = Math.PI / 2;
+
+/** WM 3537 Fig 12 — single-hose S-bend centerline (blue CAD), placed at regulator. */
+const HOSE_S_BEND = centerline('981/traces/coolant-hoses-3537.trace.json', {
+  origin: [0.25, 0.32, -0.8],
+  // traced XY (along hose / down) → gen X (outboard) / Y (down) / Z (aft→fwd)
+  map: (x, y) => [x * 0.35, y * 0.85, x * 0.55],
+});
+const HOSE_S_BEND_L = HOSE_S_BEND.map(([x, y, z]) => [x - 0.22, y - 0.02, z]);
 
 // Corner radiator: taller-than-wide core, vertical L/R side tanks (WM ~4174 /
 // 190819), thin top/bottom headers kept for hose attach points.
@@ -160,13 +169,21 @@ export function build() {
   // PRIMARY: electric auxiliary water pump — smaller cylinder beside it.
   add(rot(at(cyl('waterPumpElectric', 0.14, 0.14, 0.22, 'cast', 18), -0.45, -0.15, EZ + 0.1), 0, 0, HALF));
 
-  // PRIMARY: map-controlled thermostat housing near the pump.
-  add(at(box('coolantThermostat', 0.24, 0.24, 0.22, 'cast'), 0.25, 0.2, EZ + 0.1));
+  // PRIMARY: map-controlled thermostat / coolant regulator housing (WM belt-side -8-).
+  add(at(roundBox('coolantThermostat', 0.32, 0.28, 0.3, 'cast', 2), 0.25, 0.18, EZ + 0.1));
+  add(rot(at(cyl('coolantThermostatPortA', 0.07, 0.07, 0.14, 'tank', 12), 0.25, 0.32, EZ + 0.22), HALF, 0, 0));
+  add(rot(at(cyl('coolantThermostatPortB', 0.07, 0.07, 0.14, 'tank', 12), 0.4, 0.22, EZ + 0.1), 0, 0, HALF));
 
-  // SUB: pump housing, water guide housing, pulley, internal block plumbing.
-  add(rot(at(cyl('coolantPumpHousing', 0.26, 0.26, 0.18, 'cast', 18), 0.25, -0.1, EZ - 0.16), 0, 0, HALF));
-  add(at(box('waterGuideHousing', 0.5, 0.3, 0.3, 'cast'), 0, 0.05, EZ - 0.25));
-  add(rot(at(cyl('coolantPumpPulley', 0.16, 0.16, 0.06, 'steel', 16), 0.46, -0.1, EZ), 0, 0, HALF));
+  // SUB: pump housing, water guide housing, pulley, internal block plumbing (WM 3669).
+  add(rot(at(cyl('coolantPumpHousing', 0.28, 0.28, 0.22, 'cast', 18), 0.25, -0.12, EZ - 0.18), 0, 0, HALF));
+  add(at(roundBox('waterGuideHousing', 0.52, 0.28, 0.32, 'cast', 2), 0, 0.05, EZ - 0.25));
+  add(at(roundBox('coolantPumpBracket', 0.35, 0.2, 0.28, 'cast', 2), 0.15, -0.2, EZ - 0.05));
+  add(rot(at(cyl('coolantPumpPulley', 0.18, 0.18, 0.07, 'steel', 20), 0.48, -0.12, EZ - 0.05), 0, 0, HALF));
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * Math.PI * 2;
+    add(at(box(`coolantPumpPulleyRib_${i}`, 0.02, 0.14, 0.04, 'steel'),
+      0.48 + Math.cos(a) * 0.12, -0.12 + Math.sin(a) * 0.12, EZ - 0.05));
+  }
   add(rot(at(cyl('waterPipeInternal', 0.06, 0.06, 0.6, 'cast', 12), 0, 0, EZ - 0.3), 0, 0, HALF));
   add(rot(at(cyl('distributerTubeLeft', 0.05, 0.05, 0.5, 'cast', 12), -0.3, 0.1, EZ - 0.28), HALF, 0, 0));
   add(rot(at(cyl('distributerTubeRight', 0.05, 0.05, 0.5, 'cast', 12), 0.3, 0.1, EZ - 0.28), HALF, 0, 0));
@@ -193,44 +210,73 @@ export function build() {
 
   // ---------------------------------------------------------------------------
   // PLUMBING — long front-to-rear coolant lines (mid-engine car)
+  // WM 3537: molded S/Z-bend hoses with spring-band clamps at both ends.
+  // WM 3614 / 3669: twin parallel rigid pipes + distributor / pump stubs.
+  // Chassis lines hug the sills (outboard) rather than floating mid-car.
   // ---------------------------------------------------------------------------
-  // PRIMARY: upper radiator hose — engine outlet up to top of right radiator.
+  // PRIMARY: upper radiator hose — engine outlet → top of right radiator (S-bend).
   add(tube('upperRadiatorHose', [
-    [0.25, 0.34, EZ + 0.1], [0.6, 0.5, 0.2], [1.0, 0.4, 1.2], [RX, CORE_TOP_Y, RZ],
-  ], 0.06, 'hose'));
+    [0.25, 0.34, EZ + 0.1],
+    [0.55, 0.55, EZ - 0.4],
+    [0.95, 0.48, 0.5],
+    [1.15, 0.35, 1.3],
+    [RX + 0.05, CORE_TOP_Y + 0.05, RZ - 0.15],
+    [RX, CORE_TOP_Y, RZ],
+  ], 0.065, 'hose', 48, 12));
+  add(rot(at(torus('upperHoseClampEngine', 0.075, 0.018, 'polished', 8, 16), 0.25, 0.34, EZ + 0.1), 0.5, 0, 0));
+  add(rot(at(torus('upperHoseClampRad', 0.075, 0.018, 'polished', 8, 16), RX, CORE_TOP_Y, RZ), 0.5, 0, 0));
 
-  // PRIMARY: lower radiator hose — bottom of left radiator back to pump inlet.
+  // PRIMARY: lower radiator hose — left rad bottom → pump inlet (S-bend, low).
   add(tube('lowerRadiatorHose', [
-    [LX, CORE_BOT_Y, RZ], [-1.0, -0.5, 1.2], [-0.6, -0.4, 0.2], [-0.45, -0.3, EZ + 0.1],
-  ], 0.06, 'hose'));
+    [LX, CORE_BOT_Y, RZ],
+    [LX - 0.05, CORE_BOT_Y - 0.05, RZ - 0.2],
+    [-1.15, -0.55, 1.2],
+    [-0.95, -0.5, 0.4],
+    [-0.55, -0.35, EZ - 0.2],
+    [-0.45, -0.28, EZ + 0.1],
+  ], 0.065, 'hose', 48, 12));
+  add(rot(at(torus('lowerHoseClampRad', 0.075, 0.018, 'polished', 8, 16), LX, CORE_BOT_Y, RZ), 0.5, 0, 0));
+  add(rot(at(torus('lowerHoseClampPump', 0.075, 0.018, 'polished', 8, 16), -0.45, -0.28, EZ + 0.1), 0.5, 0, 0));
 
-  // PRIMARY: coolant hoses (the upper+lower circuit pair as a named group).
+  // PRIMARY: coolant hoses — twin parallel S-bends from WM 3537 trace + sill runs.
   const hoses = group('coolantHoses');
-  hoses.add(tube('hoseCircuitRight', [
-    [0.3, 0.0, EZ], [0.9, 0.1, 0.6], [RX, 0.2, RZ - 0.1],
-  ], 0.055, 'hose'));
-  hoses.add(tube('hoseCircuitLeft', [
-    [-0.3, 0.0, EZ], [-0.9, 0.1, 0.6], [LX, 0.2, RZ - 0.1],
-  ], 0.055, 'hose'));
+  // Engine-bay molded pair (traced centerline, offset for L/R)
+  hoses.add(tube('hoseCircuitRight', HOSE_S_BEND, 0.06, 'hose', 48, 12));
+  hoses.add(tube('hoseCircuitLeft', HOSE_S_BEND_L, 0.055, 'hose', 48, 12));
+  // Spring-band clamps at hose ends (WM yellow callouts)
+  const h0 = HOSE_S_BEND[0];
+  const hN = HOSE_S_BEND[HOSE_S_BEND.length - 1];
+  hoses.add(rot(at(torus('hoseClampUpperR', 0.07, 0.016, 'polished', 8, 16), h0[0], h0[1], h0[2]), 0.4, 0, 0));
+  hoses.add(rot(at(torus('hoseClampLowerR', 0.07, 0.016, 'polished', 8, 16), hN[0], hN[1], hN[2]), 0.4, 0, 0));
   add(hoses);
 
   // PRIMARY: heater hoses to/from the cabin heater core (forward, low).
   add(tube('heaterHoseSupply', [
-    [0.2, 0.0, EZ + 0.1], [0.3, -0.2, 0.5], [0.35, -0.3, 1.8],
-  ], 0.04, 'hose'));
+    [0.2, 0.0, EZ + 0.1], [0.35, -0.15, 0.6], [0.4, -0.28, 1.2], [0.35, -0.32, 1.8],
+  ], 0.04, 'hose', 32, 10));
   add(tube('heaterHoseReturn', [
-    [0.45, -0.35, 1.8], [0.4, -0.25, 0.5], [0.3, -0.05, EZ + 0.1],
-  ], 0.04, 'hose'));
+    [0.5, -0.35, 1.8], [0.45, -0.28, 1.2], [0.4, -0.18, 0.6], [0.3, -0.05, EZ + 0.1],
+  ], 0.04, 'hose', 32, 10));
 
   // SUB: rigid heater pipeline running through the front structure.
   add(rot(at(cyl('heaterPipeline', 0.035, 0.035, 1.6, 'tank', 12), 0.4, -0.32, 1.0), HALF, 0, 0));
 
-  // SUB: aluminium crossover pipes left/right spanning the engine bay.
+  // SUB: aluminium crossover / chassis coolant pipes — twin parallel hard lines
+  // along each sill (WM 3614 twin pipes), not a single mid-car tube.
   add(tube('coolantPipes', [
-    [-0.6, -0.4, EZ], [0, -0.45, 0.4], [0.6, -0.4, 1.4],
-  ], 0.05, 'tank'));
-  add(rot(at(cyl('crossoverPipeLeft', 0.045, 0.045, 2.6, 'tank', 12), -0.55, -0.45, 0.6), HALF, 0, 0));
-  add(rot(at(cyl('crossoverPipeRight', 0.045, 0.045, 2.6, 'tank', 12), 0.55, -0.45, 0.6), HALF, 0, 0));
+    [-0.55, -0.42, EZ], [-0.55, -0.48, 0.5], [-0.55, -0.45, 1.5], [-0.5, -0.4, RZ - 0.3],
+  ], 0.048, 'tank', 36, 10));
+  add(tube('coolantPipeRightHard', [
+    [0.55, -0.4, EZ], [0.55, -0.46, 0.5], [0.55, -0.43, 1.5], [0.5, -0.38, RZ - 0.3],
+  ], 0.042, 'tank', 36, 10));
+  add(rot(at(cyl('crossoverPipeLeft', 0.045, 0.045, 2.4, 'tank', 12), -0.55, -0.45, 0.55), HALF, 0, 0));
+  add(rot(at(cyl('crossoverPipeRight', 0.04, 0.04, 2.4, 'tank', 12), 0.55, -0.42, 0.55), HALF, 0, 0));
+
+  // Engine-bay distributor stub + short pump feed (WM 3669 / 3614)
+  add(at(roundBox('coolantDistributorStub', 0.28, 0.22, 0.2, 'cast', 2), 0.15, 0.05, EZ + 0.05));
+  add(tube('coolantPumpFeedPipe', [
+    [0.25, -0.05, EZ - 0.05], [0.35, -0.12, EZ - 0.2], [0.4, -0.12, EZ - 0.35],
+  ], 0.045, 'tank', 20, 10));
 
   // SUB: expansion-tank feed / overflow / reservoir / vent lines (rear, high).
   add(tube('expansionTankFeedHose', [

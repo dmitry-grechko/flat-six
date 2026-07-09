@@ -28,7 +28,8 @@ const OUT_MD = join(ROOT, 'tools/gen/wm-refs/notes/unified-layout-report.md');
 const AXLE = { frontZ: 1.5, rearZ: -1.5, halfTrack: 0.82, hubY: -0.35 };
 
 /** Soft car envelope used for out-of-bounds warnings (scene units). */
-const ENVELOPE = { x: 1.35, yMin: -1.35, yMax: 1.35, zMin: -2.35, zMax: 2.45 };
+// zMin reaches tip exits after the aft/low exhaust packaging shift.
+const ENVELOPE = { x: 1.35, yMin: -1.35, yMax: 1.35, zMin: -2.85, zMax: 2.45 };
 
 /**
  * Expected packaging zones (car-space). A placed AABB center should land near
@@ -37,15 +38,16 @@ const ENVELOPE = { x: 1.35, yMin: -1.35, yMax: 1.35, zMin: -2.35, zMax: 2.45 };
 const ZONES = {
   engine:    { center: [0, 0.15, -0.85], tol: [0.55, 0.55, 0.55], maxExtent: [1.6, 1.4, 1.8] },
   trans:     { center: [0, -0.15, -1.65], tol: [0.45, 0.45, 0.45], maxExtent: [1.2, 1.0, 1.4] },
-  exhaust:   { center: [0, -0.45, -1.4], tol: [0.7, 0.55, 0.85], maxExtent: [2.2, 1.2, 2.6] },
+  exhaust:   { center: [0, -0.55, -1.85], tol: [0.7, 0.55, 0.85], maxExtent: [2.2, 1.2, 2.6] },
   fbrakes:   { center: [0, -0.25, 1.45], tol: [1.4, 0.55, 0.45], maxExtent: [2.8, 1.2, 1.2] },
   rbrakes:   { center: [0, -0.25, -1.4], tol: [1.4, 0.55, 0.45], maxExtent: [2.8, 1.2, 1.2] },
   cooling:   { center: [0, 0.0, 1.2], tol: [0.9, 0.7, 1.0], maxExtent: [2.4, 1.6, 3.2] },
   oil:       { center: [0.55, 0.1, -0.9], tol: [0.45, 0.4, 0.45], maxExtent: [0.9, 0.8, 0.9] },
-  airfilter: { center: [0, 0.5, -0.55], tol: [0.55, 0.45, 0.55], maxExtent: [1.6, 1.0, 1.4] },
+  airfilter: { center: [0, 0.3, -0.9], tol: [0.7, 0.55, 0.7], maxExtent: [2.4, 1.2, 2.2] },
   plugs:     { center: [-0.4, 0.25, -0.9], tol: [0.5, 0.45, 0.5], maxExtent: [1.0, 0.9, 1.0] },
   susp:      { center: [0, -0.2, 0], tol: [0.4, 0.5, 0.4], maxExtent: [2.6, 1.4, 3.6] },
-  elec:      { center: [0, 0.25, 0.3], tol: [0.7, 0.6, 0.8], maxExtent: [2.2, 1.6, 2.4] },
+  // Car-space elec: battery (+X frunk) + fuse (−X) span the front half.
+  elec:      { center: [0, 0.05, 0.35], tol: [0.7, 0.55, 1.2], maxExtent: [2.0, 1.4, 3.6] },
   // RWD half-shafts only (rear axle) — not a full-length propshaft.
   driveline: { center: [0, -0.2, -1.4], tol: [0.5, 0.45, 0.55], maxExtent: [2.4, 1.2, 2.2] },
   fuel:      { center: [0, -0.05, 0.95], tol: [0.55, 0.45, 0.55], maxExtent: [1.6, 1.0, 1.6] },
@@ -432,7 +434,8 @@ function checkFlows(flowPts, placed) {
   let oob = 0;
   const samples = [];
   for (const [x, y, z] of flowPts) {
-    if (Math.abs(x) > 2.05 || y < -1.25 || y > 1.25 || z < -2.45 || z > 2.45) {
+    // zMin matches ENVELOPE after aft exhaust tip packaging.
+    if (Math.abs(x) > 2.05 || y < -1.25 || y > 1.25 || z < -2.85 || z > 2.45) {
       oob++;
       if (samples.length < 4) samples.push([x, y, z]);
     }

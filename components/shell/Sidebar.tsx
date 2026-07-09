@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { fmtMiles } from '@/lib/data';
 import { useVehicle } from '@/lib/vehicle-context';
 import { createClient } from '@/lib/supabase/client';
@@ -28,8 +28,7 @@ export default function Sidebar({
   onClose?: () => void;
 } = {}) {
   const pathname = usePathname();
-  const router = useRouter();
-  const { vehicle: VEHICLE } = useVehicle();
+  const { vehicle: VEHICLE, needsSetup } = useVehicle();
 
   // The admin usage panel is visible only to the admin account (or in demo mode,
   // so it can be tested without a real session). The /api/admin route enforces
@@ -56,16 +55,26 @@ export default function Sidebar({
 
       <div style={{ padding: '18px 18px 6px' }}>
         <div style={{ background: '#141416', border: '1px solid #1F1F22', borderRadius: 4, padding: 14 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 30, height: 30, borderRadius: 3, background: VEHICLE.colorHex, border: '1px solid rgba(255,255,255,.18)', flexShrink: 0 }} />
-            <div style={{ minWidth: 0 }}>
-              <div style={{ font: "500 13px/1.2 'Helvetica Neue',Arial,sans-serif", color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{VEHICLE.model}</div>
-              <div style={{ font: `500 10px/1.3 ${mono}`, letterSpacing: '.08em', color: '#76767B', marginTop: 2 }}>{VEHICLE.year} · {VEHICLE.plate}</div>
+          {needsSetup ? (
+            <div style={{ font: "400 12px/1.45 'Helvetica Neue',Arial,sans-serif", color: '#9A9AA0' }}>
+              Set up your car in onboarding to see it here.
             </div>
-          </div>
-          <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between', font: `500 10px/1 ${mono}`, letterSpacing: '.08em', color: '#76767B' }}>
-            <span>ODO</span><span style={{ color: '#fff' }}>{fmtMiles(VEHICLE.mileage)}</span>
-          </div>
+          ) : (
+            <>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ width: 30, height: 30, borderRadius: 3, background: VEHICLE.colorHex || '#2A2A2E', border: '1px solid rgba(255,255,255,.18)', flexShrink: 0 }} />
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ font: "500 13px/1.2 'Helvetica Neue',Arial,sans-serif", color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{VEHICLE.model || 'Your car'}</div>
+                  <div style={{ font: `500 10px/1.3 ${mono}`, letterSpacing: '.08em', color: '#76767B', marginTop: 2 }}>
+                    {[VEHICLE.year, VEHICLE.plate].filter(Boolean).join(' · ') || '—'}
+                  </div>
+                </div>
+              </div>
+              <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between', font: `500 10px/1 ${mono}`, letterSpacing: '.08em', color: '#76767B' }}>
+                <span>ODO</span><span style={{ color: '#fff' }}>{VEHICLE.mileage ? fmtMiles(VEHICLE.mileage) : '—'}</span>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
@@ -97,12 +106,18 @@ export default function Sidebar({
       </nav>
 
       <div style={{ padding: '14px 18px', borderTop: '1px solid #1B1B1E' }}>
-        <div
-          onClick={() => router.push('/')}
-          style={{ display: 'flex', alignItems: 'center', gap: 9, cursor: 'pointer', font: "500 12px/1 'Helvetica Neue',Arial,sans-serif", color: '#76767B' }}
-        >
-          <span style={{ fontFamily: mono }}>←</span> Sign out
-        </div>
+        <form action="/auth/signout" method="post">
+          <button
+            type="submit"
+            style={{
+              display: 'flex', alignItems: 'center', gap: 9, cursor: 'pointer',
+              font: "500 12px/1 'Helvetica Neue',Arial,sans-serif", color: '#76767B',
+              background: 'none', border: 'none', padding: 0, width: '100%',
+            }}
+          >
+            <span style={{ fontFamily: mono }}>←</span> Sign out
+          </button>
+        </form>
       </div>
     </aside>
   );

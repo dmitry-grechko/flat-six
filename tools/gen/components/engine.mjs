@@ -19,8 +19,9 @@
 // Water-cooled: NO cooling fins, NO central fan.
 
 import {
-  group, box, roundBox, cyl, cylArc, capsule, lathe, tube, torus, sphere, at, rot,
+  group, box, roundBox, cyl, cylArc, capsule, lathe, tube, torus, sphere, extrude, at, rot,
 } from '../lib/primitives.mjs';
+import { footprint, centerline } from '../lib/wm-traces.mjs';
 
 export const meta = {
   id: 'engine',
@@ -32,6 +33,17 @@ export const meta = {
 
 const HALF_PI = Math.PI / 2;
 
+/** WM 175019 Fig 1 (p4035) — blue CAD outline traced → gen XZ footprint. */
+const OIL_PAN_FOOTPRINT = footprint('981/traces/oil-pan-4035.trace.json');
+
+/** WM 3537 S-bend hose — placed on Bank1 coolant connection. */
+const ENGINE_HOSE_S = centerline('981/traces/coolant-hoses-3537.trace.json', {
+  origin: [1.35, 0.45, 0.9],
+  map: (x, y) => [-y * 0.5, -x * 0.35, -x * 0.4],
+  scale: 0.85,
+});
+const ENGINE_HOSE_S_L = ENGINE_HOSE_S.map(([x, y, z]) => [-x - 0.15, y - 0.05, z]);
+
 export function build() {
   const engine = group('engine');
   const add = (m, p = engine) => { p.add(m); return m; };
@@ -39,18 +51,34 @@ export function build() {
   // ====================================================================
   // STRUCTURE — crankcase, cylinder heads L/R, sump/oil pan, motor mounts,
   // starter motor, transaxle bellhousing. RIGHT bank cutaway for internals.
+  // Tier A silhouette: WM belt-side-3597 (unit carrier / case massing) +
+  // oil-pan-4035/4045 (lower finned pan + upper frame).
   // ====================================================================
   const structure = group('structure');
 
   // ---- crankcase (+ engineBlock alias for PRIMARY eng-block-001)
+  // Flat-six: wide shallow case with bank shoulders, not a single brick.
   const crankcase = group('crankcase');
-  add(roundBox('crankcaseMain', 3.0, 1.7, 2.35, 'block'), crankcase);
-  add(at(box('crankcaseSeam', 3.04, 0.14, 2.4, 'castDark'), 0, 0, 0), crankcase);
-  add(at(box('crankcaseWebFront', 2.9, 1.4, 0.1, 'castDark'), 0, 0, 1.2), crankcase);
-  add(at(box('crankcaseWebRear', 2.9, 1.4, 0.1, 'castDark'), 0, 0, -1.2), crankcase);
+  // Central tunnel (crank tunnel / case split)
+  add(roundBox('crankcaseMain', 1.55, 1.35, 2.35, 'block', 3), crankcase);
+  // Bank shoulders (cylinder banks flare outboard)
+  add(at(roundBox('crankcaseBankR', 0.95, 1.05, 2.15, 'block', 3), 1.05, 0.05, 0), crankcase);
+  add(at(roundBox('crankcaseBankL', 0.95, 1.05, 2.15, 'block', 3), -1.05, 0.05, 0), crankcase);
+  // Horizontal case ribs (WM belt-side / pump figs show finned casting)
+  for (let i = 0; i < 6; i++) {
+    const y = -0.45 + i * 0.18;
+    add(at(box(`crankcaseRibR_${i}`, 0.04, 0.06, 1.9, 'castDark'), 1.52, y, 0), crankcase);
+    add(at(box(`crankcaseRibL_${i}`, 0.04, 0.06, 1.9, 'castDark'), -1.52, y, 0), crankcase);
+  }
+  // Horizontal split seam (upper/lower crankcase halves)
+  add(at(box('crankcaseSeam', 3.1, 0.1, 2.4, 'castDark'), 0, -0.15, 0), crankcase);
+  add(at(box('crankcaseWebFront', 2.9, 1.1, 0.1, 'castDark'), 0, 0, 1.2), crankcase);
+  add(at(box('crankcaseWebRear', 2.9, 1.1, 0.1, 'castDark'), 0, 0, -1.2), crankcase);
+  // Unit carrier / coolant distributor housing mass on Bank2 accessory face (WM -10-)
+  add(at(roundBox('unitCarrier', 0.55, 0.95, 0.7, 'cast', 2), -1.55, 0.15, 1.05), crankcase);
   for (const zz of [-0.9, -0.3, 0.3, 0.9]) {
     for (const s of [1, -1]) {
-      add(rot(at(cyl(`caseBolt_${s > 0 ? 'R' : 'L'}_${zz}`, 0.07, 0.07, 0.14, 'bolt', 10), s * 1.52, 0, zz), 0, 0, HALF_PI), crankcase);
+      add(rot(at(cyl(`caseBolt_${s > 0 ? 'R' : 'L'}_${zz}`, 0.07, 0.07, 0.14, 'bolt', 10), s * 1.55, 0, zz), 0, 0, HALF_PI), crankcase);
     }
   }
   for (let i = 0; i < 3; i++) {
@@ -60,28 +88,55 @@ export function build() {
   structure.add(crankcase);
 
   const engineBlock = group('engineBlock');
-  add(at(roundBox('engineBlockCasting', 2.95, 1.55, 2.2, 'block'), 0, 0, 0), engineBlock);
-  add(at(box('engineBlockSeam', 2.98, 0.1, 2.22, 'castDark'), 0, 0, 0), engineBlock);
+  add(at(roundBox('engineBlockCasting', 1.5, 1.25, 2.2, 'block', 3), 0, 0, 0), engineBlock);
+  add(at(roundBox('engineBlockBankR', 0.9, 0.95, 2.05, 'block', 2), 1.05, 0.05, 0), engineBlock);
+  add(at(roundBox('engineBlockBankL', 0.9, 0.95, 2.05, 'block', 2), -1.05, 0.05, 0), engineBlock);
+  add(at(box('engineBlockSeam', 3.0, 0.08, 2.22, 'castDark'), 0, -0.15, 0), engineBlock);
   structure.add(engineBlock);
 
   // ---- sump / oil pan (+ oilPanSump alias)
+  // WM 175019: lower pan = irregular flange + dense longitudinal cooling fins +
+  // two support-dome recesses; upper pan = open frame with side protrusion.
   const sump = group('sump');
-  add(at(roundBox('oilPan', 2.4, 0.75, 1.9, 'cast'), 0, -1.05, 0), sump);
-  for (let i = 0; i < 5; i++) {
-    add(at(box(`sumpRib_${i}`, 0.06, 0.6, 1.85, 'castDark'), -0.9 + i * 0.45, -1.05, 0), sump);
+  // Lower pan body — extruded irregular footprint, fins on underside
+  const oilPanBody = rot(extrude('oilPan', OIL_PAN_FOOTPRINT, 0.55, 'cast', {
+    bevelThickness: 0.04, bevelSize: 0.035,
+  }), HALF_PI, 0, 0);
+  oilPanBody.position.set(0, -1.15, 0);
+  sump.add(oilPanBody);
+  // Perimeter flange lip (thinner plate above body)
+  const oilPanLip = rot(extrude('oilPanLip', OIL_PAN_FOOTPRINT.map(([x, z]) => [x * 1.04, z * 1.04]), 0.06, 'castDark', {
+    bevel: false,
+  }), HALF_PI, 0, 0);
+  oilPanLip.position.set(0, -0.85, 0);
+  sump.add(oilPanLip);
+  // Longitudinal cooling fins (WM 4035 — dense vertical fins across pan face)
+  for (let i = 0; i < 11; i++) {
+    const x = -0.95 + i * 0.19;
+    add(at(box(`sumpRib_${i}`, 0.045, 0.42, 1.55, 'castDark'), x, -1.28, 0.05), sump);
   }
-  add(at(cyl('oilDrainPlug', 0.1, 0.1, 0.16, 'bolt', 12), 0.7, -1.45, 0.35), sump);
-  // Sub: oil sump upper baffle + gasket
+  // Support domes (screws 3 & 4 in WM sequence) — circular recesses mid-pan
+  add(at(cyl('oilPanDomeA', 0.16, 0.16, 0.12, 'castDark', 16), -0.25, -1.0, 0.1), sump);
+  add(at(cyl('oilPanDomeB', 0.16, 0.16, 0.12, 'castDark', 16), 0.35, -1.0, 0.1), sump);
+  add(at(cyl('oilDrainPlug', 0.1, 0.1, 0.16, 'bolt', 12), 0.7, -1.48, 0.35), sump);
+  // Upper oil pan frame (WM 4045) — open rectangular frame + side box protrusion
   const oilSumpUpperPart = group('oilSumpUpperPart');
-  add(at(box('oilSumpBaffle', 2.0, 0.08, 1.6, 'castDark'), 0, -0.7, 0), oilSumpUpperPart);
+  add(at(box('oilSumpUpperFrame', 2.2, 0.22, 1.7, 'cast'), 0, -0.72, 0), oilSumpUpperPart);
+  add(at(box('oilSumpUpperCutout', 1.5, 0.24, 1.1, 'castDark'), 0, -0.72, 0), oilSumpUpperPart);
+  add(at(box('oilSumpUpperProtrusion', 0.55, 0.28, 0.7, 'cast'), -1.25, -0.7, 0.15), oilSumpUpperPart);
+  add(at(box('oilSumpBaffle', 1.8, 0.06, 1.4, 'castDark'), 0, -0.62, 0), oilSumpUpperPart);
   sump.add(oilSumpUpperPart);
   const oilSumpGasket = group('oilSumpGasket');
-  add(at(box('oilSumpGasketRing', 2.35, 0.03, 1.85, 'damper'), 0, -0.68, 0), oilSumpGasket);
+  add(at(box('oilSumpGasketRing', 2.35, 0.03, 1.85, 'damper'), 0, -0.58, 0), oilSumpGasket);
   sump.add(oilSumpGasket);
   structure.add(sump);
 
   const oilPanSump = group('oilPanSump');
-  add(at(roundBox('oilPanSumpBody', 2.35, 0.7, 1.85, 'cast'), 0, -1.05, 0), oilPanSump);
+  const oilPanSumpBody = rot(extrude('oilPanSumpBody', OIL_PAN_FOOTPRINT.map(([x, z]) => [x * 0.98, z * 0.98]), 0.5, 'cast', {
+    bevelThickness: 0.035, bevelSize: 0.03,
+  }), HALF_PI, 0, 0);
+  oilPanSumpBody.position.set(0, -1.15, 0);
+  oilPanSump.add(oilPanSumpBody);
   structure.add(oilPanSump);
 
   // ---- cylinder heads (cylHead_L/R) + Bank1/Bank2 aliases
@@ -901,18 +956,31 @@ export function build() {
   lubeCooling.add(coolantTempSensor);
 
   const coolantPlumbing = group('coolantPlumbing');
-  for (let i = 0; i < 8; i++) {
+  // WM belt-side-3597: thick vertical coolant connection piece (-5-) on Bank1 face
+  add(at(cyl('coolantConnectionPiece', 0.14, 0.14, 0.85, 'tank', 16), 1.55, 0.15, 1.15), coolantPlumbing);
+  add(at(cyl('coolantConnectionFlare', 0.17, 0.14, 0.12, 'polished', 16), 1.55, 0.5, 1.15), coolantPlumbing);
+  // Coolant distributor housing on unit carrier (WM -10-) — multi-port casting
+  add(at(roundBox('coolantDistributorHousing', 0.42, 0.55, 0.5, 'cast', 2), -1.55, -0.15, 1.15), coolantPlumbing);
+  add(rot(at(cyl('coolantDistributorPortA', 0.09, 0.09, 0.18, 'tank', 12), -1.55, 0.05, 1.4), HALF_PI, 0, 0), coolantPlumbing);
+  add(rot(at(cyl('coolantDistributorPortB', 0.08, 0.08, 0.16, 'tank', 12), -1.75, -0.05, 1.15), 0, 0, HALF_PI), coolantPlumbing);
+  // Twin parallel coolant pipes into distributor (WM 3614 Fig 19)
+  add(tube('coolantPipeThick', [
+    [1.55, 0.55, 1.15], [1.2, 0.7, 1.05], [0.4, 0.75, 0.95], [-0.6, 0.55, 1.05], [-1.4, 0.15, 1.25],
+  ], 0.075, 'tank', 36, 12), coolantPlumbing);
+  add(tube('coolantPipeThin', [
+    [1.45, 0.35, 1.25], [1.0, 0.55, 1.2], [0.3, 0.6, 1.1], [-0.5, 0.4, 1.15], [-1.35, -0.05, 1.3],
+  ], 0.055, 'tank', 36, 12), coolantPlumbing);
+  for (let i = 0; i < 3; i++) {
     add(rot(at(cyl(`coolantUnionRib_${i}`, 0.13, 0.13, 0.05, 'polished', 16), 1.0 - i * 0.07, 0.7, 1.0), 0, 0, HALF_PI), coolantPlumbing);
   }
-  add(rot(at(cyl('coolantUnionPipe', 0.1, 0.1, 0.7, 'tank', 18), 0.65, 0.7, 1.0), 0, 0, HALF_PI), coolantPlumbing);
-  add(tube('coolantHoseUpper', [
-    [1.3, 0.9, 0.5], [0.9, 1.3, 0.0], [0.2, 1.45, -0.6], [-0.6, 1.3, -0.9], [-1.3, 1.0, -0.8],
-  ], 0.12, 'hose', 40, 14), coolantPlumbing);
-  add(tube('coolantHoseLower', [
-    [-1.35, 0.2, 0.6], [-1.5, 0.0, 0.0], [-1.3, -0.3, -0.6], [-0.8, -0.5, -1.0],
-  ], 0.1, 'hose', 32, 14), coolantPlumbing);
-  add(rot(at(torus('coolantClamp1', 0.13, 0.025, 'polished', 8, 20), 1.28, 0.92, 0.46), 0.6, 0, 0), coolantPlumbing);
-  add(rot(at(torus('coolantClamp2', 0.11, 0.025, 'polished', 8, 20), -1.33, 0.22, 0.56), 0.6, 0, 0), coolantPlumbing);
+  add(rot(at(cyl('coolantUnionPipe', 0.1, 0.1, 0.55, 'tank', 18), 0.75, 0.7, 1.0), 0, 0, HALF_PI), coolantPlumbing);
+  // S-bend molded hoses (WM 3537 traced centerline)
+  add(tube('coolantHoseUpper', ENGINE_HOSE_S, 0.11, 'hose', 48, 14), coolantPlumbing);
+  add(tube('coolantHoseLower', ENGINE_HOSE_S_L, 0.1, 'hose', 48, 14), coolantPlumbing);
+  const eh0 = ENGINE_HOSE_S[0];
+  const ehN = ENGINE_HOSE_S[ENGINE_HOSE_S.length - 1];
+  add(rot(at(torus('coolantClamp1', 0.13, 0.025, 'polished', 8, 20), eh0[0], eh0[1], eh0[2]), 0.6, 0, 0), coolantPlumbing);
+  add(rot(at(torus('coolantClamp2', 0.11, 0.025, 'polished', 8, 20), ehN[0], ehN[1], ehN[2]), 0.6, 0, 0), coolantPlumbing);
   lubeCooling.add(coolantPlumbing);
 
   engine.add(lubeCooling);

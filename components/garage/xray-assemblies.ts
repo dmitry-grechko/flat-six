@@ -57,7 +57,7 @@ export const XRAY_ASSEMBLIES: XrayAssembly[] = [
   // Exhaust spans engine headers (z≈-0.85) to the rear tips (z≈-2.0): sized so the
   // native span (ports z0 → tips z-4.05, sphere r≈3.33) lands at scale ≈0.28 and
   // the flow-systems 'exhaust-flow' tubes thread through headers→cats→X-pipe→tips.
-  { id: 'exhaust',   label: 'Exhaust',           glb: '/models/components/exhaust.glb',   manifest: '/models/components/exhaust-parts.json',   hotspot3d: '0 -0.34 -1.29', displayRadius: 0.93 },
+  { id: 'exhaust',   label: 'Exhaust',           glb: '/models/components/exhaust.glb',   manifest: '/models/components/exhaust-parts.json',   hotspot3d: '0 -0.55 -1.85', displayRadius: 0.93 },
   // Brake GLBs include the chassis hydraulics (MC/booster/ABS at native y≈2.1),
   // which drag the bbox centre ~0.7 above the rotor — so the hotspot y sits HIGH
   // so the ROTOR (native origin) lands at the hub (y≈-0.33), and displayRadius is
@@ -73,13 +73,16 @@ export const XRAY_ASSEMBLIES: XrayAssembly[] = [
   { id: 'cooling',   label: 'Cooling System',    glb: '/models/components/cooling.glb',   manifest: '/models/components/cooling-parts.json',   hotspot3d: '0 -0.05 1.45', displayRadius: 0.80 },
   { id: 'oil',       label: 'Oil & Lubrication', glb: '/models/components/oil.glb',       manifest: '/models/components/oil-parts.json',       hotspot3d: '0.6 0.1 -0.9', displayRadius: 0.22 },
   // Dual air cleaners merge at central throttle (WM 242519 / 244601).
-  { id: 'airfilter', label: 'Air Intake',        glb: '/models/components/airfilter.glb', manifest: '/models/components/airfilter-parts.json', hotspot3d: '0 0.55 -0.55', displayRadius: 0.42 },
+  { id: 'airfilter', label: 'Air Intake',        glb: '/models/components/airfilter.glb', manifest: '/models/components/airfilter-parts.json', hotspot3d: '0 0 0', carSpace: true, worldScale: 1 },
   { id: 'plugs',     label: 'Ignition & Fuel',   glb: '/models/components/plugs.glb',     manifest: '/models/components/plugs-parts.json',     hotspot3d: '-0.5 0.3 -0.9', displayRadius: 0.18 },
   // Engine grew denser after WM detail pass — slightly larger display so it stays
   // the visual anchor next to exhaust/cooling in the joint view.
   // (engine displayRadius kept at 0.70; tune here if layout report flags extent)
   { id: 'susp',      label: 'Suspension',        glb: '/models/components/susp.glb',      manifest: '/models/components/susp-parts.json',      hotspot3d: '0 0 0', carSpace: true, worldScale: 0.95 },
-  { id: 'elec',      label: 'Electrical',        glb: '/models/components/elec.glb',      manifest: '/models/components/elec-parts.json',      hotspot3d: '0 0.25 0.4',  displayRadius: 0.9 },
+  // Car-space: battery (passenger +X frunk) and fuse box (driver −X) must keep
+  // their lateral packaging — normalize/recenter was collapsing them to centre
+  // and the wiring-layer FlowNode boxes then looked like duplicates/mis-sides.
+  { id: 'elec',      label: 'Electrical',        glb: '/models/components/elec.glb',      manifest: '/models/components/elec-parts.json',      hotspot3d: '0 0 0', carSpace: true, worldScale: 1 },
   { id: 'driveline', label: 'Driveline',         glb: '/models/components/driveline.glb', manifest: '/models/components/driveline-parts.json', hotspot3d: '0 0.05 0', carSpace: true, worldScale: 0.95 },
   // Fuel tank packaging (WM 20 Overview Of Fuel Tank Component ~4310) — low ahead of cabin.
   { id: 'fuel',      label: 'Fuel Tank',         glb: '/models/components/fuel.glb',      manifest: '/models/components/fuel-parts.json',      hotspot3d: '0 -0.08 0.95', displayRadius: 0.55 },

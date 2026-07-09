@@ -32,6 +32,19 @@ From each overview / R&I figure, extract:
 4. **Align** to neighbors / car-space hotspot.
 5. Only then add bolts, sensors, internals.
 
+## Trace from WM CAD (when hand profiles aren't enough)
+
+For irregular pans / molded hoses, extract the blue CAD highlight:
+
+```bash
+/tmp/wm-trace-venv/bin/python tools/gen/wm-refs/trace-silhouette.py \
+  --image tools/gen/wm-refs/981/<section>/<fig>.png \
+  --mode footprint|centerline --name NAME --width 2.4 \
+  --out tools/gen/wm-refs/981/traces/<fig>.trace.json
+```
+
+Load in gen via `tools/gen/lib/wm-traces.mjs` → `extrude()` / `tube()`. See `notes/wm-trace-findings.md`.
+
 ## “Real life” ceiling
 
 Procedural meshes ≈ technical illustration fidelity. If Tier A is exhausted and the user still wants photoreal outer form:

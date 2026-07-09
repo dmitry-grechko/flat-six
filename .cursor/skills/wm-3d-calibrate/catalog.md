@@ -10,21 +10,21 @@ Refs: `tools/gen/wm-refs/981/<section>/`
 
 | Assembly | Gen script | Parts JSON | WM hints | Status |
 | --- | --- | --- | --- | --- |
-| `engine` | `engine.mjs` | `engine-parts.json` | 10 / 13 / 15 | done |
-| `cooling` | `coolingRadiator.mjs` | `cooling-parts.json` | 19 | silhouette |
-| `airfilter` | `airIntake.mjs` | `airfilter-parts.json` | 24 | silhouette |
-| `exhaust` | `exhaust.mjs` | `exhaust-parts.json` | 26 | silhouette |
-| `oil` | `oilSystem.mjs` | `oil-parts.json` | 17 | silhouette |
+| `engine` | `engine.mjs` | `engine-parts.json` | oil-pan + hose traces | silhouette |
+| `cooling` | `coolingRadiator.mjs` | `cooling-parts.json` | hose S-bend trace | silhouette |
+| `airfilter` | `airIntake.mjs` | `airfilter-parts.json` | aircleaner CL droop | silhouette |
+| `exhaust` | `exhaust.mjs` | `exhaust-parts.json` | silencer aspect from trace | silhouette |
+| `oil` | `oilSystem.mjs` | `oil-parts.json` | filter dome from trace | silhouette |
 | `plugs` | `ignitionFuel.mjs` | `plugs-parts.json` | 24 / 28 | silhouette |
-| `trans` | `transaxle.mjs` | `trans-parts.json` | 37–39 PDK | silhouette |
-| `susp` | `suspension.mjs` | `susp-parts.json` | 40 / 42 + trailing arms | silhouette |
-| `fbrakes` | `frontBrake.mjs` | `fbrakes-parts.json` | 46 | silhouette |
+| `trans` | `transaxle.mjs` | `trans-parts.json` | ATF pan extrude trace | silhouette |
+| `susp` | `suspension.mjs` | `susp-parts.json` | 40 / 42 | silhouette |
+| `fbrakes` | `frontBrake.mjs` | `fbrakes-parts.json` | 46 (no usable blue CAD) | silhouette |
 | `rbrakes` | `rearBrake.mjs` | `rbrakes-parts.json` | 46 | silhouette |
-| `driveline` | `driveline.mjs` | `driveline-parts.json` | 422119 shafts / 39 diff | silhouette |
-| `fuel` | `fuelSystem.mjs` | `fuel-parts.json` | 20 tank overview ~4310 | silhouette |
+| `driveline` | `driveline.mjs` | `driveline-parts.json` | shafts / diff | silhouette |
+| `fuel` | `fuelSystem.mjs` | `fuel-parts.json` | tank overview | silhouette |
 | `elec` | `electrical.mjs` | `elec-parts.json` | 9X | todo |
 
-Gap-fill notes: [`tools/gen/wm-refs/notes/missing-parts-findings.md`](../../tools/gen/wm-refs/notes/missing-parts-findings.md)
+Trace notes: [`tools/gen/wm-refs/notes/wm-trace-findings.md`](../../tools/gen/wm-refs/notes/wm-trace-findings.md), [`wave-trace-catalog.md`](../../tools/gen/wm-refs/notes/wave-trace-catalog.md)
 
 ## 987 (future)
 

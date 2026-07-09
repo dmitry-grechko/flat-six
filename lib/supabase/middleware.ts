@@ -63,13 +63,20 @@ export async function updateSession(request: NextRequest) {
   if (!user && !isPublic(pathname)) {
     const url = request.nextUrl.clone();
     url.pathname = '/auth/login';
+    const returnPath = `${pathname}${request.nextUrl.search}`;
+    if (returnPath !== '/auth/login') {
+      url.searchParams.set('next', returnPath);
+    }
     return NextResponse.redirect(url);
   }
 
-  // Signed-in users hitting the login page go straight to the garage.
+  // Signed-in users hitting the login page go straight to the garage (onboarding
+  // gate redirects first-time users from there).
   if (user && pathname === '/auth/login') {
     const url = request.nextUrl.clone();
-    url.pathname = '/garage';
+    const next = url.searchParams.get('next');
+    url.pathname = next && next.startsWith('/') && !next.startsWith('//') ? next : '/garage';
+    url.search = '';
     return NextResponse.redirect(url);
   }
 

@@ -22,8 +22,9 @@
 // the case body where the real part sits inside.
 
 import {
-  group, box, roundBox, cyl, torus, torusArc, tube, sphere, at, rot,
+  group, box, roundBox, cyl, torus, torusArc, tube, sphere, extrude, at, rot,
 } from '../lib/primitives.mjs';
+import { footprint } from '../lib/wm-traces.mjs';
 
 export const meta = {
   id: 'trans',
@@ -146,23 +147,37 @@ export function build() {
   add(rot(at(cyl('pdkEndCover', 0.55, 0.55, 0.16, 'aluDark', 28), 0, -0.12, -1.58), HALF_PI, 0, 0));
   add(rot(at(torus('pdkSeal1', 0.52, 0.03, 'rubber', 8, 24), 0, -0.12, -1.5), 0, 0, 0));
 
-  // pdkOilPan — LOWER SUMP. Shield / home-plate footprint (WM 375519 Fig 1).
-  // Wider toward rear of pan face, perimeter lip, underside cooling ribs.
+  // pdkOilPan — LOWER SUMP. WM 375519 Fig 1 (p5842) blue CAD outline traced.
+  const ATF_PAN_FOOTPRINT = footprint('981/traces/atf-pan-5842.trace.json');
   const oilPan = group('pdkOilPan');
-  // main pan body — slightly tapered (wider at -Z / rear of pan)
-  add(at(roundBox('pdkOilPan_body', 1.45, 0.28, 1.35, 'aluDark', 3), 0, 0, 0.05), oilPan);
-  add(at(roundBox('pdkOilPan_rearWiden', 1.58, 0.26, 0.55, 'aluDark', 3), 0, -0.01, -0.45), oilPan);
-  // perimeter mounting lip / flange
-  add(at(box('pdkOilPan_lip', 1.68, 0.05, 1.55, 'alu'), 0, 0.14, 0.0), oilPan);
-  // underside cooling ribs (WM 5842 / 5843)
-  for (let i = 0; i < 7; i++) {
-    add(at(box(`pdkOilPan_rib_${i}`, 1.35, 0.04, 0.07, 'cast'), 0, -0.16, 0.5 - i * 0.16), oilPan);
+  const panBody = rot(extrude('pdkOilPan_body', ATF_PAN_FOOTPRINT, 0.32, 'aluDark', {
+    bevelThickness: 0.035, bevelSize: 0.03,
+  }), HALF_PI, 0, 0);
+  oilPan.add(panBody);
+  // Mid-width step ridge across pan (WM 5842 horizontal indent)
+  add(at(box('pdkOilPan_step', 1.45, 0.06, 0.12, 'cast'), 0, -0.02, 0.05), oilPan);
+  // Perimeter mounting lip / flange (slightly larger footprint, thin)
+  const panLip = rot(extrude('pdkOilPan_lip', ATF_PAN_FOOTPRINT.map(([x, z]) => [x * 1.08, z * 1.08]), 0.05, 'alu', {
+    bevel: false,
+  }), HALF_PI, 0, 0);
+  panLip.position.set(0, 0.16, 0);
+  oilPan.add(panLip);
+  // Underside cooling ribs — denser grid (WM 5842 / 5843)
+  for (let i = 0; i < 9; i++) {
+    add(at(box(`pdkOilPan_rib_${i}`, 1.25, 0.035, 0.055, 'cast'), 0, -0.18, 0.55 - i * 0.13), oilPan);
   }
-  // perimeter sump bolts (visual; PRIMARY remains pdkOilPan)
-  for (let i = 0; i < 8; i++) {
-    const a = (i / 8) * Math.PI * 2;
-    add(at(cyl(`pdkSumpBolt_${i}`, 0.035, 0.035, 0.05, 'bolt', 8),
-      Math.cos(a) * 0.72, 0.16, Math.sin(a) * 0.65), oilPan);
+  for (let i = 0; i < 5; i++) {
+    add(at(box(`pdkOilPan_ribX_${i}`, 0.045, 0.03, 1.15, 'cast'), -0.5 + i * 0.25, -0.19, 0), oilPan);
+  }
+  // Intake snorkel boss on pan floor (mates to electrohydraulic intake, WM 5844)
+  add(at(cyl('pdkOilPan_intake', 0.09, 0.09, 0.14, 'alu', 14), 0.2, 0.08, -0.1), oilPan);
+  // Perimeter sump bolts along flange (visual; PRIMARY remains pdkOilPan)
+  for (let i = 0; i < 12; i++) {
+    const a = (i / 12) * Math.PI * 2;
+    const rx = 0.68 + 0.08 * Math.cos(a * 2);
+    const rz = 0.58 + 0.1 * Math.sin(a * 2);
+    add(at(cyl(`pdkSumpBolt_${i}`, 0.03, 0.03, 0.045, 'bolt', 8),
+      Math.cos(a) * rx, 0.18, Math.sin(a) * rz), oilPan);
   }
   add(at(oilPan, 0, -0.95, 0.05));
 

@@ -73,6 +73,33 @@ export function tube(name, points, radius, mat, tubular = 24, radial = 12, close
   return tagMesh(new THREE.Mesh(new THREE.TubeGeometry(curve, tubular, radius, radial, closed)), name, mat);
 }
 
+/**
+ * Extrude a 2D footprint (array of [x,y] in the shape plane) along +Z by `depth`.
+ * Used for irregular cast pans / flanges traced from WM CAD top views.
+ * Caller typically rotates so the flange lies in XZ (car horizontal).
+ */
+export function extrude(name, shapePoints2d, depth, mat, opts = {}) {
+  const {
+    bevel = true,
+    bevelThickness = Math.min(0.03, depth * 0.15),
+    bevelSize = Math.min(0.03, depth * 0.12),
+    bevelSegments = 2,
+    curveSegments = 8,
+  } = opts;
+  const shape = new THREE.Shape(shapePoints2d.map((p) => new THREE.Vector2(p[0], p[1])));
+  const geo = new THREE.ExtrudeGeometry(shape, {
+    depth,
+    bevelEnabled: bevel,
+    bevelThickness,
+    bevelSize,
+    bevelSegments,
+    curveSegments,
+  });
+  // Center on depth so at() places the mid-plane
+  geo.translate(0, 0, -depth / 2);
+  return tagMesh(new THREE.Mesh(geo), name, mat);
+}
+
 export function torus(name, r, tube, mat, radial = 12, tubular = 36) {
   return tagMesh(new THREE.Mesh(new THREE.TorusGeometry(r, tube, radial, tubular)), name, mat);
 }

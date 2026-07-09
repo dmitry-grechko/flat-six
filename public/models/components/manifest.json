@@ -61,7 +61,7 @@
     "system": "Engine",
     "glb": "/models/components/airfilter.glb",
     "node": "airIntake",
-    "hotspot3d": "0 0.55 -0.55"
+    "hotspot3d": "0 0 0"
   },
   {
     "id": "plugs",
@@ -85,7 +85,7 @@
     "system": "Electrical",
     "glb": "/models/components/elec.glb",
     "node": "electrical",
-    "hotspot3d": "0 0.2 0"
+    "hotspot3d": "0 0 0"
   },
   {
     "id": "driveline",

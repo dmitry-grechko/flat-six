@@ -54,6 +54,9 @@ public/mobile_tech_library/**
 
 # WM CAD page extracts used to calibrate 3D gen (© Porsche — local only)
 /tools/gen/wm-refs/**/*.png
-# allow workflow helpers / notes / README under wm-refs
+# allow workflow helpers / notes / traces / scripts under wm-refs
 !/tools/gen/wm-refs/**/*.md
 !/tools/gen/wm-refs/**/*.mjs
+!/tools/gen/wm-refs/**/*.py
+!/tools/gen/wm-refs/**/*.json
+!/tools/gen/wm-refs/**/*.trace.json

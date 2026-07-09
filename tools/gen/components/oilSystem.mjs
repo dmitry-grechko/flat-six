@@ -17,6 +17,7 @@
 // modelled where convenient as nested named meshes — harmless extras.
 
 import { group, box, roundBox, cyl, torus, tube, lathe, at, rot } from '../lib/primitives.mjs';
+import { footprint } from '../lib/wm-traces.mjs';
 
 export const meta = {
   id: 'oil',
@@ -28,6 +29,53 @@ export const meta = {
 
 // Oil-wetted metal (warm tan-bronze sheen) for galleries / pipes / oil body.
 const OIL = { color: 0x6b5a2e, metalness: 0.4, roughness: 0.5 };
+
+// ---- WM 3984 Fig 1 oil filter cover trace --------------------------------
+// Traced side-view silhouette of the spin-on filter can: narrow flat base →
+// wide mid-body → tapering dome top. `filterCoverDome` below only models the
+// domed COVER (the fluted grip ring / base is separate: filterHousingCap +
+// filterFlute_*), so we take just the trace samples from the widest
+// cross-section upward (the dome) and revolve those — the WM shape, instead
+// of the previous hand-guessed profile.
+//
+// WM 4059 ("Overview Of Oil Cooler Bracket Component") is an exploded/overview
+// figure spanning the mist separator + bracket spine + cooler + filter boss
+// together (see oil-findings.md) — its traced footprint reflects that whole
+// multi-part overview rather than one clean envelope, same issue as the
+// exhaust silencer's exploded-view trace. We keep the existing hand-built
+// WM-4059 silhouette for `oilConductingHousing` / `oilHeatExchanger` (already
+// anchored consistently to the separator/filter sub-parts) and load only the
+// oil-filter trace for this pass.
+const OIL_FILTER_TRACE = footprint('981/traces/oil-filter-3984.trace.json');
+
+/**
+ * Build a lathe [radius, y] profile for the domed portion of a spin-on
+ * cover from a traced closed-loop side silhouette. Collapses independent
+ * left/right trace samples at similar heights, keeps only the widest point
+ * and everything above it (the dome), then rescales to the requested
+ * height/radius and closes both ends for a clean revolve.
+ */
+function domeProfileFromFootprint(pts, { height, maxRadius, yBase }) {
+  const sorted = pts.map(([x, y]) => [Math.abs(x), y]).sort((a, b) => a[1] - b[1]);
+  const merged = [];
+  for (const [r, y] of sorted) {
+    const last = merged[merged.length - 1];
+    if (last && Math.abs(last[1] - y) < 0.03) last[0] = (last[0] + r) / 2;
+    else merged.push([r, y]);
+  }
+  const widestIdx = merged.reduce((bi, p, i) => (p[0] > merged[bi][0] ? i : bi), 0);
+  const dome = merged.slice(widestIdx);
+  const yMin = dome[0][1];
+  const yMax = dome[dome.length - 1][1];
+  const scaleY = height / (yMax - yMin || 1);
+  const scaleR = maxRadius / dome[0][0];
+  const scaled = dome.map(([r, y]) => [r * scaleR, yBase + (y - yMin) * scaleY]);
+  return [[0, yBase], ...scaled, [0, yBase + height]];
+}
+
+const FILTER_COVER_PROFILE = domeProfileFromFootprint(OIL_FILTER_TRACE, {
+  height: 0.45, maxRadius: 0.2, yBase: -0.28,
+});
 
 export function build() {
   const oil = group('oilSystem');
@@ -153,16 +201,8 @@ export function build() {
     const a = (i / 12) * Math.PI * 2;
     add(at(box(`filterFlute_${i}`, 0.035, 0.1, 0.04, 'castDark'), Math.cos(a) * 0.2, 0.08, Math.sin(a) * 0.2), filterTilt);
   }
-  // domed cylindrical cover body
-  add(at(lathe('filterCoverDome', [
-    [0.0, -0.28],
-    [0.19, -0.28],
-    [0.2, -0.22],
-    [0.2, 0.05],
-    [0.18, 0.12],
-    [0.1, 0.16],
-    [0.0, 0.17],
-  ], 'cast', 28), 0, -0.12, 0), filterTilt);
+  // domed cylindrical cover body — profile traced from WM 3984 Fig 1
+  add(at(lathe('filterCoverDome', FILTER_COVER_PROFILE, 'cast', 28), 0, -0.12, 0), filterTilt);
   // O-ring / gasket seal (sub) near open end of cover
   add(at(torus('oilFilterHousingORing', 0.195, 0.022, 'rubber', 10, 28), 0, 0.16, 0), filterTilt);
   // integrated pressure relief valve (sub)

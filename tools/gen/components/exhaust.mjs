@@ -17,6 +17,7 @@
 // most sub-parts are emitted too (organised under per-side / per-assembly groups).
 
 import { group, box, roundBox, cyl, tube, torus, torusArc, at, rot } from '../lib/primitives.mjs';
+import { footprint } from '../lib/wm-traces.mjs';
 
 export const meta = {
   id: 'exhaust',
@@ -27,6 +28,22 @@ export const meta = {
 };
 
 const HALF_PI = Math.PI / 2;
+
+// ---- WM 263319 Fig 1 silencer trace (attempted, not extruded) ------------
+// WM 263319 Fig 1 is an EXPLODED view (holder + both rounded-rect silencer
+// cans + tailpipe cover pulled apart), so its traced footprint's boundary
+// jumps back in toward the origin partway through the point list (the
+// concave dip around index 9 of 11) instead of tracing one clean can
+// outline — it bounds several separated exploded parts, not a single can.
+// Extruding it directly would produce a blobby, non-can silhouette, so we
+// keep the hand-built rounded-rect cans and only borrow the trace's overall
+// bounding-box aspect ratio to sanity-check / gently tune their proportions.
+const SILENCER_TRACE = footprint('981/traces/silencer-4584.trace.json');
+const SILENCER_ASPECT = (() => {
+  const xs = SILENCER_TRACE.map((p) => p[0]);
+  const ys = SILENCER_TRACE.map((p) => p[1]);
+  return (Math.max(...xs) - Math.min(...xs)) / (Math.max(...ys) - Math.min(...ys));
+})(); // ≈1.9 (can length : height) — close to, but a touch taller than, the old flat 1.1:0.52 (≈2.1)
 
 export function build() {
   const exhaust = group('exhaust');
@@ -139,14 +156,15 @@ export function build() {
   // ---- pipes carrying gas rearward & OUTBOARD from each cat toward the
   // corner silencers (WM 263319 Fig 1 items 4/5). Final segment rises and
   // curves forward into the silencer inlet neck (exploded-view inlet path).
+  // Ends at the yawed muffler inlet mouth (cans at ±1.7, -1.25, -3.65,
+  // rotation.y = ±−0.32 — mouth ≈ ±1.26, −1.07, −3.22).
   for (const [dir, sk] of [[1, 'R'], [-1, 'L']]) {
     add(tube(`connectingPipe_${sk}`, [
       [dir * 0.85, -1.0, -1.95],
-      [dir * 1.1, -1.05, -2.45],
-      [dir * 1.45, -1.08, -2.85],
-      [dir * 1.65, -1.0, -3.05],
-      [dir * 1.72, -0.88, -3.18],
-      [dir * 1.7, -0.82, -3.28],
+      [dir * 1.05, -1.05, -2.4],
+      [dir * 1.15, -1.08, -2.85],
+      [dir * 1.22, -1.08, -3.05],
+      [dir * 1.26, -1.07, -3.22],
     ], 0.1, 'exhaustD', 20, 12));
   }
 
@@ -186,18 +204,22 @@ export function build() {
   // ====================================================================
   function makeMuffler(dir, side) {
     const sk = side;
-    // Canister centres stay at rear corners (native gen space ≈ ±1.7, z ≈ -3.3).
-    const mx = dir * 1.7, my = -1.02, mz = -3.3;
+    // Canister centres — further aft/low so silencers clear the rear axle
+    // (native gen space; unified hotspot also shifted back/down).
+    const mx = dir * 1.7, my = -1.25, mz = -3.65;
     const muffler = group(`muffler_${sk}`);
     // Rounded-rectangular / oval can (WM Fig 1 + Fig 3 clamp view) — flatter
-    // in Y than a cylinder, long axis along local X (transverse).
-    add(roundBox(`mufflerBody_${sk}`, 1.1, 0.52, 0.72, 'exhaustD', 4), muffler);
+    // in Y than a cylinder, long axis along local X (transverse). Height is
+    // trace-informed (SILENCER_ASPECT) rather than a flat hand-picked 0.52.
+    const mufflerLen = 1.1;
+    const mufflerH = mufflerLen / SILENCER_ASPECT;
+    add(roundBox(`mufflerBody_${sk}`, mufflerLen, mufflerH, 0.72, 'exhaustD', 4), muffler);
     // subtle body ribs (horizontal indentations on the can)
-    add(at(roundBox(`mufflerRibA_${sk}`, 0.95, 0.04, 0.74, 'exhaustD', 2), 0, 0.08, 0), muffler);
-    add(at(roundBox(`mufflerRibB_${sk}`, 0.95, 0.04, 0.74, 'exhaustD', 2), 0, -0.08, 0), muffler);
+    add(at(roundBox(`mufflerRibA_${sk}`, 0.95, 0.04, 0.74, 'exhaustD', 2), 0, mufflerH * 0.15, 0), muffler);
+    add(at(roundBox(`mufflerRibB_${sk}`, 0.95, 0.04, 0.74, 'exhaustD', 2), 0, -mufflerH * 0.15, 0), muffler);
     // end caps — slightly proud rounded faces
-    add(at(roundBox(`mufflerEndOut_${sk}`, 0.08, 0.5, 0.68, 'exhaustD', 3), 0.56, 0, 0), muffler);
-    add(at(roundBox(`mufflerEndIn_${sk}`, 0.08, 0.5, 0.68, 'exhaustD', 3), -0.56, 0, 0), muffler);
+    add(at(roundBox(`mufflerEndOut_${sk}`, 0.08, mufflerH - 0.02, 0.68, 'exhaustD', 3), 0.56, 0, 0), muffler);
+    add(at(roundBox(`mufflerEndIn_${sk}`, 0.08, mufflerH - 0.02, 0.68, 'exhaustD', 3), -0.56, 0, 0), muffler);
     // inlet neck: curves up/forward into the front face of the can
     add(tube(`mufflerInlet_${sk}`, [
       [-0.28, 0.18, 0.55],
@@ -226,23 +248,23 @@ export function build() {
   // PRIMARY contract node silencerBracketPSE (no new primary node names).
   const silencerBracketPSE = group('silencerBracketPSE');
   // transverse bridge rail above the cans
-  add(at(roundBox('silencerHolderBridge', 3.2, 0.08, 0.18, 'steel', 2), 0, -0.62, -3.2), silencerBracketPSE);
+  add(at(roundBox('silencerHolderBridge', 3.2, 0.08, 0.18, 'steel', 2), 0, -0.85, -3.55), silencerBracketPSE);
   // central lattice / X reinforcement (transmission-bracket mount area)
-  add(at(box('silencerHolderCentrePost', 0.14, 0.42, 0.12, 'steel'), 0, -0.42, -3.15), silencerBracketPSE);
-  add(rot(at(box('silencerHolderXBraceA', 0.55, 0.05, 0.08, 'steel'), 0, -0.48, -3.18), 0, 0, 0.55), silencerBracketPSE);
-  add(rot(at(box('silencerHolderXBraceB', 0.55, 0.05, 0.08, 'steel'), 0, -0.48, -3.18), 0, 0, -0.55), silencerBracketPSE);
+  add(at(box('silencerHolderCentrePost', 0.14, 0.42, 0.12, 'steel'), 0, -0.65, -3.5), silencerBracketPSE);
+  add(rot(at(box('silencerHolderXBraceA', 0.55, 0.05, 0.08, 'steel'), 0, -0.71, -3.53), 0, 0, 0.55), silencerBracketPSE);
+  add(rot(at(box('silencerHolderXBraceB', 0.55, 0.05, 0.08, 'steel'), 0, -0.71, -3.53), 0, 0, -0.55), silencerBracketPSE);
   // outer drop arms toward each silencer
   for (const dir of [1, -1]) {
     add(at(box(`silencerHolderArm_${dir > 0 ? 'R' : 'L'}`, 0.1, 0.28, 0.12, 'steel'),
-      dir * 1.45, -0.78, -3.22), silencerBracketPSE);
+      dir * 1.45, -1.01, -3.57), silencerBracketPSE);
     add(at(box(`silencerHolderPad_${dir > 0 ? 'R' : 'L'}`, 0.22, 0.06, 0.16, 'steel'),
-      dir * 1.55, -0.92, -3.25), silencerBracketPSE);
+      dir * 1.55, -1.15, -3.6), silencerBracketPSE);
   }
   exhaust.add(silencerBracketPSE);
 
   // ---- PSE bypass valve (integrated into a muffler, outboard) + actuator + line
   const pseValve = group('pseValve');
-  const pvx = 1.45, pvy = -0.85, pvz = -3.1;
+  const pvx = 1.45, pvy = -1.08, pvz = -3.45;
   add(at(box('pseValveBody', 0.2, 0.2, 0.24, 'exhaustD'), pvx, pvy, pvz), pseValve);
   add(rot(at(cyl('pseValveFlap', 0.1, 0.1, 0.06, 'steel', 14), pvx, pvy, pvz), HALF_PI, 0, 0), pseValve);
   exhaust.add(pseValve);
@@ -264,12 +286,12 @@ export function build() {
   // ---- (6) Clamping sleeve at the L/R outlet junction, centre-rear, just
   // ahead of the twin tip cover (WM 263319 Fig 1 item 6).
   // sleeve axis along X (joins L↔R outlet pipes)
-  add(rot(at(cyl('exhaustClampingSleeve', 0.13, 0.13, 0.22, 'steel', 16), 0, -1.0, -3.72), 0, 0, HALF_PI));
+  add(rot(at(cyl('exhaustClampingSleeve', 0.13, 0.13, 0.22, 'steel', 16), 0, -1.23, -4.07), 0, 0, HALF_PI));
 
   // ---- (8) Twin tailpipe cover — one T-shaped assembly: shared base plate /
   // neck at the sleeve, then tip_R_0 / tip_L_0 outlet groups (PRIMARY nodes).
-  const tipBaseY = -1.0;
-  const tipBaseZ = -3.88;
+  const tipBaseY = -1.23;
+  const tipBaseZ = -4.23;
   // shared T-stem / base plate (visual only; not a PRIMARY contract node)
   add(at(roundBox('tailpipeCoverBase', 0.55, 0.1, 0.22, 'exhaustC', 3), 0, tipBaseY, tipBaseZ + 0.08));
   add(rot(at(cyl('tailpipeCoverNeck', 0.11, 0.11, 0.18, 'exhaustC', 16), 0, tipBaseY, tipBaseZ + 0.18), HALF_PI, 0, 0));
@@ -284,9 +306,9 @@ export function build() {
     add(rot(at(torus(`tipClamp_${sk}_0`, 0.13, 0.022, 'steel', 8, 20), xoff, tipBaseY, tipBaseZ + 0.02), HALF_PI, 0, 0), tip);
     // outlet pipe from corner silencer → centre sleeve → tip
     add(tube(`tipPipe_${sk}_0`, [
-      [dir * 1.25, -1.02, -3.48],
-      [dir * 0.65, -1.01, -3.62],
-      [dir * 0.22, -1.0, -3.7],
+      [dir * 1.25, -1.25, -3.83],
+      [dir * 0.65, -1.24, -3.97],
+      [dir * 0.22, -1.23, -4.05],
       [xoff * 0.4, tipBaseY, tipBaseZ + 0.05],
       [xoff, tipBaseY, tipBaseZ - 0.05],
     ], 0.085, 'exhaustC', 16, 12), tip);
@@ -306,7 +328,7 @@ export function build() {
 
   // ---- pipe clamp on the right silencer inlet joint (item 2); left is mirrored
   // visually by the gasket/inlet geometry — keep the named PRIMARY node once.
-  add(rot(at(torus('exhaustClamp', 0.12, 0.03, 'steel', 10, 22), 1.7, -0.82, -3.22), HALF_PI, 0, 0));
+  add(rot(at(torus('exhaustClamp', 0.12, 0.03, 'steel', 10, 22), 1.7, -1.05, -3.57), HALF_PI, 0, 0));
 
   return exhaust;
 }

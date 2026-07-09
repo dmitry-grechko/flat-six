@@ -23,7 +23,7 @@ export function makeCanister({ node, r = 0.4, h = 1.1, bodyMat = 'red', capMat =
   return g;
 }
 
-// Flat panel air filter element in a frame.
+// Flat panel air filter element in a frame (cabin particle filter, HVAC).
 export function makePanel({ node, w = 1.4, h = 0.9, d = 0.22 }) {
   const g = group(node);
   const add = (m) => { g.add(m); return m; };
@@ -33,6 +33,37 @@ export function makePanel({ node, w = 1.4, h = 0.9, d = 0.22 }) {
   for (let i = 0; i < n; i++) {
     add(at(box(`pleat_${i}`, w * 0.92 / n, d * 0.7, h * 0.9, 'paper'), -w * 0.46 + (i + 0.5) * (w * 0.92 / n), 0, 0));
   }
+  return g;
+}
+
+/**
+ * 981 engine air-cleaner element (WM 242419) — long cylindrical cartridge
+ * that slides into the side air-cleaner housing, not a flat panel.
+ * Local +Y = cylinder axis (caller rotates into the housing).
+ */
+export function makeCylindricalAirCleaner({
+  node,
+  r = 0.09,
+  len = 0.42,
+  bodyMat = 'paper',
+  mountMat = 'intake',
+  ringMat = 'rubber',
+}) {
+  const g = group(node);
+  const add = (m) => { g.add(m); return m; };
+  // Pleated cylindrical media
+  add(at(cyl('elementBody', r, r * 0.95, len, bodyMat, 28), 0, 0, 0));
+  // Inner mesh hint
+  add(at(cyl('elementCore', r * 0.45, r * 0.45, len * 0.92, 'steel', 16), 0, 0, 0));
+  // Outer O-ring near mount end
+  add(at(torus('oRingOuter', r * 1.02, 0.012, ringMat, 8, 24), 0, -len * 0.42, 0));
+  // Mounting / end-cap (WM item 3) — open mouth toward scoop
+  add(at(cyl('mounting', r * 1.08, r * 1.12, len * 0.18, mountMat, 24), 0, -len * 0.55, 0));
+  add(at(torus('oRingInner', r * 0.85, 0.01, ringMat, 8, 20), 0, -len * 0.48, 0));
+  // Positioning pegs on end face (WM Fig 2)
+  add(at(cyl('positioningPinA', 0.012, 0.012, 0.04, mountMat, 8), 0, -len * 0.66, r * 0.55));
+  add(at(cyl('positioningPinB', 0.012, 0.012, 0.04, mountMat, 8), 0, -len * 0.66, -r * 0.55));
+  add(at(box('fasteningTab', 0.04, 0.03, 0.02, mountMat), r * 0.7, -len * 0.55, 0));
   return g;
 }
 
