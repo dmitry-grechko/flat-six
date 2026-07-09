@@ -1,0 +1,506 @@
+
+===== PAGE CHUNK 0 =====
+           "Removing"
+
+        3. Loosen tailpipe cover and turn downwards. → 263519 REMOVING AND INSTALLING
+           TAILPIPE COVER - section on "Removing"
+
+
+
+
+WM 263319 REMOVING AND INSTALLING REAR MUFFLER (ALL MODELS) >
+INFORMATION > COMPONENT OVERVIEW > COMPONENT OVERVIEW OF EXHAUST
+SYSTEM
+
+Fig 1: Exploded View Of Rear Silencer With Holder And Tailpipe Cover (Shown Without Exhaust Flaps)
+
+
+
+
+Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+           1 - Rear Silencer Holder
+
+           2 - Clamp
+
+           2A - M8 Fastening Screw
+
+           3 - Fastening Screws For Transmission Bracket, M10
+
+           4 - Silencer, Right
+
+           5 - Silencer, Left
+
+           6 - Clamping Sleeve
+
+           7 - Screw-Type Clamp
+
+           8 - Tailpipe Cover (Twin Tailpipe)
+
+
+===== PAGE CHUNK 1 =====
+         9 - Tailpipe Cover
+
+         10 - Fastening Screws, M8
+
+
+
+
+WM 263319 REMOVING AND INSTALLING REAR MUFFLER (ALL MODELS) >
+REMOVING REAR MUFFLER > REMOVING BOTH REAR SILENCERS
+
+
+      CAUTION: Hot components
+
+       Risk of burns
+
+
+
+→ Let hot components cool down.
+
+→ Wear personal protective gear.
+
+Information
+
+     Treat corroded components with anti-rust agent or heat .
+
+Information
+
+     Some of the repair illustrations show only one side of the vehicle .
+
+     Naturally, some steps also have to be performed on the opposite side of the vehicle as well .
+
+      1. Screw off lock nuts -1- on the two-hole flange.
+
+
+===== PAGE CHUNK 2 =====
+  Fig 1: Identifying Two-Hole Flange Lock Nuts
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+2. Only For Vehicles With Exhaust Flaps:
+
+  Pull off vacuum hose -3- for exhaust flap.
+
+          1. 2.1. Loosen clip -4- .
+
+          2. 2.2. Pull the vacuum hose -3- off the control box -5- .
+
+
+===== PAGE CHUNK 3 =====
+           Fig 2: Identifying Control Box (Shown On 991)
+
+
+
+
+           Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+           Information
+
+              1. The help of another person is required for removing and installing the silencer .
+
+3. Remove both rear silencers.
+
+         1. 3.1. Unscrew fastening screws -3- and counter at the fastening nuts -arrows- .
+
+         2. 3.2. Unscrew and remove fastening screws -2- .
+
+         3. 3.3. Unscrew and remove fastening screw -1- .
+
+         4. 3.4. Remove both rear silencers.
+
+
+===== PAGE CHUNK 4 =====
+      Fig 3: Locating Rear Silencer Holder
+
+
+
+
+      Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+WM 263319 REMOVING AND INSTALLING REAR MUFFLER (ALL MODELS) >
+REMOVING REAR MUFFLER > REPAIR SOLUTION: REPLACING THREADED BOLTS
+ON TWO-HOLE FLANGE
+
+    1. Tap out damaged threaded bolts on the exhaust manifold using a hammer -arrows- .
+
+      Use M8 x 30 screw (Part No. 900.075.365.02) instead of the threaded bolt.
+
+
+===== PAGE CHUNK 5 =====
+         Fig 1: Tapping Out Threaded Bolts On Exhaust Manifold
+
+
+
+
+         Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+WM 263319 REMOVING AND INSTALLING REAR MUFFLER (ALL MODELS) >
+REMOVING REAR MUFFLER > REMOVING ONE REAR SILENCER
+
+
+      CAUTION: Hot components
+
+       Risk of burns
+
+
+
+→ Let hot components cool down.
+
+→ Wear personal protective gear.
+
+Information
+
+     Treat corroded components with anti-rust agent or heat .
+
+      1. Screw off lock nuts -1- on the two-hole flange.
+
+
+===== PAGE CHUNK 6 =====
+  Fig 1: Identifying Two-Hole Flange Lock Nuts
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+2. Only For Vehicles With Exhaust Flaps:
+
+  Pull off vacuum hose -3- for exhaust flap.
+
+          1. 2.1. Loosen clip -4- .
+
+          2. 2.2. Pull the vacuum hose -3- off the control box -5- .
+
+
+===== PAGE CHUNK 7 =====
+  Fig 2: Identifying Control Box (Shown On 991)
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+3. Remove clamp -1- from the rear silencer -3- .
+
+          1. 3.1. Unscrew and remove fastening screw -2- .
+
+          2. 3.2. Remove clamp -1- .
+
+
+===== PAGE CHUNK 8 =====
+      Fig 3: Identifying Clamp On Rear Silencer
+
+
+
+
+      Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+    4. Loosen clamping sleeve and move it onto the rear silencer that is still in the vehicle.
+
+      Information
+
+         1. The help of another person is required for removing and installing the silencer .
+
+    5. Remove rear silencer.
+
+
+
+
+WM 263319 REMOVING AND INSTALLING REAR MUFFLER (ALL MODELS) >
+REMOVING REAR MUFFLER > REPAIR SOLUTION: REPLACING THREADED BOLTS
+ON TWO-HOLE FLANGE
+
+    1. Tap out damaged threaded bolts on the exhaust manifold using a hammer -arrows- .
+
+      Use M8 x 30 screw (Part No. 900.075.365.02) instead of the threaded bolt.
+
+
+===== PAGE CHUNK 9 =====
+         Fig 1: Tapping Out Threaded Bolts On Exhaust Manifold
+
+
+
+
+         Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+WM 263319 REMOVING AND INSTALLING REAR MUFFLER (ALL MODELS) >
+INSTALLING REAR MUFFLER > INSTALLING BOTH REAR SILENCERS
+
+Information
+
+     The help of another person is required for removing and installing the silencer .
+
+Information
+
+     The help of another person is required for removing and installing the silencer .
+
+      1. Install both rear silencers.
+
+                 1. 1.1. Position both rear silencers.
+
+                 2. 1.2. Fit fastening screw -1- and tighten to Tightening torque 23 Nm (17 ft. lbs.) .
+
+                 3. 1.3. Fit fastening screws -2- and tighten to Tightening torque 23 Nm (17 ft. lbs.) .
+
+                 4. 1.4. Fit fastening screws -3- , counter at the fastening nuts -arrows- and tighten to
+                    Tightening torque 23 Nm (17 ft. lbs.) .
+
+
+===== PAGE CHUNK 10 =====
+  Fig 1: Locating Rear Silencer Holder
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+2. Only For Vehicles With Exhaust Flaps:
+
+  Connect vacuum hose -3- for exhaust flap.
+
+          1. 2.1. Attach vacuum hose -3- to the control box -5- .
+
+          2. 2.2. Fasten clamp -4- .
+
+
+===== PAGE CHUNK 11 =====
+  Fig 2: Identifying Control Box (Shown On 991)
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+3. Attach rear silencer to the two-hole flange.
+
+
+===== PAGE CHUNK 12 =====
+  Fig 1: Locating Exhaust Manifold Seal Installation Position
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+2. Install exhaust manifold.
+
+  Information
+
+     1. The seals, fastening screws and lock nuts must always be replaced when removing and
+        installing the exhaust manifold .
+
+          1. 2.1. Position new metal seal on the two-hole flange.
+
+          2. 2.2. Position exhaust manifold -1- .
+
+             Information
+
+                1. The seals, fastening screws and lock nuts must always be replaced when
+                   removing and installing the exhaust manifold .
+
+          3. 2.3. Fit new fastening screws -2- on the exhaust manifold -1- .
+
+          4. 2.4. Fit fastening screw -3- on the vibration balancer.
+
+             Information
+
+                1. The seals, fastening screws and lock nuts must always be replaced when
+
+
+===== PAGE CHUNK 13 =====
+        removing and installing the exhaust manifold .
+  Fig 2: Identifying Exhaust Manifold Screws (View Of Cyl. 1-3)
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+5. 2.5. Fit new lock nuts -1- on the two-hole flange.
+
+
+===== PAGE CHUNK 14 =====
+  Fig 3: Identifying Two-Hole Flange On Exhaust Manifold
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+6. 2.6. Tighten new fastening screws according to the specified tightening sequence -1
+   to 9- to Tightening Torque 30 Nm (22 ft. lbs.) .
+
+
+===== PAGE CHUNK 15 =====
+  Fig 4: Exhaust Manifold Bolt Tightening Sequence
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+7. 2.7. Tighten new lock nuts -1- on the two-hole flange to Tightening Torque 23 Nm
+   (17 ft. lbs.) .
+
+
+===== PAGE CHUNK 16 =====
+  Fig 5: Tightening Two-Hole Flange Lock Nuts On Exhaust Manifold
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+8. 2.8. Tighten fastening screw -3- on the vibration balancer to Tightening Torque 23
+   Nm (17 ft. lbs.) .
+
+
+===== PAGE CHUNK 17 =====
+                  Fig 6: Identifying Exhaust Manifold Screws (View Of Cyl. 1-3)
+
+
+
+
+                  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+WM 261019 REMOVING AND INSTALLING EXHAUST MANIFOLD WITH CATALYTIC
+CONVERTER (ALL MODELS) > SUBSEQUENT WORK
+
+Information
+
+     The connecting cable can be turned by up to four turns when removing the oxygen sensors .
+
+     Also loosen the cable attachments at the cable ducts on the cylinder head .
+
+      1. Install oxygen sensors.
+
+         → 246919 REMOVING AND INSTALLING OXYGEN SENSOR UPSTREAM OF CATALYTIC
+         CONVERTER .
+
+         → 247319 REMOVING AND INSTALLING OXYGEN SENSOR DOWNSTREAM OF CATALYTIC
+         CONVERTER .
+
+                1. 1.1. Grease thread of oxygen sensors with "Optimol Paste MF" (Part No. 000.043.
+                   207.07) before refitting them.
+
+                2. 1.2. Turn each oxygen sensor cable anti-clockwise by four turns and screw in oxygen
+                   sensor by hand.
+
+
+===== PAGE CHUNK 18 =====
+                 3. 1.3. Clip oxygen sensor cables onto the relevant holder.
+
+       2. Secure oxygen sensors using the prescribed tool.
+
+       3. Install support plate. → 421419 REMOVING AND INSTALLING SUPPORT PLATE - section on
+          "Installing"
+
+
+
+
+WM 263319 REMOVING AND INSTALLING REAR MUFFLER (ALL MODELS) >
+TECHNICAL VALUES
+
+                                                                       Basic        Tolerance   Tolerance
+            Location                Description            Type
+                                                                       value            1           2
+
+Exhaust manifold to rear        Collar nut, M8 -     Tightening     23 Nm (17
+silencer                        replace              torque            ft. lbs.)
+
+Holder for rear silencer to     Hexagon-head         Tightening     23 Nm (17
+transmission bracket            bolts, M8            torque            ft. lbs.)
+
+                                External Torx        Tightening      15 Nm (11
+Clamp on rear silencer
+                                screw, M8            torque             ft. lbs.)
+
+
+
+
+WM 263319 REMOVING AND INSTALLING REAR MUFFLER (ALL MODELS) >
+PRELIMINARY WORK
+
+
+      WARNING: Vehicle can fall down
+
+        Risk of squashing or crushing
+
+        Risk of damage to the vehicle
+
+
+
+→ Do not place any solid objects under the raised vehicle.
+
+→ Ensure that the lifting platform is prevented from lowering.
+
+→ Remove solid objects before lowering the vehicle.
+
+→ Raise the vehicle only at the jacking points provided.
+
+→ The outer jacking points should be used primarily.
+
+Only for both rear silencers:
+
+       1. Remove rear wheels. → 440519 REMOVING AND INSTALLING WHEEL - section on
+          "Removing"
+
+         Only for one rear silencer:
+
+       2. Remove rear wheel. → 440519 REMOVING AND INSTALLING WHEEL - section on
+

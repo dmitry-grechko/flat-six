@@ -3,6 +3,13 @@
 // coolant lines the length of the chassis back to the rear engine, where the
 // water pumps, thermostat, oil cooler, PDK cooler and expansion tank live.
 //
+// WM geometry refs (factory CAD figures):
+//   - Radiator module overview ~4174 (WM 197019 Fig 1): corner module ahead of
+//     front wheel, angled outboard, fan on rear face, mounts top/bottom.
+//   - Electric fan WM 190819 (~4083–4084): A/C condenser stacked on rad face;
+//     vertical side air guide flush to core; 5-blade fan in deep square shroud.
+//   - Middle radiator ~4198 (WM 198019 Fig 1): low centre rad + front air guide.
+//
 // Coordinate frame: +Z = front, -Z = rear, +Y = up, +X = right. The root group
 // stays named 'coolingRadiator' (the app + manifest reference this name). Every
 // PRIMARY part from cooling-parts.json is exposed as a child mesh/group whose
@@ -20,30 +27,51 @@ export const meta = {
 
 const HALF = Math.PI / 2;
 
-// Build one finned radiator core + alloy end tanks into a named group.
+// Corner radiator: taller-than-wide core, vertical L/R side tanks (WM ~4174 /
+// 190819), thin top/bottom headers kept for hose attach points.
+// Middle / secondary (sub=true): wider-than-tall, low centre unit (WM ~4198).
 function radiatorUnit(name, sub = false) {
   const g = group(name);
   const add = (m) => { g.add(m); return m; };
-  // dark finned core
-  add(at(box('core', 1.2, 1.2, 0.16, 'core'), 0, 0, 0));
-  for (let i = 0; i < 8; i++) {
-    add(at(box(`${name}_fin_${i}`, 0.015, 1.1, 0.18, 'tank'), -0.5 + i * 0.14, 0, 0.01));
+
+  const w = sub ? 1.55 : 1.0;
+  const h = sub ? 0.72 : 1.35;
+  const d = sub ? 0.14 : 0.16;
+  const tankW = 0.14;
+  const headerH = 0.1;
+
+  add(at(box('core', w, h, d, 'core'), 0, 0, 0));
+  const finCount = sub ? 10 : 8;
+  const finSpan = w * 0.82;
+  const finStart = -finSpan / 2;
+  const finStep = finSpan / (finCount - 1);
+  for (let i = 0; i < finCount; i++) {
+    add(at(box(`${name}_fin_${i}`, 0.015, h * 0.9, d + 0.02, 'tank'), finStart + i * finStep, 0, 0.01));
   }
-  // alloy end tanks top/bottom
-  add(at(box('tankTop', 1.28, 0.16, 0.2, 'tank'), 0, 0.66, 0));
-  add(at(box('tankBottom', 1.28, 0.16, 0.2, 'tank'), 0, -0.66, 0));
+
+  // Vertical side tanks (primary CAD read on corner + middle rads).
+  add(at(box('tankLeft', tankW, h + 0.06, d + 0.04, 'tank'), -(w / 2 + tankW / 2), 0, 0));
+  add(at(box('tankRight', tankW, h + 0.06, d + 0.04, 'tank'), w / 2 + tankW / 2, 0, 0));
+  // Thin top/bottom headers (hose / mount faces).
+  add(at(box('tankTop', w + tankW * 2, headerH, d + 0.04, 'tank'), 0, h / 2 + headerH / 2, 0));
+  add(at(box('tankBottom', w + tankW * 2, headerH, d + 0.04, 'tank'), 0, -(h / 2 + headerH / 2), 0));
   return g;
 }
 
-// Build an electric fan assembly (shroud + hub + a few blades) into a group.
+// Electric fan (WM 190819 Fig 7 / ~4084): 5 blades, deep square shroud,
+// circular opening implied by hub + blades + ring.
 function fanUnit(name) {
   const g = group(name);
   const add = (m) => { g.add(m); return m; };
-  add(at(box('shroud', 1.1, 1.1, 0.12, 'plastic'), 0, 0, 0));
-  add(rot(at(cyl('hub', 0.14, 0.14, 0.16, 'cover', 14), 0, 0, -0.08), HALF, 0, 0));
-  for (let i = 0; i < 6; i++) {
-    const a = (i / 6) * Math.PI * 2;
-    add(rot(at(box(`blade_${i}`, 0.42, 0.12, 0.03, 'cover'), Math.cos(a) * 0.34, Math.sin(a) * 0.34, -0.08), 0, 0, a));
+  // Deep square shroud frame (CAD has noticeable depth).
+  add(at(box('shroud', 1.15, 1.15, 0.24, 'plastic'), 0, 0, 0));
+  // Circular opening ring on the rear face.
+  add(rot(at(cyl('shroudRing', 0.48, 0.48, 0.04, 'plastic', 24), 0, 0, -0.1), HALF, 0, 0));
+  add(rot(at(cyl('hub', 0.14, 0.14, 0.18, 'cover', 14), 0, 0, -0.1), HALF, 0, 0));
+  const blades = 5;
+  for (let i = 0; i < blades; i++) {
+    const a = (i / blades) * Math.PI * 2;
+    add(rot(at(box(`blade_${i}`, 0.44, 0.14, 0.03, 'cover'), Math.cos(a) * 0.32, Math.sin(a) * 0.32, -0.1), 0, 0, a));
   }
   return g;
 }
@@ -57,12 +85,21 @@ export function build() {
   // ---------------------------------------------------------------------------
   const RZ = 2.2;          // front radiator plane (z)
   const LX = -1.6, RX = 1.6; // left / right corner x
-  // Factory mounting (WM 197019 Fig 1): each corner radiator is ANGLED so its
-  // face points forward-outboard into the corner air inlet (~35°). Fans sit
-  // behind the core along the rotated normal.
+  // Factory mounting (WM ~4174 / 197019 Fig 1): each corner radiator is ANGLED
+  // so its face points forward-outboard into the corner air inlet (~35°). Fans
+  // sit behind the core along the rotated normal.
   const YAW = 0.6; // ≈35°; left = -YAW, right = +YAW
-  const NX = Math.sin(YAW) * 0.2, NZ = Math.cos(YAW) * 0.2;   // fan offset (0.20 behind)
-  const FX = Math.sin(YAW) * 0.34, FZ = Math.cos(YAW) * 0.34; // left fan node (0.34 behind)
+  const NX = Math.sin(YAW) * 0.22, NZ = Math.cos(YAW) * 0.22;   // fan offset (behind)
+  const FX = Math.sin(YAW) * 0.36, FZ = Math.cos(YAW) * 0.36; // left fan node (further behind)
+
+  // Corner core half-extents (must match radiatorUnit defaults above).
+  const CORE_W = 1.0;
+  const CORE_H = 1.35;
+  const SIDE_TANK_W = 0.14;
+  const HEADER_H = 0.1;
+  const CORE_HALF_W = CORE_W / 2 + SIDE_TANK_W; // outer face of side tank
+  const CORE_TOP_Y = CORE_H / 2 + HEADER_H;     // top header outer face
+  const CORE_BOT_Y = -(CORE_H / 2 + HEADER_H);
 
   // PRIMARY: both front radiators. The JSON has a single combined node for the
   // pair, so this group spans both corners; the two cores live inside it.
@@ -80,23 +117,37 @@ export function build() {
   // PRIMARY: dedicated left electric fan node (distinct from the module pair).
   add(rot(at(fanUnit('radiatorFanLeft'), LX + FX, 0, RZ - FZ), 0, -YAW, 0));
 
-  // SUB: secondary / centre radiator + its fan, between the corners.
-  add(at(radiatorUnit('radiatorFanSecondary', true), 0, -0.1, RZ + 0.05));
+  // SUB: secondary / centre radiator (WM ~4198) — wider, shorter, lower, forward.
+  add(at(radiatorUnit('radiatorFanSecondary', true), 0, -0.38, RZ + 0.12));
 
-  // SUB: air guides flanking the radiators (angled with the cores).
-  add(rot(at(box('radiatorAirGuideLeft', 0.2, 1.3, 0.5, 'plastic'), LX - 0.6, 0, RZ + 0.25), 0, -YAW, 0));
-  add(rot(at(box('radiatorAirGuideRight', 0.2, 1.3, 0.5, 'plastic'), RX + 0.6, 0, RZ + 0.25), 0, YAW, 0));
+  // SUB: vertical side air guides flush to the outboard edge of each core
+  // (WM 190819 ~4083 blue highlight), not distant plates. Offset along the
+  // rotated local axes so the panel sits against the side tank.
+  const GUIDE_W = 0.12;
+  const GUIDE_H = CORE_H + 0.12;
+  const GUIDE_D = 0.42;
+  const guideLocalX = CORE_HALF_W + GUIDE_W / 2;
+  // Left (yaw = -YAW): local -X is outboard.
+  const lGuideX = LX - guideLocalX * Math.cos(YAW);
+  const lGuideZ = RZ - guideLocalX * Math.sin(YAW);
+  // Right (yaw = +YAW): local +X is outboard.
+  const rGuideX = RX + guideLocalX * Math.cos(YAW);
+  const rGuideZ = RZ - guideLocalX * Math.sin(YAW);
+  add(rot(at(box('radiatorAirGuideLeft', GUIDE_W, GUIDE_H, GUIDE_D, 'plastic'), lGuideX, 0, lGuideZ), 0, -YAW, 0));
+  add(rot(at(box('radiatorAirGuideRight', GUIDE_W, GUIDE_H, GUIDE_D, 'plastic'), rGuideX, 0, rGuideZ), 0, YAW, 0));
 
-  // SUB: A/C condenser thin panel ahead of the right radiator + its air guide,
-  // stacked along the rotated face normal.
-  add(rot(at(box('acCondenser', 1.1, 1.05, 0.08, 'plastic'), RX + Math.sin(YAW) * 0.18, 0, RZ + Math.cos(YAW) * 0.18), 0, YAW, 0));
-  add(rot(at(box('acCondenserAirGuide', 1.15, 1.1, 0.06, 'plastic'), RX + Math.sin(YAW) * 0.26, 0, RZ + Math.cos(YAW) * 0.26), 0, YAW, 0));
+  // SUB: A/C condenser — thin stacked panel ahead of the right radiator along
+  // the face normal (WM 190819 ~4083), plus its air guide slightly further out.
+  const condOff = 0.14;
+  const condGuideOff = 0.2;
+  add(rot(at(box('acCondenser', 0.95, 1.2, 0.06, 'plastic'), RX + Math.sin(YAW) * condOff, 0, RZ + Math.cos(YAW) * condOff), 0, YAW, 0));
+  add(rot(at(box('acCondenserAirGuide', 1.0, 1.25, 0.05, 'plastic'), RX + Math.sin(YAW) * condGuideOff, 0, RZ + Math.cos(YAW) * condGuideOff), 0, YAW, 0));
 
   // SUB: fan control module — a box near the left fan.
   add(at(box('fanControlModule', 0.26, 0.2, 0.12, 'cover'), LX + 0.55, -0.5, RZ - 0.3));
 
-  // SUB: radiator-outlet coolant temp sensor on the left radiator bottom tank.
-  add(rot(at(cyl('coolantTempSensorRadiatorOutlet', 0.04, 0.04, 0.12, 'steel', 10), LX + 0.55, -0.66, RZ), HALF, 0, 0));
+  // SUB: radiator-outlet coolant temp sensor on the left radiator bottom header.
+  add(rot(at(cyl('coolantTempSensorRadiatorOutlet', 0.04, 0.04, 0.12, 'steel', 10), LX + 0.45, CORE_BOT_Y, RZ), HALF, 0, 0));
 
   // ---------------------------------------------------------------------------
   // REAR / ENGINE BAY — pumps, thermostat, oil + PDK coolers, reservoir
@@ -145,12 +196,12 @@ export function build() {
   // ---------------------------------------------------------------------------
   // PRIMARY: upper radiator hose — engine outlet up to top of right radiator.
   add(tube('upperRadiatorHose', [
-    [0.25, 0.34, EZ + 0.1], [0.6, 0.5, 0.2], [1.0, 0.4, 1.2], [RX, 0.66, RZ],
+    [0.25, 0.34, EZ + 0.1], [0.6, 0.5, 0.2], [1.0, 0.4, 1.2], [RX, CORE_TOP_Y, RZ],
   ], 0.06, 'hose'));
 
   // PRIMARY: lower radiator hose — bottom of left radiator back to pump inlet.
   add(tube('lowerRadiatorHose', [
-    [LX, -0.66, RZ], [-1.0, -0.5, 1.2], [-0.6, -0.4, 0.2], [-0.45, -0.3, EZ + 0.1],
+    [LX, CORE_BOT_Y, RZ], [-1.0, -0.5, 1.2], [-0.6, -0.4, 0.2], [-0.45, -0.3, EZ + 0.1],
   ], 0.06, 'hose'));
 
   // PRIMARY: coolant hoses (the upper+lower circuit pair as a named group).
@@ -192,7 +243,7 @@ export function build() {
     [-0.42, 0.42, EZ + 0.2], [-0.2, 0.3, EZ + 0.1], [0.1, 0.25, EZ + 0.1],
   ], 0.03, 'hose'));
   add(tube('breatherLine', [
-    [RX, 0.66, RZ], [0.5, 0.6, 0.8], [-0.45, 0.55, EZ + 0.25],
+    [RX, CORE_TOP_Y, RZ], [0.5, 0.6, 0.8], [-0.45, 0.55, EZ + 0.25],
   ], 0.02, 'hose'));
 
   // SUB: bleeder screw (high point) + block drain plug (low).

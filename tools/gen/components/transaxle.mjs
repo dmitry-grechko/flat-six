@@ -7,15 +7,22 @@
 // Coordinates (matching the app hotspot convention):
 //   +Z = FRONT, toward the engine (bell-housing / clutch end)
 //   -Z = REAR (tail / end cover)
-//   +Y = up, -Y = down (oil pan / sump lives at the bottom)
+//   +Y = up, -Y = down (ATF pan / electrohydraulic lives at the bottom)
 //   +X = right, -X = left (output flanges / driveshafts exit the sides)
+//
+// Tier A silhouette (981 WM):
+//   - Bellhousing bolt face / ears: WM 373419 Fig 8 / Fig 2 (p5814, p5817)
+//   - Stepped ribbed case + ATF pan underside: WM 375519 (p5842–p5845)
+//   - Electrohydraulic under pan: WM 375519 Fig 1 intake (p5844)
+//   - Dynamic hydro-mount + bracket: WM 374019 (p5832–p5836)
+//   - PDK TCU body-side install: WM 373019 Fig 1–3 (p5794–p5798)
 //
 // Internal rotating parts (input shafts, lay shafts, gear sets, synchros,
 // selector forks) are placed along the central case axis so their pins land on
 // the case body where the real part sits inside.
 
 import {
-  group, box, roundBox, cyl, cylArc, capsule, torus, torusArc, tube, sphere, at, rot,
+  group, box, roundBox, cyl, torus, torusArc, tube, sphere, at, rot,
 } from '../lib/primitives.mjs';
 
 export const meta = {
@@ -37,50 +44,127 @@ export function build() {
   const add = (m, p = trans) => { p.add(m); return m; };
 
   // ====================================================================
-  // MAIN CASE — keep the existing good case shape.
+  // MAIN CASE — stepped dual-clutch casting (not a single gear box).
+  // WM 373419 / 375519: bell → clutch barrel → gear case → tail / end cover;
+  // dense structural ribs; final-drive bulge low between output flanges.
   // ====================================================================
 
-  // bell housing (engine end) — large conical/cylindrical alloy mass
-  add(rot(at(cyl('bellHousing', 1.35, 1.05, 0.9, 'alu', 32), 0, 0, 1.1), HALF_PI, 0, 0));
-  // mounting flange ring to engine
-  add(rot(at(torus('bellFlange', 1.32, 0.09, 'aluDark', 10, 32), 0, 0, 1.55), 0, 0, 0));
+  // bell housing (engine end, +Z) — large conical/cylindrical alloy mass
+  add(rot(at(cyl('bellHousing', 1.38, 1.12, 0.95, 'alu', 36), 0, 0.02, 1.12), HALF_PI, 0, 0));
+  // mounting flange ring to engine (WM bolt face)
+  add(rot(at(torus('bellFlange', 1.34, 0.1, 'aluDark', 10, 36), 0, 0.02, 1.58), 0, 0, 0));
+  // flange mounting ears at ~12 / 3 / 5 / 7 / 9 o'clock (WM 373419 Fig 8 bolts 1–5)
+  const earAngles = [
+    [Math.PI * 0.5, 'Top'],           // 12:00 bolt 4
+    [0, 'R'],                         // 3:00 bolt 5
+    [-Math.PI * 0.35, 'BR'],          // ~5:00 bolt 2
+    [Math.PI + Math.PI * 0.35, 'BL'], // ~7:00 bolt 1
+    [Math.PI, 'L'],                   // 9:00 bolt 3
+  ];
+  for (const [ang, tag] of earAngles) {
+    const ex = Math.cos(ang) * 1.28;
+    const ey = Math.sin(ang) * 1.28;
+    add(at(roundBox(`bellEar_${tag}`, 0.28, 0.22, 0.14, 'aluDark'), ex, ey + 0.02, 1.55));
+    add(rot(at(cyl(`bellEarBoss_${tag}`, 0.07, 0.07, 0.08, 'bolt', 10), ex, ey + 0.02, 1.62), HALF_PI, 0, 0));
+  }
 
-  // main gearbox case — the big alloy gear case (gearCase node)
-  add(at(box('gearCase', 1.7, 1.6, 1.6, 'alu'), 0, -0.05, 0.05));
-  // tail taper toward rear
-  add(rot(at(cyl('tailCase', 0.55, 0.9, 1.1, 'alu', 24), 0, -0.1, -1.0), HALF_PI, 0, 0));
+  // gearCase — PRIMARY: stepped main alloy shell (clutch step + mid case + rear step)
+  const gearCase = group('gearCase');
+  // mid gear case (taller, slightly wider)
+  add(at(roundBox('gearCase_mid', 1.72, 1.55, 1.35, 'alu', 4), 0, -0.02, 0.05), gearCase);
+  // clutch-end step (wider barrel just behind bell)
+  add(at(roundBox('gearCase_clutchStep', 1.85, 1.48, 0.55, 'alu', 4), 0, 0.0, 0.72), gearCase);
+  // rear step toward end cover
+  add(at(roundBox('gearCase_rearStep', 1.35, 1.25, 0.55, 'alu', 4), 0, -0.08, -0.72), gearCase);
+  // upper casting shoulder
+  add(at(roundBox('gearCase_topShoulder', 1.45, 0.35, 1.1, 'aluDark', 3), 0, 0.72, 0.05), gearCase);
+  add(gearCase);
+
+  // tail taper toward rear (-Z)
+  add(rot(at(cyl('tailCase', 0.48, 0.78, 0.95, 'alu', 28), 0, -0.12, -1.15), HALF_PI, 0, 0));
   // final-drive / differential housing (bulge low between the output flanges)
   add(rot(at(cyl('finalDrive', 0.62, 0.62, 0.95, 'alu', 28), 0, -0.42, -0.2), 0, 0, HALF_PI));
-  add(at(box('rearMount', 0.7, 0.7, 0.4, 'aluDark'), 0, -0.1, -1.6));
 
-  // ribbed casting detail down the case sides
-  for (let i = 0; i < 5; i++) {
-    const z = 0.7 - i * 0.34;
-    add(at(box(`ribR_${i}`, 0.06, 1.3, 0.12, 'aluDark'), 0.88, -0.05, z));
-    add(at(box(`ribL_${i}`, 0.06, 1.3, 0.12, 'aluDark'), -0.88, -0.05, z));
+  // rearMount — PRIMARY: dynamic hydro-mount + transmission bracket (WM 374019)
+  // Cylindrical ribbed mount + Y/L bracket with lightening holes (p5832–p5836).
+  const rearMount = group('rearMount');
+  // hydro-mount body (radial cooling ribs)
+  add(at(cyl('rearMount_body', 0.28, 0.32, 0.42, 'rubber', 24), 0, 0.28, 0), rearMount);
+  add(at(cyl('rearMount_dome', 0.22, 0.26, 0.14, 'rubber', 20), 0, 0.52, 0), rearMount);
+  for (let i = 0; i < 10; i++) {
+    const a = (i / 10) * Math.PI * 2;
+    add(at(box(`rearMount_rib_${i}`, 0.04, 0.32, 0.08, 'cast'),
+      Math.cos(a) * 0.3, 0.28, Math.sin(a) * 0.3), rearMount);
+  }
+  // electrical plug boss (dynamic unit mount)
+  add(at(roundBox('rearMount_plug', 0.14, 0.1, 0.12, 'cover'), 0.34, 0.38, 0), rearMount);
+  // transmission bracket / console — vertical flange + arm with lightening holes
+  const console = group('pdkTransaxleMountConsole');
+  add(at(box('pdkTransaxleMountConsole_flange', 0.12, 0.55, 0.42, 'aluDark'), -0.55, 0.05, 0), console);
+  add(at(box('pdkTransaxleMountConsole_arm', 0.55, 0.12, 0.32, 'aluDark'), -0.22, -0.12, 0), console);
+  add(at(cyl('pdkTransaxleMountConsole_hole1', 0.08, 0.08, 0.14, 'cast', 12), -0.35, -0.12, 0), console);
+  add(at(cyl('pdkTransaxleMountConsole_hole2', 0.06, 0.06, 0.14, 'cast', 10), -0.18, -0.12, 0.08), console);
+  add(at(cyl('pdkTransaxleMountConsole_seat', 0.18, 0.18, 0.1, 'alu', 16), 0, -0.12, 0), console);
+  // stud nut under bracket (WM callout A)
+  add(at(cyl('rearMount_nut', 0.08, 0.08, 0.06, 'bolt', 8), 0, -0.22, 0), rearMount);
+  add(at(console, 0, 0, 0), rearMount);
+  add(at(rearMount, 0, 0.15, -1.72));
+
+  // Structural casting ribs — vertical side ribs + cross-grid near mount (WM 5833)
+  for (let i = 0; i < 6; i++) {
+    const z = 0.85 - i * 0.32;
+    add(at(box(`ribR_${i}`, 0.07, 1.35, 0.1, 'aluDark'), 0.9, -0.05, z));
+    add(at(box(`ribL_${i}`, 0.07, 1.35, 0.1, 'aluDark'), -0.9, -0.05, z));
+  }
+  // horizontal cross ribs (square-grid look on case sides)
+  for (let i = 0; i < 4; i++) {
+    const y = 0.45 - i * 0.32;
+    add(at(box(`ribXR_${i}`, 0.05, 0.08, 1.5, 'aluDark'), 0.92, y, 0.05));
+    add(at(box(`ribXL_${i}`, 0.05, 0.08, 1.5, 'aluDark'), -0.92, y, 0.05));
   }
   // top ribs
-  for (let i = 0; i < 4; i++) {
-    add(at(box(`ribTop_${i}`, 1.4, 0.07, 0.1, 'aluDark'), 0, 0.78, 0.55 - i * 0.34));
+  for (let i = 0; i < 5; i++) {
+    add(at(box(`ribTop_${i}`, 1.5, 0.06, 0.09, 'aluDark'), 0, 0.82, 0.6 - i * 0.3));
   }
 
   // ====================================================================
-  // PDK HOUSING — main bellhousing/case, rear end cover, lower oil pan/sump.
+  // PDK HOUSING — bellhousing band, rear end cover, ATF pan (lower sump).
+  // WM 375519: shield-shaped pan with perimeter lip + underside cooling ribs;
+  // electrohydraulic control sits above the pan (intake snorkel interface).
   // ====================================================================
 
-  // pdkBellhousing — main structural PDK case shell wrapping the clutch end.
-  // A ribbed cylindrical band just behind the bell housing, on the case body.
-  add(rot(at(cyl('pdkBellhousing', 0.92, 0.92, 0.5, 'aluDark', 32), 0, 0.0, 0.62), HALF_PI, 0, 0));
+  // pdkBellhousing — ribbed cylindrical band just behind the bell (clutch case)
+  add(rot(at(cyl('pdkBellhousing', 0.98, 0.98, 0.55, 'aluDark', 36), 0, 0.0, 0.58), HALF_PI, 0, 0));
+  // circumferential stiffening ribs on clutch band
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * Math.PI * 2;
+    add(at(box(`pdkBellRib_${i}`, 0.06, 0.55, 0.1, 'cast'),
+      Math.cos(a) * 1.0, Math.sin(a) * 1.0, 0.58));
+  }
 
-  // pdkEndCover — rear closing plate at the tail end (-Z face).
-  add(rot(at(cyl('pdkEndCover', 0.58, 0.58, 0.14, 'aluDark', 28), 0, -0.1, -1.52), HALF_PI, 0, 0));
+  // pdkEndCover — rear closing plate at the tail end (-Z face)
+  add(rot(at(cyl('pdkEndCover', 0.55, 0.55, 0.16, 'aluDark', 28), 0, -0.12, -1.58), HALF_PI, 0, 0));
+  add(rot(at(torus('pdkSeal1', 0.52, 0.03, 'rubber', 8, 24), 0, -0.12, -1.5), 0, 0, 0));
 
-  // pdkOilPan — LOWER SUMP. Shallow pan at the very BOTTOM of the case, the
-  // lowest visible element. Service item removed for every fluid change.
+  // pdkOilPan — LOWER SUMP. Shield / home-plate footprint (WM 375519 Fig 1).
+  // Wider toward rear of pan face, perimeter lip, underside cooling ribs.
   const oilPan = group('pdkOilPan');
-  add(roundBox('pdkOilPan_body', 1.55, 0.3, 1.55, 'aluDark'), oilPan);
-  add(at(box('pdkOilPan_lip', 1.62, 0.06, 1.62, 'alu'), 0, 0.15, 0), oilPan);
-  add(at(oilPan, 0, -0.92, 0.0));
+  // main pan body — slightly tapered (wider at -Z / rear of pan)
+  add(at(roundBox('pdkOilPan_body', 1.45, 0.28, 1.35, 'aluDark', 3), 0, 0, 0.05), oilPan);
+  add(at(roundBox('pdkOilPan_rearWiden', 1.58, 0.26, 0.55, 'aluDark', 3), 0, -0.01, -0.45), oilPan);
+  // perimeter mounting lip / flange
+  add(at(box('pdkOilPan_lip', 1.68, 0.05, 1.55, 'alu'), 0, 0.14, 0.0), oilPan);
+  // underside cooling ribs (WM 5842 / 5843)
+  for (let i = 0; i < 7; i++) {
+    add(at(box(`pdkOilPan_rib_${i}`, 1.35, 0.04, 0.07, 'cast'), 0, -0.16, 0.5 - i * 0.16), oilPan);
+  }
+  // perimeter sump bolts (visual; PRIMARY remains pdkOilPan)
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * Math.PI * 2;
+    add(at(cyl(`pdkSumpBolt_${i}`, 0.035, 0.035, 0.05, 'bolt', 8),
+      Math.cos(a) * 0.72, 0.16, Math.sin(a) * 0.65), oilPan);
+  }
+  add(at(oilPan, 0, -0.95, 0.05));
 
   // ====================================================================
   // DUAL CLUTCH — concentric wet clutch pack, actuator, torsional damper.
@@ -145,34 +229,38 @@ export function build() {
   add(forks);
 
   // ====================================================================
-  // HYDRAULIC CONTROL — valve body, solenoids, pump, filter, temp sensor,
-  // heat exchanger + hoses, pressure/return lines.
+  // HYDRAULIC CONTROL — electrohydraulic under ATF pan (WM 375519 p5844).
+  // Valve body + solenoid bank + intake duct sit in the sump cavity;
+  // heat exchanger / pump remain on the case exterior.
   // ====================================================================
 
-  // pdkValveBody — central valve body / HCU. Detailed block on top of the case.
+  // pdkValveBody — HCU plate stack in the ATF pan cavity (underside packaging).
   const valveBody = group('pdkValveBody');
-  add(roundBox('pdkValveBody_body', 0.95, 0.28, 1.0, 'aluDark'), valveBody);
+  add(roundBox('pdkValveBody_body', 1.15, 0.22, 1.05, 'aluDark', 3), valveBody);
   // channel / casting detail on the valve body face
-  for (let i = 0; i < 4; i++) {
-    add(at(box(`pdkValveBody_ch_${i}`, 0.85, 0.04, 0.06, 'cast'), 0, 0.16, 0.36 - i * 0.24), valveBody);
+  for (let i = 0; i < 5; i++) {
+    add(at(box(`pdkValveBody_ch_${i}`, 1.0, 0.035, 0.05, 'cast'), 0, 0.12, 0.4 - i * 0.2), valveBody);
   }
-  add(at(valveBody, 0.05, 0.86, -0.1));
+  // intake duct / snorkel seat (WM 5844 blue callout)
+  add(at(cyl('pdkValveBody_intake', 0.12, 0.12, 0.08, 'alu', 16), 0.25, -0.12, 0.1), valveBody);
+  add(at(valveBody, 0.0, -0.68, 0.05));
 
-  // pdkShiftSolenoids — row of proportional solenoids on the valve body.
+  // pdkShiftSolenoids — row along one edge of the electrohydraulic unit (WM 5844).
   const solenoids = group('pdkShiftSolenoids');
-  for (let i = 0; i < 6; i++) {
-    add(rot(at(cyl(`pdkShiftSolenoids_${i}`, 0.06, 0.06, 0.2, 'steel', 14), -0.32 + i * 0.13, 0.0, 0.0), HALF_PI, 0, 0), solenoids);
+  for (let i = 0; i < 7; i++) {
+    add(rot(at(cyl(`pdkShiftSolenoids_${i}`, 0.055, 0.055, 0.18, 'steel', 14),
+      -0.42 + i * 0.14, 0.0, 0.0), HALF_PI, 0, 0), solenoids);
   }
-  add(at(solenoids, 0.05, 1.05, 0.32));
+  add(at(solenoids, 0.0, -0.55, -0.42));
 
   // pdkFluidPump — small electric oil pump cylinder on the case side.
-  add(rot(at(cyl('pdkFluidPump', 0.2, 0.2, 0.3, 'aluDark', 20), -0.92, -0.45, 0.5), 0, 0, HALF_PI));
+  add(rot(at(cyl('pdkFluidPump', 0.2, 0.2, 0.3, 'aluDark', 20), -0.95, -0.35, 0.45), 0, 0, HALF_PI));
 
-  // pdkFluidFilter — fluid filter / strainer inside-near the oil pan.
-  add(at(box('pdkFluidFilter', 0.7, 0.1, 0.7, 'plastic'), 0, -0.78, 0.0));
+  // pdkFluidFilter — strainer integrated with ATF pan (WM: filter replaced with pan).
+  add(at(roundBox('pdkFluidFilter', 0.75, 0.1, 0.65, 'plastic', 2), 0, -0.82, 0.15));
 
-  // pdkFluidTempSensor — small NTC sensor on the case/valve body.
-  add(rot(at(cyl('pdkFluidTempSensor', 0.05, 0.05, 0.16, 'steel', 12), 0.55, 0.78, -0.4), HALF_PI, 0, 0));
+  // pdkFluidTempSensor — small NTC sensor on the case side near the pan lip.
+  add(rot(at(cyl('pdkFluidTempSensor', 0.05, 0.05, 0.16, 'steel', 12), 0.72, -0.55, -0.35), 0, 0, HALF_PI));
 
   // pdkHeatExchanger — finned oil-to-water cooler block on the case side.
   const cooler = group('pdkHeatExchanger');
@@ -180,32 +268,31 @@ export function build() {
   for (let i = 0; i < 8; i++) {
     add(at(box(`pdkHeatExchanger_fin_${i}`, 0.26, 0.62, 0.04, 'alu'), 0, 0, 0.35 - i * 0.1), cooler);
   }
-  add(at(cooler, 0.98, 0.2, 0.4));
+  add(at(cooler, 0.98, 0.15, 0.35));
 
-  // pdkOilPressureLine + pdkOilReturnLine — sub parts, but build them as named
-  // lines so they show up (sub coverage bonus). Pressure line: pump -> valve body.
+  // pdkOilPressureLine + pdkOilReturnLine — pump ↔ valve body (now underside).
   add(tube('pdkOilPressureLine', [
-    [-0.92, -0.45, 0.5], [-0.6, 0.2, 0.4], [-0.2, 0.7, 0.0], [0.0, 0.82, -0.1],
+    [-0.95, -0.35, 0.45], [-0.55, -0.45, 0.25], [-0.2, -0.6, 0.1], [0.0, -0.68, 0.05],
   ], 0.03, 'steel', 24, 8));
   add(tube('pdkOilReturnLine', [
-    [0.4, 0.82, -0.3], [0.2, 0.3, -0.4], [0.0, -0.4, -0.2], [0.0, -0.78, 0.0],
+    [0.35, -0.68, -0.2], [0.2, -0.5, -0.15], [0.0, -0.75, 0.0], [0.0, -0.82, 0.15],
   ], 0.03, 'steel', 24, 8));
 
   // cooler hoses (sub parts) running from the heat exchanger.
   add(tube('pdkCoolHose1', [
-    [0.98, 0.4, 0.7], [1.1, 0.6, 0.9], [1.2, 0.9, 1.1],
+    [0.98, 0.35, 0.65], [1.1, 0.55, 0.85], [1.2, 0.85, 1.05],
   ], 0.05, COOLANT, 20, 8));
   add(tube('pdkCoolHose2', [
-    [0.98, 0.0, 0.7], [1.15, -0.2, 0.95], [1.25, -0.5, 1.1],
+    [0.98, -0.05, 0.65], [1.15, -0.25, 0.9], [1.25, -0.5, 1.05],
   ], 0.05, COOLANT, 20, 8));
   add(tube('pdkCoolHose3', [
-    [0.98, 0.2, 0.05], [0.7, -0.2, -0.1], [0.3, -0.7, -0.1],
+    [0.98, 0.15, 0.0], [0.7, -0.25, -0.1], [0.3, -0.65, -0.05],
   ], 0.045, FLUID, 20, 8));
   add(tube('pdkMoldedHose', [
-    [0.98, 0.5, 0.55], [1.05, 0.8, 0.3], [0.9, 1.0, 0.0],
+    [0.98, 0.45, 0.5], [1.05, 0.75, 0.25], [0.9, 0.95, -0.05],
   ], 0.045, 'rubber', 20, 8));
   add(tube('pdkVacuumHose', [
-    [0.3, 0.82, 0.2], [0.6, 1.0, 0.4], [0.9, 1.1, 0.6],
+    [0.3, 0.55, 0.15], [0.55, 0.7, 0.35], [0.85, 0.85, 0.55],
   ], 0.025, 'rubber', 18, 6));
 
   // ====================================================================
@@ -233,53 +320,73 @@ export function build() {
   add(shafts);
 
   // ====================================================================
-  // CONTROLS — selector housing, mechatronic unit, selector shaft.
+  // CONTROLS — selector housing (case top); mechatronic = electrohydraulic
+  // module packaged with the valve body under the ATF pan (WM 375519).
   // ====================================================================
 
   // selectorHousing — gear-selection mechanism housing on top of the case.
-  add(at(box('selectorHousing', 0.9, 0.45, 0.8, 'aluDark'), 0.1, 0.62, 0.2));
-  // mechatronic — combined hydraulic/electronic module (valve body + TCU block).
-  add(at(roundBox('mechatronic', 0.5, 0.34, 0.6, 'cover'), 0.45, 1.12, 0.0));
+  add(at(roundBox('selectorHousing', 0.85, 0.38, 0.7, 'aluDark', 3), 0.05, 0.95, 0.15));
+  // mechatronic — combined hydraulic/electronic module above the pan cavity
+  // (same packaging zone as valve body / solenoids per WM underside figs).
+  const mecha = group('mechatronic');
+  add(roundBox('mechatronic_plate', 0.95, 0.18, 0.85, 'cover', 3), mecha);
+  add(at(roundBox('mechatronic_block', 0.7, 0.16, 0.55, 'cast', 2), 0.05, 0.14, 0.05), mecha);
+  add(at(mecha, 0.05, -0.58, 0.08));
   // pdkSelectorShaft (sub) — internal selector shaft.
   add(rot(at(cyl('pdkSelectorShaft', 0.04, 0.04, 0.9, 'steel', 12), 0.1, 0.55, 0.0), HALF_PI, 0, 0));
 
   // ====================================================================
-  // PDK CONTROL — TCU, cabin selector unit, shift paddles, speed sensors.
+  // PDK CONTROL — TCU is body-mounted (rear luggage, LH), not on the case.
+  // WM 373019 Fig 1 (p5794): installation position; Fig 2–3: ribbed box +
+  // dual connectors in a slide-in bracket.
   // ====================================================================
 
-  // pdkTcu — TCU / control module box mounted on/near the case.
-  add(at(roundBox('pdkTcu', 0.55, 0.16, 0.42, 'cover'), -0.45, 1.0, -0.3));
+  // pdkTcu — distinct control-module box offset rear-left of the transaxle
+  // (representative of the body-side mount near the LH rear quarter).
+  const tcu = group('pdkTcu');
+  add(roundBox('pdkTcu_body', 0.48, 0.22, 0.72, 'cover', 3), tcu);
+  // cooling / stiffening ribs on the outer face (WM 5796 / 5797)
+  for (let i = 0; i < 5; i++) {
+    add(at(box(`pdkTcu_rib_${i}`, 0.42, 0.025, 0.04, 'cast'), 0, 0.12, 0.28 - i * 0.12), tcu);
+  }
+  // slide-in mounting bracket
+  add(at(box('pdkTcu_bracket', 0.52, 0.08, 0.78, 'aluDark'), 0, -0.14, 0), tcu);
+  add(at(box('pdkTcu_bracketSide', 0.06, 0.28, 0.78, 'aluDark'), 0.26, 0.0, 0), tcu);
+  // dual multi-pin connectors on the long face (WM Fig 2/3 plugs 1 & 2)
+  add(at(roundBox('pdkTcu_conn1', 0.14, 0.12, 0.18, 'plastic', 2), -0.12, -0.02, 0.42), tcu);
+  add(at(roundBox('pdkTcu_conn2', 0.14, 0.12, 0.18, 'plastic', 2), 0.12, -0.02, 0.42), tcu);
+  add(at(tcu, -1.35, 0.55, -0.85));
 
-  // pdkGearSelectorUnit — cabin push-button selector (shown as a small console
-  // detail near the front-top so it has a representative location).
+  // pdkGearSelectorUnit — cabin push-button selector (representative location).
   const selUnit = group('pdkGearSelectorUnit');
   add(roundBox('pdkGearSelectorUnit_base', 0.3, 0.1, 0.4, 'cover'), selUnit);
   add(at(box('pdkGearSelectorUnit_knob', 0.12, 0.14, 0.12, 'plastic'), 0, 0.12, 0.0), selUnit);
-  add(at(selUnit, -0.5, 1.18, 0.55));
+  add(at(selUnit, -0.55, 1.25, 0.55));
 
   // pdkShiftPaddles — steering-wheel paddles (small detail near the front-top).
   const paddles = group('pdkShiftPaddles');
   add(rot(at(box('pdkShiftPaddles_up', 0.06, 0.22, 0.14, 'cover'), 0.18, 0, 0), 0, 0, -0.3), paddles);
   add(rot(at(box('pdkShiftPaddles_dn', 0.06, 0.22, 0.14, 'cover'), -0.18, 0, 0), 0, 0, 0.3), paddles);
-  add(at(paddles, 0.0, 1.22, 0.7));
+  add(at(paddles, 0.0, 1.28, 0.7));
 
   // pdkSpeedSensors — Hall-effect sensors on input + output shafts.
   const sensors = group('pdkSpeedSensors');
   add(rot(cyl('pdkSpeedSensors_in', 0.05, 0.05, 0.18, 'steel', 12), 0, 0, 0), sensors);
   add(rot(at(cyl('pdkSpeedSensors_out', 0.05, 0.05, 0.18, 'steel', 12), -0.5, -0.4, 0), 0, 0, 0), sensors);
-  add(at(sensors, 0.78, 0.5, -0.5));
+  add(at(sensors, 0.78, 0.45, -0.5));
 
   // ====================================================================
-  // SERVICE — drain/fill plugs, fluid.
+  // SERVICE — drain/fill plugs, fluid (WM 375519 drain on ATF pan face).
   // ====================================================================
 
-  // drainPlug — bottom plug at the lowest point of the oil pan.
-  add(at(cyl('drainPlug', 0.1, 0.1, 0.08, 'aluDark', 12), 0, -1.1, -0.1));
-  // fillPlug — side level plug.
-  add(rot(at(cyl('fillPlug', 0.1, 0.1, 0.08, 'aluDark', 12), 0.86, -0.4, -0.3), 0, 0, HALF_PI));
+  // drainPlug — bottom plug offset on the ATF pan (WM 5842 yellow callout).
+  add(at(cyl('drainPlug', 0.09, 0.09, 0.08, 'aluDark', 12), -0.35, -1.12, -0.35));
+  add(at(cyl('drainPlugSeal', 0.1, 0.1, 0.02, 'rubber', 10), -0.35, -1.07, -0.35));
+  // fillPlug — side level plug on the case.
+  add(rot(at(cyl('fillPlug', 0.1, 0.1, 0.08, 'aluDark', 12), 0.88, -0.35, -0.25), 0, 0, HALF_PI));
 
-  // pdkFluid — represented as a thin translucent-ish fluid layer in the sump.
-  add(at(box('pdkFluid', 1.4, 0.12, 1.4, FLUID), 0, -0.86, 0.0));
+  // pdkFluid — thin fluid layer in the sump above the pan floor.
+  add(at(box('pdkFluid', 1.3, 0.1, 1.2, FLUID), 0, -0.88, 0.05));
 
   return trans;
 }

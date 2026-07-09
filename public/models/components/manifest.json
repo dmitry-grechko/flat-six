@@ -61,7 +61,7 @@
     "system": "Engine",
     "glb": "/models/components/airfilter.glb",
     "node": "airIntake",
-    "hotspot3d": "0 0.5 0"
+    "hotspot3d": "0 0.55 -0.55"
   },
   {
     "id": "plugs",
@@ -94,5 +94,13 @@
     "glb": "/models/components/driveline.glb",
     "node": "driveline",
     "hotspot3d": "0 0 0"
+  },
+  {
+    "id": "fuel",
+    "label": "Fuel Tank & Supply",
+    "system": "Fuel",
+    "glb": "/models/components/fuel.glb",
+    "node": "fuelSystem",
+    "hotspot3d": "0 -0.1 0.9"
   }
 ]

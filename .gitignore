@@ -40,8 +40,9 @@ supabase/logs/
 2014-porsche-cayman-s-981/
 2015-porsche-boxster-gts-718/
 
-# workshop manual PDF (~213 MB) — copy locally to public/manual/981-workshop-manual.pdf
+# workshop manual PDF (~213 MB) + Free-tier compressed volumes — local only
 public/manual/*.pdf
+public/manual/volumes.json
 
 # Mobile Tech Library (~3 GB, © Porsche) — keep local only; allow the README
 public/mobile_tech_library/**
@@ -50,3 +51,9 @@ public/mobile_tech_library/**
 # workshop / MTL extraction (© Porsche — never commit; feed your own Supabase only)
 /data/manual-981.json
 /data/mtl-981-987.json
+
+# WM CAD page extracts used to calibrate 3D gen (© Porsche — local only)
+/tools/gen/wm-refs/**/*.png
+# allow workflow helpers / notes / README under wm-refs
+!/tools/gen/wm-refs/**/*.md
+!/tools/gen/wm-refs/**/*.mjs

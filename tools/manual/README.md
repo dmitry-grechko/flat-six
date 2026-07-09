@@ -28,10 +28,13 @@ in the private `workshop-manual` Storage bucket; `/api/manual/url?doc=` returns
 a signed URL.
 
 ```bash
-# Raise global Storage limit to ≥250 MB (Dashboard → Storage → Settings), then:
-npm run docs:upload                 # workshop + MTL curated set
-npm run docs:upload -- --mtl-only   # skip the 213 MB workshop PDF
+# Free tier (≤50 MB): compress+split first, then upload volumes
+npm run manual:compress             # Ghostscript → v1/v2/v3 (~32 MB each)
+npm run docs:upload                 # workshop volumes + MTL curated set
+npm run docs:upload -- --mtl-only   # skip workshop volumes
 ```
+
+`db:import-mtl` only loads text search; it does not upload PDFs.
 
 ## 2. Text → Supabase knowledge
 

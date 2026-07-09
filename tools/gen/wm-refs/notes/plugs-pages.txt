@@ -1,0 +1,613 @@
+
+===== p4443 =====
+            Fig 3: Pulling Off Fuel Injector Spring Clamp
+
+
+
+
+            Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+                    1. 5.2.1. If this is not possible because they are inaccessible, pull out fuel
+                       collection pipe together with the fuel injectors.
+
+                    2. 5.2.2. If this is not possible because the fuel injectors are stuck, spray
+                       valve seats with special solution "Caramba" and leave it to take effect.
+
+         3. 5.3. Carefully move the fuel collection pipe back and forth. Then lift up the fuel
+            collection pipe using a plastic or wooden wedge (shop made).
+
+         4. 5.4. Remove fuel collection pipe with the fuel injectors from the engine compartment.
+
+                    1. 5.4.1. If the fuel injectors are still installed on the fuel collection pipe,
+                       remove the spring clamps -1- and pull fuel injectors straight out of the pipe
+                       adapters.
+
+                       One or more fuel injectors can remain in the cylinder head, depending on
+                       the age of the vehicle. The spring clamps -1- become loose and fall into
+                       the engine compartment when the fuel collection pipe is pulled off.
+
+                       Remove spring clamps -1- immediately.
+
+         5. 5.5. Replace spring clamps -1- .
+
+6. Remove fuel injector -1- from its seat in the cylinder head. Use special tool repair kit T10133
+   with puller arms for T10133/1 - kit T10133/30 to do this.
+
+
+===== p4444 =====
+Fig 4: Identifying Fuel Injectors In Cylinder Head
+
+
+
+
+Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+        1. 6.1. Puller arms T10133/30 -4- must be inserted into the puller -1- .
+
+                   1. Puller
+
+                   2. O-ring
+
+                   3. Original puller arms
+
+                   4. Puller arms T10133/30 for Porsche fuel injectors
+
+
+===== p4445 =====
+  Fig 5: Identifying Converting Fuel Injector Holder (Puller Arms)
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+2. 6.2. Loosen fuel injector using a rotary motion.
+
+3. 6.3. Position puller arms -arrow- on the fuel injector -1- . To do this, insert the lever
+   arms into the cut-outs on the fuel injector and lock them by screwing the hexagon nut
+   -2- clockwise.
+
+
+===== p4446 =====
+  Fig 6: Installing Puller Arms On Fuel Injector
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+4. 6.4. Screw slide hammer from the repair kit onto the hexagon nut -1- . Press lever
+   arms -2- together -arrow- and remove the fuel injector by pulling it up gently.
+
+
+===== p4447 =====
+Fig 7: Pulling Off Fuel Injector
+
+
+
+
+Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+Illustration of tool on fuel injector:
+
+        1. Slide hammer with pull rod
+
+        2. Puller for locking lever arms
+
+           arrow - Position of retaining bore for pulling lever arms
+
+        3. Fuel injector (high-pressure injector)
+
+
+===== p4448 =====
+                 Fig 8: Installing Special Tool On Fuel Injector
+
+
+
+
+                 Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+    7. Carefully clean fitting bores on cylinder head.
+
+              1. 7.1. Remove loose parts using a powerful workshop vacuum cleaner.
+
+              2. 7.2. Soak a small, clean and lint-free cloth in acetone or solvent naphtha and
+                 carefully clean the bores.
+
+              3. 7.3. Use the cleaning brush from the tool set to remove any remaining dirt from the
+                 fitting bores.
+
+    8. Clean fuel collection pipe.
+
+              1. 8.1. Clean connection piece for the fuel injectors with acetone or solvent naphtha.
+
+    9. Fuel injectors that are to be reinstalled must also be cleaned (see CLEANING FUEL
+       INJECTORS .
+
+
+
+
+WM 243019 REMOVING AND INSTALLING FUEL COLLECTION PIPE WITH FUEL
+INJECTORS (CAYMAN, CAYMAN S, CAYMAN "BLACK/STYLE EDITION, BOXSTER,
+BOXSTER S, BOXSTER GTS, BOXSTER "BLACK/STYLE EDITION, BOXSTER
+SPYDER, CAYMAN GT4) > REMOVING FUEL COLLECTION PIPE > CLEANING FUEL
+INJECTORS AND REPLACING WEARING PARTS > COMPONENT OVERVIEW OF
+
+
+===== p4449 =====
+FUEL INJECTOR
+
+    1. Spring clamp - always replace
+
+    2. O-ring - always replace and lubricate with VP 881
+
+    3. Fuel injector - follow cleaning instructions!
+
+    4. Bellows - always replace
+
+    5. Spacer ring
+
+    6. Stainless steel circlip - always replace
+
+    7. Teflon sealing ring - always replace
+
+
+===== p4450 =====
+Fig 1: Identifying Fuel Injector Components
+
+
+
+
+Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+Information
+
+      When removing and installing the fuel injectors, the following components must always be replaced
+      to guarantee function and leak tightness .
+
+      O-ring, spring clamp, bellows and Teflon sealing ring .
+
+        1. Grip Teflon sealing ring -1- carefully using a suitable tool -2- and pull it off. Do not scratch the
+
+
+===== p4451 =====
+  valve body.
+
+  Scratched valves must be replaced .
+
+  Fig 2: Removing Teflon Sealing Ring
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+         WARNING: Caustic fluids
+
+        1. Danger of chemical burns
+
+
+  → Avoid contact with caustic fluid.
+
+  → Wear personal protective gear.
+
+  → Ensure that there is good ventilation.
+
+  → If you do come into contact, wash off immediately with plenty of warm water and contact a
+  doctor if necessary.
+
+2. When re-installing the fuel injectors, they must be cleaned as described below:
+
+  Cleaning if lightly soiled:
+
+
+===== p4452 =====
+3. Clean valve tips using a soft, lint-free cloth with acetone or solvent naphtha.
+
+          1. 3.1. Also clean sealing ring groove.
+
+  Cleaning if heavily soiled:
+
+4. Clean valve tips in an ultrasound bath. This allows even stubborn deposits (coking) to be
+   removed.
+
+          1. 4.1. Plunge just the metal insert into the cleaning fluid, holding it as vertically as
+             possible. Cover electric connection with adhesive tape.
+
+5. Replace O-ring and bellows.
+
+6. Place new Teflon sealing ring -2- on the mounting cone -1- .
+
+          1. 6.1. Push sealing ring onto the cylinder of the mounting cone -1- right to the end
+             using your thumb and index finger -3- .
+            Fig 3: Pushing Teflon Ring On Mounting Cone
+
+
+
+
+            Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+7. Fit mounting cone -3- with sealing ring -1- onto the fuel injector from the front.
+
+          1. 7.1. Using assembly sleeve no. 8 -2- , push sealing ring over the injector tip as far
+             as the groove -arrow- .
+
+
+                    IMPORTANT: The sealing ring is not yet seated correctly in the groove!
+
+
+===== p4614 =====
+WM 282020 REMOVING AND INSTALLING IGNITION COILS (ALL MODELS) >
+PRELIMINARY WORK
+
+    1. Remove rear wheels.
+
+      → REMOVING WHEEL .
+
+
+
+
+WM 282020 REMOVING AND INSTALLING IGNITION COILS (ALL MODELS) >
+REMOVING IGNITION COILS
+
+    1. Remove ignition coils -1- .
+
+             1. 1.1. Pull off cable plug -2- by pressing the locking mechanism and sliding the plug
+                upwards.
+
+             2. 1.2. Unscrew fastening screws -3- and pull off ignition coils.
+                Fig 1: Identifying Ignition Coils (View Of Side 4-6)
+
+
+
+
+                Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+WM 282020 REMOVING AND INSTALLING IGNITION COILS (ALL MODELS) >
+INSTALLING IGNITION COILS
+
+
+===== p4615 =====
+      1. Install ignition coils.
+
+                 1. 1.1. Fit and position ignition coils and tighten fastening screws.
+
+                 2. 1.2. Connect cable plug and check that it is seated securely.
+
+
+
+
+WM 282020 REMOVING AND INSTALLING IGNITION COILS (ALL MODELS) >
+SUBSEQUENT WORK
+
+      1. Fit rear wheels.
+
+            1. →INSTALLING WHEEL .
+
+
+
+
+WM 283919 REMOVING AND INSTALLING HALL SENDER (ALL MODELS) >
+PRELIMINARY WORK
+
+      1. Remove rear wheels.
+
+         → REMOVING WHEEL .
+
+
+
+
+WM 283919 REMOVING AND INSTALLING HALL SENDER (ALL MODELS) >
+REMOVING HALL SENDER
+
+
+      CAUTION: Hot components
+
+       Risk of burns
+
+
+
+→ Let hot components cool down.
+
+→ Wear personal protective gear.
+
+      1. Remove hall sender on side 1-3 -1- .
+
+                 1. 1.1. Pull off cable plug -2- .
+
+                 2. 1.2. Unscrew fastening screw -3- and pull off hall sender.
+
+
+===== p4616 =====
+            Fig 1: Identifying Hall Sender (Side 1-3)
+
+
+
+
+            Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+2. Remove hall sender on side 4-6 -1- .
+
+         1. 2.1. Pull off cable plug -2- .
+
+         2. 2.2. Unscrew fastening screw -3- and pull off hall sender.
+
+
+===== p4617 =====
+                 Fig 2: Identifying Hall Sender (Side 4-6)
+
+
+
+
+                 Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+WM 283919 REMOVING AND INSTALLING HALL SENDER (ALL MODELS) >
+INSTALLING HALL SENDER
+
+    1. Install hall sender.
+
+              1. 1.1. Insert hall sender and secure with a fastening screw.
+
+              2. 1.2. Connect cable plug and check that it is seated securely.
+
+
+
+
+WM 283919 REMOVING AND INSTALLING HALL SENDER (ALL MODELS) >
+SUBSEQUENT WORK
+
+    1. Fit rear wheels.
+
+      → INSTALLING WHEEL .
+
+
+
+
+WM 287020 REMOVING AND INSTALLING SPARK PLUGS (ALL MODELS) > TOOLS
+
+
+===== p4618 =====
+  Designation           Type          Number         Description
+
+
+
+
+  spark-plug    Commercially
+                                      Nr.14
+socket wrench   available tool
+
+
+
+
+                Commercially
+   extension                          Nr.15
+                available tool
+
+
+
+
+WM 287020 REMOVING AND INSTALLING SPARK PLUGS (ALL MODELS) >
+TECHNICAL VALUES
+
+    Location        Description               Type         Basic value       Tolerance 1     Tolerance 2
+
+                                        Tightening                         +/-2 Nm (+/-1.5
+   Spark plug    Initial tightening                     32 Nm (24 ftlb.)
+                                          torque                                 ftlb.)
+
+                         Second         Tightening
+   Spark plug                                           25 Nm (19 ftlb.) +3 Nm (+2 ftlb.)
+                       tightening         torque
+
+
+
+
+WM 287020 REMOVING AND INSTALLING SPARK PLUGS (ALL MODELS) >
+PRELIMINARY WORK
+
+
+      CAUTION: Hot components
+
+       Risk of burns
+
+
+
+→ Let hot components cool down.
+
+
+===== p4619 =====
+→ Wear personal protective gear.
+
+      1. Remove ignition coils.
+
+         →Removing Ignition Coils .
+
+
+
+
+WM 287020 REMOVING AND INSTALLING SPARK PLUGS (ALL MODELS) >
+REMOVING SPARK PLUGS
+
+
+      NOTE: Incorrect tool
+
+       Risk of damage to components
+
+
+
+→ Use prescribed tool.
+
+      1. Unscrew spark plugs using spark-plug socket wrench Nr.14 and extension Nr.15 .
+
+                1. 1.1. Different extensions (3/8-inch) -1- are also required, depending on the cylinder.
+                  Fig 1: Example Of Spark Plug Tool With Long Extension
+
+
+
+
+                  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+===== p4620 =====
+WM 287020 REMOVING AND INSTALLING SPARK PLUGS (ALL MODELS) >
+INSTALLING SPARK PLUGS
+
+
+      NOTE: Incorrect tool
+
+       Risk of damage to components
+
+
+
+→ Use prescribed tool.
+
+      1. Fit spark plugs using spark-plug socket wrench Nr.14 and extension Nr.15 and then tighten
+         according to specifications.
+
+                   1. 1.1. New spark plugs: Tightening torque 32 Nm (24 ftlb.) +/-2 Nm (+/-1.5 ftlb.)
+
+                   2. 1.2. Re-installed spark plugs: Tightening torque 25 Nm (19 ftlb.) +3 Nm (+2 ftlb.)
+
+
+
+
+WM 287020 REMOVING AND INSTALLING SPARK PLUGS (ALL MODELS) >
+SUBSEQUENT WORK
+
+      1. Install ignition coils.
+
+         → Installing Ignition Coils .
+
+
+
+
+WM 287219 REMOVING AND INSTALLING KNOCK SENSOR (ALL MODELS) >
+TECHNICAL VALUES
+
+     Location           Description          Type         Basic value      Tolerance 1      Tolerance 2
+
+ Knock sensor to                          Tightening      23 Nm (17
+                         M8 x 35
+  cylinder head                             torque           ftlb.)
+
+ Holder securing
+  high-pressure
+                   External Torx          Tightening      13 Nm (9.5
+     line and
+                  screw, M6 x 16            torque           ftlb.)
+low-pressure line
+ to cylinder head
+
+  Holding clamp
+     securing
+                       External Torx      Tightening      10 Nm (7.5
+ connecting line
+                      screw, M6 x 12        torque           ftlb.)
+  to sheetmetal
+     bracket
+
+
+
+
+WM 287219 REMOVING AND INSTALLING KNOCK SENSOR (ALL MODELS) >
+PRELIMINARY WORK
+
+
+===== p4621 =====
+Preliminary work for knock sensor, cylinder bank 1-3:
+
+       1. Remove resonance tube. → REMOVING RESONANCE TUBE .
+
+         Preliminary work for knock sensor, cylinder bank 4-6:
+
+       2. Remove intake-air distributor for cylinder bank 4-6.
+
+         → REMOVING INTAKE-AIR DISTRIBUTOR 4-6 .
+
+
+
+
+WM 287219 REMOVING AND INSTALLING KNOCK SENSOR (ALL MODELS) >
+REMOVING KNOCK SENSOR > REMOVING KNOCK SENSOR FOR CYLINDER BANK
+1-3
+
+Information
+
+Before removing the knock sensor, mark the installation position using a water-resistant marker.
+
+       1. Remove knock sensor for cylinder bank 1-3.
+
+                 1. 1.1. Mark installation position of the knock sensor -2- .
+
+                 2. 1.2. Unscrew fastening screw -1- .
+                   Fig 1: Identifying Knock Sensor For Cylinder Bank 1-3
+
+
+
+
+                   Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+===== p4622 =====
+       2. Disconnect plug connection.
+
+                1. 2.1. Release plug connection -a- and pull off the knock sensor -B- .
+                   Fig 2: Disconnecting Plug Connection
+
+
+
+
+                   Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+WM 287219 REMOVING AND INSTALLING KNOCK SENSOR (ALL MODELS) >
+REMOVING KNOCK SENSOR > REMOVING KNOCK SENSOR FOR CYLINDER BANK
+4-6
+
+Information
+
+Before removing the knock sensor, mark the installation position using a water-resistant marker.
+
+       1. Loosen bracket for high-pressure line.
+
+                1. 1.1. Unscrew fastening screw -1- .
+
+                2. 1.2. Unscrew fastening screw for clamp -2- and swivel holder aside.

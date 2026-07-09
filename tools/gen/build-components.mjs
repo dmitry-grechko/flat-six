@@ -28,6 +28,7 @@ import * as ignitionFuel from './components/ignitionFuel.mjs';
 import * as suspension from './components/suspension.mjs';
 import * as electrical from './components/electrical.mjs';
 import * as driveline from './components/driveline.mjs';
+import * as fuelSystem from './components/fuelSystem.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_DIR = join(__dirname, '..', '..', 'public', 'models', 'components');
@@ -47,6 +48,7 @@ const COMPONENTS = [
   suspension,
   electrical,
   driveline,
+  fuelSystem,
 ];
 
 // ---- Verify a written GLB by re-parsing it. ----

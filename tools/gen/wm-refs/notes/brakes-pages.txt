@@ -1,0 +1,875 @@
+
+===== p3110 =====
+Information
+
+     Do not open the brake system .
+
+     Do not loosen the brake line from the brake calliper when loosening the brake calliper .
+
+     The core of the warning contact wire must not be left exposed! It does not matter if the insulation is
+     worn .
+
+     If necessary, remove a little brake fluid from the reservoir by suction in order to prevent an
+     overflow when the disc brake pads are pushed back .
+     Fig 1: Identifying Brake Fluid Reservoir
+
+
+
+
+     Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+Information
+
+     To gain better access for assembly work, it is a good idea to turn the wheels fully either to the right
+     or left!
+
+      1. Before removing the brake calliper on the wheel carrier, carry out the following work:
+
+                 1. 1.1. Release plug connection on speed sensor and pull it off. Remove electric line
+                    from the holder on the wheel carrier.
+
+                 2. 1.2. Disconnect (release and unclip) the connector for the brake pad wear indicator
+
+
+===== p3111 =====
+             (on the wheel carrier holder).
+
+          3. 1.3. Remove holder at the wheel carrier.
+
+          4. 1.4. Pull line for brake pad wear indicator out of brake calliper and brake pad.
+
+          5. 1.5. Only for GT4 vehicles:
+
+             Release and disconnect connector for PASM.
+
+             Information
+
+                1. Never use an impact bolter to loosen and tighten the brake calliper on the wheel
+                   carrier .
+
+2. Remove fastening screws on the brake calliper -arrows- .
+
+  Place brake calliper onto a suitable base (e.g. universal lift). Use a suitable cloth as an
+  intermediate layer to protect paintwork from damage. When positioning the brake calliper on
+  the base, carefully guide the brake line and brake hose!
+
+  Fig 2: Locating Brake Calliper Fastening Screws
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+3. Fit brake piston on the brake calliper between the disc brake pads using piston reset tool
+   (replaces P83) Nr.144 . Then press the brake pads back evenly → Pressing back brake pads
+
+
+===== p3112 =====
+      .
+      Fig 3: Pressing Back Brake Pads
+
+
+
+
+      Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+      Information
+
+      If the disc brake pads are still to be used, mark their installation position.
+
+    4. Remove brake pads.
+
+              1. 4.1. Carefully slide a commercially available screwdriver between the disc brake
+                 pad/brake calliper and lever the disc brake pad out by turning the screwdriver slightly.
+                 When doing this, make sure not to damage the dust boots on the brake pistons.
+
+              2. 4.2. Repeat the process on the second brake pad.
+
+    5. Remove pad retaining spring.
+
+
+
+
+WM 463656 REPLACING FRONT DISC BRAKE PADS (ALL MODELS) > REMOVING
+AND INSTALLING FRONT DISC BRAKE PADS > INSTALLING FRONT DISC BRAKE
+PADS
+
+
+===== p3113 =====
+      WARNING: Old mounting parts fitted on the brake calliper
+
+       Reduced braking effect
+
+       Risk of damage to the brake calliper
+
+
+
+→ Fit new pad retaining springs
+
+→ Fit new fastening screws
+
+
+      WARNING: Installation of brake pads with the wrong brake pad quality
+
+       Longer braking distance
+
+       More wear on brake pads
+
+
+
+→ Only use the type-specific brake pads .
+
+→ Replace the brake pads when the brake pad wear indicator light comes on, but no later than when
+there is a residual pad thickness of 2 mm on each axle.
+
+→ Replace the brake discs on each axle as soon as the brake pad wear limit is reached.
+
+Information
+
+     The back of the pad backing plates must not be greased .
+
+     Check disc brakes for wear. For details of wear limits, see → 4X00IN TECHNICAL DATA/BRAKE
+     WEAR LIMIT .
+
+     Disc brakes must be clean and free of grease .
+
+     The core of the warning contact wire must not be left exposed! Worn insulation is not important .
+
+     If necessary, remove a little brake fluid from the reservoir by suction in order to prevent an
+     overflow when the disc brake pads are pushed back .
+
+     Observe correct tightening torques. → 4X00IN TIGHTENING TORQUES FOR BRAKE
+     MECHANICS/BRAKE HYDRAULIC SYSTEM .
+
+      1. Fit new pad retaining spring.
+
+      2. Fit brake pads in reverse order to removal.
+
+      3. Fit the brake calliper in reverse order to removal.
+
+         Use new fastening screws -arrows- .
+
+         Brake hose bracket to wheel carrier:
+
+
+===== p3114 =====
+  Fig 1: Locating Brake Calliper Fastening Screws
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+4. Position disc brake pads by operating the brake several times.
+
+5. Check the brake fluid level and correct it if necessary.
+
+  The brake fluid level must be between the MIN and MAX markings → Min/Max markings for
+  brake fluid .
+
+
+===== p3115 =====
+         Fig 2: Identifying Brake Fluid Reservoir Min/Max Marking
+
+
+
+
+         Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+WM 463656 REPLACING FRONT DISC BRAKE PADS (ALL MODELS) > SUBSEQUENT
+WORK
+
+      1. Fit wheel → Installing Wheel
+
+         For vehicles with PCCB brake, use assembly aids (two assembly pins).
+
+
+
+
+WM 463656 REPLACING FRONT DISC BRAKE PADS (ALL MODELS) > INFORMATION
+> BEDDING IN THE BRAKE PADS
+
+New brake pads and brake discs require a bedding-in period of several hundred kilometers! Only then do
+they achieve their best friction coefficient and wear value!
+
+The slightly reduced braking effect must be compensated for by increased pressure on the brake pedal.
+
+The same also applies after changing brake discs .
+
+
+===== p3116 =====
+WM 463802 CHECKING THICKNESS OF REAR BRAKE PADS (ALL MODELS) >
+INFORMATION
+
+Procedure during intermediate maintenance:
+
+Visually inspect the brake pads for wear. There is no need to remove the wheels unless the brake
+fluid needs to be changed at the same time .
+
+Outside of brake pad: Visual inspection through the cut-outs in the rim.
+
+Inside of brake pad: Visual inspection from below with vehicle raised.
+
+Without an aid, the inner brake pad is not or is only partly visible on the rear axle (with the wheel fitted).
+
+A mirror can be used as an aid -arrow- .
+
+Fig 1: Checking Brake Pads
+
+
+
+
+Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+Procedure during maintenance:
+
+
+===== p3117 =====
+Raise the vehicle → 4X00IN LIFTING THE VEHICLE .
+
+Remove wheels → 440519 REMOVING AND INSTALLING WHEEL .
+
+Check the brake pad thickness for wear. If in doubt following a visual inspection, you may have to
+measure the thickness.
+
+
+
+
+WM 463802 CHECKING THICKNESS OF REAR BRAKE PADS (ALL MODELS) >
+CHECKING THICKNESS OF BRAKE PADS > CHECKING THICKNESS OF THE DISC
+BRAKE PADS
+
+
+      WARNING: Installation of brake pads with the wrong brake pad quality
+
+        Longer braking distance
+
+        More wear on brake pads
+
+
+
+→ Only use the type-specific brake pads .
+
+→ Replace the brake pads when the brake pad wear indicator light comes on, but no later than when
+there is a residual pad thickness of 2 mm on each axle.
+
+→ Replace the brake discs on each axle upon reaching the wear limits.
+
+Information
+
+     If brake pad wear is indicated by the warning light, the warning contact (sender including line and
+     plug connection) must also be replaced .
+
+     Replacement of the warning contact can be avoided by replacing the brake pads no later than
+     when the pad thickness is 2.5 mm -arrows- .
+
+
+===== p3118 =====
+   Fig 1: Checking Brake Pad Thickness
+
+
+
+
+   Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+   Warning contacts must be replaced if the core of the line is worn .
+
+   However, if only the plastic part of the warning contact is worn, there is no need to replace it .
+
+    1. Visually inspect the brake pads for wear.
+
+
+
+
+WM 463856 REPLACING REAR DISC BRAKE PADS (CAYMAN GT4) > TOOLS
+
+ Designation           Type           Number      Description
+
+
+===== p3119 =====
+  piston reset     Commercially       Nr.144
+ tool (replaces    available tool
+      P83)
+
+
+
+
+WM 463856 REPLACING REAR DISC BRAKE PADS (CAYMAN GT4) > TECHNICAL
+VALUES
+
+ Location              Description             Type     Basic value   Tolerance 1   Tolerance 2
+
+Brake calliper to     M12 x                Tightening   85 Nm (63
+front and rear axle   1.5/always use         torque        ftlb.)
+(PCCB and grey        new screws on
+cast-iron brakes)     front and rear
+                      axle following
+                      removal.
+                      Different screw
+                      length on front
+                      and rear axle
+                      (see allocation in
+                      PET)
+
+Brake hose            M6                   Tightening       10 Nm
+bracket/combined                             torque
+holder to rear
+wheel bearing
+housing (wheel
+carrier)
+
+
+
+
+WM 463856 REPLACING REAR DISC BRAKE PADS (CAYMAN GT4) > PRELIMINARY
+WORK
+
+      1. Raise the vehicle.
+
+         → 4X00IN LIFTING THE VEHICLE .
+
+
+                  NOTE: Removing/fitting wheels
+
+               1. Risk of damage to (ceramic) brake discs
+
+
+===== p3120 =====
+         → Carefully guide the wheel towards the wheel hub, thereby preventing any heavy impact on
+         the (ceramic) brake disc.
+
+      2. Remove wheel.
+
+         For vehicles with PCCB, use assembly aids (assembly pins) -1- .
+
+         → 44051900 REMOVING AND INSTALLING WHEEL .
+
+         Fig 1: Identifying Wheel Assembly Pins
+
+
+
+
+         Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+WM 463856 REPLACING REAR DISC BRAKE PADS (CAYMAN GT4) > REPLACING
+REAR DISC BRAKE PADS
+
+Information
+
+     Do not open the brake system .
+
+     Do not loosen the brake line from the brake calliper when loosening the brake calliper .
+
+     The core of the warning contact wire must not be left exposed! It does not matter if the insulation is
+     worn .
+
+
+===== p3121 =====
+If necessary, remove a little brake fluid from the reservoir by suction in order to prevent an
+overflow when the disc brake pads are pushed back .
+Fig 1: Identifying Brake Fluid Reservoir Max/Min Marks
+
+
+
+
+Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+ 1. Remove rear brake calliper with line bracket.
+
+
+===== p3122 =====
+Fig 2: Identifying Wheel Carrier Holder Components
+
+
+
+
+Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+        1. 1.1. Release and unplug electric plug connection for electric parking brake (EPB) -1-
+           and unclip it from the cable retainer -2- .
+
+        2. 1.2. Release and disconnect electric plug connection for rpm sensor -3- .
+
+        3. 1.3. Release and disconnect electric plug connection for PASM -4- and unclip cable
+           retainer -5- from its holder -7- .
+
+        4. 1.4. Pull line for brake pad wear indicator out of brake calliper and brake pad.
+
+        5. 1.5. Unscrew and remove fastening screws -6- securing holder to wheel bearing
+           housing.
+
+        6. 1.6. Evenly set back brake pads a little using water pump pliers.
+
+           Information
+
+              1. Never use an impact bolter to loosen and tighten the brake calliper on the wheel
+                 carrier .
+
+        7. 1.7. Unscrew and remove fastening screws -arrows- .
+
+
+===== p3123 =====
+           Fig 3: Locating Brake Calliper Fastening Screws
+
+
+
+
+           Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+         8. 1.8. Remove brake calliper together with the holder from the wheel bearing housing
+            and place on a suitable base (e.g. universal jack). Use a suitable cloth as an
+            intermediate layer to protect paintwork from damage.
+
+           When positioning the brake calliper on the base, carefully guide the brake hose!
+
+2. Fit brake piston on the brake calliper between the disc brake pads using piston reset tool
+   (replaces P83) Nr.144 . Then press the brake pads back evenly → Pressing back brake pads
+   .
+
+
+===== p3124 =====
+  Fig 4: Pressing Back Brake Pads
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+3. Carefully insert a commercially available screwdriver between the brake pad/brake calliper and
+   lever the brake pad out by turning the screwdriver slightly -direction arrows- .
+
+  Make sure not to damage the dust boots on the brake pistons when doing this .
+
+
+===== p3125 =====
+      Fig 5: Removing Brake Pads
+
+
+
+
+      Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+    4. Remove pad retaining springs.
+
+
+
+
+WM 463856 REPLACING REAR DISC BRAKE PADS (CAYMAN GT4) > REPLACING
+REAR DISC BRAKE PADS > INSTALLING REAR DISC BRAKE PADS
+
+
+===== p3126 =====
+Information
+
+     The back of the pad backing plates must not be greased .
+
+     Check the brake discs for wear. → 4X00IN TECHNICAL DATA/BRAKE WEAR LIMIT . → 465302
+     CHECKING REAR BRAKE DISCS - WEAR ASSESSMENT . → 465402 CHECKING REAR PCCB
+     BRAKE DISC (WEAR ASSESSMENT) .
+
+     Disc brakes must be clean and free of grease .
+
+     The core of the warning contact wire must not be left exposed! It does not matter if the insulation is
+     worn .
+
+     If necessary, remove a little brake fluid from the reservoir by suction in order to prevent an
+     overflow when the disc brake pads are pushed back .
+
+     Observe specified tightening torques .
+
+
+      WARNING: Old mounting parts fitted on the brake calliper
+
+       Reduced braking effect
+
+       Risk of damage to the brake calliper
+
+
+
+→ Fit new pad retaining springs
+
+→ Fit new fastening screws
+
+      1. Fit new pad retaining springs.
+
+
+                WARNING: Installation of brake pads with the wrong brake pad quality
+
+              1. Longer braking distance
+
+              2. More wear on brake pads
+
+
+         → Only use the type-specific brake pads .
+
+         → Replace the brake pads when the brake pad wear indicator light comes on, but no later than
+         when there is a residual pad thickness of 2 mm on each axle.
+
+         → Replace the brake discs on each axle as soon as the brake pad wear limit is reached.
+
+      2. Fit disc brake pads in reverse order to removal -direction arrow- .
+
+
+===== p3127 =====
+  Fig 1: Fitting Brake Pads
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+3. Fit the brake calliper in reverse order to removal. While doing this, check that the brake hose
+   is routed correctly (do not twist the brake hose!).
+
+  Use new fastening screws -arrows- . Tightening torque 85 Nm (63 ftlb.)
+
+  Brake hose bracket to wheel bearing housing: Tightening torque 10 Nm
+
+
+===== p3128 =====
+  Fig 2: Locating Brake Calliper Fastening Screws
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+4. Position disc brake pads by operating the brake several times.
+
+5. Check the brake fluid level and correct it if necessary.
+
+  The brake fluid level must be between the MIN and MAX markings → MIN/MAX markings for
+  brake fluid .
+
+
+===== p3159 =====
+Fig 1: Identifying Brake Disc Friction Surface Bores (Perforations)
+
+
+
+
+Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+       NOTE: Work cannot be carried out on the bores in the brake disc friction surface
+
+         Damage to brake discs
+
+
+
+→ Clean the bores on PCCB brake discs with high-pressure cleaning equipment if necessary. Observe
+the relevant environmental and safety regulations.
+
+→ Do not machine the bores. Drilling or counter-sinking is not permitted.
+
+
+
+
+WM 465102 CHECKING FRONT PCCB BRAKE DISCS (WEAR ASSESSMENT)
+(EXCEPT CAYMAN GT4) > INFORMATION ON CHECKING PCCB BRAKE DISCS >
+COATING ON THE PCCB BRAKE DISCS (POTENTIAL CAUSES)
+
+The coating on the PCCB brake discs arises as a result of a high load and high temperatures, for
+
+
+===== p3160 =====
+example on a racing circuit. Check the following in such cases:
+
+Fig 1: Identifying Brake Disc Friction Surface Bores (Perforations)
+
+
+
+
+Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+      Ventilation (brake cooling): all components are present, secured correctly and undamaged.
+
+      Brake pad quality: If the vehicle is used for race-track driving, use appropriate brake pads.
+
+      The perforation bores -see illustrationFig 1- in the brake discs must not be blocked. Unblock them if
+      necessary.
+
+      In the event of brake pad wear, the brake discs can still be used provided the brake discs satisfy
+      all wear criteria (see also GENERAL INFORMATION ON REPLACEMENT OF PCCB BRAKE
+      DISCS DUE TO WEAR ). The perforation bores -see illustrationFig 1- must not be blocked.
+
+
+
+
+WM 465102 CHECKING FRONT PCCB BRAKE DISCS (WEAR ASSESSMENT)
+(EXCEPT CAYMAN GT4) > INFORMATION ON CHECKING PCCB BRAKE DISCS >
+INFORMATION ON BEDDING IN NEW BRAKE PADS
+
+
+===== p3161 =====
+New brake pads require a slightly longer bedding-in period for PCCB brake discs than cast iron brake
+discs.
+
+In general, the following applies: New brake pads must be broken in (bedding-in period), their optimum
+braking effect is therefore not reached until after a few hundred kilometers. The slightly reduced braking
+effect must be compensated for by increased pressure on the brake pedal. The same also applies after
+a brake disc change.
+
+
+
+
+WM 465102 CHECKING FRONT PCCB BRAKE DISCS (WEAR ASSESSMENT)
+(EXCEPT CAYMAN GT4) > CHECKING PCCB BRAKE DISCS (WEAR ASSESSMENT) >
+VISUAL INSPECTION OF THE SURFACES OF THE BRAKE DISC FRICTION
+SURFACES (INDICATION OF WEAR)
+
+Information
+
+     The friction surface changes occur due to material fatigue as a result of extremely high thermal
+     load. These disc temperatures, which occur above all in racing conditions, cause a progressive
+     material fatigue .
+
+     Effects on driving: The surface change worsens the smoothness of braking, decreases the disc
+     strength and increases the brake pad wear and therefore makes a precautionary parts
+     replacement necessary .
+
+The following illustrations (PCCB brake disc wear appearance) are to be used for damage assessment.
+
+
+
+
+WM 465102 CHECKING FRONT PCCB BRAKE DISCS (WEAR ASSESSMENT)
+(EXCEPT CAYMAN GT4) > CHECKING PCCB BRAKE DISCS (WEAR ASSESSMENT) >
+PCCB BRAKE DISC WEAR APPEARANCE
+
+       1. Friction surfaces after normal brake load while driving on roads. No surface fractures present -
+
+         Brake discs do not need to be replaced!
+
+
+===== p3162 =====
+  Fig 1: Identifying Brake Disc Friction Surface Bores (Perforations)
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+2. Friction surfaces after a long journey and occasional high load. Isolated cases of connected
+   surface fractures less than 1.2 cm2-arrow- .
+
+  No replacement necessary as the connected surface fractures are < 1 cm2 !
+
+
+===== p3199 =====
+      9. Fit wheels → Installing Wheel .
+
+
+
+
+WM 468320 REMOVING AND INSTALLING BRAKE SHOES (ALL MODELS) >
+PRELIMINARY WORK
+
+    1. Remove wheel.
+
+      → 440519 REMOVING AND INSTALLING WHEEL
+
+    2. Remove rear brake disc.
+
+      → 465319 REMOVING AND INSTALLING REAR BRAKE DISC .
+
+
+
+
+WM 468320 REMOVING AND INSTALLING BRAKE SHOES (ALL MODELS) >
+REMOVING AND INSTALLING PARKING-BRAKE SHOES > REMOVING
+PARKING-BRAKE SHOES
+
+    1. Loosen the adjustment device → Adjustment device for parking-brake shoes with a
+       screwdriver.
+      Fig 1: Identifying Parking-Brake Shoes Adjustment Device
+
+
+
+
+      Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+===== p3200 =====
+  Information
+
+  It is not necessary to grind down the parking-brake shoes if the parking-brake shoes are not
+  replaced.
+
+  Set the brake shoes to the basic setting if necessary and calibrate the brakes → 468316
+  ADJUSTING PARKING-BRAKE SHOES .
+
+     1. Mark the parking-brake shoes and adjustment device according to their installation
+        position .
+
+     2. Secure the adjustment device to prevent it from turning .
+
+2. Remove parking-brake shoes -1- .
+  Fig 2: Identifying Brake Shoes Parts
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+         WARNING: Preloaded or pressurized components
+
+        1. Risk of injury (e.g. crushing or bruising) when removing and installing springs.
+
+
+  → Do not reach into the danger area.
+
+  → Relieve the tension on components before starting work.
+
+
+===== p3201 =====
+      → Secure components to prevent them from loosening suddenly.
+
+      → Wear protective gloves and goggles.
+
+      → Be very careful when working on the brake system.
+
+              1. 2.1. Remove compression springs -2- .
+
+                 To do this, use a crosshead screwdriver to press the compression springs together
+                 using a considerable amount of force and turn 90 degrees clockwise.
+
+              2. 2.2. Disengage both tension springs -4 and 5- .
+
+              3. 2.3. Remove parking-brake shoes -1- using adjustment device -3- .
+
+    3. Secure actuator -1- for parking brake with a tie-wrap -2- .
+      Fig 3: Identifying Actuator (Servo Motor) For Parking Brake
+
+
+
+
+      Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+WM 468320 REMOVING AND INSTALLING BRAKE SHOES (ALL MODELS) >
+REMOVING AND INSTALLING PARKING-BRAKE SHOES > INSTALLING
+PARKING-BRAKE SHOES
+
+
+===== p3202 =====
+1. Remove tie-wrap -2- on actuator -1- for parking brake.
+  Fig 1: Identifying Actuator (Servo Motor) For Parking Brake
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+         WARNING: Preloaded or pressurized components
+
+        1. Risk of injury (e.g. crushing or bruising) when removing and installing springs.
+
+
+  → Do not reach into the danger area.
+
+  → Relieve the tension on components before starting work.
+
+  → Secure components to prevent them from loosening suddenly.
+
+  → Wear protective gloves and goggles.
+
+  → Be very careful when working on the brake system.
+
+2. The parking-brake shoes -1- are installed in reverse order.
+
+
+===== p3203 =====
+      Fig 2: Identifying Brake Shoe Components
+
+
+
+
+      Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+              1. 2.1. Fit parking-brake shoes with adjustment device -1 and 3- .
+
+              2. 2.2. Engage both tension springs -4 and 5- .
+
+              3. 2.3. Install compression springs -2- . To do this, guide the hook of both compression
+                 springs in horizontally and turn it 90 degrees anti-clockwise.
+
+              4. 2.4. Centre the entire unit.
+
+
+
+
+WM 468320 REMOVING AND INSTALLING BRAKE SHOES (ALL MODELS) >
+SUBSEQUENT WORK
+
+    1. Install brake disc.
+
+      → Installing Rear Brake Disc .
+
+      Information
+
+          1. Grinding down applies only to grey cast-iron brakes with one-piece brake discs .

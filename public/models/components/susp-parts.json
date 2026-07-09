@@ -308,6 +308,94 @@
 "partNumber": "991.347.131.00",
 "function": "Right-side inner tie rod and ball-jointed outer end connecting the steering rack to the front right wheel carrier to steer the wheel.",
 "componentId": "susp"
+},
+{
+"id": "SUSP-F-010-L",
+"node": "frontTrailingArmLeft",
+"label": "Front Lower Trailing Arm (Left)",
+"assembly": "Front Suspension",
+"system": "Suspension",
+"tier": "primary",
+"partNumber": null,
+"function": "Front left lower trailing arm / control-arm link with bushings and aero spoiler (WM 401719).",
+"componentId": "susp"
+},
+{
+"id": "SUSP-F-010-R",
+"node": "frontTrailingArmRight",
+"label": "Front Lower Trailing Arm (Right)",
+"assembly": "Front Suspension",
+"system": "Suspension",
+"tier": "primary",
+"partNumber": null,
+"function": "Front right lower trailing arm / control-arm link with bushings and aero spoiler (WM 401719).",
+"componentId": "susp"
+},
+{
+"id": "SUSP-F-011-L",
+"node": "frontWheelCarrierLeft",
+"label": "Front Wheel Carrier / Knuckle (Left)",
+"assembly": "Front Suspension",
+"system": "Suspension",
+"tier": "primary",
+"partNumber": null,
+"function": "Front left wheel carrier (knuckle) clamping the strut and carrying the hub/bearing unit.",
+"componentId": "susp"
+},
+{
+"id": "SUSP-F-011-R",
+"node": "frontWheelCarrierRight",
+"label": "Front Wheel Carrier / Knuckle (Right)",
+"assembly": "Front Suspension",
+"system": "Suspension",
+"tier": "primary",
+"partNumber": null,
+"function": "Front right wheel carrier (knuckle) clamping the strut and carrying the hub/bearing unit.",
+"componentId": "susp"
+},
+{
+"id": "SUSP-R-010-L",
+"node": "rearTrailingArmLeft",
+"label": "Rear Trailing Arm (Left)",
+"assembly": "Rear Suspension",
+"system": "Suspension",
+"tier": "primary",
+"partNumber": null,
+"function": "Rear left trailing arm linking subframe to wheel carrier (WM 42 / drive-shaft R&I context).",
+"componentId": "susp"
+},
+{
+"id": "SUSP-R-010-R",
+"node": "rearTrailingArmRight",
+"label": "Rear Trailing Arm (Right)",
+"assembly": "Rear Suspension",
+"system": "Suspension",
+"tier": "primary",
+"partNumber": null,
+"function": "Rear right trailing arm linking subframe to wheel carrier (WM 42 / drive-shaft R&I context).",
+"componentId": "susp"
+},
+{
+"id": "SUSP-R-011-L",
+"node": "rearWheelCarrierLeft",
+"label": "Rear Wheel Carrier / Knuckle (Left)",
+"assembly": "Rear Suspension",
+"system": "Suspension",
+"tier": "primary",
+"partNumber": null,
+"function": "Rear left wheel carrier receiving the drive shaft, hub, and multi-link arms (WM 5505).",
+"componentId": "susp"
+},
+{
+"id": "SUSP-R-011-R",
+"node": "rearWheelCarrierRight",
+"label": "Rear Wheel Carrier / Knuckle (Right)",
+"assembly": "Rear Suspension",
+"system": "Suspension",
+"tier": "primary",
+"partNumber": null,
+"function": "Rear right wheel carrier receiving the drive shaft, hub, and multi-link arms (WM 5505).",
+"componentId": "susp"
 }
 ]
 }

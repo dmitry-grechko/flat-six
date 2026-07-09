@@ -34,19 +34,27 @@ failure exits non-zero.
 ```
 tools/gen/
   build-components.mjs     entry point: registry, GLB write, manifest, verify
+  wm-refs/                 WM CAD extracts + extract-pages.mjs (local PNGs gitignored)
   lib/
     materials.mjs          per-system color palette + glTF material conversion
     primitives.mjs         box/cyl/tube/torus/sphere helpers (tag mesh + material)
     glb-writer.mjs         THREE.Object3D hierarchy -> GLB serializer
   components/
     engine.mjs             flat-six (MA1, water-cooled)
-    transaxle.mjs          PDK transaxle
-    exhaust.mjs            headers -> cats -> mufflers -> tips
-    frontBrake.mjs         disc + red caliper (exports reusable makeBrake)
-    rearBrake.mjs          reuses makeBrake (smaller disc)
-    coolingRadiator.mjs    radiator + condenser + fan
-    smallParts.mjs         generic builders: canister / panel / coil-plug
+    ...
 ```
+
+## Calibrating from the workshop manual
+
+Use the project skill **`wm-3d-calibrate`** (`.cursor/skills/wm-3d-calibrate/`) for the
+full AI workflow: find figures → extract → Tier A silhouette → coverage → verify.
+Also: `npm run wm:figs`, `npm run wm:extract`, `npm run gen:verify`.
+
+## Joint-view placement
+
+After geometry changes, run **`xray-unified-layout`**
+(`.cursor/skills/xray-unified-layout/`) via `npm run gen:layout` so hotspots /
+displayRadius still compose correctly in the unified scene.
 
 ## Adding a component
 

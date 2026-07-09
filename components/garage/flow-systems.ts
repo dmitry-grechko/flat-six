@@ -86,13 +86,16 @@ export const FLOW_SYSTEMS: FlowSystem[] = [
     pipe: { color: '#23262b', metalness: 0.3, roughness: 0.6 },   // black plastic ducting
     radius: 0.05,
     speed: 0.16,
-    desc: 'Intake air enters through the LEFT side scoop only (the right scoop just ventilates the engine bay): a corrugated duct runs inboard to the airbox and filter, then through the throttle body into the plenum.',
+    desc: 'Intake air enters through BOTH side scoops into dual air cleaner housings, merges at a single central throttle housing, then feeds the intake-air distributors / plenums.',
     relatedAssembly: 'airfilter',
-    labelAt: [-1.05, 0.45, -0.05],
-    // Factory routing (WM 242519 Fig 2): a single near-horizontal duct from the
-    // left scoop to the airbox — the right side has NO intake duct.
+    labelAt: [0, 0.55, -0.55],
+    // Factory routing (WM 242519 / 244601): plural air cleaner housings → singular
+    // throttle housing → intake-air distributor. Both scoops feed induction.
     paths: [
-      { points: [[-1.0, 0.35, -0.12], [-0.62, 0.46, -0.35], [-0.25, 0.56, -0.52], [-0.02, 0.6, -0.62], [0, 0.42, -0.75], [0, 0.32, -0.82]] },
+      // Left scoop → L housing → central throttle → plenum
+      { points: [[-1.95, 0.42, -0.05], [-1.35, 0.48, -0.1], [-0.7, 0.5, -0.25], [-0.25, 0.5, -0.55], [0, 0.5, -0.9], [0, 0.42, -1.15], [0, 0.35, -1.35]] },
+      // Right scoop → R housing → central throttle → plenum
+      { points: [[1.95, 0.42, -0.05], [1.35, 0.48, -0.1], [0.7, 0.5, -0.25], [0.25, 0.5, -0.55], [0, 0.5, -0.9], [0, 0.42, -1.15], [0, 0.35, -1.35]] },
     ],
   },
   {
@@ -158,16 +161,13 @@ export const FLOW_SYSTEMS: FlowSystem[] = [
     radius: 0.021,
     speed: 0.1,
     desc: 'Fuel is drawn from the tank ahead of the cabin bulkhead by the in-tank pump and routed along the center tunnel to the rail and injectors at the engine.',
-    relatedAssembly: 'plugs',
+    relatedAssembly: 'fuel',
     labelAt: [-0.1, -0.25, 0.4],
     paths: [
       // Tank outlet (underside) → center tunnel → fuel rail at the engine
       { points: [[0, -0.2, 0.9], [-0.1, -0.4, 0.55], [-0.15, -0.42, 0], [-0.2, -0.3, -0.5], [-0.42, 0.22, -0.85]] },
     ],
-    nodes: [
-      // 981 tank: low, centered ahead of the passenger cell (battery sits above-right).
-      { id: 'fuel-tank', label: 'Fuel Tank', at: [0, -0.12, 0.95], size: [0.5, 0.26, 0.42], color: '#3b3f45' },
-    ],
+    // Tank body now lives in the dedicated `fuel` assembly (WM tank overview).
   },
   {
     id: 'brake-lines',

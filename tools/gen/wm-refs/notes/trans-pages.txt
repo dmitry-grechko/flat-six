@@ -1,0 +1,712 @@
+
+===== p5794 =====
+Fig 1: Identifying Transmission Control Unit (PDK) Installation Position
+
+
+
+
+Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+       NOTE: Voltage peaks
+
+         Risk of damage to electrical load or to the control unit
+
+
+
+Information
+
+Always comply with the regulations for handling ESD-sensitive components!
+
+      Assembly work may only be carried out if the mechanic is wearing the working clothes and shoes
+      approved by Porsche .
+
+      The new part must only be removed from the ESD (electrostatic discharge) protective packaging
+      just before installation and at the position at which the part is to be installed .
+
+      Never touch the electric pins and plug contacts .
+
+        1. Loosen transmission control unit.
+
+                   1. 1.1. Unclip wire harness -A- .
+
+                   2. 1.2. Pull out the expansion rivet -B- .
+
+                   3. 1.3. Pull out the bracket with the control unit -C- .
+
+
+===== p5795 =====
+  Fig 2: Loosening Transmission Control Unit
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+2. Disconnect plug connections.
+
+          1. 2.1. Release electric plug connection -1- (-a- ) and bend the clip over, then unplug
+             the connector -1- (-A- ).
+
+          2. 2.2. Release electric plug connection -2- (-b- ) and bend the clip over, then unplug
+             the connector -2- (-B- ).
+
+
+===== p5796 =====
+      Fig 3: Disconnecting Plug Connections
+
+
+
+
+      Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+    3. Remove control unit from the bracket.
+
+              1. 3.1. Release the lock and remove the control unit from the bracket.
+
+
+
+
+WM 373019 REMOVING AND INSTALLING TRANSMISSION CONTROL UNIT (PDK)
+(ALL MODELS) > INSTALLING TRANSMISSION CONTROL UNIT (PDK)
+
+    1. Slide the control unit into the bracket until it engages securely.
+
+    2. Connect plug connections.
+
+              1. 2.1. Connect electric plug connection -1- (-A- ) and bend the clip over at the same
+                 time until the connector locks securely.
+
+              2. 2.2. Connect electric plug connection -2- (-B- ) and bend the clip over at the same
+                 time until the connector locks securely.
+
+
+===== p5797 =====
+  Fig 1: Connecting Plug Connections
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+3. Secure the control unit.
+
+          1. 3.1. Fit the bracket with the control unit in the mounting point on the body and slide it
+             in -A- .
+
+          2. 3.2. Secure the bracket with the control unit using an expansion rivet -B- .
+
+          3. 3.3. Secure the wire harness -C- .
+
+
+===== p5798 =====
+       Fig 2: Securing Control Unit
+
+
+
+
+       Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+WM 373019 REMOVING AND INSTALLING TRANSMISSION CONTROL UNIT (PDK)
+(ALL MODELS) > SUBSEQUENT WORK
+
+     1. Secure the rear luggage compartment trim on the left side. → 700619 REMOVING AND
+        INSTALLING REAR LUGGAGE COMPARTMENT TRIM - section on "Installing"
+
+     2. If the control unit was replaced, the values/coding must be written into the control unit using
+        PIWIS Tester II 9818 .
+
+
+
+
+WM 373055 REPLACING PDK TRANSMISSION CONTROL UNIT (ALL MODELS) >
+TOOLS
+
+  Designation         Type         Number      Description
+
+
+===== p5814 =====
+     11. Remove Porsche Doppelkupplung (PDK).
+
+                 1. 11.1. Loosen and unscrew screws in the following sequence: -1- and -2- , then -3-
+                    and -5- and finally -4- .
+
+                 2. 11.2. Lower the Porsche Doppelkupplung (PDK).
+
+                 3. 11.3. Remove Porsche Doppelkupplung (PDK) by pulling it backwards and drain it.
+         Fig 8: Identifying PDK Transmission Bolt Loosening Sequence
+
+
+
+
+         Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+WM 373419 REMOVING AND INSTALLING PORSCHE DOPPELKUPPLUNG (PDK)
+(ALL MODELS) > INSTALLING PORSCHE DOPPELKUPPLUNG (PDK)
+
+Information
+
+     The coolant hoses must lock with an audible click when pushed into the plug-in couplings .
+
+Information
+
+After replacing the Porsche Doppelkupplung (PDK) or after carrying out repairs in the Porsche
+Doppelkupplung (PDK), the transmission control unit must be calibrated using PIWIS Tester II 9818 .
+
+
+===== p5815 =====
+1. Install Porsche Doppelkupplung (PDK).
+
+
+         NOTE: Engine housing overload.
+
+       1. Risk of engine damage if housing breaks.
+
+
+  → Observe specified loosening and tightening sequence!
+
+  → Loosening sequence: Loosen screws from the bottom up.
+
+  → Tightening sequence: Tighten screws from top to bottom.
+
+         1. 1.1. Lift the Porsche Doppelkupplung (PDK).
+
+                  1. 1.1.1. Make sure that the guide sleeves are located in the engine flange.
+
+                  2. 1.1.2. When lifting the transmission, make sure that no connectors or
+                     cables are trapped.
+
+         2. 1.2. As soon as the Porsche Doppelkupplung (PDK) is raised far enough:
+
+                  1. 1.2.1. Fit bracket with change-over valves, screw in fastening screw -3-
+                     and tighten to Tightening Torque 13 Nm (9.5 ft. lbs.) until secure.
+
+                  2. 1.2.2. Attach vacuum hose -2- to the vacuum line -1- .
+
+
+===== p5816 =====
+  Fig 1: Securing Change-Over Valves
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+3. 1.3. Lift the Porsche Doppelkupplung (PDK) further and fit it.
+
+          1. 1.3.1. Adjust the transmission jack bracket so that the transmission flange
+             and engine flange are parallel.
+
+          2. 1.3.2. Make sure that no lines are trapped between the transmission flange
+             and engine flange.
+
+          3. 1.3.3. Fit the Porsche Doppelkupplung (PDK).
+
+4. 1.4. Screw the transmission flange to the engine flange.
+
+  Information
+
+
+===== p5817 =====
+            Replace flange screws if necessary.
+
+                   1. 1.4.1. Screw in all screws in the following sequence:
+
+                      First -1- and -2- ,
+
+                      then -4- ,
+
+                      and finally -3- and -5- .
+
+                      Fig 2: Identifying PDK Transmission Bolt Loosening Sequence
+
+
+
+
+                      Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+                   2. 1.4.2. Tighten screws from top to bottom.
+
+                      Tightening torque 85 Nm (63 ft. lbs.)
+
+2. Fit transverse strut -2- , screw in fastening screws -1- and tighten to Initial Tightening 35
+   Nm (26 ft. lbs.) Final tightening +60° until secure.
+
+
+===== p5818 =====
+  Fig 3: Installing Transverse Strut
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+3. Fit coolant hoses -1- and fasten the locks -2- (-arrows- ).
+
+
+===== p5832 =====
+  1 - Transmission mount
+
+  2 - Transmission bracket
+
+  A - Nut on transmission mount
+  Fig 1: Removing Transmission Bracket With Hydraulic Mount
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+1. On Vehicles With Dynamic Unit Mounts: Disconnect cable plug -1- on the transmission
+   mount.
+
+2. Screw off fastening nuts -2- on the transmission mount.
+
+3. Unscrew fastening screws -3- on the transmission.
+
+
+===== p5833 =====
+         Fig 2: Identifying Dynamic Unit Mount Fasteners
+
+
+
+
+         Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+      4. Remove fastening screws on the transmission mount and remove transmission mount and gear
+         support.
+
+
+
+
+WM 374019 REMOVING AND INSTALLING TRANSMISSION MOUNT (ALL MODELS) >
+REMOVING TRANSMISSION MOUNT > REMOVING RIGHT TRANSMISSION MOUNT
+
+Information
+
+     Only loosen the nut on the transmission mount if the transmission mount has to be replaced .
+
+     Counter at the two flats on the transmission bracket while loosening .
+
+     Do not loosen the nut during re-installation .
+
+Overview Of Transmission Mount:
+
+         1 - Transmission mount
+
+         2 - Transmission bracket
+
+         A - Nut on transmission mount
+
+
+===== p5834 =====
+  Fig 1: Removing Transmission Bracket With Hydraulic Mount
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+1. On Vehicles With Dynamic Unit Mounts: Disconnect cable plug -1- on the transmission
+   mount -2- .
+
+          1. 1.1. Unclip retaining clips -3- on the transmission and move electric line aside.
+
+
+===== p5835 =====
+            Fig 2: Releasing Dynamic Unit Mount Electric Lines
+
+
+
+
+            Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+2. Screw off fastening nuts -1- on the transmission mount.
+
+         1. 2.1. Only loosen the fastening nut on the transmission mount if the transmission
+            mount will be replaced.
+
+3. Unscrew fastening screws -2- on the transmission bracket -3- .
+
+
+===== p5836 =====
+      Fig 3: Identifying Dynamic Unit Mount Fasteners
+
+
+
+
+      Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+    4. Remove fastening screws on the transmission mount and remove transmission mount and
+       transmission bracket.
+
+
+
+
+WM 374019 REMOVING AND INSTALLING TRANSMISSION MOUNT (ALL MODELS) >
+REPLACING TRANSMISSION MOUNT
+
+
+===== p5837 =====
+      NOTE: Incorrect handling of components
+
+       Risk of damage to components
+
+
+
+→ Carefully fit or remove the component.
+
+      1. Mark position of transmission bracket and transmission mount with a colored pen.
+
+      2. Clamp transmission bracket in a vice.
+
+         Use Aluminum Clamping Jaws!
+
+      3. Screw off loosened fastening nut -A- on the transmission mount.
+
+                1. 3.1. Copy marked position on the transmission mount to the new transmission mount.
+                  Fig 1: Removing Transmission Bracket With Hydraulic Mount
+
+
+
+
+                  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+      4. Fit new transmission mount and only tighten fastening nut slightly.
+
+                1. 4.1. Fit fastening screws on the transmission mount.
+
+
+
+
+WM 374019 REMOVING AND INSTALLING TRANSMISSION MOUNT (ALL MODELS) >
+
+
+===== p5838 =====
+INSTALLING TRANSMISSION MOUNT > INSTALLING RIGHT TRANSMISSION MOUNT
+
+    1. Insert and position transmission mount with transmission bracket -3 - .
+
+    2. Fit and tighten fastening nuts -1- . Tightening Torque 33 Nm
+
+    3. Fit and tighten fastening screws -2- . Initial Tightening 30 Nm (22 ft. lbs.)
+      Fig 1: Identifying Transmission Mount Fasteners
+
+
+
+
+      Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+      Information
+
+
+===== p5839 =====
+          1. For new transmission mounts, tighten the fastening nut according to specifications after
+             installing the bracket and securing the transmission mount .
+
+          2. Counter at the two flats on the transmission bracket while tightening .
+
+    4. If the transmission mount was replaced, tighten fastening nut.
+
+      Counter At The Two Flats On The Transmission Bracket!
+
+      Tightening Torque 85 Nm
+
+    5. Position electric line and clip in retaining clips -3- on the transmission.
+
+    6. On Vehicles With Dynamic Unit Mounts: Connect cable plug -1- to the transmission mount
+       -2- .
+      Fig 2: Securing Electric Lines
+
+
+
+
+      Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+WM 374019 REMOVING AND INSTALLING TRANSMISSION MOUNT (ALL MODELS) >
+INSTALLING TRANSMISSION MOUNT > INSTALLING LEFT TRANSMISSION MOUNT
+
+    1. Fit transmission mount with gear support.
+
+
+===== p5840 =====
+    2. Fit and tighten fastening nuts -2- . Tightening Torque 33 Nm
+
+    3. Screw in and tighten fastening screws -3- . Initial Tightening 30 Nm (22 ft. lbs.) Final
+       Tightening +40°
+
+      Information
+
+         1. For new transmission mounts, tighten the fastening nut according to specifications after
+            installing the bracket and securing the transmission mount .
+
+         2. Counter at the two flats on the transmission bracket while tightening .
+
+    4. If the transmission mount was replaced, tighten fastening nut.
+
+      Counter At The Two Flats On The Transmission Bracket!
+
+      Tightening Torque 85 Nm
+
+    5. On Vehicles With Dynamic Unit Mounts: Connect cable plug -1- to the transmission mount.
+      Fig 1: Identifying Transmission Mount Fasteners
+
+
+
+
+      Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+WM 374019 REMOVING AND INSTALLING TRANSMISSION MOUNT (ALL MODELS) >
+
+
+===== p5841 =====
+SUBSEQUENT WORK
+
+       1. Subsequent Work For Right Transmission Mount:
+
+         Install left transmission mount.
+
+       2. Lower the transmission jack.
+
+       3. Install support plate.
+
+         → 421419 REMOVING AND INSTALLING SUPPORT PLATE - section on "Installing".
+
+
+
+
+WM 375519 REMOVING AND INSTALLING ATF PAN (ALL MODELS) > TECHNICAL
+VALUES
+
+                                                                       Basic                      Tolerance
+     Location                 Description              Type                         Tolerance 1
+                                                                       Value                          2
+
+Drain Plug For                                                       15 Nm (11 +3 Nm (+2 ft.
+                   Replace Drain Plug           Tightening Torque
+ATF Pan                                                                 ft. lbs.)      lbs.)
+
+                   Aluminum Screw, M6 x 25 -
+ATF Pan To                                      Initial Tightening   2.4 Nm (2
+                   Replace Screw - Medium
+Transmission                                    + Yield Strength        ft. lbs.)
+                   Setting
+
+
+
+
+WM 375519 REMOVING AND INSTALLING ATF PAN (ALL MODELS) > PRELIMINARY
+WORK
+
+
+      WARNING: Caustic fluids
+
+        Danger of chemical burns
+
+
+
+→ Avoid contact with caustic fluid.
+
+→ Wear personal protective gear.
+
+→ Ensure that there is good ventilation.
+
+→ If you do come into contact, wash off immediately with plenty of warm water and contact a doctor if
+necessary.
+
+
+      WARNING: Hot fluid
+
+        Danger of scalding
+
+
+
+→ Let the fluid cool down.
+
+
+===== p5842 =====
+→ Wear personal protective gear.
+
+      1. Remove support plate.
+
+         → 421419 REMOVING AND INSTALLING SUPPORT PLATE - section on "Removing"
+
+      2. Drain ATF.
+
+         → 370255 CHANGING ATF CLUTCH FLUID
+
+         Fig 1: Locating ATF Drain Plug
+
+
+
+
+         Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+WM 375519 REMOVING AND INSTALLING ATF PAN (ALL MODELS) > REMOVING
+ATF PAN
+
+Information
+
+     Even after you have drained the hydraulic oil, there will still be residual oil in the ATF pan .
+
+      1. Loosen all screws on the ATF pan except for screws -1 and 3- in reverse tightening sequence
+         and then unscrew them.
+
+
+===== p5843 =====
+        2. Carefully lever off the ATF pan on the opposite side to screws -1 and 3- and catch any oil that
+           overflows.
+
+        3. Unscrew screws -1 and 3- and carefully remove the ATF pan.
+
+Fig 1: Identifying ATF Pan Screw Tightening Sequence
+
+
+
+
+Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+WM 375519 REMOVING AND INSTALLING ATF PAN (ALL MODELS) > INSTALLING
+ATF PAN
+
+Information
+
+      Aluminum screws must always be replaced .
+
+      Aluminum screws are secured using the yield-point-controlled method .
+
+      Use special tool electronic torque wrench 9768 for this .
+
+      To ensure that the screws are tightened uniformly, the specified tightening setting "light, medium or
+      hard" must be used .
+
+        1. Coat the sealing ring on the intake snorkel on the ATF pan with oil.
+
+           Information
+
+           Always use a new ATF pan and new aluminum screws.
+
+           The sealing faces of the transmission and ATF pan must be clean and dry for installation.
+
+
+===== p5844 =====
+  Before screwing in the new screws, blow out the threaded bore thoroughly with compressed
+  air. Have a clean, lint-free cloth to hand to collect any emerging particles of dirt.
+
+2. Fit the ATF pan on the transmission. Make sure that the sealing ring on the intake connection
+   of the ATF pan is lying on the intake duct of the electrohydraulic control mechanism -arrow- .
+  Fig 1: Locating Intake Connection On Electrohydraulic Control Mechanism
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+3. Press the ATF pan onto the transmission until the sealing ring on the intake connection clicks
+   into the intake duct of the control mechanism and the ATF pan is flat on the transmission.
+
+4. Fit fastening screws in the ATF pan and tighten to the specified torque according to the
+   specified sequence.
+
+  Initial tightening + yield strength 2.4 Nm (2 ft. lbs.)
+
+  Tighten M6 screws at "medium" setting .
+
+
+===== p5845 =====
+         Fig 2: Identifying ATF Pan Screw Tightening Sequence
+
+
+
+
+         Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+WM 375519 REMOVING AND INSTALLING ATF PAN (ALL MODELS) > SUBSEQUENT
+WORK
+
+      1. Tighten new drain plug.
+
+         Tightening torque 15 Nm (11 ft. lbs.) +3 Nm (+2 ft. lbs.)
+
+      2. Fill in ATF clutch fluid.
+
+         → 370255 CHANGING ATF CLUTCH FLUID
+
+      3. Check and top up ATF clutch fluid:
+
+         → 370235 CHECKING AND TOPPING UP ATF CLUTCH FLUID
+
+
+
+
+WM 375855 REPLACING ATF FILTER (ALL MODELS) > REPLACING ATF FILTER
+
+Information
+
+     The ATF filter can only be replaced as a unit with the ATF pan. → 375519 REMOVING AND
+     INSTALLING ATF PAN

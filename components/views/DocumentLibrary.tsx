@@ -6,6 +6,7 @@ import {
   CATEGORY_LABELS,
   documentsForGeneration,
   getDocument,
+  resolveWorkshopViewerLink,
   type DocCategory,
   type DocumentMeta,
 } from '@/lib/documents';
@@ -22,7 +23,6 @@ export default function DocumentLibrary() {
   const searchParams = useSearchParams();
   const docId = searchParams.get('doc');
   const pageParam = Number(searchParams.get('page') || '0');
-  const initialPage = Number.isFinite(pageParam) && pageParam > 0 ? pageParam : undefined;
   const { vehicle } = useVehicle();
   const vehicleGen = generationForBody(vehicle.body);
   const gen = vehicleGen === '987' || vehicleGen === '981' ? vehicleGen : '981';
@@ -67,7 +67,12 @@ export default function DocumentLibrary() {
 
   // Deep-link: if ?doc= is set and valid, show the viewer (optional ?page=).
   // Must run AFTER all hooks — early return before useMemo caused a hooks mismatch.
-  const active = docId ? getDocument(docId) : undefined;
+  const workshopLink = docId ? resolveWorkshopViewerLink(docId, pageParam) : null;
+  const active = workshopLink?.doc ?? (docId ? getDocument(docId) : undefined);
+  const initialPage = workshopLink
+    ? workshopLink.pageInVolume
+    : (Number.isFinite(pageParam) && pageParam > 0 ? pageParam : undefined);
+
   if (docId && active) {
     return (
       <WorkshopManual

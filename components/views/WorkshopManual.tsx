@@ -26,7 +26,7 @@ async function fetchManualUrl(docId: string): Promise<ManualUrlResponse> {
   const res = await fetch(`/api/manual/url?doc=${encodeURIComponent(docId)}`);
   if (res.status === 401) throw new Error('auth');
   if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
+    const body = await res.json().catch(() => ({})) as { error?: string };
     throw new Error(body.error || `Could not resolve manual URL (${res.status})`);
   }
   return res.json() as Promise<ManualUrlResponse>;
@@ -103,7 +103,7 @@ function PdfPageSlot({
 }
 
 export default function WorkshopManual({
-  documentId = '981-workshop-manual',
+  documentId = '981-workshop-manual-v1',
   initialPage,
   onBack,
 }: {
@@ -182,8 +182,13 @@ export default function WorkshopManual({
           setLoadError('Sign in to view documents.');
           return;
         }
+        const detail = typeof e?.message === 'string' && e.message && e.message !== 'auth'
+          ? e.message
+          : '';
         setLoadError(
-          'Could not load this PDF. For local dev, ensure the file exists under public/. For production, upload with npm run docs:upload.',
+          detail && !detail.startsWith('Could not')
+            ? detail
+            : 'Could not load this PDF. For local dev, ensure the file exists under public/. For production, upload with npm run docs:upload (workshop PDF is separate from db:import-mtl).',
         );
       })
       .finally(() => {

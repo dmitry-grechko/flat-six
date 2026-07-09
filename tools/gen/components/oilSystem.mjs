@@ -6,6 +6,9 @@
 // implied engine block centred near the origin. The sump is the largest part
 // (bottom centre); sensors and the filter are kept appropriately small.
 //
+// WM CAD refs (981): filter underside ~3984–3986; pump sprocket/chain ~4010–4015;
+// pan upper/lower + molded seal ~4035–4045; cooler bracket exploded ~4059.
+//
 // Primary nodes covered (tier !== 'sub'):
 //   oilPump, oilFilterHousing, oilPressureSensor, oilFillerCap, oilSump,
 //   oilSeparator, oilConductingHousing, oilHeatExchanger, oilLevelSensor,
@@ -13,8 +16,7 @@
 // Sub-tier parts (galleries, inserts, gaskets, drive chain, jets, etc.) are
 // modelled where convenient as nested named meshes — harmless extras.
 
-import { group, box, cyl, torus, tube, at, rot } from '../lib/primitives.mjs';
-import { makeCanister } from './smallParts.mjs';
+import { group, box, roundBox, cyl, torus, tube, lathe, at, rot } from '../lib/primitives.mjs';
 
 export const meta = {
   id: 'oil',
@@ -32,35 +34,42 @@ export function build() {
   const add = (m, p = oil) => { p.add(m); return m; };
 
   // ----------------------------------------------------------------------
-  // OIL SUMP / PAN — largest component, bottom centre (y negative).
-  // Two-piece pan: lower sump + upper sump section, with a gasket plane,
-  // rear sealing flange, drain plug + crush washer.
+  // OIL SUMP / PAN — two-piece: lower sump + upper frame (WM ~4035–4045).
+  // Molded seal lip between halves; pickup/strainer visible in lower cavity.
   // ----------------------------------------------------------------------
   const sump = group('oilSump');
   add(sump);
-  // main lower pan body (wide, shallow, tapered toward the bottom)
-  add(at(box('sumpBody', 2.0, 0.55, 2.6, 'cast'), 0, -1.35, -0.1), sump);
-  add(at(box('sumpFloor', 1.7, 0.18, 2.3, 'castDark'), 0, -1.62, -0.1), sump);
+  // lower pan body — shallow cast bowl with tapered floor (WM pan lower)
+  add(at(roundBox('sumpBody', 2.0, 0.48, 2.55, 'cast', 3), 0, -1.38, -0.1), sump);
+  add(at(roundBox('sumpFloor', 1.65, 0.14, 2.2, 'castDark', 2), 0, -1.62, -0.1), sump);
   // cast cooling/strengthening ribs on the pan floor
   for (let i = 0; i < 5; i++) {
-    add(at(box(`sumpRib_${i}`, 1.6, 0.05, 0.06, 'castDark'), 0, -1.66, -1.0 + i * 0.45), sump);
+    add(at(box(`sumpRib_${i}`, 1.55, 0.04, 0.055, 'castDark'), 0, -1.68, -1.0 + i * 0.45), sump);
   }
-  // upper sump part (sub) — forms the lower crankcase enclosure
-  add(at(box('oilSumpUpperPart', 2.05, 0.4, 2.6, 'cast'), 0, -0.95, -0.1), sump);
-  // sump gasket (sub) — thin sealing plane between sump and upper part
-  add(at(box('oilSumpGasket', 2.06, 0.03, 2.62, 'rubber'), 0, -1.12, -0.1), sump);
-  // rear crankshaft sealing flange (sub) — closes the rear of the lower crankcase
+  // lower-pan flange lip (outer rim where molded seal seats)
+  add(at(box('sumpLowerFlange', 2.08, 0.06, 2.62, 'cast'), 0, -1.12, -0.1), sump);
+
+  // upper sump part (sub) — frame with central void (WM Fig 9 ~4045)
+  add(at(roundBox('oilSumpUpperPart', 2.1, 0.38, 2.65, 'cast', 3), 0, -0.9, -0.1), sump);
+  // inner void suggestion (thinner inset) so upper reads as a frame, not a solid slab
+  add(at(box('sumpUpperVoid', 1.35, 0.42, 1.7, 'castDark'), 0, -0.9, -0.05), sump);
+  // molded seal lip (sub) — perimeter gasket plane between upper/lower (WM ~4036)
+  add(at(box('oilSumpGasket', 2.12, 0.035, 2.68, 'rubber'), 0, -1.12, -0.1), sump);
+  // raised seal bead along flange edge
+  add(at(box('sumpSealBeadOuter', 2.14, 0.02, 2.7, 'rubber'), 0, -1.1, -0.1), sump);
+
+  // rear crankshaft sealing flange (sub)
   add(rot(at(cyl('sealingFlange', 0.62, 0.62, 0.12, 'cast', 28), 0, -0.85, -1.45), Math.PI / 2, 0, 0), sump);
   // drain plug + aluminium crush washer (sub) at the lowest point
   add(at(cyl('oilDrainPlug', 0.1, 0.1, 0.1, 'bolt', 6), 0.0, -1.72, 0.3), sump);
   add(at(torus('oilDrainPlugWasher', 0.11, 0.025, 'steel', 8, 20), 0.0, -1.66, 0.3), sump);
 
   // Engine oil (primary) — translucent-ish oil mass filling the lower sump.
-  add(at(box('engineOil', 1.65, 0.28, 2.2, OIL), 0, -1.5, -0.1), oil);
+  add(at(box('engineOil', 1.6, 0.26, 2.15, OIL), 0, -1.5, -0.1), oil);
 
   // ----------------------------------------------------------------------
-  // OIL PUMP — cast housing low in the block, crank-driven, with drive chain
-  // & sprocket and the suction tube reaching down into the sump.
+  // OIL PUMP — cast housing + sprocket with lightening holes + chain stub
+  // toward crank (WM ~4010–4015).
   // ----------------------------------------------------------------------
   const pump = group('oilPump');
   add(pump);
@@ -68,22 +77,38 @@ export function build() {
   add(rot(at(cyl('pumpCover', 0.3, 0.3, 0.08, 'castDark', 28), -0.55, -0.6, 0.82), Math.PI / 2, 0, 0), pump);
   // pump inlet boss
   add(at(cyl('pumpInletBoss', 0.12, 0.12, 0.16, 'cast', 18), -0.55, -0.85, 0.6), pump);
-  // drive chain & sprocket (sub) — crank-driven simplex chain
+  // oil pressure control valve boss on pump face (WM ~4015)
+  add(rot(at(cyl('pumpPressureValveBoss', 0.07, 0.07, 0.14, 'steel', 14), -0.55, -0.45, 0.78), Math.PI / 2, 0, 0), pump);
+
+  // drive chain & sprocket (sub) — holed sprocket + chain run toward crank
   const chain = group('oilPumpDriveChain');
   add(chain, pump);
-  add(rot(at(cyl('pumpSprocket', 0.16, 0.16, 0.06, 'steel', 24), -0.55, -0.6, 0.9), Math.PI / 2, 0, 0), chain);
-  add(rot(at(cyl('crankSprocket', 0.22, 0.22, 0.06, 'steel', 24), -0.55, 0.25, 0.9), Math.PI / 2, 0, 0), chain);
-  add(rot(at(torus('chainRunL', 0.45, 0.025, 'steel', 8, 40), -0.62, -0.18, 0.9), 0, Math.PI / 2, 0), chain);
+  add(rot(at(cyl('pumpSprocket', 0.2, 0.2, 0.055, 'steel', 28), -0.55, -0.6, 0.92), Math.PI / 2, 0, 0), chain);
+  add(rot(at(cyl('pumpSprocketHub', 0.07, 0.07, 0.07, 'bolt', 16), -0.55, -0.6, 0.96), Math.PI / 2, 0, 0), chain);
+  // six lightening holes (WM ~4010 Fig 1)
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * Math.PI * 2;
+    const hx = -0.55 + Math.cos(a) * 0.12;
+    const hy = -0.6 + Math.sin(a) * 0.12;
+    add(rot(at(cyl(`pumpSprocketHole_${i}`, 0.035, 0.035, 0.07, 'castDark', 10), hx, hy, 0.92), Math.PI / 2, 0, 0), chain);
+  }
+  // crank sprocket stub + chain runs upward toward crank
+  add(rot(at(cyl('crankSprocket', 0.22, 0.22, 0.06, 'steel', 24), -0.55, 0.28, 0.92), Math.PI / 2, 0, 0), chain);
+  add(rot(at(torus('chainRunL', 0.48, 0.022, 'steel', 8, 40), -0.62, -0.16, 0.92), 0, Math.PI / 2, 0), chain);
+  add(rot(at(torus('chainRunR', 0.48, 0.022, 'steel', 8, 40), -0.48, -0.16, 0.92), 0, Math.PI / 2, 0), chain);
+  // short chain stub segments toward crank (visual continuity)
+  add(at(box('chainStubUp', 0.04, 0.55, 0.05, 'steel'), -0.55, -0.15, 0.98), chain);
 
-  // Oil suction tube / pickup (sub) — from pump down into the sump.
+  // Oil suction tube / pickup (sub) — from pump down into the sump (WM ~4042).
   add(tube('oilSuctionTube', [
     [-0.55, -0.78, 0.6],
     [-0.5, -1.1, 0.3],
     [-0.2, -1.35, -0.1],
     [0.0, -1.45, -0.3],
   ], 0.06, 'steel', 28, 12), pump);
-  // pickup screen at the tube mouth
-  add(at(box('pickupScreen', 0.22, 0.05, 0.22, 'castDark'), 0.0, -1.46, -0.3), pump);
+  // pickup strainer screen at the tube mouth
+  add(at(cyl('pickupScreen', 0.14, 0.14, 0.06, 'castDark', 16), 0.0, -1.46, -0.3), pump);
+  add(at(box('pickupStrainer', 0.24, 0.04, 0.24, 'steel'), 0.0, -1.48, -0.3), pump);
 
   // Oil supply pipe (sub) — rigid pipe from pump outlet up to the gallery feed.
   add(tube('oilPipe', [
@@ -94,81 +119,113 @@ export function build() {
   ], 0.05, 'steel', 28, 12), oil);
 
   // ----------------------------------------------------------------------
-  // OIL-CONDUCTING HOUSING — integrated housing on the side of the block
-  // routing oil between filter, cooler and galleries. Carries the filter
-  // mounting interface plus the cooler bypass thermostat.
+  // OIL-CONDUCTING HOUSING / COOLER BRACKET SPINE (WM ~4059 item 1)
+  // Long cast bracket: mist separator end → cooler pad → filter housing end.
   // ----------------------------------------------------------------------
   const conduct = group('oilConductingHousing');
   add(conduct);
-  add(at(box('conductBody', 0.5, 0.7, 0.5, 'cast'), 0.95, 0.05, 0.2), conduct);
-  add(at(box('conductFlange', 0.12, 0.5, 0.4, 'castDark'), 0.68, 0.05, 0.2), conduct);
-  // filter mount boss (where the filter housing screws on, underneath)
-  add(at(cyl('filterMountBoss', 0.2, 0.2, 0.12, 'cast', 24), 0.95, -0.32, 0.2), conduct);
-  // cooler bypass thermostat (sub) — small element in the housing
-  add(rot(at(cyl('oilCoolerBypassThermostat', 0.08, 0.08, 0.18, 'steel', 16), 0.95, 0.2, 0.5), Math.PI / 2, 0, 0), conduct);
+  // main spine along +X / slight -Z (bracket body)
+  add(at(roundBox('conductBody', 0.42, 0.55, 1.35, 'cast', 3), 1.0, 0.15, -0.15), conduct);
+  add(at(box('conductFlange', 0.1, 0.48, 1.1, 'castDark'), 0.76, 0.12, -0.1), conduct);
+  // cooler mounting pad (recessed flat on spine)
+  add(at(box('coolerMountPad', 0.38, 0.08, 0.55, 'castDark'), 1.05, 0.42, -0.35), conduct);
+  // filter mount boss at bracket end (underside, angled interface)
+  add(at(cyl('filterMountBoss', 0.22, 0.22, 0.1, 'cast', 24), 1.05, -0.18, 0.35), conduct);
+  // cooler bypass thermostat (sub)
+  add(rot(at(cyl('oilCoolerBypassThermostat', 0.08, 0.08, 0.18, 'steel', 16), 1.05, 0.28, 0.35), Math.PI / 2, 0, 0), conduct);
 
   // ----------------------------------------------------------------------
-  // OIL FILTER HOUSING + insert — on the side of the block, BELOW the
-  // conducting housing. Kept clearly SMALL (radius ~0.18) vs the sump.
+  // OIL FILTER HOUSING — cartridge cover on underside, ~45° mount
+  // (WM ~3984 Fig 1: domed cover + fluted grip near base; ~3985 element).
   // ----------------------------------------------------------------------
   const filterHousing = group('oilFilterHousing');
   add(filterHousing);
-  // outer cap/housing shell (spin-on style), small
-  add(at(cyl('filterHousingShell', 0.22, 0.22, 0.52, 'cast', 28), 0.95, -0.62, 0.2), filterHousing);
-  add(at(cyl('filterHousingCap', 0.18, 0.2, 0.1, 'castDark', 24), 0.95, -0.35, 0.2), filterHousing);
-  // O-ring / gasket seal (sub)
-  add(at(torus('oilFilterHousingORing', 0.2, 0.025, 'rubber', 10, 28), 0.95, -0.32, 0.2), filterHousing);
-  // integrated pressure relief valve (sub)
-  add(rot(at(cyl('oilPressureReliefValve', 0.06, 0.06, 0.16, 'steel', 14), 1.15, -0.5, 0.2), 0, 0, Math.PI / 2), filterHousing);
+  // tilt group: pitch ~45° down/out from bracket end
+  const filterTilt = group('oilFilterTilt');
+  add(at(filterTilt, 1.05, -0.35, 0.4), filterHousing);
+  rot(filterTilt, -Math.PI / 4, 0, 0.15);
 
-  // Filter element / insert (sub) — small pleated cartridge inside the housing.
-  const insert = makeCanister({ node: 'oilFilterInsert', r: 0.16, h: 0.42, bodyMat: 'red', capMat: 'steel', pleats: true });
-  add(at(insert, 0.95, -0.62, 0.2), filterHousing);
-  // filter service set marker (sub) — co-located with the insert
-  add(at(cyl('oilFilterSet', 0.17, 0.17, 0.44, 'paper', 20), 0.95, -0.62, 0.2), filterHousing);
+  // fixed housing cup (open toward cover)
+  add(at(cyl('filterHousingShell', 0.2, 0.2, 0.18, 'cast', 28), 0, 0.22, 0), filterTilt);
+  // fluted/faceted grip ring near base of cover (WM ~3984)
+  add(at(cyl('filterHousingCap', 0.21, 0.21, 0.1, 'castDark', 12), 0, 0.08, 0), filterTilt);
+  for (let i = 0; i < 12; i++) {
+    const a = (i / 12) * Math.PI * 2;
+    add(at(box(`filterFlute_${i}`, 0.035, 0.1, 0.04, 'castDark'), Math.cos(a) * 0.2, 0.08, Math.sin(a) * 0.2), filterTilt);
+  }
+  // domed cylindrical cover body
+  add(at(lathe('filterCoverDome', [
+    [0.0, -0.28],
+    [0.19, -0.28],
+    [0.2, -0.22],
+    [0.2, 0.05],
+    [0.18, 0.12],
+    [0.1, 0.16],
+    [0.0, 0.17],
+  ], 'cast', 28), 0, -0.12, 0), filterTilt);
+  // O-ring / gasket seal (sub) near open end of cover
+  add(at(torus('oilFilterHousingORing', 0.195, 0.022, 'rubber', 10, 28), 0, 0.16, 0), filterTilt);
+  // integrated pressure relief valve (sub)
+  add(rot(at(cyl('oilPressureReliefValve', 0.055, 0.055, 0.14, 'steel', 14), 0.22, 0.05, 0), 0, 0, Math.PI / 2), filterTilt);
+
+  // Filter element / insert (sub) — pleated cartridge visible inside cover (WM ~3985)
+  const insert = group('oilFilterInsert');
+  add(at(insert, 0, -0.08, 0), filterTilt);
+  add(at(cyl('filterInsertCore', 0.14, 0.14, 0.38, 'paper', 20), 0, 0, 0), insert);
+  for (let i = 0; i < 16; i++) {
+    const a = (i / 16) * Math.PI * 2;
+    add(at(box(`filterPleat_${i}`, 0.025, 0.34, 0.05, 'paper'), Math.cos(a) * 0.145, 0, Math.sin(a) * 0.145), insert);
+  }
+  add(at(cyl('filterInsertCap', 0.13, 0.13, 0.04, 'steel', 16), 0, 0.2, 0), insert);
+  // filter service set marker (sub)
+  add(at(cyl('oilFilterSet', 0.155, 0.155, 0.4, 'paper', 18), 0, -0.08, 0), filterTilt);
 
   // ----------------------------------------------------------------------
-  // OIL HEAT EXCHANGER (oil cooler) — finned oil-to-coolant block on the side.
+  // OIL HEAT EXCHANGER — rectangular oil/water cooler + dual pipe stubs
+  // on bracket pad (WM ~4059 item 6).
   // ----------------------------------------------------------------------
   const cooler = group('oilHeatExchanger');
   add(cooler);
-  add(at(box('coolerBody', 0.6, 0.5, 0.45, 'castDark'), 1.15, 0.55, -0.5), cooler);
-  for (let i = 0; i < 9; i++) {
-    add(at(box(`coolerFin_${i}`, 0.64, 0.03, 0.45, 'steel'), 1.15, 0.32 + i * 0.055, -0.5), cooler);
+  add(at(roundBox('coolerBody', 0.55, 0.32, 0.48, 'castDark', 3), 1.08, 0.62, -0.35), cooler);
+  // plate-stack suggestion (not tall finned block — WM is a compact rectangular HX)
+  for (let i = 0; i < 5; i++) {
+    add(at(box(`coolerPlate_${i}`, 0.52, 0.025, 0.46, 'steel'), 1.08, 0.5 + i * 0.045, -0.35), cooler);
   }
-  // coolant inlet/outlet stubs
-  add(rot(at(cyl('coolerInlet', 0.07, 0.07, 0.18, 'steel', 14), 1.15, 0.78, -0.32), Math.PI / 2, 0, 0), cooler);
-  add(rot(at(cyl('coolerOutlet', 0.07, 0.07, 0.18, 'steel', 14), 1.15, 0.32, -0.32), Math.PI / 2, 0, 0), cooler);
+  // dual coolant/oil pipe stubs (WM ~4059 — two stubs on cooler face)
+  add(at(cyl('coolerInlet', 0.065, 0.065, 0.16, 'steel', 14), 0.95, 0.82, -0.22), cooler);
+  add(at(cyl('coolerOutlet', 0.065, 0.065, 0.16, 'steel', 14), 1.2, 0.82, -0.22), cooler);
+  add(at(torus('coolerInletFlange', 0.075, 0.018, 'cast', 8, 16), 0.95, 0.74, -0.22), cooler);
+  add(at(torus('coolerOutletFlange', 0.075, 0.018, 'cast', 8, 16), 1.2, 0.74, -0.22), cooler);
 
   // ----------------------------------------------------------------------
-  // OIL SEPARATOR (crankcase ventilation) — canister on top/side of the block.
-  // Plus the sump-mounted secondary separator (sub).
+  // OIL SEPARATOR — mist separator canister on cooler-bracket end
+  // (WM ~4059 item 2) + sump-mounted secondary separator (sub).
   // ----------------------------------------------------------------------
   const separator = group('oilSeparator');
   add(separator);
-  add(at(cyl('separatorBody', 0.3, 0.3, 0.55, 'cover', 24), -0.7, 0.85, -0.4), separator);
-  add(at(cyl('separatorCap', 0.32, 0.32, 0.08, 'cover', 24), -0.7, 1.16, -0.4), separator);
+  // primary mist separator on bracket (canister / slight cone)
+  add(at(cyl('separatorBody', 0.22, 0.26, 0.42, 'cover', 24), 1.05, 0.55, 0.45), separator);
+  add(at(cyl('separatorCap', 0.24, 0.24, 0.07, 'cover', 24), 1.05, 0.8, 0.45), separator);
+  add(at(cyl('separatorNeck', 0.1, 0.1, 0.1, 'cast', 16), 1.05, 0.32, 0.45), separator);
   // breather hose stub to intake
   add(tube('separatorHose', [
-    [-0.7, 1.05, -0.4],
-    [-0.4, 1.1, -0.1],
-    [-0.1, 1.0, 0.2],
-  ], 0.05, 'hose2', 24, 10), separator);
-  // secondary sump separator (sub)
-  add(at(cyl('oilSumpSeparator', 0.18, 0.18, 0.3, 'cover', 20), 0.4, -0.95, -0.5), separator);
+    [1.05, 0.75, 0.45],
+    [0.6, 0.9, 0.2],
+    [0.1, 0.95, -0.1],
+  ], 0.045, 'hose2', 24, 10), separator);
+  // secondary sump separator (sub) — air/oil separator on pan (WM ~4041)
+  add(at(cyl('oilSumpSeparator', 0.16, 0.16, 0.28, 'cover', 20), 0.45, -0.95, -0.55), separator);
+  add(at(box('sumpSeparatorFlange', 0.28, 0.04, 0.22, 'cast'), 0.45, -1.1, -0.55), separator);
 
   // ----------------------------------------------------------------------
   // OIL FILLER CAP & DIPSTICK — cap on top (tan/yellow), thin dipstick tube.
   // ----------------------------------------------------------------------
   const filler = group('oilFillerCap');
   add(filler);
-  // filler neck + cap on top of the cam housing
   add(at(cyl('fillerNeck', 0.14, 0.14, 0.22, 'cast', 20), -0.1, 1.0, 0.55), filler);
   add(at(cyl('fillerCapBody', 0.18, 0.18, 0.12, 'oilcap', 24), -0.1, 1.16, 0.55), filler);
   add(at(cyl('fillerCapGrip', 0.2, 0.18, 0.06, 'yellow', 24), -0.1, 1.24, 0.55), filler);
-  // filler neck seal (sub)
   add(at(torus('oilFillerNeckSeal', 0.15, 0.025, 'rubber', 10, 24), -0.1, 0.9, 0.55), filler);
-  // dipstick tube (sub geometry) + handle
   add(tube('dipstickTube', [
     [0.25, 1.0, 0.3],
     [0.3, 0.4, 0.1],
@@ -180,19 +237,16 @@ export function build() {
   // ----------------------------------------------------------------------
   // SENSORS — small cylinders on the housing / sump. Kept tiny.
   // ----------------------------------------------------------------------
-  // Oil pressure sensor (primary) — on the conducting housing.
   const pSensor = group('oilPressureSensor');
   add(pSensor);
-  add(rot(at(cyl('pressureSensorBody', 0.06, 0.06, 0.18, 'steel', 16), 1.18, 0.2, 0.0), 0, 0, Math.PI / 2), pSensor);
-  add(rot(at(cyl('pressureSensorConn', 0.05, 0.05, 0.08, 'cover', 12), 1.32, 0.2, 0.0), 0, 0, Math.PI / 2), pSensor);
+  add(rot(at(cyl('pressureSensorBody', 0.06, 0.06, 0.18, 'steel', 16), 1.22, 0.2, 0.05), 0, 0, Math.PI / 2), pSensor);
+  add(rot(at(cyl('pressureSensorConn', 0.05, 0.05, 0.08, 'cover', 12), 1.36, 0.2, 0.05), 0, 0, Math.PI / 2), pSensor);
 
-  // Oil temperature sensor (primary) — in the oil circuit on the housing.
   const tSensor = group('oilTemperatureSensor');
   add(tSensor);
-  add(rot(at(cyl('tempSensorBody', 0.055, 0.055, 0.16, 'steel', 16), 1.18, -0.1, 0.0), 0, 0, Math.PI / 2), tSensor);
-  add(rot(at(cyl('tempSensorConn', 0.045, 0.045, 0.07, 'cover', 12), 1.31, -0.1, 0.0), 0, 0, Math.PI / 2), tSensor);
+  add(rot(at(cyl('tempSensorBody', 0.055, 0.055, 0.16, 'steel', 16), 1.22, -0.05, 0.05), 0, 0, Math.PI / 2), tSensor);
+  add(rot(at(cyl('tempSensorConn', 0.045, 0.045, 0.07, 'cover', 12), 1.35, -0.05, 0.05), 0, 0, Math.PI / 2), tSensor);
 
-  // Oil level sensor (primary) — capacitive sensor in the sump floor.
   const lSensor = group('oilLevelSensor');
   add(lSensor);
   add(at(cyl('levelSensorFlange', 0.12, 0.12, 0.05, 'cover', 18), -0.4, -1.62, 0.4), lSensor);

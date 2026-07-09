@@ -35,17 +35,68 @@ export interface DocumentMeta {
 
 const MTL = 'mobile_tech_library';
 
-/** Factory workshop manual — single large PDF. */
-const WORKSHOP: DocumentMeta = {
-  id: '981-workshop-manual',
-  title: '981 Workshop Manual',
-  subtitle: 'Cayman · Boxster · Base · S · GT4 (2013–2016)',
-  category: 'workshop',
-  generations: ['981'],
-  storagePath: '981-workshop-manual.pdf',
-  localUrl: '/manual/981-workshop-manual.pdf',
-  sizeLabel: '~213 MB',
-};
+/**
+ * Workshop manual volumes (compressed + split for Supabase Free ≤50 MB).
+ * Absolute PDF page N maps via `workshopVolumeForPage`. Local full PDF still
+ * works in dev when present; prod serves these volumes from Storage.
+ */
+export const WORKSHOP_VOLUMES: DocumentMeta[] = [
+  {
+    id: '981-workshop-manual-v1',
+    title: '981 Workshop Manual — Vol 1',
+    subtitle: 'Pages 1–2029 · Cayman · Boxster · GT4 (2013–2016)',
+    category: 'workshop',
+    generations: ['981'],
+    storagePath: '981-workshop-manual-v1.pdf',
+    localUrl: '/manual/981-workshop-manual-v1.pdf',
+    sizeLabel: '~32 MB',
+  },
+  {
+    id: '981-workshop-manual-v2',
+    title: '981 Workshop Manual — Vol 2',
+    subtitle: 'Pages 2030–4058 · Cayman · Boxster · GT4 (2013–2016)',
+    category: 'workshop',
+    generations: ['981'],
+    storagePath: '981-workshop-manual-v2.pdf',
+    localUrl: '/manual/981-workshop-manual-v2.pdf',
+    sizeLabel: '~33 MB',
+  },
+  {
+    id: '981-workshop-manual-v3',
+    title: '981 Workshop Manual — Vol 3',
+    subtitle: 'Pages 4059–6087 · Cayman · Boxster · GT4 (2013–2016)',
+    category: 'workshop',
+    generations: ['981'],
+    storagePath: '981-workshop-manual-v3.pdf',
+    localUrl: '/manual/981-workshop-manual-v3.pdf',
+    sizeLabel: '~33 MB',
+  },
+];
+
+/** Absolute page ranges matching `npm run manual:compress` (6087 pages / 3). */
+export const WORKSHOP_VOLUME_RANGES: ReadonlyArray<{
+  id: string;
+  startPage: number;
+  endPage: number;
+}> = [
+  { id: '981-workshop-manual-v1', startPage: 1, endPage: 2029 },
+  { id: '981-workshop-manual-v2', startPage: 2030, endPage: 4058 },
+  { id: '981-workshop-manual-v3', startPage: 4059, endPage: 6087 },
+];
+
+/** Map an absolute workshop PDF page → volume doc + page-within-volume. */
+export function workshopVolumeForPage(absolutePage: number): {
+  doc: DocumentMeta;
+  pageInVolume: number;
+} {
+  const page = Math.max(1, Math.floor(absolutePage) || 1);
+  const range =
+    WORKSHOP_VOLUME_RANGES.find((r) => page >= r.startPage && page <= r.endPage) ??
+    WORKSHOP_VOLUME_RANGES[0];
+  const doc =
+    WORKSHOP_VOLUMES.find((v) => v.id === range.id) ?? WORKSHOP_VOLUMES[0];
+  return { doc, pageInVolume: page - range.startPage + 1 };
+}
 
 /** Encode each path segment for a public URL (spaces, commas, etc.). */
 function publicUrl(relPath: string): string {
@@ -147,7 +198,7 @@ function slug(s: string): string {
 
 /** Full catalog shown in the Documents tab (981 / 987 scoped). */
 export const DOCUMENTS: DocumentMeta[] = [
-  WORKSHOP,
+  ...WORKSHOP_VOLUMES,
 
   // ---- 981 Diagnostic ----
   diag981('3730 PDK.pdf', 'PDK Diagnosis'),
@@ -270,7 +321,35 @@ export const CATEGORY_LABELS: Record<DocCategory, string> = {
 };
 
 export function getDocument(id: string): DocumentMeta | undefined {
+  // Legacy single-PDF id → Vol 1 (prod no longer ships the 213 MB file).
+  if (id === '981-workshop-manual') return WORKSHOP_VOLUMES[0];
   return DOCUMENTS.find((d) => d.id === id);
+}
+
+/**
+ * Resolve Documents deep-links for workshop volumes.
+ * - Legacy `?doc=981-workshop-manual&page=<absolute>` → correct volume + local page
+ * - `?doc=…-v2&page=<absolute>` (page past volume length) → remapped
+ * - Otherwise page is already within the volume
+ */
+export function resolveWorkshopViewerLink(
+  docId: string,
+  pageParam: number,
+): { doc: DocumentMeta; pageInVolume: number } | null {
+  const abs = Number.isFinite(pageParam) && pageParam > 0 ? pageParam : 1;
+
+  if (docId === '981-workshop-manual') {
+    return workshopVolumeForPage(abs);
+  }
+
+  const range = WORKSHOP_VOLUME_RANGES.find((r) => r.id === docId);
+  if (!range) return null;
+
+  const len = range.endPage - range.startPage + 1;
+  if (abs > len) return workshopVolumeForPage(abs);
+
+  const doc = WORKSHOP_VOLUMES.find((v) => v.id === docId) ?? WORKSHOP_VOLUMES[0];
+  return { doc, pageInVolume: abs };
 }
 
 export function documentsForGeneration(gen: string | null | undefined): DocumentMeta[] {
@@ -306,7 +385,10 @@ export function resolveDocumentForManualHit(hit: {
   }
 
   const src = hit.source ?? 'workshop';
-  if (src === 'workshop') return getDocument('981-workshop-manual');
+  if (src === 'workshop') {
+    // Prefer volume for page when caller passes page via manualHitHref.
+    return WORKSHOP_VOLUMES[0];
+  }
 
   // Strip " (2/5)" suffixes from oversized chunk titles.
   const stem = hit.title.replace(/\s+\(\d+\/\d+\)\s*$/, '').trim();
@@ -342,14 +424,28 @@ export function manualHitHref(hit: {
   docId?: string | null;
   page: number;
 }): string | null {
+  const src = hit.source ?? 'workshop';
+  const absolutePage = hit.page > 0 ? hit.page : 1;
+
+  if (src === 'workshop' && !hit.docId) {
+    const { doc, pageInVolume } = workshopVolumeForPage(absolutePage);
+    return `/manual?doc=${encodeURIComponent(doc.id)}&page=${pageInVolume}`;
+  }
+
   const doc = resolveDocumentForManualHit(hit);
   if (!doc) return null;
-  const page = hit.page > 0 ? hit.page : 1;
-  return `/manual?doc=${encodeURIComponent(doc.id)}&page=${page}`;
+
+  // Already a volume id — treat page as absolute and remap.
+  if (doc.category === 'workshop' && WORKSHOP_VOLUME_RANGES.some((r) => r.id === doc.id)) {
+    const { doc: vol, pageInVolume } = workshopVolumeForPage(absolutePage);
+    return `/manual?doc=${encodeURIComponent(vol.id)}&page=${pageInVolume}`;
+  }
+
+  return `/manual?doc=${encodeURIComponent(doc.id)}&page=${absolutePage}`;
 }
 
 /** Back-compat aliases used by the signed-URL route / upload script. */
 export const MANUAL_BUCKET = 'workshop-manual';
-export const MANUAL_OBJECT = WORKSHOP.storagePath;
-export const MANUAL_LOCAL_URL = WORKSHOP.localUrl!;
+export const MANUAL_OBJECT = WORKSHOP_VOLUMES[0].storagePath;
+export const MANUAL_LOCAL_URL = WORKSHOP_VOLUMES[0].localUrl!;
 export const MANUAL_SIGNED_URL_TTL = 60 * 60 * 24;

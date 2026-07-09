@@ -30,9 +30,23 @@ if (!url || !key) {
 
 function collectLocalFiles() {
   const files = [];
-  const workshop = path.join(PUBLIC, 'manual/981-workshop-manual.pdf');
-  if (!mtlOnly && fs.existsSync(workshop)) {
-    files.push({ storagePath: '981-workshop-manual.pdf', local: workshop });
+
+  // Prefer compressed Free-tier volumes (<50 MB each). Fall back to the full
+  // 213 MB PDF only when volumes are missing (will 413 on Free plans).
+  const volumeFiles = [1, 2, 3].map((n) => ({
+    storagePath: `981-workshop-manual-v${n}.pdf`,
+    local: path.join(PUBLIC, `manual/981-workshop-manual-v${n}.pdf`),
+  }));
+  const volumesPresent = volumeFiles.filter((f) => fs.existsSync(f.local));
+  if (!mtlOnly) {
+    if (volumesPresent.length) {
+      files.push(...volumesPresent);
+    } else {
+      const workshop = path.join(PUBLIC, 'manual/981-workshop-manual.pdf');
+      if (fs.existsSync(workshop)) {
+        files.push({ storagePath: '981-workshop-manual.pdf', local: workshop });
+      }
+    }
   }
 
   const sitAllow = new Set([
@@ -118,9 +132,19 @@ async function uploadSmall(localPath, objectPath) {
 }
 
 const files = collectLocalFiles();
+if (
+  !mtlOnly &&
+  !files.some((f) => f.storagePath.startsWith('981-workshop-manual'))
+) {
+  console.warn(
+    '⚠ no workshop PDF volumes at public/manual/981-workshop-manual-v*.pdf\n' +
+      '  Run: npm run manual:compress   then retry docs:upload',
+  );
+}
 console.log(`Uploading ${files.length} PDFs to ${BUCKET}/…`);
 
 let ok = 0;
+const failed = [];
 for (const f of files) {
   const mb = fs.statSync(f.local).size / 1024 / 1024;
   process.stdout.write(`  ${f.storagePath} (${mb.toFixed(1)} MB)…`);
@@ -130,7 +154,21 @@ for (const f of files) {
     console.log(' ok');
     ok++;
   } catch (e) {
-    console.log(` FAILED: ${e.message || e}`);
+    const msg = e.message || String(e);
+    console.log(` FAILED: ${msg}`);
+    failed.push({ path: f.storagePath, msg });
   }
 }
 console.log(`\n✓ ${ok}/${files.length} uploaded`);
+if (failed.length) {
+  console.error(`\n✗ ${failed.length} failed:`);
+  for (const f of failed) console.error(`  - ${f.path}: ${f.msg}`);
+  if (failed.some((f) => f.path.startsWith('981-workshop-manual'))) {
+    console.error(
+      '\nWorkshop upload failed. For Free-tier (50 MB cap):\n' +
+        '  npm run manual:compress && npm run docs:upload\n' +
+        'Or raise Global file size limit on Pro and upload the full PDF.',
+    );
+  }
+  process.exit(1);
+}

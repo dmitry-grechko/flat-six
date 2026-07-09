@@ -11,12 +11,12 @@ export const dynamic = 'force-dynamic';
 
 /**
  * Resolve a signed (or local) URL for a catalog document.
- *   GET /api/manual/url?doc=981-workshop-manual
- *   GET /api/manual/url          → defaults to workshop manual
+ *   GET /api/manual/url?doc=981-workshop-manual-v1
+ *   GET /api/manual/url          → defaults to workshop Vol 1
  */
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const docId = searchParams.get('doc') || '981-workshop-manual';
+  const docId = searchParams.get('doc') || '981-workshop-manual-v1';
   const doc = getDocument(docId);
   if (!doc) {
     return NextResponse.json({ error: 'Unknown document' }, { status: 404 });
@@ -41,7 +41,15 @@ export async function GET(req: Request) {
     .createSignedUrl(doc.storagePath, MANUAL_SIGNED_URL_TTL);
 
   if (error || !data?.signedUrl) {
-    if (doc.localUrl) {
+    // Local public/ fallback is for `next dev` only — on Vercel those PDFs are
+    // gitignored and a localUrl 404s after pdf.js tries to load it.
+    const host = req.headers.get('host') ?? '';
+    const isLocalHost =
+      host.startsWith('localhost') ||
+      host.startsWith('127.0.0.1') ||
+      host.endsWith('.local');
+
+    if (isLocalHost && doc.localUrl) {
       return NextResponse.json({
         url: doc.localUrl,
         source: 'local' as const,
@@ -51,7 +59,13 @@ export async function GET(req: Request) {
       });
     }
     return NextResponse.json(
-      { error: error?.message || 'Document not available in storage' },
+      {
+        error:
+          error?.message === 'Object not found'
+            ? `Not in Storage (${doc.storagePath}). Upload with: npm run docs:upload`
+            : error?.message || 'Document not available in storage',
+        storagePath: doc.storagePath,
+      },
       { status: 404 },
     );
   }

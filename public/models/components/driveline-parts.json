@@ -1,45 +1,105 @@
 {
-"glb": "/models/components/driveline.glb",
-"parts": [
-{
-"id": "DL-001",
-"node": "engineToPdkAdapter",
-"label": "Engine-to-PDK Adapter / Bellhousing Interface",
-"assembly": "Engine Mounts",
-"system": "Driveline",
-"tier": "primary",
-"partNumber": null,
-"function": "Adapter plate and bellhousing interface that mates the flat-six engine block to the PDK transaxle, aligning input shaft and locating the dual-clutch housing."
-},
-{
-"id": "DL-002",
-"node": "engineMounts",
-"label": "Engine Mounts x2 \u2014 Hydraulic Rubber Mounts",
-"assembly": "Engine Mounts",
-"system": "Driveline",
-"tier": "primary",
-"partNumber": "98137511205",
-"function": "Pair of hydraulic rubber engine mounts, one on each side of the mid-mounted flat-six, that isolate engine vibration from the chassis and carry vertical and lateral engine loads."
-},
-{
-"id": "DL-003",
-"node": "pdkTransmissionMount",
-"label": "PDK / Transmission Mount",
-"assembly": "Engine Mounts",
-"system": "Driveline",
-"tier": "primary",
-"partNumber": null,
-"function": "Hydraulic rubber mount that supports the tail of the PDK transaxle against the rear subframe, isolating driveline torque reaction and vibration from the chassis."
-},
-{
-"id": "DL-WHL-005",
-"node": "lugBolts",
-"label": "Lug Bolts M14x1.5 Ball-Seat x20",
-"assembly": "Wheels & Hubs",
-"system": "Driveline",
-"tier": "primary",
-"partNumber": "99936101704",
-"function": "Set of 20 M14x1.5 ball-seat lug bolts (5 per wheel) that secure all four wheels to the Porsche hub flanges at the specified torque."
-}
-]
+  "glb": "/models/components/driveline.glb",
+  "parts": [
+    {
+      "id": "DL-001",
+      "node": "engineToPdkAdapter",
+      "label": "Engine-to-PDK Adapter / Bellhousing Interface",
+      "assembly": "Engine Mounts",
+      "system": "Driveline",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Adapter plate and bellhousing interface that mates the flat-six engine block to the PDK transaxle."
+    },
+    {
+      "id": "DL-002",
+      "node": "engineMounts",
+      "label": "Engine Mounts x2 — Hydraulic Rubber Mounts",
+      "assembly": "Engine Mounts",
+      "system": "Driveline",
+      "tier": "primary",
+      "partNumber": "98137511205",
+      "function": "Pair of hydraulic rubber engine mounts isolating the mid-mounted flat-six from the chassis."
+    },
+    {
+      "id": "DL-003",
+      "node": "pdkTransmissionMount",
+      "label": "PDK / Transmission Mount",
+      "assembly": "Engine Mounts",
+      "system": "Driveline",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Hydraulic rubber mount supporting the PDK transaxle against the rear subframe."
+    },
+    {
+      "id": "DL-004",
+      "node": "differential",
+      "label": "Differential / Final Drive Housing",
+      "assembly": "Final Drive",
+      "system": "Driveline",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Final-drive differential housing with halfshaft flanges (WM 39 / Fig protective sleeve & flanged shaft)."
+    },
+    {
+      "id": "DL-005-L",
+      "node": "rearDriveShaftLeft",
+      "label": "Rear Drive Shaft / Half-Shaft (Left)",
+      "assembly": "Drive Shafts",
+      "system": "Driveline",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Left rear drive shaft from PDK flange to wheel hub with CV joints and bellows (WM 422119)."
+    },
+    {
+      "id": "DL-005-R",
+      "node": "rearDriveShaftRight",
+      "label": "Rear Drive Shaft / Half-Shaft (Right)",
+      "assembly": "Drive Shafts",
+      "system": "Driveline",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Right rear drive shaft from PDK flange to wheel hub with CV joints and bellows (WM 422119)."
+    },
+    {
+      "id": "DL-006",
+      "node": "innerCVJoints",
+      "label": "Inner CV Joints (Transmission Side) x2",
+      "assembly": "Drive Shafts",
+      "system": "Driveline",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Constant-velocity joints at the transmission/halfshaft flange (WM Fig CV joint on transmission side)."
+    },
+    {
+      "id": "DL-007",
+      "node": "outerCVJoints",
+      "label": "Outer CV Joints (Wheel Side) x2",
+      "assembly": "Drive Shafts",
+      "system": "Driveline",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Constant-velocity joints at the wheel carrier / hub end of each rear drive shaft."
+    },
+    {
+      "id": "DL-008",
+      "node": "cvBellows",
+      "label": "CV Joint Bellows / Boots x4",
+      "assembly": "Drive Shafts",
+      "system": "Driveline",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Corrugated protective bellows over inner and outer CV joints (WM 422855)."
+    },
+    {
+      "id": "DL-WHL-005",
+      "node": "lugBolts",
+      "label": "Lug Bolts M14x1.5 Ball-Seat x20",
+      "assembly": "Wheels & Hubs",
+      "system": "Driveline",
+      "tier": "primary",
+      "partNumber": "99936101704",
+      "function": "Set of M14x1.5 ball-seat lug bolts securing wheels to the hub flanges."
+    }
+  ]
 }

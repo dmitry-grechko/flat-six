@@ -1,9 +1,11 @@
 // Rear brake assembly (id 'rbrakes'). 299 mm vented disc, smaller red 4-piston
 // caliper WITH an integrated electronic parking brake (EPB) motor-in-caliper
-// actuator. Reuses the shared makeBrake builder from frontBrake.mjs, passing the
-// rear node-name set so every primary part in rbrakes-parts.json gets a pin
-// anchor (rotors, calipers, pads, EPB actuators, wheel-speed sensors, ABS/PSM
-// unit, brake lines, and the fluid reservoir).
+// actuator + drum-in-hat parking shoes (WM 3199–3203). Reuses the shared
+// makeBrake builder from frontBrake.mjs, passing the rear node-name set so every
+// primary part in rbrakes-parts.json gets a pin anchor.
+//
+// WM Tier A (981): caliper-pads-3111/3123 fastening screws; disc-perforations-3159
+// curved bores; parking-brake-3199…3203 shoes / adjuster / actuator.
 
 import { makeBrake } from './frontBrake.mjs';
 
@@ -17,6 +19,11 @@ const REAR_NODES = {
   pads: 'rearBrakePads',
   epbActuatorLeft: 'epbActuatorLeft',
   epbActuatorRight: 'epbActuatorRight',
+  // Sub-node names for drum-in-hat shoe hint (WM parking-brake figs)
+  epbShoeLeft: 'epbShoeLeft',
+  epbShoeRight: 'epbShoeRight',
+  epbSpringLeft: 'epbSpringLeft',
+  epbSpringRight: 'epbSpringRight',
   wheelSpeedLeft: 'wheelSpeedSensorRearLeft',
   wheelSpeedRight: 'wheelSpeedSensorRearRight',
   absUnit: 'absPsmHydraulicUnit',

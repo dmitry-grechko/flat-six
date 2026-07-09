@@ -1,0 +1,410 @@
+
+===== PAGE CHUNK 0 =====
+GTS, BOXSTER "BLACK/STYLE EDITION, BOXSTER SPYDER, CAYMAN GT4) >
+SUBSEQUENT WORK
+
+     1. Only for right air cleaner housing:
+
+                  1. 1.1. Secure DME control unit. → Installing DME Control Unit
+
+                  2. 1.2. Clip in oil filler neck. → INSTALLING OIL FILLER NECK
+
+     2. Install luggage compartment cover. → INSTALLING FRONT LUGGAGE COMPARTMENT TRIM
+        PANEL .
+
+
+
+
+WM 242519 REMOVING AND INSTALLING AIR CLEANER HOUSING (CAYMAN,
+CAYMAN S, CAYMAN "BLACK/STYLE EDITION, BOXSTER, BOXSTER S, BOXSTER
+GTS, BOXSTER "BLACK/STYLE EDITION, BOXSTER SPYDER, CAYMAN GT4) >
+TECHNICAL VALUES
+
+   Location           Description          Type         Basic value      Tolerance 1     Tolerance 2
+
+Rubber sleeve        Screw-type         Tightening
+                                                       3 Nm (2 ftlb.)
+ for air intake        clamp              torque
+
+  Air cleaner                           Tightening
+                    Fastening nut                      4 Nm (3 ftlb.)
+housing to body                           torque
+
+
+
+
+WM 242519 REMOVING AND INSTALLING AIR CLEANER HOUSING (CAYMAN,
+CAYMAN S, CAYMAN "BLACK/STYLE EDITION, BOXSTER, BOXSTER S, BOXSTER
+GTS, BOXSTER "BLACK/STYLE EDITION, BOXSTER SPYDER, CAYMAN GT4) >
+PRELIMINARY WORK
+
+     1. Remove engine. → REMOVING ENGINE .
+
+     2. Loosen luggage compartment cover and fold it towards the rear. → REMOVING FRONT
+        LUGGAGE COMPARTMENT TRIM PANEL
+
+     3. Only for right air cleaner housing:
+
+                  1. 3.1. Unclip oil filler neck and set it aside. → REMOVING OIL FILLER NECK .
+
+                  2. 3.2. Loosen DME control unit and set it aside. → Removing DME Control Unit .
+
+
+
+
+WM 242519 REMOVING AND INSTALLING AIR CLEANER HOUSING (CAYMAN,
+CAYMAN S, CAYMAN "BLACK/STYLE EDITION, BOXSTER, BOXSTER S, BOXSTER
+GTS, BOXSTER "BLACK/STYLE EDITION, BOXSTER SPYDER, CAYMAN GT4) >
+REMOVING AIR CLEANER HOUSING
+
+
+===== PAGE CHUNK 1 =====
+1. Unscrew and remove fastening screw for air cleaner housing at the flow duct.
+
+2. Unscrew fastening nuts -1- on the air cleaner housing in the luggage compartment.
+
+3. Remove air cleaner housing -1- .
+  Fig 1: Identifying Threaded Joint For Air Cleaner Housing In Luggage Compartment
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+          1. 3.1. Loosen screw-type clamp -2- .
+
+          2. 3.2. Unclip air cleaner housing -1- at the flow duct.
+
+          3. 3.3. Loosen and remove air cleaner housing -1- from the rubber sleeve -3- .
+
+
+===== PAGE CHUNK 2 =====
+                 Fig 2: Identifying Air Cleaner Housing In Engine Compartment
+
+
+
+
+                 Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+WM 242519 REMOVING AND INSTALLING AIR CLEANER HOUSING (CAYMAN,
+CAYMAN S, CAYMAN "BLACK/STYLE EDITION, BOXSTER, BOXSTER S, BOXSTER
+GTS, BOXSTER "BLACK/STYLE EDITION, BOXSTER SPYDER, CAYMAN GT4) >
+INSTALLING AIR CLEANER HOUSING
+
+    1. Install air cleaner housing -1- .
+
+              1. 1.1. Position air cleaner housing -1- and insert it into the rubber sleeve -2- .
+
+              2. 1.2. Fit screw-type clamp -2- and tighten to Tightening torque 3 Nm (2 ftlb.) .
+
+              3. 1.3. Clip in air cleaner housing -1- at the flow duct.
+
+
+===== PAGE CHUNK 3 =====
+  Fig 1: Identifying Air Cleaner Housing In Engine Compartment
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+2. Fit fastening nuts -1- on the air cleaner housing in the luggage compartment and tighten to
+   Tightening torque 4 Nm (3 ftlb.) .
+
+
+===== PAGE CHUNK 4 =====
+      Fig 2: Identifying Threaded Joint For Air Cleaner Housing In Luggage Compartment
+
+
+
+
+      Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+    3. Tighten fastening screw for air cleaner housing at the flow duct.
+
+
+
+
+WM 242519 REMOVING AND INSTALLING AIR CLEANER HOUSING (CAYMAN,
+CAYMAN S, CAYMAN "BLACK/STYLE EDITION, BOXSTER, BOXSTER S, BOXSTER
+GTS, BOXSTER "BLACK/STYLE EDITION, BOXSTER SPYDER, CAYMAN GT4) >
+SUBSEQUENT WORK
+
+    1. Only for right air cleaner housing:
+
+              1. 1.1. Secure DME control unit. → Installing DME Control Unit
+
+              2. 1.2. Clip in oil filler neck. → INSTALLING OIL FILLER NECK .
+
+    2. Install luggage compartment cover. → INSTALLING FRONT LUGGAGE COMPARTMENT TRIM
+       PANEL .
+
+    3. Install engine. → INSTALLING ENGINE .
+
+
+===== PAGE CHUNK 5 =====
+WM 243019 REMOVING AND INSTALLING FUEL COLLECTION PIPE WITH FUEL
+INJECTORS (CAYMAN, CAYMAN S, CAYMAN "BLACK/STYLE EDITION, BOXSTER,
+BOXSTER S, BOXSTER GTS, BOXSTER "BLACK/STYLE EDITION, BOXSTER
+SPYDER, CAYMAN GT4) > TOOLS
+
+  Designation       Type          Number          Description
+
+
+
+
+   repair kit      VW tool        T10133
+
+
+
+
+ puller arms for
+                   VW tool    T10133/30
+ T10133/1 - kit
+
+
+
+
+WM 243019 REMOVING AND INSTALLING FUEL COLLECTION PIPE WITH FUEL
+INJECTORS (CAYMAN, CAYMAN S, CAYMAN "BLACK/STYLE EDITION, BOXSTER,
+BOXSTER S, BOXSTER GTS, BOXSTER "BLACK/STYLE EDITION, BOXSTER
+SPYDER, CAYMAN GT4) > TECHNICAL VALUES
+
+    Location        Description            Type         Basic value      Tolerance 1   Tolerance 2
+
+  Union nut on
+                 M14 x 1.5 - coat
+connecting line                       Tightening
+                 thread and cone                      20 Nm (15 ftlb.)
+for cylinder 1-3                        torque
+                  with OKS 1710
+    and 4-6
+
+
+===== PAGE CHUNK 6 =====
+ Fuel collection
+                   External Torx          Tightening       13 Nm (9.5
+pipes to cylinder
+                  screw, M6 x 30            torque            ftlb.)
+      head
+
+ Holding clamp
+    securing
+                     External Torx        Tightening       10 Nm (7.5
+connecting line
+                    screw, M6 x 12          torque            ftlb.)
+ to sheetmetal
+    bracket
+
+
+
+
+WM 243019 REMOVING AND INSTALLING FUEL COLLECTION PIPE WITH FUEL
+INJECTORS (CAYMAN, CAYMAN S, CAYMAN "BLACK/STYLE EDITION, BOXSTER,
+BOXSTER S, BOXSTER GTS, BOXSTER "BLACK/STYLE EDITION, BOXSTER
+SPYDER, CAYMAN GT4) > PRELIMINARY WORK
+
+      1. Relieve fuel pressure in the system.
+
+                  1. 1.1. Remove cover on the fuse carrier in the passenger compartment at the front left.
+
+                  2. 1.2. In row B -1- , pull out the (20-amp) fuse -2- for the fuel pump.
+
+                  3. 1.3. Start the engine, wait until it stops and then insert the fuse again.
+
+
+===== PAGE CHUNK 7 =====
+ forcing devices Special tool        9264
+
+
+
+
+WM 244601 CHECKING INTAKE-AIR DISTRIBUTOR FOR LEAKS (CAYMAN, CAYMAN
+S, CAYMAN "BLACK/STYLE EDITION, BOXSTER, BOXSTER S, BOXSTER GTS,
+BOXSTER "BLACK/STYLE EDITION, BOXSTER SPYDER, CAYMAN GT4) >
+PRELIMINARY WORK
+
+         1. Remove rubber sleeve on air intake between the air cleaner housings and throttle housing.
+
+           → Removing Air Cleaner Housing .
+
+
+
+
+WM 244601 CHECKING INTAKE-AIR DISTRIBUTOR FOR LEAKS (CAYMAN, CAYMAN
+S, CAYMAN "BLACK/STYLE EDITION, BOXSTER, BOXSTER S, BOXSTER GTS,
+BOXSTER "BLACK/STYLE EDITION, BOXSTER SPYDER, CAYMAN GT4) > TEST
+PROCEDURE > CHECKING INTAKE-AIR DISTRIBUTOR FOR LEAKS
+
+Tools:
+
+         1. Rubber sleeve: Original Porsche part number 966.110.686.02
+
+         2. Special tool forcing devices 9264 , part 6
+
+
+===== PAGE CHUNK 8 =====
+Fig 1: Identifying Leak-Testing Intake-Air Distributor Tool
+
+
+
+
+Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+        1. Secure test tool to throttle housing.
+
+                   1. 1.1. Fit rubber sleeve -1- to throttle housing and secure with a screw-type clamp.
+
+                   2. 1.2. Insert forcing device -2- into the rubber sleeve and secure using a screw-type
+                      clamp.
+
+
+===== PAGE CHUNK 9 =====
+                 Fig 2: Securing Test Tool On Throttle Housing
+
+
+
+
+                 Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+    2. Check intake-air distributor for leaks.
+
+              1. 2.1. Connect compressed air hose with pressure gauge to the valve.
+
+              2. 2.2. Build up overpressure of max. 0.8 bar in the intake system!
+
+              3. 2.3. Coat accessible sealing points with commercially available leak-locating spray
+                 (e.g. TEGA test spray TPS 674) to make it easier to locate leaks (bubbles).
+
+                 Leaks at more difficult-to-reach joints can be detected by obvious air-leak sounds.
+
+    3. Remove test tool from throttle housing.
+
+
+
+
+WM 244601 CHECKING INTAKE-AIR DISTRIBUTOR FOR LEAKS (CAYMAN, CAYMAN
+S, CAYMAN "BLACK/STYLE EDITION, BOXSTER, BOXSTER S, BOXSTER GTS,
+BOXSTER "BLACK/STYLE EDITION, BOXSTER SPYDER, CAYMAN GT4) >
+SUBSEQUENT WORK
+
+    1. Fit rubber sleeve on air intake between the air cleaner housings and throttle housing. →
+       Installing Air Cleaner Housing .
+
+
+===== PAGE CHUNK 10 =====
+WM 244619 REMOVING AND INSTALLING INTAKE-AIR DISTRIBUTOR (CAYMAN,
+CAYMAN S, CAYMAN "BLACK/STYLE EDITION, BOXSTER, BOXSTER S, BOXSTER
+GTS, BOXSTER "BLACK/STYLE EDITION, BOXSTER SPYDER, CAYMAN GT4) >
+TECHNICAL VALUES
+
+    Location           Description          Type         Basic value      Tolerance 1      Tolerance 2
+
+   Intake-air
+                      External Torx      Tightening      13 Nm (9.5
+ distributor to
+                     screw, M6 x 35        torque           ftlb.)
+ cylinder head
+
+   Positive
+  crankcase
+  ventilation         External Torx      Tightening      10 Nm (7.5
+   holder to         screw, M6 x 12        torque           ftlb.)
+  intake-air
+  distributor
+
+Tank vent valve
+    holder to         External Torx      Tightening      10 Nm (7.5
+   intake-air        screw, M6 x 12        torque           ftlb.)
+  distributor
+
+ Cable duct to
+                      External Torx      Tightening      13 Nm (9.5
+  intake-air
+                     screw, M6 x 16        torque           ftlb.)
+  distributor
+
+Refrigerant line
+   holder to          External Torx      Tightening      10 Nm (7.5
+  intake-air         screw, M6 x 12        torque           ftlb.)
+  distributor
+
+
+
+
+WM 244619 REMOVING AND INSTALLING INTAKE-AIR DISTRIBUTOR (CAYMAN,
+CAYMAN S, CAYMAN "BLACK/STYLE EDITION, BOXSTER, BOXSTER S, BOXSTER
+GTS, BOXSTER "BLACK/STYLE EDITION, BOXSTER SPYDER, CAYMAN GT4) >
+PRELIMINARY WORK
+
+      1. Remove resonance tube. → Removing Resonance Tube
+
+
+
+
+WM 244619 REMOVING AND INSTALLING INTAKE-AIR DISTRIBUTOR (CAYMAN,
+CAYMAN S, CAYMAN "BLACK/STYLE EDITION, BOXSTER, BOXSTER S, BOXSTER
+GTS, BOXSTER "BLACK/STYLE EDITION, BOXSTER SPYDER, CAYMAN GT4) >
+REMOVING INTAKE-AIR DISTRIBUTOR > REMOVING INTAKE-AIR DISTRIBUTOR 1-3
+
+      1. Remove intake-air distributor 1-3.
+
+                   1. 1.1. Release and disconnect electric plug connection for engine temperature sensor
+
+
+===== PAGE CHUNK 11 =====
+            -7- .
+
+          2. 1.2. Unscrew fastening screw -5- and remove holder for refrigerant lines -4- .
+
+          3. 1.3. Unscrew fastening screw -2- and remove cable duct -1- .
+
+          4. 1.4. Open fixing clip -arrow- and remove electric line -6- .
+
+          5. 1.5. Unscrew fastening screws -8- and lift the intake-air distributor 1-3 -3- up and
+             remove it from the engine compartment.
+
+            Use a bar magnet to remove the screws (poor accessibility in some areas)!
+
+            Fig 1: Removing Intake-Air Distributor 1-3
+
+
+
+
+            Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+          6. 1.6. The intake-air distributor can be cleaned in a parts washing machine without
+             aggressive cleaning ↓agents.
+
+          7. 1.7. Clean sealing faces on the cylinder head.
+
+          8. 1.8. Replace molded seals.
+
+
+
+
+WM 244619 REMOVING AND INSTALLING INTAKE-AIR DISTRIBUTOR (CAYMAN,
+CAYMAN S, CAYMAN "BLACK/STYLE EDITION, BOXSTER, BOXSTER S, BOXSTER
+GTS, BOXSTER "BLACK/STYLE EDITION, BOXSTER SPYDER, CAYMAN GT4) >
+

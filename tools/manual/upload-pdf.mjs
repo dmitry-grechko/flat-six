@@ -40,7 +40,11 @@ console.log(`Uploading ${filePath} (${sizeMb.toFixed(1)} MB) → ${BUCKET}/${OBJ
 
 if (sizeMb > 50) {
   console.log(
-    'Note: files over 50 MB require raising the global limit in Supabase Dashboard → Storage → Settings.',
+    'Note: the project Global file size limit defaults to 50 MB (separate from the bucket 500 MB limit).\n' +
+      '      Raise it to ≥250 MB: https://supabase.com/dashboard/project/' +
+      new URL(url).hostname.split('.')[0] +
+      '/storage/settings\n' +
+      '      Free plans cannot exceed 50 MB — Pro is required for this PDF.',
   );
 }
 

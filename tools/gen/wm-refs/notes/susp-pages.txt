@@ -1,0 +1,698 @@
+
+===== p3338 =====
+      Fig 1: Identifying Spring Strut Adjustment Dimension
+
+
+
+
+      Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+WM 408537 DISASSEMBLING AND ASSEMBLING FRONT SPRING STRUT (CAYMAN
+"BLACK/STYLE EDITION", BOXSTER "BLACK/STYLE EDITION", CAYMAN GT4) >
+INFORMATION > COMPONENT AND ASSEMBLY OVERVIEW
+
+
+===== p3339 =====
+Fig 1: Overview Of Front Spring Strut
+
+
+
+
+Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+  No. Designation                   Qty. Removal                                  Installation
+
+                                       Before loosening the hexagon nut,
+                                       pre-tension the coil spring using a spring
+                                                                                  Use a new hexagon nut.
+      Hexagon nut M14 x                tensioner (not generally
+-1-                             1                                                 Tightening torque: 70 Nm
+      1.5                              required/depends on the setting
+                                                                                  (52 ftlb.).
+                                       (installation pretension of coil spring).
+
+
+===== p3340 =====
+                                   Loosen the hexagon nut using socket-
+                                   wrench insert Nr.187 .
+                                   Counter at the piston rod (7-mm
+                                   hexagon socket) when loosening (and
+                                   tightening) the nut.
+
+      Spring-strut
+                                                                              Identical parts on left and
+-2-   mount/dust bellows     1     Remove assembly.
+                                                                              right side.
+      assembly
+
+      Concave washer
+-3-                          1                                                Replace if necessary.
+      upper part
+
+      Deep-groove ball
+-4-                          1                                                Replace if necessary.
+      bearing
+
+      Concave washer
+-5-   lower part (coil spring 1                                               Replace if necessary.
+      plate)
+
+                                                                              Replacement parts are only
+                                                                              available as a set.
+                                                                              Technically, there is no
+                                                                              prescribed installation
+-6-   Coil spring            1                                                position.
+                                                                              Install so that the inscription
+                                                                              (Made in Germany and
+                                                                              manufacturer's
+                                                                              specifications) can be read.
+
+-7-   Bellows                1                                                Replace if necessary.
+
+                                                                              Identical parts on left and
+                                                                              right side.
+      Vibration damper with
+                                                                              If the vibration damper
+      lock nut (grooved
+-8-                         1                                                 needs to be replaced, use
+      nut) and height-
+                                                                              the same adjustment
+      adjusting nut
+                                                                              dimension X on the new
+                                                                              part.
+
+
+
+
+WM 408537 DISASSEMBLING AND ASSEMBLING FRONT SPRING STRUT (CAYMAN
+"BLACK/STYLE EDITION", BOXSTER "BLACK/STYLE EDITION", CAYMAN GT4) >
+DISASSEMBLING AND ASSEMBLING FRONT SPRING STRUT > DISASSEMBLING
+FRONT SPRING STRUT
+
+       1. To prevent damage (deformation), clamp the spring strut in a suitable clamping block
+          (tensioning device for McPherson spring struts). Alternatively, the spring clamp can also be
+          held in a retaining device.
+
+       2. Pretension the coil spring using spring clamp Nr.121 Pos.1 until the piston rod is relieved
+          (not generally required as this depends on the installation pretension on the coil spring). The
+          appropriate fork
+
+===== p3341 =====
+      3. Use a socket-wrench insert Nr.187 to loosen the lock nut (securing piston rod to spring-strut
+         mount).
+
+         Counter at the piston rod (7-mm hexagon socket) while loosening.
+
+         Fig 1: Identifying Socket-Wrench Insert No. 187
+
+
+
+
+         Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+      4. Remove all parts from the piston rod.
+
+
+
+
+WM 408537 DISASSEMBLING AND ASSEMBLING FRONT SPRING STRUT (CAYMAN
+"BLACK/STYLE EDITION", BOXSTER "BLACK/STYLE EDITION", CAYMAN GT4) >
+DISASSEMBLING AND ASSEMBLING FRONT SPRING STRUT > ASSEMBLING
+FRONT SPRING STRUT
+
+Information
+
+     Coil springs are only available in pairs (as a set) .
+
+     The spring-strut mounts for the left and right sides are identical .
+
+     Replace hexagon nut for securing the piston rod to the spring-strut mount .
+
+
+===== p3342 =====
+1. Assembly is performed in reverse order to disassembly.
+
+         1. 1.1. If the vibration damper is to be replaced, move the height-adjusting nut -2- to the
+            same position as on the old vibration damper (copy the actual dimension -X- to the
+            new vibration damper).
+
+            Tightening torque for lock nut -1- = 50 Nm (37 ftlb.).
+
+            Fig 1: Identifying Spring Strut Adjustment Dimension
+
+
+
+
+            Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+===== p3295 =====
+            Fig 2: Identifying Wheel Bearing Fastening Screws
+
+
+
+
+            Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+2. Unscrew fastening nut -1- for wheel hub -3- at the tension bolt -2- .
+
+3. Press tension bolt -2- out of the wheel hub -3- .
+
+
+===== p3296 =====
+  Fig 3: Identifying Wheel Hub, Tension Bolt, Fastening Nut
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+4. Press wheel hub out of the wheel bearing.
+
+          1. 4.1. Fit special tools as shown in the illustration → Pressing wheel hub out of wheel
+             bearing .
+
+                     1. Press tool
+
+                     2. Sleeve T10230/3 from assembly tool T10230
+
+                     3. Pressure piece T10230/8 from assembly tool T10230
+
+                     4. Wheel bearing unit
+
+                     5. Pressure plate VW 402
+
+                     6. Pressure plate VW 401
+
+
+===== p3297 =====
+                      Fig 4: Pressing Wheel Hub Out Of Wheel Bearing
+
+
+
+
+                      Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+         2. 4.2. Press wheel hub out of the wheel bearing.
+
+5. Press inner bearing ring off the wheel hub.
+
+         1. 5.1. Separating device Nr.112-2 must be inserted between the inner bearing ring
+            -1- and wheel hub -2- . Then pre-tension with the spindle.
+
+
+===== p3298 =====
+  Fig 5: Identifying Pre-Tensioning Separating Device
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+2. 5.2. Fit special tools as shown in the illustration → Pressing inner bearing ring off the
+   wheel hub .
+
+          1. Press tool
+
+          2. Sleeve T10230/3 from assembly tool T10230
+
+          3. Pressure piece T10230/8 from assembly tool T10230
+
+          4. Separating device Nr.112-2
+
+
+===== p3299 =====
+                         Fig 6: Pressing Inner Wheel Hub Bearing Ring
+
+
+
+
+                         Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+             3. 5.3. Press inner bearing ring off the wheel hub.
+
+
+
+
+WM 405719 REMOVING AND INSTALLING FRONT WHEEL BEARING (CAYMAN
+"BLACK/STYLE EDITION", BOXSTER "BLACK/STYLE EDITION", CAYMAN GT4) >
+REMOVING AND INSTALLING FRONT WHEEL BEARING > INSTALLING FRONT
+WHEEL BEARING
+
+
+    WARNING: Mechanical, hydraulic or pneumatic press
+
+     Risk of squashing
+
+
+===== p3300 =====
+→ Read specific safety information for the press.
+
+→ Check that the press is working perfectly before use, particularly the safety components.
+
+Information
+
+     The wheel bearing has a magnetised multipole seal, which acts as a pulse sender for the wheel
+     speed sensor .
+
+     The multiple-pole seal -1- must always face upwards when the wheel bearing is set down (this
+     does not apply when pressing the wheel hub into the wheel bearing). Do not damage the multipole
+     seal and do not come into contact with magnetic objects (e.g. magnetised screwdriver, magnet) .
+
+
+===== p3301 =====
+Fig 1: Identifying Wheel Bearing Unit
+
+
+
+
+Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+ 1. Press the wheel hub into the wheel bearing.
+
+            1. Press tool
+
+            2. Pressure plate VW 402
+
+            3. Wheel hub
+
+
+===== p3302 =====
+         4. Wheel bearing
+
+         5. Pressure plate VW 401
+            Fig 2: Pressing Wheel Hub Into Wheel Bearing
+
+
+
+
+            Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+                    1. 1.1. Fit special tools as shown in the illustration → Pressing wheel hub into
+                       wheel bearing .
+
+                    2. 1.2. Press the wheel hub into the wheel bearing.
+
+2. Insert the tension bolt -2- in the wheel bearing -4- with the wheel hub -3- and tighten the new
+   hexagon nut -1- hand-tight.
+
+
+===== p3303 =====
+  Fig 3: Identifying Tension Bolt, Wheel Bearing And Bolt
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+3. Install the wheel bearing in the wheel bearing housing.
+
+          1. 3.1. Insert the wheel bearing in the wheel bearing housing.
+
+
+                    WARNING: Incorrect handling of safety bolts
+
+                   1. Danger of injury
+
+                   2. Loss of torque
+
+
+             → Always use new fastening screws and nuts following removal.
+
+             → Observe specified tightening torques.
+
+             → Carry out a visual inspection of all re-used parts.
+
+          2. 3.2. Tighten fastening screws in the sequence -1, 2, 3, 4- .
+
+             Step 1: Tightening torque 80 Nm (59 ftlb.)
+
+             Step 2: Torque angle 120 Grad
+
+
+===== p3304 =====
+  Fig 4: Identifying Wheel Bearing Fastening Screws
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+3. 3.3. Tighten fastening screw -3- securing holder -2- to wheel bearing housing.
+   Tightening torque 10 Nm (7.5 ftlb.)
+
+4. 3.4. Clip electric line -1- onto the holder.
+
+
+===== p5542 =====
+Fig 1: Overview Of Rear Spring Strut
+
+
+
+
+Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+         No.                Designation        Qty.         Removal              Installation
+
+         -1-                 Lock nut          1      Before loosening the Use a new lock nut.
+                             M14 x 1.5                    lock nut -1- ,    Tightening torque
+                                                       pre-tension the coil   70 Nm +5 Nm
+                                                         spring -9- using   Position spring-strut
+                                                        spring clamp for      mount -3- with
+
+
+===== p5543 =====
+                                spring struts         respect to the
+                               Nr.121 until the     vibration damper
+                                 piston rod is         -10- before
+                                   relieved.       tightening the lock
+                                                           nut.
+                                                  This is described in
+                                                      the Assembly
+                                                         section.
+
+-2-       Stop plate       1                       Fit dome upwards,
+                                                    towards lock nut.
+
+-3-   Spring-strut mount   1                      Position with respect
+                                                    to the vibration
+                                                    damper. This is
+                                                    described in the
+                                                   Assembly section.
+
+-4-     Centring ring      1                         Two types are
+                                                  available (3 mm and
+                                                         6 mm).
+                                                  Observe allocation,
+                                                   depending on coil
+                                                   spring load group.
+                                                   Fit at the correct
+                                                    position on the
+                                                   spring-strut mount
+                                                          -3- .
+                                                  This is described in
+                                                     the Assembly
+                                                        section.
+
+-5-      Spring plate      1                      Replace if damaged.
+
+-6-       Stop plate       1                           Fit dome
+                                                      downwards.
+
+-7-   Additional spring    1                      Replace if damaged.
+       (rubber stop)
+
+-8-        Bellows         1                      Replace if damaged.
+                                                    Fit on additional
+                                                      spring -7- .
+
+-9-      Coil spring       1                      Replace coil springs
+                                                        only in pairs.
+                                                  It may be necessary
+                                                       to replace the
+                                                       centring rings
+                                                          (different
+                                                    thicknesses) -4- .
+                                                  The thickness of the
+                                                       centring rings
+                                                   depends on the coil
+                                                    spring load group.
+
+
+===== p5544 =====
+                                                                                        This is described in
+                                                                                           the Assembly
+                                                                                              section.
+
+       -10-          Vibration damper              1              Do not damage         The item number is
+                                                                 connecting cable         shown on the
+                                                               (electric line) on the     damper tube.
+                                                                  PASM version.
+
+
+
+
+WM 427137 DISASSEMBLING AND ASSEMBLING REAR SPRING STRUT (EXCEPT
+CAYMAN GT4) > DISASSEMBLING AND ASSEMBLING REAR SPRING STRUT >
+DISASSEMBLING REAR SPRING STRUT
+
+
+      WARNING: Preloaded or pressurized components
+
+       Risk of squashing or bruising
+
+
+
+→ Do not reach into the danger area .
+
+→ Relieve the tension on components before starting work .
+
+→ Secure components to prevent them from loosening suddenly .
+
+      1. To prevent damage (deformation), clamp the spring strut in a suitable clamping block
+         (tensioning device for spring struts). Alternatively, the spring clamp can also be held in a
+         retaining device.
+
+      2. Pre-tension the coil spring using spring clamp for spring struts Nr.121 until the piston rod is
+         relieved. The appropriate forks must be inserted into the spring clamp.
+
+
+===== p5545 =====
+  Fig 1: Compressing Coil Springs
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+3. Remove spring-strut mount. To do this, loosen the lock nut on the piston rod (with coil spring
+   pre-tensioned).
+
+  Loosen the lock nut using socket-wrench insert 9630/2 .
+
+  Counter at the piston rod hexagon with a wrench when loosening the nut.
+
+
+===== p5546 =====
+         Fig 2: Disassembling Spring Strut
+
+
+
+
+         Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+      4. Remove all parts from the piston rod.
+
+
+
+
+WM 427137 DISASSEMBLING AND ASSEMBLING REAR SPRING STRUT (EXCEPT
+CAYMAN GT4) > DISASSEMBLING AND ASSEMBLING REAR SPRING STRUT >
+ASSEMBLING REAR SPRING STRUT
+
+
+      WARNING: Preloaded or pressurized components
+
+       Risk of squashing or bruising
+
+
+
+→ Do not reach into the danger area .
+
+→ Relieve the tension on components before starting work .
+
+→ Secure components to prevent them from loosening suddenly .
+
+     When installing new components, always check that they are assigned correctly .
+
+
+===== p5547 =====
+Coil springs are only available in pairs .
+
+ 1. Prepare parts for assembly.
+
+ 2. Clamp the spring strut in a suitable clamping block (tensioning device for spring struts).
+    Alternatively, the spring clamp can also be held in a retaining device.
+
+ 3. Slide the bellows/additional spring assembly onto the piston rod.
+
+ 4. Push the pre-tensioned coil spring onto the vibration damper so that the end of the coil spring
+    rests against the stop of the spring plate. Fit the stop plate -7- at the correct position.
+
+    If you are using new coil springs, observe centering ring allocation.
+
+
+===== p5548 =====
+Fig 1: Compressing Rear Axle Spring/Stop Plate
+
+
+
+
+Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+Information
+
+   1. Coil spring marking -1- comprising two different colored lines (e.g. one red and one brown
+      line) indicates the spring rate and spring length (depending on vehicle variant and
+      equipment) .
+
+   2. A marking -2- comprising one colored line indicates the coil spring tolerance group (load
+      group) and determines the thickness of the centering ring -arrows- (tolerance
+
+
+===== p5549 =====
+  compensation). The colored line -2- is either YELLOW or BLUE .
+
+3. If you are installing new coil springs, then order the 3 mm and 6 mm centering rings at the
+   same time. As coil springs of load group 1 or 2 will be supplied, you will then have the
+   correct centering rings for installation (for tolerance compensation) .
+  Fig 2: Identifying Coil Spring Color Marking
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+4. Yellow colored line -2- = use 3-mm centering ring . Blue colored line -2- = use 6-mm
+   centering ring .
+
+
+===== p5550 =====
+        Fig 3: Identifying Centering Ring
+
+
+
+
+        Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+5. Fit spring plate with centering ring (compensation part) and spring-strut mount. Position the
+   centering ring correctly. The cut-outs in the centering ring must be positioned between the
+   collars of the three fastening pins -arrows- .
+
+
+===== p5551 =====
+  Fig 4: Locating Support Ring Fastening Pins
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+6. Position the spring-strut mount.
+
+          1. 6.1. Fit stop plate at the correct position (domed side upwards) and screw a new lock
+             nut onto the piston rod (do not tighten fully yet).
+
+          2. 6.2. The spring-strut mount is positioned correctly if the fastening pin -2- (on the
+             sloping supporting mount part) is at an angle of 180 degrees from the bar -1- (on the
+             vibration damper).
+
+
+===== p5552 =====
+            Fig 5: Positioning Spring-Strut Supporting Mount
+
+
+
+
+            Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+7. Tighten lock nut on the piston rod.
+
+  Use socket-wrench insert 9630/2 for tightening the lock nut.
+
+  When tightening the nut, counter at the piston rod hexagon using a suitable wrench.
+
+  Tightening torque 70 Nm +5 Nm
+
+
+===== p5553 =====
+         Fig 6: Assembling Spring Strut
+
+
+
+
+         Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+WM 429019 REMOVING AND INSTALLING REAR ANTI-ROLL BAR (ALL MODELS) >
+TECHNICAL VALUES
+
+       Location             Description            Type      Basic value   Tolerance 1   Tolerance 2
+
+   Anti-roll bar to      Hexagon-head          Tightening     33 Nm
+rear-axle carrier side      bolt M8              torque
+       section
+
+Suspension/stabilizer Collar nut, M10              Initial   40 Nm (30
+    to stabilizer                               tightening      ftlb.)
+
+Suspension/stabilizer Collar nut, M10 Final tightening         +30°
+    to stabilizer
+
+
+
+
+WM 429019 REMOVING AND INSTALLING REAR ANTI-ROLL BAR (ALL MODELS) >
+PRELIMINARY WORK

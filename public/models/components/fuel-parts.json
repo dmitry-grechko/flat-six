@@ -1,0 +1,95 @@
+{
+  "glb": "/models/components/fuel.glb",
+  "parts": [
+    {
+      "id": "FUEL-001",
+      "node": "fuelTank",
+      "label": "Fuel Tank",
+      "assembly": "Fuel Tank",
+      "system": "Fuel",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Main plastic fuel tank ahead of the cabin (WM Overview Of Fuel Tank Component -1-)."
+    },
+    {
+      "id": "FUEL-002",
+      "node": "fuelTankProtectivePan",
+      "label": "Fuel Tank Protective Pan & Straps",
+      "assembly": "Fuel Tank",
+      "system": "Fuel",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Underbody protective pan and retaining straps securing the tank (WM -13- / -14-)."
+    },
+    {
+      "id": "FUEL-003",
+      "node": "fuelLevelSender",
+      "label": "Fuel Level Sender",
+      "assembly": "Fuel Tank",
+      "system": "Fuel",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "In-tank fuel level sender with float arm (WM -3-)."
+    },
+    {
+      "id": "FUEL-004",
+      "node": "fuelSenderLockRing",
+      "label": "Fuel Sender Locking Ring",
+      "assembly": "Fuel Tank",
+      "system": "Fuel",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Locking ring securing the fuel level sender to the tank (WM -4-)."
+    },
+    {
+      "id": "FUEL-005",
+      "node": "fuelPump",
+      "label": "In-Tank Fuel Pump",
+      "assembly": "Fuel Tank",
+      "system": "Fuel",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Electric fuel pump in the tank (WM -5-)."
+    },
+    {
+      "id": "FUEL-006",
+      "node": "carbonCanister",
+      "label": "Carbon Canister & Leak Diagnosis",
+      "assembly": "EVAP",
+      "system": "Fuel",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "EVAP carbon canister with leakage diagnosis unit (WM -6- / -7-, USA/Canada)."
+    },
+    {
+      "id": "FUEL-007",
+      "node": "fuelFillerNeck",
+      "label": "Fuel Filler Neck & Cap",
+      "assembly": "Fuel Tank",
+      "system": "Fuel",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Filler neck and fuel tank cap (WM -9- / -11-)."
+    },
+    {
+      "id": "FUEL-008",
+      "node": "tankVentLine",
+      "label": "Tank Vent Line",
+      "assembly": "EVAP",
+      "system": "Fuel",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Tank vent line between canister and tank (WM -8-)."
+    },
+    {
+      "id": "FUEL-009",
+      "node": "fuelLinesToEngine",
+      "label": "Fuel Lines to Engine",
+      "assembly": "Fuel Lines",
+      "system": "Fuel",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Hard/soft fuel lines from tank toward the engine (WM -16-)."
+    }
+  ]
+}

@@ -1,0 +1,581 @@
+
+===== PAGE CHUNK 0 =====
+Fig 1: Overview Of Radiator Module Component
+
+
+
+
+Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+        1. Radiator
+
+        2. Fastening screws, M8 x 25
+
+        3. Fastening screw, M8 x 50 with washer
+
+        4. Fastening nut M8
+
+        5. Fixing clip
+
+        1. Place a container under the radiator to collect emerging coolant.
+
+        2. Disconnect air-conditioning condenser.
+
+           → 875019 REMOVING AND INSTALLING CONDENSER .
+
+                   1. 2.1. Unscrew fastening screw -3- .
+
+
+===== PAGE CHUNK 1 =====
+  Fig 2: Identifying Condenser Threaded Connections
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+2. 2.2. Pull the condenser -1- out of the side retaining lugs -4- and suspend on the
+   body with a tie-wrap -2- .
+
+
+===== PAGE CHUNK 2 =====
+           Fig 3: Identifying Condenser, Side Retaining Lugs And Tie Wrap
+
+
+
+
+           Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+3. Only for vehicles with middle radiator:
+
+         1. 3.1. Disconnect connecting hose -1- going to the middle radiator. Remove spring
+            clamp -2- and pull off hose.
+
+         2. 3.2. Collect emerging coolant.
+
+         3. 3.3. Refit spring clamp.
+
+         4. 3.4. Close off hose and connection piece.
+
+         5. 3.5. Check O-ring for damage and replace if necessary.
+
+
+===== PAGE CHUNK 3 =====
+            Fig 4: Identifying Connecting Hose And Spring Clamp
+
+
+
+
+            Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+4. Disconnect supply and return hoses on the coolant pipes.
+
+         1. 4.1. On vehicles without the middle radiator, drain coolant at the lower hose -3- .
+
+         2. 4.2. Remove spring clamps and pull off hoses.
+
+         3. 4.3. Refit spring clamps.
+
+         4. 4.4. Close off lower hose and connection piece.
+
+         5. 4.5. Check O-rings on plug connections for damage and replace them if necessary.
+
+
+===== PAGE CHUNK 4 =====
+             Fig 5: Identifying Supply And Return Hose Connections
+
+
+
+
+             Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+5. Disconnect vent line -2- by pressing the locking mechanism and pulling off the line.
+
+6. Pull off cable plug -1- .
+
+
+===== PAGE CHUNK 5 =====
+  Fig 6: Identifying Electric Fan Cable Plug
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+7. Remove radiator.
+
+          1. 7.1. Unscrew fastening screws -1- on the radiator (lower).
+
+
+===== PAGE CHUNK 6 =====
+  Fig 7: Identifying Lower Radiator Support Fastening Screws
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+2. 7.2. Unscrew fastening screw -1- on the radiator (upper). Press fixing clip -2-
+   together and disengage the radiator.
+
+
+===== PAGE CHUNK 7 =====
+  Fig 8: Identifying Upper Radiator Support With Fixing Clip
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+3. 7.3. Fixing clip -2- shown on removed radiator.
+
+
+===== PAGE CHUNK 8 =====
+                    Fig 9: Identifying Radiator Fixing Clip
+
+
+
+
+                    Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+WM 197019 REMOVING AND INSTALLING RADIATOR (ALL MODELS) > INSTALLING
+RADIATOR
+
+Information
+
+     Grease O-rings, hoses and lines in the cooling system with Kluberplus Gel (Part No.
+     000.043.205.93) .
+
+      1. Install radiator.
+
+                 1. 1.1. Secure the radiator to the body with a yellow fixing clip.
+
+                 2. 1.2. Screw in upper fastening screw.
+
+                 3. 1.3. Screw in lower fastening screws.
+
+                 4. 1.4. Tighten upper and lower fastening screws to Tightening torque 23 Nm (17
+                    ftlb.) .
+
+      2. Fit supply and return hose -1 and 3- .
+
+                 1. 2.1. Coat O-rings lightly with Kluberplus Gel and fit hoses.
+
+
+===== PAGE CHUNK 9 =====
+              2. 2.2. Fit the vent line -2- .
+
+              3. 2.3. Plug connections must engage correctly; check by pulling on the lines.
+                Fig 1: Identifying Supply And Return Hose Connections
+
+
+
+
+                Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+    3. Vehicles with middle radiator:
+
+              1. 3.1. Coat O-ring lightly with Kluberplus Gel.
+
+              2. 3.2. Connect hose to the middle radiator. Pull to check that hose is secure.
+
+    4. Connect cable plug for electric fan.
+
+    5. Install condenser.
+
+      → 875019 REMOVING AND INSTALLING CONDENSER .
+
+              1. 5.1. Engage the condenser in the side clips on the radiator and secure with a tapping
+                 screw.
+
+              2. 5.2. Remove tie-wrap.
+
+
+
+
+WM 197019 REMOVING AND INSTALLING RADIATOR (ALL MODELS) >
+SUBSEQUENT WORK
+
+
+===== PAGE CHUNK 10 =====
+       1. Fill in coolant and bleed the cooling system.
+
+         → Filling Coolant
+
+       2. Install the side air guide.
+
+         → Installing Air Guide
+
+       3. Install front apron.
+
+         → Installing Front Apron
+
+       4. Install front wheel housing liner (front section).
+
+         → 505619 REMOVING AND INSTALLING FRONT WHEEL HOUSING LINER
+
+       5. Install front wheel.
+
+         → Installing Wheel
+
+
+
+
+WM 197819 REMOVING AND INSTALLING COOLANT TEMPERATURE SENSOR (ALL
+MODELS) > TECHNICAL VALUES
+
+     Location           Description           Type             Basic value   Tolerance 1   Tolerance 2
+
+  Temperature           M14 x 1.5 -        Tightening          35 Nm (26
+sensor in coolant      replace seal          torque               ftlb.)
+      pipe
+
+
+
+
+WM 197819 REMOVING AND INSTALLING COOLANT TEMPERATURE SENSOR (ALL
+MODELS) > PRELIMINARY WORK
+
+
+      WARNING: Hot fluid
+
+        Danger of scalding
+
+
+
+→ Let the fluid cool down.
+
+→ Wear personal protective gear.
+
+       1. Remove underbody panels at rear and center.
+
+         → 519419 REMOVING AND INSTALLING COVER FOR REAR UNDERBODY
+
+         → 519319 REMOVING AND INSTALLING COVER FOR CENTRE UNDERBODY
+
+       2. Drain coolant at the rear coolant pipes.
+
+         → 193817 DRAINING AND FILLING COOLANT
+
+
+===== PAGE CHUNK 11 =====
+WM 197819 REMOVING AND INSTALLING COOLANT TEMPERATURE SENSOR (ALL
+MODELS) > REMOVING COOLANT TEMPERATURE SENSOR
+
+
+      WARNING: Caustic fluids
+
+        Danger of chemical burns
+
+
+
+→ Avoid contact with caustic fluid.
+
+→ Wear personal protective gear.
+
+→ Ensure that there is good ventilation.
+
+→ If you do come into contact, wash off immediately with plenty of warm water and contact a doctor if
+necessary.
+
+Installation overview:
+
+
+===== PAGE CHUNK 12 =====
+  Fig 2: Identifying Lower Radiator Support Hexagon-Head Bolts
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+2. 2.2. Unscrew one hexagon-head bolt (M8 x 50) with washer -1- at the top of the
+   radiator frame.
+
+
+===== PAGE CHUNK 13 =====
+  Fig 3: Identifying Upper Radiator Support Hexagon-Head Bolts
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+3. 2.3. Press locking tabs on the fixing clip -2- together and disengage radiator frame.
+
+
+===== PAGE CHUNK 14 =====
+            Fig 4: Identifying Fixing Clip For Radiator
+
+
+
+
+            Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+            Information
+
+               1. Get another person to hold the electric fan.
+
+3. Unscrew two internal Torx screws (M6 x 25) -2- at the top of the electric fan holder -1- .
+
+  Get another person to hold the electric fan from underneath .
+
+         1. 3.1. Remove electric fan with frame.
+
+
+===== PAGE CHUNK 15 =====
+            Fig 5: Identifying Electric Fan Holder With Screws
+
+
+
+
+            Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+4. Suspend the radiator with air-conditioning condenser -1- on the body with a tie-wrap -2- .
+
+
+===== PAGE CHUNK 16 =====
+  Fig 6: Identifying Radiator With Air-Conditioning Condenser Body
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+5. Remove rear air guide.
+
+          1. 5.1. Pull cable plug out of the guide and unclip the cable on the air guide -arrows- .
+
+          2. 5.2. Use a flat-nosed pliers to pull off five clips -1- and remove the air guide.
+
+
+===== PAGE CHUNK 17 =====
+            Fig 7: Locating Rear Air Guide Clips
+
+
+
+
+            Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+6. Remove electric fan.
+
+         1. 6.1. Remove the cover -1- by pulling off four clips -2- using a flat-nosed pliers.
+
+
+===== PAGE CHUNK 18 =====
+  Fig 8: Identifying Electric Fan Cover
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+2. 6.2. Unscrew three M6 hexagon nuts -2- and remove the electric fan -1- from the
+   fan frame.
+
+
+===== PAGE CHUNK 19 =====
+                Fig 9: Identifying Electric Fan Mounting With M6 Hexagon Nuts
+
+
+
+
+                Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+WM 190819 REMOVING AND INSTALLING ELECTRIC FAN (ALL MODELS) >
+INSTALLING ELECTRIC FAN
+
+    1. Fit electric fan -1- in radiator frame and secure with three M6 hexagon nuts -2- . Tightening
+       torque 10 Nm (7.5 ftlb.)
+
+
+===== PAGE CHUNK 20 =====
+  Fig 1: Identifying Electric Fan Mounting With M6 Hexagon Nuts
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+2. Fit cover on electric fan motor.
+
+          1. 2.1. Secure cover -1- with four clips -2- .
+
+
+===== PAGE CHUNK 21 =====
+→ Avoid contact with caustic fluid.
+
+→ Wear personal protective gear.
+
+→ Ensure that there is good ventilation.
+
+→ If you do come into contact, wash off immediately with plenty of warm water and contact a doctor if
+necessary.
+
+Information
+
+Despite the fact that the coolant has been drained, residual amounts of coolant can still emerge at the
+joints during removal. Have sufficient collecting containers and cloths to hand.
+
+Component overview:
+
+Fig 1: Overview Of Middle Radiator And Air Guide Component
+
+
+
+
+Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+        1. Pull off coolant hoses -1- .
+
+                   1. 1.1. Clamp off coolant hoses using hose clamps.
+
+                   2. 1.2. Open the clamps -2- on the left and right coolant hoses.
+
+                   3. 1.3. Pull left and right coolant hoses off the middle radiator.
+
+
+===== PAGE CHUNK 22 =====
+            Fig 2: Identifying Middle Radiator Coolant Hoses With Clamp
+
+
+
+
+            Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+2. Press the middle radiator -1- to the rear and out of the lower brackets -2- (-arrow- ).
+
+
+===== PAGE CHUNK 23 =====
+  Fig 3: Locating Bottom Radiator Mounting
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+3. Press the middle radiator forward out of the upper brackets -2- and hold it.
+
+
+===== PAGE CHUNK 24 =====
+  Fig 4: Removing Middle Radiator Out Of Upper Brackets
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+4. Take the middle radiator -1- out of the bracket.
+
+
+===== PAGE CHUNK 25 =====
+      Fig 5: Identifying Middle Radiator
+
+
+
+
+      Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+WM 198019 REMOVING AND INSTALLING MIDDLE RADIATOR (ALL MODELS) >
+INSTALLING MIDDLE RADIATOR
+
+    1. Install the middle radiator -1- in reverse order to removal.
+
+              1. 1.1. Make sure that the rubber sleeves on the radiator are seated securely in the
+                 appropriate holders in the bracket.
+
+
+===== PAGE CHUNK 26 =====
+           Fig 1: Identifying Radiator Position
+
+
+
+
+           Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+           Information
+
+              1. Grease O-rings, hoses and lines in the cooling system with Kluberplus Gel (Part
+                 No. 000.043.205.93) .
+
+2. Connect coolant hoses -1- .
+
+         1. 2.1. Apply a light coating of the prescribed lubricant to the coolant hoses.
+
+         2. 2.2. Connect coolant hoses to the radiator and secure with clamps -2- .
+

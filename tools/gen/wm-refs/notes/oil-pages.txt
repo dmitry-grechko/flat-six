@@ -1,0 +1,717 @@
+
+===== p3984 =====
+The oil filter -1- is located on the underside of the engine:
+
+Fig 1: Identifying Oil Filter
+
+
+
+
+Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+        1. Loosen oil filter cover using oil filter tool.
+
+        2. Carefully remove the oil filter cover -2- and wipe off residual oil with a cloth.
+
+                   1. 2.1. Pull the filter element -1- out of the housing using a cloth and wrap it in the cloth.
+
+                   2. 2.2. Lever off the old O-ring -3- on the oil filter cover using a plastic spatula.
+
+
+===== p3985 =====
+             Fig 2: Identifying Oil Filter Cover And Filter Element
+
+
+
+
+             Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+3. Clean oil filter cover thoroughly inside and out.
+
+          1. 3.1. Fit a new O-ring and grease lightly with Kluber Syntheso Glep (Part No.
+             000.043.204.68).
+
+4. Clean the oil-filter housing -1- with a clean cloth.
+
+
+===== p3986 =====
+      Fig 3: Identifying Oil-Filter Housing
+
+
+
+
+      Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+    5. Fit new filter element - it can be fitted on either side.
+
+    6. Screw in the oil filter cover and tighten to the specified torque.
+
+      Tightening torque 25 Nm (19 ftlb.)
+
+
+
+
+WM 170117 CHANGING ENGINE OIL AND OIL FILTER (ALL MODELS) > FILLING
+ENGINE OIL
+
+    1. The service opening for engine oil is located at the rear right of the luggage compartment.
+
+
+              CAUTION: Incorrect oil level
+
+            1. Damage to engine and catalytic converter.
+
+
+      → Always observe specification for oil fill quantities.
+
+      Information
+
+
+===== p4010 =====
+            Fig 1: Identifying Oil Pump Sprocket, Timing Chain, Fastening Screws
+
+
+
+
+            Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+2. 1.2. Position special tool retaining device 9791 -1- on the oil pump gear.
+
+
+===== p4011 =====
+  Fig 2: Positioning Special Tool Retaining Device 9791 -1 On Oil Pump Gear
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+3. 1.3. Loosen internal Torx screw (M8 x 22) -2- using socket-wrench insert (T45).
+
+          1. Tool
+
+          2. Fastening screw for sprocket
+
+
+===== p4012 =====
+                     Fig 3: Screwing Oil Pump Gear
+
+
+
+
+                     Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+         4. 1.4. Remove special tool.
+
+2. Remove chain tensioner -1- on side 4-6.
+
+         1. 2.1. Replace sealing ring.
+
+
+===== p4013 =====
+            Fig 4: Identifying Chain Tensioner
+
+
+
+
+            Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+3. Unscrew screw on the sprocket, pull sprocket off the driver and leave sprocket in the timing
+   chain.
+
+4. Remove oil pump.
+
+         1. 4.1. Unscrew six M6 external Torx screws and lift off the oil pump.
+
+                    1. External Torx screws, M6 x 30
+
+                    2. External Torx screw, M6 x 95
+
+
+===== p4014 =====
+            Fig 5: Identifying Oil Pump Screws
+
+
+
+
+            Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+5. View of oil pump on engine side:
+
+         1. Oil pump
+
+         2. Oil pressure control valve connection
+
+
+===== p4015 =====
+      Fig 6: Identifying Oil Pump And Oil Pressure Control Valve Connection
+
+
+
+
+      Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+WM 172019 REMOVING AND INSTALLING OIL PUMP (ALL MODELS) > INSTALLING
+OIL PUMP
+
+    1. Wipe off any traces of oil on the sealing faces with a clean, lint-free cloth.
+
+      Information
+
+          1. The new oil pump is fitted on the crankcase without a seal .
+
+          2. Replace fastening screw for oil pump sprocket .
+
+    2. Fit the oil pump.
+
+              1. 2.1. Screw in five external Torx screws M6 x 30 -1- and one M6 x 95 -2- by hand.
+
+              2. 2.2. Slide the oil pump gear and timing chain onto the driver and secure with a new
+                 internal Torx screw (M8 x 22).
+
+              3. 2.3. Check that the two bores are positioned horizontally in order to insert the special
+                 tool.
+
+
+===== p4016 =====
+         4. 2.4. Fit and tighten screws for oil pump evenly.
+
+            Screws, M6 x 30: Tightening torque 13 Nm (9.5 ftlb.)
+
+            Screw, M6 x 95: Tightening torque 13 Nm (9.5 ftlb.)
+
+            Fig 1: Identifying Oil Pump Screws
+
+
+
+
+            Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+3. Install chain tensioner → Chain tensioner on side 4-6 with a new sealing ring.
+
+  Tightening torque 80 Nm (59 ftlb.)
+
+
+===== p4035 =====
+      NOTE: Dirt and contamination
+
+       Risk of damage to units or components
+
+
+
+→ Protect components from dirt and contamination.
+
+→ Clean or replace dirty components.
+
+      1. Remove lower part of oil pan.
+
+                1. 1.1. Unscrew 23 inner Torx screws (M6 x 25).
+                  Fig 1: Oil Pan Screws Loosening Sequence (Lower Part)
+
+
+
+
+                  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+      2. Remove the oil pan.
+
+                1. 2.1. Check molded seal -1- and replace it if necessary. Replace O-rings -2- on the
+                   support domes.
+
+
+===== p4036 =====
+                  Fig 2: Identifying Molded Seal And O-Rings For Oil Pan (Lower Part)
+
+
+
+
+                  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+      3. Clean and degrease sealing faces (using solvent naphtha or metal cleaner for example). Allow
+         parts to dry off well.
+
+
+
+
+WM 175019 REMOVING AND INSTALLING OIL PAN (ALL MODELS) > REMOVING OIL
+PAN > REMOVING OIL PAN (UPPER PART)
+
+
+      NOTE: Dirt and contamination
+
+       Risk of damage to units or components
+
+
+
+→ Protect components from dirt and contamination.
+
+→ Clean or replace dirty components.
+
+      1. Drain coolant from the engine.
+
+         → 193817 DRAINING AND FILLING COOLANT .
+
+      2. Remove lower part of oil pan.
+
+
+===== p4037 =====
+3. Remove coolant pipe -4- .
+
+         1. 3.1. Unscrew one countersunk screw (M6) -3- .
+
+         2. 3.2. Unscrew one external Torx screw (M6) -5- .
+
+         3. 3.3. Open the spring band clamp -2- and pull off the hose -1- .
+
+         4. 3.4. Pull coolant pipe out of the coolant regulator housing connection.
+
+         5. 3.5. Replace O-rings.
+           Fig 1: Identifying Lower Coolant Pipe, Spring Band Clamp, Screws
+
+
+
+
+           Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+4. Remove coolant guide -1- for the coolant pump.
+
+         1. 4.1. Unscrew six external Torx screws (M6 x 25) -2- and remove coolant guide.
+
+         2. 4.2. Collect the remaining emerging coolant.
+
+         3. 4.3. Clean molded seals and coat with Kluber Plus Gel.
+
+           Only replace molded seals if they are damaged .
+
+
+===== p4038 =====
+            Fig 2: Identifying Lower Coolant Guide With Screws
+
+
+
+
+            Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+5. Remove joint flange for oil regulating valve.
+
+          1. 5.1. Release and disconnect cable plug for air flow sensor -2- .
+
+          2. 5.2. Unscrew two external Torx screws (M6 x 20) -1- .
+
+          3. 5.3. Replace O-ring.
+
+
+===== p4039 =====
+            Fig 3: Identifying Oil Regulating Valve Joint Flange, Screws
+
+
+
+
+            Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+6. Remove oil pressure pipe -1- .
+
+         1. 6.1. Unscrew three external Torx screws (M6 x 16) -2- .
+
+         2. 6.2. Pull out pressure pipe and replace O-ring on the pipe and on the oil pump.
+
+
+===== p4040 =====
+            Fig 4: Identifying Oil Pan Pressure Pipe, Screws
+
+
+
+
+            Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+7. Remove air/oil separator.
+
+         1. 7.1. Unscrew five external Torx screws (M6 x 20) -1 to 5- . Turn the air/oil separator
+            and line towards the belt side into a vertical position.
+
+         2. 7.2. Pull out the connecting line at the oil pump.
+
+         3. 7.3. Replace O-ring on the line going to the oil pump.
+
+
+===== p4041 =====
+           Fig 5: Identifying Oil Pan Air/Oil Separator Screws
+
+
+
+
+           Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+8. Remove suction tube -2- .
+
+         1. 8.1. Unscrew one inner Torx screw (M6 x 25) -1- and pull suction tube out of the oil
+            pump. Replace O-ring.
+
+
+===== p4042 =====
+            Fig 6: Identifying Suction Tube With Screws
+
+
+
+
+            Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+9. Remove oil deflector.
+
+         1. 9.1. Unscrew one external Torx screw (M6 x 20) -1- and pull off the oil deflector.
+
+         2. 9.2. Replace two O-rings.
+
+
+===== p4043 =====
+             Fig 7: Identifying Oil Deflector Screws
+
+
+
+
+             Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+10. Remove oil pressure control valve -1- .
+
+   → 172619 REMOVING AND INSTALLING OIL PRESSURE CONTROL VALVE .
+
+          1. 10.1. Remove cap screw -2- using special tool socket-wrench insert 9753 .
+
+          2. 10.2. Pull valve using relay puller 9235 if necessary.
+
+
+===== p4044 =====
+             Fig 8: Identifying Oil Pressure Regulating Valve With Screws
+
+
+
+
+             Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+11. Remove upper part of oil pan.
+
+          1. 11.1. Unscrew 11 internal Torx screws (M6 x 25).
+
+          2. 11.2. Unscrew 10 internal Torx screws (M6 x 25).
+
+          3. 11.3. Lift up upper part of oil pan and slide it to the right until it is released at the oil
+             pump.
+
+          4. 11.4. Lower upper part of oil pan.
+
+          5. 11.5. Be careful with the molded seal - check this and only replace it if necessary.
+
+          6. 11.6. Clean and degrease sealing faces (using solvent naphtha or metal cleaner for
+             example). Allow parts to dry off well.
+
+
+===== p4045 =====
+                   Fig 9: Identifying Oil Pan Upper Part
+
+
+
+
+                   Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+WM 175019 REMOVING AND INSTALLING OIL PAN (ALL MODELS) > INSTALLING
+OIL PAN > INSTALLING OIL PAN (UPPER PART)
+
+Information
+
+     Grease O-rings, hoses and lines in the cooling system with Kluberplus Gel (Part No.
+     000.043.205.93) .
+
+      1. Place upper part of oil pan in installation position.
+
+                1. 1.1. Check that the molded seal is seated correctly. Apply thin layer of Kluber
+                   Syntheso Glep grease to molded seal.
+
+                2. 1.2. Screw in and tighten evenly 21 internal Torx screws (M6 x 25).
+
+                3. 1.3. Tighten screws according to tightening specifications. Retighten the screws -1
+                   to 4- .
+
+                   Tightening torque 13 Nm (9.5 ftlb.)
+
+
+===== p4046 =====
+             Fig 1: Identifying Oil Pan Screws Tightening Sequence (Upper Part)
+
+
+
+
+             Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+2. Install oil pressure control valve.
+
+  → INSTALLING OIL PRESSURE CONTROL VALVE .
+
+          1. 2.1. Place oil pressure-regulating valve in installation position.
+
+          2. 2.2. Position cap screw.
+
+          3. 2.3. Tighten cap screw using socket-wrench insert 9753 -3- .
+
+             Tightening torque 40 Nm (30 ftlb.)
+
+
+===== p4059 =====
+Oil guide, oil cooling, oil filter components:
+
+Fig 1: Overview Of Oil Cooler Bracket Component
+
+
+
+
+Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+        1. Bracket for oil cooler
+
+        2. Oil mist separator
+
+        3. External Torx screw, M6 x 28; self-tapping screws can be used 4-5 times; metric screws can
+           also be used
+
+        4. Sealing ring - replace
+
+        5. Sealing ring - replace
+
+        6. Oil cooler (oil/water heat exchanger)
+
+        7. Internal Torx screw, M6 x 20; self-tapping screws can be used 4-5 times; metric screws can
+           also be used
+
+        8. Sealing ring - replace
+
+        9. Oil filter element - replace
+
+      10. Sealing ring - replace
+
+      11. Oil filter cover
+
+      12. Profile seal - replace
+
+      13. Sealing ring - replace
+
+
+===== p4060 =====
+     14. Sealing ring - replace
+
+     15. External Torx screw, M6 x 60
+
+     16. External Torx screw, M6 x 45
+
+
+
+
+WM 176719 REMOVING AND INSTALLING BRACKET FOR OIL COOLER (ALL
+MODELS) > REMOVING BRACKET FOR OIL COOLER
+
+
+      CAUTION: Hot components
+
+        Risk of burns
+
+
+
+→ Let hot components cool down.
+
+→ Wear personal protective gear.
+
+
+      WARNING: Hot fluid
+
+        Danger of scalding
+
+
+
+→ Let the fluid cool down.
+
+→ Wear personal protective gear.
+
+       1. Pull off cable plug -2- from oil pressure sensor -1- .
+
+
+===== p4061 =====
+  Fig 1: Identifying Oil-Pressure Sender
+
+
+
+
+  Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+2. Remove screws from the bracket.
+
+          1. 2.1. Unscrew external Torx screws (M6 x 45) -1- .
+
+          2. 2.2. Unscrew external Torx screw (M6 x 60) -2- .
+
+
+===== p4062 =====
+            Fig 2: Locating Torx Screws For Oil Cooler Bracket
+
+
+
+
+            Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+            Information
+
+               1. The bracket for the oil/water heat exchanger must not be removed at an angle
+                  or levered off at one side .
+
+               2. The bracket's aluminum supports can break off in the crankcase .
+
+3. Remove console for oil cooler upwards.
+
+4. Replace old O-rings -1- and profile seal -2- .
+
+
+===== p4063 =====
+         Fig 3: Identifying Oil Cooler Bracket Seals
+
+
+
+
+         Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+      5. Clean repair area of bracket for oil cooler and crankcase and close off connection points with
+         stoppers.
+
+
+
+
+WM 176719 REMOVING AND INSTALLING BRACKET FOR OIL COOLER (ALL
+MODELS) > INSTALLING BRACKET FOR OIL COOLER
+
+Information
+
+Always replace gaskets and O-rings.
+
+     Grease all gaskets (except for the cooling system) with Kluber Syntheso Glep (Part No.
+     000.043.204.68) .
+
+      1. Replace stoppers at the connection points and fit new O-rings and profile seal.
+
+      2. Install bracket for oil cooler from above.
+
+      3. Fit screws and tighten uniformly.
+
+                 1. External Torx screws (M6 x 45) -1- Tightening torque 13 Nm (9.5 ftlb.)
+
+
+===== p4064 =====
+              2. External Torx screw (M6 x 60) -2- Tightening torque 13 Nm (9.5 ftlb.)
+                 Fig 1: Locating Torx Screws For Oil Cooler Bracket
+
+
+
+
+                 Courtesy of PORSCHE CARS NORTH AMERICA, INC.
+
+
+
+
+    4. Connect cable plug to oil pressure sensor, check that it is seated securely.
+
+
+
+
+WM 176719 REMOVING AND INSTALLING BRACKET FOR OIL COOLER (ALL
+MODELS) > SUBSEQUENT WORK
+
+    1. Secure air-conditioning compressor.
+
+      → 873419 REMOVING AND INSTALLING AIR CONDITIONING COMPRESSOR .
+
+    2. Install oil separator.
+
+      → INSTALLING OIL SEPARATOR .
+
+    3. Install oil/water heat exchanger.
+
+      → INSTALLING OIL/WATER HEAT EXCHANGER .
+
+    4. Install fuel connection line.
+
+      → INSTALLING FUEL CONNECTION LINE .
+
+    5. Install intake-air distributor for cylinder bank 4-6.
