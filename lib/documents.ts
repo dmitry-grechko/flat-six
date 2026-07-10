@@ -516,6 +516,18 @@ export const DOCUMENTS: DocumentMeta[] = [
   sit('2014 Cayman.pdf', 'SIT 2014 Cayman', ['981']),
   sit('2016 Cayman GT4.pdf', 'SIT 2016 Cayman GT4', ['981']),
 
+  // ---- Technical Information bulletins (TSB / workshop campaigns) ----
+  {
+    id: 'tsb-wd06-water-drain-valves',
+    title: 'WD06 — Water Drain Valves (Workshop Campaign)',
+    subtitle: 'Technical Information · SB-10052000-1049 · Boxster (981) MY2013',
+    category: 'service-info',
+    generations: ['981'],
+    storagePath: '981/service-info/SB-10052000-1049.pdf',
+    localUrl: publicUrl(`${MTL}/Service Information Technik/Boxster-Cayman/SB-10052000-1049.pdf`),
+    sizeLabel: '~106 KB',
+  },
+
   // ---- Training books relevant to 981/987 ----
   training('P10W 911 Carrera-Boxster-Cayman Engine Repair.pdf', 'Engine Repair — Carrera / Boxster / Cayman', ['987', 'shared']),
   training('P10W 997-987 Gen II Engine Repair.pdf', 'Engine Repair — 997 / 987 Gen II', ['987']),

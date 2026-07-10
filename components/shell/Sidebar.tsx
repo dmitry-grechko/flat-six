@@ -17,8 +17,9 @@ const NAV: { no: string; label: string; href: string }[] = [
   { no: '03', label: 'Service Plans', href: '/plans' },
   { no: '04', label: 'Fault Finding', href: '/faults' },
   { no: '05', label: 'Documents', href: '/manual' },
-  { no: '06', label: 'AI', href: '/ai' },
-  { no: '07', label: 'Settings', href: '/settings' },
+  { no: '06', label: 'Tools', href: '/tools' },
+  { no: '07', label: 'AI', href: '/ai' },
+  { no: '08', label: 'Settings', href: '/settings' },
 ];
 
 const mono = "'JetBrains Mono',monospace";
@@ -43,7 +44,7 @@ export default function Sidebar({
     if (DEMO_MODE) return;
     createClient().auth.getUser().then(({ data }) => setIsAdmin(isAdminEmail(data.user?.email)));
   }, []);
-  const items = isAdmin ? [...NAV, { no: '08', label: 'Admin', href: '/admin' }] : NAV;
+  const items = isAdmin ? [...NAV, { no: '09', label: 'Admin', href: '/admin' }] : NAV;
 
   return (
     <aside

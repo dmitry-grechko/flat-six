@@ -1,0 +1,43 @@
+---
+description: FLAT·SIX core project rules (architecture, layers, procedures)
+globs:
+alwaysApply: true
+---
+
+# FLAT·SIX — core rules
+
+DIY maintenance app for the **Porsche Boxster/Cayman (981 & 987)** — Next.js 14
+(App Router) + TypeScript on Vercel + Supabase, with an MCP server for Claude.
+Full rules in [`CLAUDE.md`](mdc:CLAUDE.md); runbooks in
+[`docs/procedures/`](mdc:docs/procedures).
+
+## Golden rule
+
+A change isn't done until the **five layers** it touches are consistent:
+**Data** (`lib/`) · **Backend** (`supabase/migrations/` + `lib/db/*`) · **UI**
+(`app/` + `components/`) · **MCP** (`lib/mcp/tools.ts`) · **Docs**
+(`docs/procedures/` + `CLAUDE.md` + `.cursor/rules/`).
+
+## Key facts
+
+- Static reference data lives in `lib/` (`data.ts`, `models.ts`, `knowledge/`,
+  `fitment/`, `documents.ts`, `credits.ts`). `lib/models.ts` (`CAR_VARIANTS`) is the
+  single source of truth for models.
+- Per-user data is in Postgres via `lib/db/*`; RLS = `auth.uid() = user_id`.
+- Knowledge/specs are **per generation** — never let 981 and 987 data cross.
+- Backend change → additive Supabase migration + `lib/db/*` mapping + `lib/types.ts`.
+- **A new user-facing capability the AI should use → add an MCP tool**
+  (`lib/mcp/tools.ts`); knowledge/computation tools no-auth, garage tools
+  token-scoped, always generation-scoped. Validate before shipping.
+- Data claims (specs/torque/alignment) must be sourced or flagged `unconfirmed`.
+
+## Before non-trivial work
+
+Read the matching runbook: adding-documents / adding-model-variant /
+adding-new-generation / building-features. **When you change a process, update its
+procedure doc + `CLAUDE.md` + these rules.**
+
+## Verify
+
+Lint isn't configured — **`npx tsc --noEmit` is the gate.** Unit-check pure logic;
+run the app and drive the real flow (mobile at 375 px too).

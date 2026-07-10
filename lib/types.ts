@@ -1,5 +1,7 @@
 // ---- Core domain types (the contract all UI + agents build against) ----
 
+import type { WheelSpec } from './fitment/oem';
+
 export type SystemName =
   | 'Engine' | 'Brakes' | 'Cooling' | 'Transmission' | 'HVAC'
   | 'Electrical' | 'Fuel' | 'Steering' | 'Exhaust' | 'Wheels' | 'Body' | 'Suspension';
@@ -143,6 +145,15 @@ export interface Vehicle {
   colorHex: string;
   interiorHex: string;
   plate: string;
+  /** The owner's current wheel/tyre setup, saved from Tools → fitment. */
+  wheelSetup?: WheelSetup;
+}
+
+/** A saved wheel/tyre setup for a vehicle (front + rear + optional notes). */
+export interface WheelSetup {
+  front: WheelSpec;
+  rear: WheelSpec;
+  notes?: string;
 }
 
 export interface PaintColor { name: string; hex: string; }

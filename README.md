@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./public/logo.svg" alt="FLAT·SIX — Porsche 981/987 Garage" width="360" />
+</p>
+
 # FLAT·SIX — Porsche Garage
 
 A DIY maintenance OS for the **Porsche Boxster / Cayman** — **987 and 981 today**, with more generations on the way: an interactive component explorer, a generation-scoped knowledge base (fault codes, torque specs, known issues), a personal service log + planner, and an **AI workshop assistant** exposed to Claude over the Model Context Protocol (MCP).
@@ -20,12 +24,18 @@ Built as a single Next.js app that deploys for free on **Vercel + Supabase**.
 - **Service planner** — plan upcoming work with parts and how-to links, then
   "start service" to pre-fill a record.
 - **Fault finding** — symptom/cause/check reference.
-- **981 knowledge base** — ~52 fault codes, ~58 specs, full maintenance schedule,
-  ~19 model-specific known issues, and reference articles, with a dependency-free
-  search used for RAG (`lib/knowledge/`).
-- **MCP server** — connect the garage to Claude. Knowledge tools (fault/spec/part
-  lookup, search) need no auth; per-user garage tools are scoped by Supabase Row
-  Level Security. See [`MCP_SETUP.md`](./MCP_SETUP.md).
+- **DIY Tools** — native wheel & tyre fitment tools: a "will it fit?" checker
+  (save your disks, test any tyre → tyre↔rim, rolling-diameter, speedo, poke/
+  clearance), plus tyre-size, offset, staggered-diameter and alignment
+  calculators — with visual diagrams. Our own math, no third-party API
+  (`lib/fitment/`, `components/tools/`).
+- **981 & 987 knowledge base** — per-generation fault codes, specs, maintenance
+  schedules, known issues, and reference articles, with a dependency-free search
+  used for RAG (`lib/knowledge/`).
+- **MCP server** — connect the garage to Claude. Knowledge + fitment tools
+  (fault/spec/part lookup, search, wheel-fitment, "will it fit", alignment specs)
+  need no auth; per-user garage tools are scoped by Supabase Row Level Security.
+  See [`MCP_SETUP.md`](./MCP_SETUP.md).
 - **Multi-user** — magic-link auth, each user owns their own vehicles and records.
 
 ## Tech stack
@@ -131,6 +141,21 @@ tools/gen/          Procedural 3D component generator
 Deploy on **Vercel**: import the repo, set `NEXT_PUBLIC_SUPABASE_URL` and
 `NEXT_PUBLIC_SUPABASE_ANON_KEY` env vars, and add your production `/auth/callback` URL
 to the Supabase dashboard. Node 24 is selected automatically via the `engines` field.
+
+## Contributing & procedures
+
+Common, repeatable work has step-by-step runbooks under
+**[`docs/procedures/`](./docs/procedures)** — keep them current when the process changes:
+
+| Procedure | What it covers |
+| --- | --- |
+| [Adding documents](./docs/procedures/adding-documents.md) | Add a manual/TSB/tech doc → knowledge base, faults, Documents registry, Supabase upload |
+| [Adding a model variant](./docs/procedures/adding-model-variant.md) | New `BodyType` (e.g. a Spyder) — registry, GLB, credits, colors |
+| [Adding a new generation](./docs/procedures/adding-new-generation.md) | A whole new generation (e.g. 991/718) — knowledge, docs, 3D, fitment |
+| [Building features](./docs/procedures/building-features.md) | Design-system rules, backend/MCP changes, when to update these docs |
+
+The same rules are encoded for AI pair-programming in [`CLAUDE.md`](./CLAUDE.md) and
+[`.cursor/rules/`](./.cursor/rules) so Claude Code and Cursor follow them automatically.
 
 ## License & attributions
 

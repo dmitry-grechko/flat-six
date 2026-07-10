@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="88" viewBox="0 0 360 88" role="img" aria-label="FLAT·SIX — Porsche 981/987 Garage">
+  <rect width="360" height="88" rx="10" fill="#0B0B0C"/>
+  <rect x="28" y="34" width="14" height="14" fill="#D5001C"/>
+  <text x="54" y="46" font-family="'JetBrains Mono', ui-monospace, monospace" font-weight="700" font-size="24" letter-spacing="7" fill="#FFFFFF">FLAT·SIX</text>
+  <text x="55" y="66" font-family="'JetBrains Mono', ui-monospace, monospace" font-weight="500" font-size="10.5" letter-spacing="3.5" fill="#9A9AA0">PORSCHE 981 / 987 GARAGE</text>
+</svg>

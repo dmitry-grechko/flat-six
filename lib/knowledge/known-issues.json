@@ -226,5 +226,17 @@
     "fix": "Dealer assesses and replaces the airbag control module free of charge.",
     "estCost": "Free (recall)",
     "source": "https://www.motorsafety.org/porsche-recalls-vehicles-with-defective-airbag-control-modules/"
+  },
+  {
+    "id": "issue-water-drain-valves",
+    "title": "Blocked underbody water drain valves (WD06 campaign)",
+    "system": "Body",
+    "severity": "LOW",
+    "affected": "Boxster / Boxster S (981), MY2013 — VIN-specific (Porsche Workshop Campaign WD06; ~4,123 vehicles in North America)",
+    "symptoms": ["Water pooling on the underbody", "Damp sills / interior in heavy rain"],
+    "description": "On affected MY2013 981 Boxsters, incorrect process parameters during cavity sealing left wax that could dry incompletely and block the underbody water drain valves, so water no longer drains effectively. Porsche issued voluntary Workshop Campaign WD06 to replace the drain valves. Scope is VIN-specific — verify in PIWIS.",
+    "fix": "Replace the four underbody water drain valves (P/N 000.043.302.49) per Technical Information SB-10052000-1049: press out the old valves, press in the new ones, refit the side covers (fastening screws to 2.7 Nm). Covered under the campaign.",
+    "estCost": "Free (workshop campaign)",
+    "source": "Porsche Technical Information SB-10052000-1049 (WD06), Mar 2013"
   }
 ]

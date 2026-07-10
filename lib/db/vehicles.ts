@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/client';
 import { DEMO_MODE, demoStore, demoId } from '@/lib/demo';
-import type { Vehicle, BodyType } from '@/lib/types';
+import type { Vehicle, BodyType, WheelSetup } from '@/lib/types';
 
 /** A vehicle as stored in the DB — the domain Vehicle plus its row id + primary flag. */
 export interface StoredVehicle extends Vehicle {
@@ -24,6 +24,7 @@ interface VehicleRow {
   color_hex: string | null;
   interior_hex: string | null;
   plate: string | null;
+  wheel_setup: WheelSetup | null;
   is_primary: boolean;
 }
 
@@ -47,6 +48,7 @@ function rowToVehicle(r: VehicleRow): StoredVehicle {
     colorHex: r.color_hex ?? '',
     interiorHex: r.interior_hex ?? '',
     plate: r.plate ?? '',
+    wheelSetup: r.wheel_setup ?? undefined,
     isPrimary: r.is_primary,
   };
 }
@@ -65,6 +67,7 @@ function vehicleToRow(v: Partial<Vehicle>): Record<string, unknown> {
   if (v.colorHex !== undefined) row.color_hex = v.colorHex;
   if (v.interiorHex !== undefined) row.interior_hex = v.interiorHex;
   if (v.plate !== undefined) row.plate = v.plate;
+  if (v.wheelSetup !== undefined) row.wheel_setup = v.wheelSetup;
   return row;
 }
 

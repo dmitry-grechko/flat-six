@@ -1,0 +1,27 @@
+---
+description: FLAT·SIX UI design system — apply when editing components or routes
+globs: components/**/*.tsx,app/**/*.tsx
+alwaysApply: false
+---
+
+# FLAT·SIX — design system
+
+Inline styles, no CSS framework. Match the existing look exactly.
+
+- **Type:** body `'Helvetica Neue',Arial,sans-serif`; mono labels/values
+  `'JetBrains Mono',monospace` (uppercase, letter-spaced).
+- **Color:** red `var(--red)`/`#D5001C`; ink `#0B0B0C`; greys `#6E6E73`,
+  `#9A9AA0`, `#B4B4B8`; border `#E3E3E5`; page bg `#ECECEE`.
+- **Surfaces:** page bg is grey; **content sits on white cards** (`#fff`,
+  `1px solid #E3E3E5`, radius 4–6). Result/verdict boxes are **white with a
+  tone-colored border** — never a filled tinted background.
+- **Reuse primitives:** `components/tools/ui.tsx` (`InfoBox`, `Stat`,
+  `NumberField`, `FieldGrid`, `ToolSection`) and `components/tools/diagrams.tsx`
+  for SVG visuals. Prefer a diagram where it aids understanding.
+- **Responsive (test at 375 px):** root views use `className="padView"`;
+  3-col grids use `stackSm`; input grids use `repeat(auto-fit,minmax(N,1fr))`;
+  chip/toggle rows use `flexWrap:'wrap'`; tab/segment bars use `overflowX:'auto'`.
+- **Number inputs:** native spinners are hidden globally — use a unit suffix.
+- **Nav = route:** `app/<name>/page.tsx` → `<AppShell>` + register in
+  `Sidebar.tsx` `NAV` and `AppShell.tsx` `PAGE_META`. Views are `'use client'`,
+  read the car via `useVehicle()`, derive generation via `generationForBody()`.

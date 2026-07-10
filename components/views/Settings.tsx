@@ -91,7 +91,7 @@ export default function Settings() {
         </div>
 
         <label style={fieldLabel}>Model (rendered in 3D)</label>
-        <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
           {MODEL_OPTIONS.map((m) => (
             <button
               key={m.id}

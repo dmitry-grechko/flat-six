@@ -1,0 +1,61 @@
+# Procedure: Building a feature
+
+The rules every new feature must follow. See the [golden rule](./README.md#the-golden-rule):
+keep Data / Backend / UI / MCP / Docs consistent.
+
+## 1. Design system (non-negotiable)
+
+The UI is inline-styled (no CSS framework). Match the existing look:
+
+- **Type:** body `'Helvetica Neue', Arial, sans-serif`; mono labels/values
+  `'JetBrains Mono', monospace` (uppercase, letter-spaced).
+- **Colors:** brand red `var(--red)` / `#D5001C`; ink `#0B0B0C`; greys `#6E6E73`,
+  `#9A9AA0`, `#B4B4B8`; border `#E3E3E5`; page bg `#ECECEE`.
+- **Surfaces:** page background is grey; **content sits on white cards**
+  (`#fff`, `1px solid #E3E3E5`, radius 4–6). Result/verdict boxes are white with a
+  tone-colored border — never a filled tinted background. Reuse
+  `components/tools/ui.tsx` (`InfoBox`, `Stat`, `NumberField`, `FieldGrid`,
+  `ToolSection`) and `components/tools/diagrams.tsx` for visuals.
+- **Responsive:** root views use `className="padView"` (padding drops on mobile);
+  3-column grids use `stackSm`; input grids use
+  `repeat(auto-fit, minmax(N, 1fr))`; chip/toggle rows use `flexWrap: 'wrap'`;
+  tab/segment bars use `overflowX: 'auto'`. Test at 375 px.
+- **Number inputs** hide native spinners globally — use unit suffixes instead.
+
+## 2. Nav = route
+
+A nav destination is a real route: add `app/<name>/page.tsx` wrapping the view in
+`<AppShell>`, register it in `components/shell/Sidebar.tsx` (`NAV`) and
+`components/shell/AppShell.tsx` (`PAGE_META`). Views are `'use client'`, read the
+car via `useVehicle()` and derive generation with `generationForBody()`.
+
+## 3. If it touches the backend
+
+- Per-user data → add a migration in `supabase/migrations/NNNN_*.sql` (additive;
+  RLS is `auth.uid() = user_id`), update the mapping in `lib/db/*` **and** the
+  domain type in `lib/types.ts`, then `npm run db:push`. Demo mode
+  (`NEXT_PUBLIC_DEMO_MODE=true`) carries any `Vehicle` field in memory for free.
+- Shared reference data → `lib/` (static, version-controlled).
+
+## 4. If it adds a capability the AI should use → MCP
+
+Expose it in `lib/mcp/tools.ts` with `server.registerTool`:
+
+- Knowledge/computation tools are **no-auth**; garage (per-user) tools read the
+  bearer token via `extra.authInfo?.token` and are RLS-scoped.
+- Scope by generation (`GENERATION_ARG` / `VEHICLE_ID_ARG` + `resolveKnowledgeScope`)
+  so answers never cross 981/987.
+- **Validate** it (MCP Inspector or Claude Code against `/api/mcp`) before shipping.
+  Rule of thumb: if a new Tools tab or data source ships, it gets an MCP tool.
+
+## 5. Update the docs
+
+If you changed a **process** (not just code), update the matching file in
+`docs/procedures/`, and mirror any rule change into `CLAUDE.md` and
+`.cursor/rules/`. Docs, `CLAUDE.md`, and cursor rules must not drift.
+
+## 6. Verify before you commit
+
+- `npx tsc --noEmit` clean (lint isn't configured — tsc is the gate).
+- Unit-check pure logic (e.g. `lib/fitment/*` with `node --experimental-strip-types`).
+- Run the app and drive the actual flow; confirm mobile at 375 px.
