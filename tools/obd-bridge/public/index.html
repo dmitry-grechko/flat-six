@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FLAT·SIX OBD Bridge — Test UI</title>
+  <style>
+    :root {
+      --bg: #0b0b0c;
+      --panel: #141416;
+      --border: #232327;
+      --text: #e8e8ea;
+      --muted: #9a9aa0;
+      --red: #d5001c;
+      --green: #3cd37a;
+      --mono: 'JetBrains Mono', ui-monospace, monospace;
+      --sans: 'Helvetica Neue', Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      background: #ececee;
+      color: #0b0b0c;
+      line-height: 1.5;
+    }
+    header {
+      background: var(--bg);
+      color: #fff;
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    header .mark { width: 12px; height: 12px; background: var(--red); }
+    header h1 { margin: 0; font: 700 14px/1 var(--mono); letter-spacing: .28em; }
+    header span { margin-left: auto; font: 500 11px/1 var(--mono); color: var(--muted); }
+    main { max-width: 1100px; margin: 0 auto; padding: 28px 20px 60px; display: grid; gap: 20px; }
+    .card {
+      background: #fff;
+      border: 1px solid #e3e3e5;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .card h2 {
+      margin: 0;
+      padding: 16px 20px;
+      font: 600 11px/1 var(--mono);
+      letter-spacing: .14em;
+      color: var(--red);
+      border-bottom: 1px solid #f0f0f1;
+      text-transform: uppercase;
+    }
+    .card .body { padding: 18px 20px 22px; }
+    ol.steps { margin: 0; padding-left: 20px; color: #3a3a3e; }
+    ol.steps li { margin: 8px 0; }
+    ol.steps strong { color: #0b0b0c; }
+    .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px; }
+    label { font: 500 11px/1 var(--mono); letter-spacing: .08em; color: #6e6e73; }
+    select, input {
+      height: 38px;
+      border: 1px solid #d2d2d6;
+      border-radius: 3px;
+      padding: 0 12px;
+      font: 500 12px/1 var(--mono);
+      min-width: 220px;
+    }
+    button {
+      height: 38px;
+      padding: 0 16px;
+      border: none;
+      border-radius: 2px;
+      font: 600 11px/1 var(--sans);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .btn-primary { background: var(--red); color: #fff; }
+    .btn-ghost { background: #fff; color: #0b0b0c; border: 1px solid #c9c9cd; }
+    .btn-dark { background: var(--bg); color: #fff; }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font: 600 11px/1 var(--mono);
+      letter-spacing: .1em;
+      padding: 8px 12px;
+      border-radius: 3px;
+      background: #f4f4f5;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #b4b4b8; }
+    .dot.on { background: var(--green); }
+    .dot.err { background: var(--red); }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+    }
+    .metric {
+      background: var(--panel);
+      color: #fff;
+      border-radius: 6px;
+      padding: 14px 16px;
+    }
+    .metric .k {
+      font: 500 9px/1 var(--mono);
+      letter-spacing: .12em;
+      color: #76767b;
+      margin-bottom: 8px;
+    }
+    .metric .v { font: 300 28px/1 var(--sans); }
+    .metric .u { font: 500 11px/1 var(--mono); color: #9a9aa0; margin-top: 6px; }
+    pre {
+      margin: 0;
+      background: #0f0f11;
+      color: #c9c9cd;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px;
+      font: 500 11px/1.45 var(--mono);
+      max-height: 320px;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .errbox {
+      background: rgba(213,0,28,.08);
+      border: 1px solid rgba(213,0,28,.25);
+      color: #8a0011;
+      border-radius: 4px;
+      padding: 12px 14px;
+      font-size: 14px;
+      margin-top: 12px;
+    }
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+      font: 600 11px/1 var(--mono);
+      letter-spacing: .08em;
+    }
+    .switch {
+      width: 44px; height: 24px; border-radius: 12px;
+      background: #d2d2d6; position: relative; transition: background .15s;
+    }
+    .switch.on { background: var(--red); }
+    .switch::after {
+      content: '';
+      position: absolute; top: 3px; left: 3px;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #fff; transition: transform .15s;
+    }
+    .switch.on::after { transform: translateX(20px); }
+    code { font-family: var(--mono); font-size: 12px; background: #f4f4f5; padding: 2px 6px; border-radius: 2px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="mark"></div>
+    <h1>FLAT·SIX</h1>
+    <div>OBD BRIDGE · TEST UI</div>
+    <span id="bridgeHealth">checking…</span>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Mac setup — Bluetooth dongle (e.g. Ancel)</h2>
+      <div class="body">
+        <ol class="steps">
+          <li>Plug the dongle into the car’s <strong>OBD port</strong> (under dash, driver side).</li>
+          <li>Turn ignition <strong>ON</strong> (engine running is best for live RPM).</li>
+          <li>On Mac: <strong>System Settings → Bluetooth</strong> — pair the dongle (often named OBDII, OBD, ELM327, CHX…).</li>
+          <li>Start the bridge in Terminal: <code>npm run obd-bridge</code> from the repo root.</li>
+          <li>Click <strong>Refresh ports</strong> below — pick the new <code>/dev/cu.…</code> entry (not <em>Bluetooth-Incoming-Port</em>).</li>
+          <li>Leave baud at <strong>38400</strong> first; try 9600 or 115200 if connect fails.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Connection</h2>
+      <div class="body">
+        <div class="row">
+          <div class="status" id="connStatus"><span class="dot" id="connDot"></span><span id="connLabel">DISCONNECTED</span></div>
+        </div>
+        <div class="row">
+          <label for="port">Serial port</label>
+          <select id="port"><option value="">— refresh ports —</option></select>
+          <button class="btn-ghost" id="btnRefresh">Refresh ports</button>
+        </div>
+        <div class="row">
+          <label for="baud">Baud</label>
+          <select id="baud">
+            <option value="38400" selected>38400</option>
+            <option value="9600">9600</option>
+            <option value="115200">115200</option>
+          </select>
+          <button class="btn-primary" id="btnConnect">Connect</button>
+          <button class="btn-ghost" id="btnDisconnect" disabled>Disconnect</button>
+          <button class="btn-ghost" id="btnSnapshot" disabled>Read once</button>
+        </div>
+        <div class="row">
+          <label class="toggle" id="pollToggle">
+            <span class="switch" id="pollSwitch"></span>
+            Live poll (1s)
+          </label>
+        </div>
+        <div id="connError" class="errbox" style="display:none"></div>
+        <div id="meta" style="margin-top:12px;font:500 11px/1.4 var(--mono);color:#6e6e73"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Live data</h2>
+      <div class="body">
+        <div class="grid" id="metrics">
+          <div class="metric"><div class="k">RPM</div><div class="v" id="mRpm">—</div><div class="u">rev/min</div></div>
+          <div class="metric"><div class="k">COOLANT</div><div class="v" id="mCoolant">—</div><div class="u">°C</div></div>
+          <div class="metric"><div class="k">SPEED</div><div class="v" id="mSpeed">—</div><div class="u">km/h</div></div>
+          <div class="metric"><div class="k">VOLTAGE</div><div class="v" id="mVolt">—</div><div class="u">V</div></div>
+          <div class="metric"><div class="k">LOAD</div><div class="v" id="mLoad">—</div><div class="u">%</div></div>
+        </div>
+        <div style="margin-top:16px;font:600 10px/1 var(--mono);letter-spacing:.12em;color:#9a9aa0">DTCs</div>
+        <pre id="dtcs">—</pre>
+        <div id="pidErrors" class="errbox" style="display:none"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Debug log (raw ELM327)</h2>
+      <div class="body">
+        <div class="row">
+          <button class="btn-dark" id="btnDebug">Refresh debug log</button>
+          <button class="btn-ghost" id="btnCopy">Copy JSON</button>
+        </div>
+        <pre id="debug">—</pre>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const API = ''; // same origin as bridge
+
+    const $ = (id) => document.getElementById(id);
+
+    async function api(path, opts = {}) {
+      const res = await fetch(API + path, {
+        headers: { 'Content-Type': 'application/json' },
+        ...opts,
+      });
+      const text = await res.text();
+      let data;
+      try { data = JSON.parse(text); } catch { data = { raw: text }; }
+      if (!res.ok) throw new Error(data.error || res.statusText || 'Request failed');
+      return data;
+    }
+
+    function showError(el, msg) {
+      if (!msg) { el.style.display = 'none'; el.textContent = ''; return; }
+      el.style.display = 'block';
+      el.textContent = msg;
+    }
+
+    function setConnected(on, label) {
+      $('connDot').className = 'dot' + (on ? ' on' : '');
+      $('connLabel').textContent = label || (on ? 'CONNECTED' : 'DISCONNECTED');
+      $('btnConnect').disabled = on;
+      $('btnDisconnect').disabled = !on;
+      $('btnSnapshot').disabled = !on;
+    }
+
+    function renderSnapshot(snap) {
+      if (!snap) return;
+      const p = snap.pids || {};
+      $('mRpm').textContent = p.rpm ?? '—';
+      $('mCoolant').textContent = p.coolant_c ?? '—';
+      $('mSpeed').textContent = p.speed_kmh ?? '—';
+      $('mVolt').textContent = p.voltage_v ?? '—';
+      $('mLoad').textContent = p.engine_load_pct ?? '—';
+      const dtcs = snap.dtcs || [];
+      $('dtcs').textContent = dtcs.length ? dtcs.join('\n') : '(none)';
+      if (snap.errors?.length) {
+        showError($('pidErrors'), snap.errors.map((e) => `${e.pid}: ${e.message}`).join('\n'));
+      } else {
+        showError($('pidErrors'), '');
+      }
+    }
+
+    function renderMeta(st) {
+      if (!st) { $('meta').textContent = ''; return; }
+      const bits = [];
+      if (st.adapter) bits.push('Adapter: ' + st.adapter);
+      if (st.protocol) bits.push('Protocol: ' + st.protocol);
+      if (st.path) bits.push('Port: ' + st.path + ' @ ' + st.baudRate);
+      if (st.polling) bits.push('Polling: ON');
+      $('meta').textContent = bits.join(' · ');
+    }
+
+    async function checkHealth() {
+      try {
+        const h = await api('/health');
+        $('bridgeHealth').textContent = h.connected ? 'BRIDGE OK · LINK UP' : 'BRIDGE OK · IDLE';
+        return h;
+      } catch (e) {
+        $('bridgeHealth').textContent = 'BRIDGE OFFLINE';
+        $('bridgeHealth').style.color = '#d5001c';
+        throw e;
+      }
+    }
+
+    async function refreshPorts() {
+      const data = await api('/ports');
+      const sel = $('port');
+      const cur = sel.value;
+      sel.innerHTML = '<option value="">— select port —</option>';
+      for (const p of data.ports) {
+        const opt = document.createElement('option');
+        opt.value = p.path;
+        const hint = p.hint ? ` · ${p.hint}` : '';
+        opt.textContent = p.path + hint;
+        sel.appendChild(opt);
+      }
+      if (cur) sel.value = cur;
+      // Auto-select likely OBD port if nothing selected
+      if (!sel.value) {
+        const likely = data.ports.find((p) =>
+          /obd|elm|chx|spp/i.test(p.path) && !/incoming|debug/i.test(p.path)
+        );
+        if (likely) sel.value = likely.path;
+      }
+    }
+
+    async function refreshStatus() {
+      const st = await api('/status');
+      setConnected(st.connected, st.connected ? 'CONNECTED' : 'DISCONNECTED');
+      renderMeta(st);
+      if (st.lastSnapshot) renderSnapshot(st.lastSnapshot);
+      const sw = $('pollSwitch');
+      sw.classList.toggle('on', !!st.polling);
+      return st;
+    }
+
+    $('btnRefresh').onclick = async () => {
+      showError($('connError'), '');
+      try { await refreshPorts(); } catch (e) { showError($('connError'), e.message); }
+    };
+
+    $('btnConnect').onclick = async () => {
+      showError($('connError'), '');
+      const port = $('port').value;
+      if (!port) return showError($('connError'), 'Select a serial port first.');
+      try {
+        setConnected(false, 'CONNECTING…');
+        await api('/connect', {
+          method: 'POST',
+          body: JSON.stringify({ port, baudRate: Number($('baud').value) }),
+        });
+        await refreshStatus();
+        await loadDebug();
+      } catch (e) {
+        setConnected(false, 'FAILED');
+        showError($('connError'), e.message);
+        await loadDebug();
+      }
+    };
+
+    $('btnDisconnect').onclick = async () => {
+      showError($('connError'), '');
+      await api('/disconnect', { method: 'POST', body: '{}' });
+      $('pollSwitch').classList.remove('on');
+      setConnected(false);
+      renderMeta(null);
+    };
+
+    $('btnSnapshot').onclick = async () => {
+      showError($('connError'), '');
+      try {
+        const snap = await api('/snapshot', { method: 'POST', body: '{}' });
+        renderSnapshot(snap);
+        await loadDebug();
+      } catch (e) { showError($('connError'), e.message); }
+    };
+
+    $('pollToggle').onclick = async () => {
+      showError($('connError'), '');
+      const on = $('pollSwitch').classList.contains('on');
+      try {
+        if (on) {
+          await api('/poll/stop', { method: 'POST', body: '{}' });
+          $('pollSwitch').classList.remove('on');
+        } else {
+          await api('/poll/start', { method: 'POST', body: JSON.stringify({ intervalMs: 1000 }) });
+          $('pollSwitch').classList.add('on');
+        }
+      } catch (e) { showError($('connError'), e.message); }
+    };
+
+    async function loadDebug() {
+      const d = await api('/debug');
+      $('debug').textContent = JSON.stringify(d, null, 2);
+      window.__lastDebug = d;
+    }
+
+    $('btnDebug').onclick = () => loadDebug().catch((e) => showError($('connError'), e.message));
+    $('btnCopy').onclick = () => {
+      if (window.__lastDebug) navigator.clipboard.writeText(JSON.stringify(window.__lastDebug, null, 2));
+    };
+
+    (async function boot() {
+      try {
+        await checkHealth();
+        await refreshPorts();
+        await refreshStatus();
+        await loadDebug();
+        setInterval(async () => {
+          try {
+            const st = await api('/status');
+            if (st.lastSnapshot) renderSnapshot(st.lastSnapshot);
+            renderMeta(st);
+            $('pollSwitch').classList.toggle('on', !!st.polling);
+            setConnected(st.connected);
+          } catch { /* bridge stopped */ }
+        }, 1500);
+      } catch (e) {
+        showError($('connError'), 'Bridge not running. In the repo root run: npm run obd-bridge');
+      }
+    })();
+  </script>
+</body>
+</html>

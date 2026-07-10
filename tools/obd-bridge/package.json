@@ -1,0 +1,17 @@
+{
+  "name": "flatsix-obd-bridge",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local ELM327 OBD bridge + test UI for FLAT·SIX (Mac BT dongles, USB serial)",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node --watch server.mjs"
+  },
+  "dependencies": {
+    "serialport": "^13.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
