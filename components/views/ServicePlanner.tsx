@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useServicePlans } from '@/lib/plans-context';
+import { useVehicle } from '@/lib/vehicle-context';
 import { fmtMiles } from '@/lib/data';
 import { uid } from '@/lib/uid';
 import type {
@@ -98,6 +99,7 @@ const ghostBtn: React.CSSProperties = {
 };
 
 export default function ServicePlanner() {
+  const { vehicle } = useVehicle();
   const { plans, loading, add, update, remove } = useServicePlans();
   const [editing, setEditing] = useState<ServicePlan | null | undefined>(undefined);
   // undefined = list view, null = new plan, ServicePlan = edit existing.
@@ -125,8 +127,12 @@ export default function ServicePlanner() {
           <div style={{ font: `500 11px/1 ${mono}`, letterSpacing: '.16em', color: '#6E6E73' }}>
             SERVICE PLANS
           </div>
-          <p style={{ margin: '8px 0 0', font: "400 13px/1.5 'Helvetica Neue',Arial,sans-serif", color: '#9A9AA0', maxWidth: 520 }}>
-            Plan jobs ahead — gather parts and how-to links, then knock them all out in one session.
+          <div style={{ marginTop: 6, font: "400 15px/1.3 'Helvetica Neue',Arial,sans-serif", color: '#0B0B0C' }}>
+            {vehicle.year ? `${vehicle.year} ` : ''}
+            {vehicle.model || 'Active vehicle'}
+          </div>
+          <p style={{ margin: '6px 0 0', font: "400 13px/1.5 'Helvetica Neue',Arial,sans-serif", color: '#9A9AA0', maxWidth: 520 }}>
+            Plans are per car — switch vehicles in the sidebar to see another. Gather parts and how-to links, then knock them out in one session.
           </p>
         </div>
         <button onClick={() => setEditing(null)} style={{ ...primaryBtn(), marginLeft: 'auto' }}>

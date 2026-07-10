@@ -87,29 +87,186 @@ export const WORKSHOP_VOLUMES: DocumentMeta[] = [
   },
 ];
 
+/**
+ * 987.1 (2005–2008 Cayman) factory service manual — compressed volumes.
+ * Page ranges match `public/manual/volumes-9871.json`.
+ */
+export const WORKSHOP_VOLUMES_9871: DocumentMeta[] = [
+  {
+    id: '987-workshop-9871-v1',
+    title: '987.1 Service Manual — Vol 1',
+    subtitle: 'Pages 1–1760 · Cayman (2005–2008)',
+    category: 'workshop',
+    generations: ['987'],
+    storagePath: '987/workshop/987-workshop-9871-v1.pdf',
+    localUrl: '/manual/987-workshop-9871-v1.pdf',
+    sizeLabel: '~31 MB',
+  },
+  {
+    id: '987-workshop-9871-v2',
+    title: '987.1 Service Manual — Vol 2',
+    subtitle: 'Pages 1761–3520 · Cayman (2005–2008)',
+    category: 'workshop',
+    generations: ['987'],
+    storagePath: '987/workshop/987-workshop-9871-v2.pdf',
+    localUrl: '/manual/987-workshop-9871-v2.pdf',
+    sizeLabel: '~28 MB',
+  },
+  {
+    id: '987-workshop-9871-v3',
+    title: '987.1 Service Manual — Vol 3',
+    subtitle: 'Pages 3521–5278 · Cayman (2005–2008)',
+    category: 'workshop',
+    generations: ['987'],
+    storagePath: '987/workshop/987-workshop-9871-v3.pdf',
+    localUrl: '/manual/987-workshop-9871-v3.pdf',
+    sizeLabel: '~27 MB',
+  },
+];
+
+/**
+ * 987.2 (2009–2011 Boxster/Cayman) factory service manual — compressed volumes.
+ * Page ranges match `public/manual/volumes-9872.json`.
+ */
+export const WORKSHOP_VOLUMES_9872: DocumentMeta[] = [
+  {
+    id: '987-workshop-9872-v1',
+    title: '987.2 Service Manual — Vol 1',
+    subtitle: 'Pages 1–789 · Boxster / Cayman (2009–2011)',
+    category: 'workshop',
+    generations: ['987'],
+    storagePath: '987/workshop/987-workshop-9872-v1.pdf',
+    localUrl: '/manual/987-workshop-9872-v1.pdf',
+    sizeLabel: '~17 MB',
+  },
+  {
+    id: '987-workshop-9872-v2',
+    title: '987.2 Service Manual — Vol 2',
+    subtitle: 'Pages 790–1578 · Boxster / Cayman (2009–2011)',
+    category: 'workshop',
+    generations: ['987'],
+    storagePath: '987/workshop/987-workshop-9872-v2.pdf',
+    localUrl: '/manual/987-workshop-9872-v2.pdf',
+    sizeLabel: '~16 MB',
+  },
+  {
+    id: '987-workshop-9872-v3',
+    title: '987.2 Service Manual — Vol 3',
+    subtitle: 'Pages 1579–2367 · Boxster / Cayman (2009–2011)',
+    category: 'workshop',
+    generations: ['987'],
+    storagePath: '987/workshop/987-workshop-9872-v3.pdf',
+    localUrl: '/manual/987-workshop-9872-v3.pdf',
+    sizeLabel: '~20 MB',
+  },
+  {
+    id: '987-workshop-9872-v4',
+    title: '987.2 Service Manual — Vol 4',
+    subtitle: 'Pages 2368–3156 · Boxster / Cayman (2009–2011)',
+    category: 'workshop',
+    generations: ['987'],
+    storagePath: '987/workshop/987-workshop-9872-v4.pdf',
+    localUrl: '/manual/987-workshop-9872-v4.pdf',
+    sizeLabel: '~19 MB',
+  },
+  {
+    id: '987-workshop-9872-v5',
+    title: '987.2 Service Manual — Vol 5',
+    subtitle: 'Pages 3157–3945 · Boxster / Cayman (2009–2011)',
+    category: 'workshop',
+    generations: ['987'],
+    storagePath: '987/workshop/987-workshop-9872-v5.pdf',
+    localUrl: '/manual/987-workshop-9872-v5.pdf',
+    sizeLabel: '~17 MB',
+  },
+  {
+    id: '987-workshop-9872-v6',
+    title: '987.2 Service Manual — Vol 6',
+    subtitle: 'Pages 3946–4734 · Boxster / Cayman (2009–2011)',
+    category: 'workshop',
+    generations: ['987'],
+    storagePath: '987/workshop/987-workshop-9872-v6.pdf',
+    localUrl: '/manual/987-workshop-9872-v6.pdf',
+    sizeLabel: '~17 MB',
+  },
+  {
+    id: '987-workshop-9872-v7',
+    title: '987.2 Service Manual — Vol 7',
+    subtitle: 'Pages 4735–5523 · Boxster / Cayman (2009–2011)',
+    category: 'workshop',
+    generations: ['987'],
+    storagePath: '987/workshop/987-workshop-9872-v7.pdf',
+    localUrl: '/manual/987-workshop-9872-v7.pdf',
+    sizeLabel: '~18 MB',
+  },
+  {
+    id: '987-workshop-9872-v8',
+    title: '987.2 Service Manual — Vol 8',
+    subtitle: 'Pages 5524–6309 · Boxster / Cayman (2009–2011)',
+    category: 'workshop',
+    generations: ['987'],
+    storagePath: '987/workshop/987-workshop-9872-v8.pdf',
+    localUrl: '/manual/987-workshop-9872-v8.pdf',
+    sizeLabel: '~18 MB',
+  },
+];
+
 /** Absolute page ranges matching `npm run manual:compress` (6087 pages / 3). */
 export const WORKSHOP_VOLUME_RANGES: ReadonlyArray<{
   id: string;
   startPage: number;
   endPage: number;
+  series?: '981' | '9871' | '9872';
 }> = [
-  { id: '981-workshop-manual-v1', startPage: 1, endPage: 2029 },
-  { id: '981-workshop-manual-v2', startPage: 2030, endPage: 4058 },
-  { id: '981-workshop-manual-v3', startPage: 4059, endPage: 6087 },
+  { id: '981-workshop-manual-v1', startPage: 1, endPage: 2029, series: '981' },
+  { id: '981-workshop-manual-v2', startPage: 2030, endPage: 4058, series: '981' },
+  { id: '981-workshop-manual-v3', startPage: 4059, endPage: 6087, series: '981' },
+  { id: '987-workshop-9871-v1', startPage: 1, endPage: 1760, series: '9871' },
+  { id: '987-workshop-9871-v2', startPage: 1761, endPage: 3520, series: '9871' },
+  { id: '987-workshop-9871-v3', startPage: 3521, endPage: 5278, series: '9871' },
+  { id: '987-workshop-9872-v1', startPage: 1, endPage: 789, series: '9872' },
+  { id: '987-workshop-9872-v2', startPage: 790, endPage: 1578, series: '9872' },
+  { id: '987-workshop-9872-v3', startPage: 1579, endPage: 2367, series: '9872' },
+  { id: '987-workshop-9872-v4', startPage: 2368, endPage: 3156, series: '9872' },
+  { id: '987-workshop-9872-v5', startPage: 3157, endPage: 3945, series: '9872' },
+  { id: '987-workshop-9872-v6', startPage: 3946, endPage: 4734, series: '9872' },
+  { id: '987-workshop-9872-v7', startPage: 4735, endPage: 5523, series: '9872' },
+  { id: '987-workshop-9872-v8', startPage: 5524, endPage: 6309, series: '9872' },
 ];
 
-/** Map an absolute workshop PDF page → volume doc + page-within-volume. */
-export function workshopVolumeForPage(absolutePage: number): {
+/** Every workshop volume across generations (981 + 987.1 + 987.2). */
+export function allWorkshopVolumes(): DocumentMeta[] {
+  return [...WORKSHOP_VOLUMES, ...WORKSHOP_VOLUMES_9871, ...WORKSHOP_VOLUMES_9872];
+}
+
+/**
+ * Map an absolute workshop PDF page → volume doc + page-within-volume.
+ * Pass `series` when the page belongs to a specific manual (required once
+ * multiple manuals share overlapping absolute page numbers).
+ */
+export function workshopVolumeForPage(
+  absolutePage: number,
+  series: '981' | '9871' | '9872' = '981',
+): {
   doc: DocumentMeta;
   pageInVolume: number;
 } {
   const page = Math.max(1, Math.floor(absolutePage) || 1);
+  const ranges = WORKSHOP_VOLUME_RANGES.filter((r) => (r.series ?? '981') === series);
   const range =
-    WORKSHOP_VOLUME_RANGES.find((r) => page >= r.startPage && page <= r.endPage) ??
-    WORKSHOP_VOLUME_RANGES[0];
-  const doc =
-    WORKSHOP_VOLUMES.find((v) => v.id === range.id) ?? WORKSHOP_VOLUMES[0];
+    ranges.find((r) => page >= r.startPage && page <= r.endPage) ?? ranges[0] ?? WORKSHOP_VOLUME_RANGES[0];
+  const docs = allWorkshopVolumes();
+  const doc = docs.find((v) => v.id === range.id) ?? docs[0] ?? WORKSHOP_VOLUMES[0];
   return { doc, pageInVolume: page - range.startPage + 1 };
+}
+
+/** Infer workshop series from a volume doc id. */
+export function workshopSeriesForDocId(docId: string | null | undefined): '981' | '9871' | '9872' | null {
+  if (!docId) return null;
+  if (docId.startsWith('987-workshop-9872')) return '9872';
+  if (docId.startsWith('987-workshop-9871')) return '9871';
+  if (docId.startsWith('981-workshop')) return '981';
+  return null;
 }
 
 /** Encode each path segment for a public URL (spaces, commas, etc.). */
@@ -245,6 +402,8 @@ function slug(s: string): string {
 /** Full catalog shown in the Documents tab (981 / 987 scoped). */
 export const DOCUMENTS: DocumentMeta[] = [
   ...WORKSHOP_VOLUMES,
+  ...WORKSHOP_VOLUMES_9871,
+  ...WORKSHOP_VOLUMES_9872,
 
   // ---- 981 Parts ----
   parts981('981 Parts Catalog 2012-2016.pdf', '981 Parts Catalog', 'Official PET parts catalog · Boxster/Cayman (981) 2012–2016 · 794 pp', '~31 MB'),
@@ -400,16 +559,19 @@ export function resolveWorkshopViewerLink(
   const abs = Number.isFinite(pageParam) && pageParam > 0 ? pageParam : 1;
 
   if (docId === '981-workshop-manual') {
-    return workshopVolumeForPage(abs);
+    return workshopVolumeForPage(abs, '981');
   }
 
+  const series = workshopSeriesForDocId(docId);
   const range = WORKSHOP_VOLUME_RANGES.find((r) => r.id === docId);
   if (!range) return null;
 
   const len = range.endPage - range.startPage + 1;
-  if (abs > len) return workshopVolumeForPage(abs);
+  if (abs > len) {
+    return workshopVolumeForPage(abs, series ?? (range.series as '981' | '9871' | '9872') ?? '981');
+  }
 
-  const doc = WORKSHOP_VOLUMES.find((v) => v.id === docId) ?? WORKSHOP_VOLUMES[0];
+  const doc = allWorkshopVolumes().find((v) => v.id === docId) ?? WORKSHOP_VOLUMES[0];
   return { doc, pageInVolume: abs };
 }
 
@@ -447,7 +609,14 @@ export function resolveDocumentForManualHit(hit: {
 
   const src = hit.source ?? 'workshop';
   if (src === 'workshop') {
-    // Prefer volume for page when caller passes page via manualHitHref.
+    // Prefer an explicit volume doc_id (set on 987 chunks; 981 often omits it).
+    if (hit.docId) {
+      const byId = getDocument(hit.docId);
+      if (byId) return byId;
+    }
+    if (hit.generation === '987') {
+      return WORKSHOP_VOLUMES_9871[0] ?? WORKSHOP_VOLUMES[0];
+    }
     return WORKSHOP_VOLUMES[0];
   }
 
@@ -488,8 +657,21 @@ export function manualHitHref(hit: {
   const src = hit.source ?? 'workshop';
   const absolutePage = hit.page > 0 ? hit.page : 1;
 
-  if (src === 'workshop' && !hit.docId) {
-    const { doc, pageInVolume } = workshopVolumeForPage(absolutePage);
+  if (src === 'workshop') {
+    const series =
+      workshopSeriesForDocId(hit.docId) ??
+      (hit.generation === '987' ? '9871' : '981');
+    // Explicit volume id with a page already inside the volume.
+    if (hit.docId && WORKSHOP_VOLUME_RANGES.some((r) => r.id === hit.docId)) {
+      const range = WORKSHOP_VOLUME_RANGES.find((r) => r.id === hit.docId)!;
+      const len = range.endPage - range.startPage + 1;
+      if (absolutePage <= len) {
+        return `/manual?doc=${encodeURIComponent(hit.docId)}&page=${absolutePage}`;
+      }
+      const { doc, pageInVolume } = workshopVolumeForPage(absolutePage, series);
+      return `/manual?doc=${encodeURIComponent(doc.id)}&page=${pageInVolume}`;
+    }
+    const { doc, pageInVolume } = workshopVolumeForPage(absolutePage, series);
     return `/manual?doc=${encodeURIComponent(doc.id)}&page=${pageInVolume}`;
   }
 
@@ -498,7 +680,8 @@ export function manualHitHref(hit: {
 
   // Already a volume id — treat page as absolute and remap.
   if (doc.category === 'workshop' && WORKSHOP_VOLUME_RANGES.some((r) => r.id === doc.id)) {
-    const { doc: vol, pageInVolume } = workshopVolumeForPage(absolutePage);
+    const series = workshopSeriesForDocId(doc.id) ?? '981';
+    const { doc: vol, pageInVolume } = workshopVolumeForPage(absolutePage, series);
     return `/manual?doc=${encodeURIComponent(vol.id)}&page=${pageInVolume}`;
   }
 

@@ -51,9 +51,11 @@ public/manual/volumes.json
 public/mobile_tech_library/**
 !public/mobile_tech_library/README.md
 
-# workshop / MTL extraction (© Porsche — never commit; feed your own Supabase only)
-/data/manual-981.json
-/data/mtl-981-987.json
+# workshop / MTL / parts extraction (© Porsche — never commit; feed your own Supabase only)
+/data/manual-*.json
+/data/mtl-*.json
+/data/parts-*.json
+/data/
 
 # WM CAD page extracts used to calibrate 3D gen (© Porsche — local only)
 /tools/gen/wm-refs/**/*.png

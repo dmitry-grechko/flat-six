@@ -10,7 +10,6 @@ import {
 } from '@/lib/knowledge';
 import { searchCatalog, formatPartNumber } from '@/lib/catalog';
 import { GENERATIONS, generationForBody } from '@/lib/models';
-import type { SupabaseClient } from '@supabase/supabase-js';
 import { resolveUser, AUTH_REQUIRED_MESSAGE, publicClient } from './auth';
 import { manualHitHref } from '@/lib/documents';
 
@@ -18,29 +17,203 @@ import { manualHitHref } from '@/lib/documents';
 const GENERATION_ARG = z
   .string()
   .optional()
-  .describe(`Car generation, e.g. ${GENERATIONS.map((g) => `"${g}"`).join(' / ')}. Defaults to your garage vehicle, else ${DEFAULT_GENERATION}.`);
+  .describe(
+    `Car generation to scope results, e.g. ${GENERATIONS.map((g) => `"${g}"`).join(' / ')}. ` +
+      `ALWAYS pass this (or vehicleId) when the user names a specific car/generation, or when ` +
+      `get_my_vehicles shows multiple generations in the garage — never guess across models.`,
+  );
+
+/** Optional vehicle id — preferred over generation when the user has multiple cars. */
+const VEHICLE_ID_ARG = z
+  .string()
+  .uuid()
+  .optional()
+  .describe(
+    'Garage vehicle id from get_my_vehicles. Prefer this when the user has multiple cars — ' +
+      'it pins both the generation AND which car garage tools should use.',
+  );
+
+type GarageVehicle = {
+  id: string;
+  body: string;
+  model: string | null;
+  year: number | null;
+  is_primary: boolean | null;
+  generation: string;
+};
+
+type KnowledgeScope = {
+  generation: string;
+  vehicleId?: string;
+  vehicleLabel?: string;
+  /** Set when the garage has multiple generations and the caller didn't disambiguate. */
+  ambiguous?: boolean;
+  garageGenerations?: string[];
+};
 
 /**
- * Resolve which generation a knowledge/catalog lookup should use:
- * explicit arg (if a known generation) → the caller's primary vehicle (if
- * authenticated) → the default (981).
+ * Resolve which generation (and optional vehicle) a knowledge/catalog lookup
+ * should use. Priority:
+ *   1. explicit vehicleId (maps to that car's generation)
+ *   2. explicit generation arg
+ *   3. single-generation garage → that generation
+ *   4. multi-generation garage → primary vehicle, but flagged ambiguous
+ *   5. DEFAULT_GENERATION (981)
+ *
+ * Callers should surface `ambiguous` so the model asks which car — this is the
+ * main guard against cross-generation hallucinations when users own both a 981
+ * and a 987.
  */
-async function resolveGeneration(explicit: string | undefined, token: string | undefined): Promise<string> {
-  if (explicit && GENERATIONS.includes(explicit)) return explicit;
-  if (token) {
-    const user = await resolveUser(token);
-    if (user) {
-      const { data } = await user.supabase
-        .from('vehicles')
-        .select('body, is_primary, created_at')
-        .order('is_primary', { ascending: false })
-        .order('created_at', { ascending: true })
-        .limit(1);
-      const body = (data as { body: string }[] | null)?.[0]?.body;
-      if (body) return generationForBody(body);
+async function resolveKnowledgeScope(
+  explicitGen: string | undefined,
+  vehicleId: string | undefined,
+  token: string | undefined,
+): Promise<KnowledgeScope> {
+  const vehicles = token ? await listGarageVehicles(token) : [];
+
+  if (vehicleId) {
+    const match = vehicles.find((v) => v.id === vehicleId);
+    if (match) {
+      return {
+        generation: match.generation,
+        vehicleId: match.id,
+        vehicleLabel: formatVehicleLabel(match),
+      };
     }
+    // Unknown / unauthenticated vehicleId — fall through; generation arg may still help.
   }
-  return DEFAULT_GENERATION;
+
+  if (explicitGen && GENERATIONS.includes(explicitGen)) {
+    const match = vehicles.find((v) => v.generation === explicitGen);
+    return {
+      generation: explicitGen,
+      vehicleId: match?.id,
+      vehicleLabel: match ? formatVehicleLabel(match) : undefined,
+    };
+  }
+
+  if (vehicles.length === 0) {
+    return { generation: DEFAULT_GENERATION };
+  }
+
+  const gens = Array.from(new Set(vehicles.map((v) => v.generation)));
+  const primary =
+    vehicles.find((v) => v.is_primary) ?? vehicles[0];
+
+  if (gens.length === 1) {
+    return {
+      generation: primary.generation,
+      vehicleId: primary.id,
+      vehicleLabel: formatVehicleLabel(primary),
+    };
+  }
+
+  // Multi-generation garage without an explicit pick — use primary but warn.
+  return {
+    generation: primary.generation,
+    vehicleId: primary.id,
+    vehicleLabel: formatVehicleLabel(primary),
+    ambiguous: true,
+    garageGenerations: gens,
+  };
+}
+
+async function listGarageVehicles(token: string): Promise<GarageVehicle[]> {
+  const user = await resolveUser(token);
+  if (!user) return [];
+  const { data } = await user.supabase
+    .from('vehicles')
+    .select('id, body, model, year, is_primary, created_at')
+    .order('is_primary', { ascending: false })
+    .order('created_at', { ascending: true });
+  return ((data as Omit<GarageVehicle, 'generation'>[] | null) ?? []).map((v) => ({
+    ...v,
+    generation: generationForBody(v.body),
+  }));
+}
+
+function formatVehicleLabel(v: GarageVehicle): string {
+  const bits = [v.year, v.model || v.body].filter(Boolean);
+  return `${bits.join(' ')} (${v.generation})`;
+}
+
+/** Resolve which garage vehicle a history/plans tool should use. */
+async function resolveGarageVehicle(
+  token: string,
+  vehicleId: string | undefined,
+): Promise<
+  | { ok: true; vehicle: GarageVehicle; ambiguous: boolean; garageCount: number }
+  | { ok: false; message: string }
+> {
+  const vehicles = await listGarageVehicles(token);
+  if (!vehicles.length) {
+    return { ok: false, message: 'No vehicle found in your garage. Add one first.' };
+  }
+  if (vehicleId) {
+    const match = vehicles.find((v) => v.id === vehicleId);
+    if (!match) {
+      return {
+        ok: false,
+        message:
+          `No vehicle with id "${vehicleId}". Call get_my_vehicles and pass one of: ` +
+          vehicles.map((v) => `${v.id} (${formatVehicleLabel(v)})`).join(', '),
+      };
+    }
+    return { ok: true, vehicle: match, ambiguous: false, garageCount: vehicles.length };
+  }
+  const primary = vehicles.find((v) => v.is_primary) ?? vehicles[0];
+  return {
+    ok: true,
+    vehicle: primary,
+    ambiguous: vehicles.length > 1,
+    garageCount: vehicles.length,
+  };
+}
+
+function garageScopedJson(
+  vehicle: GarageVehicle,
+  ambiguous: boolean,
+  garageCount: number,
+  value: unknown,
+) {
+  const payload: Record<string, unknown> = {
+    scope: {
+      vehicleId: vehicle.id,
+      vehicleLabel: formatVehicleLabel(vehicle),
+      generation: vehicle.generation,
+    },
+    result: value,
+  };
+  if (ambiguous) {
+    payload.warning =
+      `Garage has ${garageCount} vehicles. Showing data for the primary car ` +
+      `(${formatVehicleLabel(vehicle)}). Service history and plans are per vehicle — ` +
+      `call get_my_vehicles and re-run with vehicleId if the user meant a different car.`;
+  }
+  return json(payload);
+}
+
+/**
+ * Wrap a knowledge result with scope metadata so the model always knows which
+ * generation the answer is for — and gets a clear prompt when the garage is
+ * ambiguous.
+ */
+function scopedJson(scope: KnowledgeScope, value: unknown) {
+  const payload: Record<string, unknown> = {
+    scope: {
+      generation: scope.generation,
+      vehicleId: scope.vehicleId ?? null,
+      vehicleLabel: scope.vehicleLabel ?? null,
+    },
+    result: value,
+  };
+  if (scope.ambiguous) {
+    payload.warning =
+      `Your garage has multiple generations (${(scope.garageGenerations ?? []).join(', ')}). ` +
+      `Results below are scoped to the primary vehicle (${scope.vehicleLabel ?? scope.generation}). ` +
+      `If the user meant a different car, call get_my_vehicles and re-run with vehicleId or generation.`;
+  }
+  return json(payload);
 }
 
 /** Wrap a JSON-serialisable value as an MCP text content result. */
@@ -73,16 +246,18 @@ export function registerTools(server: McpServer): void {
       description:
         'Full-text search across the Porsche knowledge base: fault codes, specs, ' +
         'maintenance items, known issues and articles. Use for general "how/why/what" questions. ' +
-        'Scoped to the car generation (defaults to your garage vehicle).',
+        'ALWAYS scoped to one car generation — pass vehicleId or generation when the user has ' +
+        'multiple cars or names a specific model (981 vs 987). Call get_my_vehicles first if unsure.',
       inputSchema: {
         query: z.string().min(1).describe('What to search for, e.g. "AOS failure symptoms"'),
         limit: z.number().int().min(1).max(25).optional().describe('Max results (default 8)'),
         generation: GENERATION_ARG,
+        vehicleId: VEHICLE_ID_ARG,
       },
     },
-    async ({ query, limit, generation }, extra) => {
-      const gen = await resolveGeneration(generation, extra.authInfo?.token);
-      return json(searchKnowledge(query, { limit: limit ?? 8, generation: gen }));
+    async ({ query, limit, generation, vehicleId }, extra) => {
+      const scope = await resolveKnowledgeScope(generation, vehicleId, extra.authInfo?.token);
+      return scopedJson(scope, searchKnowledge(query, { limit: limit ?? 8, generation: scope.generation }));
     },
   );
 
@@ -90,26 +265,33 @@ export function registerTools(server: McpServer): void {
     'lookup_fault_code',
     {
       title: 'Look up a fault / OBD code',
-      description: 'Resolve a fault or OBD-II code (e.g. P0011) to its meaning, causes and fixes.',
+      description:
+        'Resolve a fault or OBD-II code (e.g. P0011) to its meaning, causes and fixes for ONE ' +
+        'car generation. Pass vehicleId/generation when the garage has multiple models.',
       inputSchema: {
         code: z.string().min(1).describe('The fault code, e.g. "P0011" (case-insensitive)'),
         generation: GENERATION_ARG,
+        vehicleId: VEHICLE_ID_ARG,
       },
     },
-    async ({ code, generation }, extra) => {
-      const gen = await resolveGeneration(generation, extra.authInfo?.token);
+    async ({ code, generation, vehicleId }, extra) => {
+      const scope = await resolveKnowledgeScope(generation, vehicleId, extra.authInfo?.token);
       const needle = code.trim().toLowerCase();
-      const faults = getFaultCodes(gen);
+      const faults = getFaultCodes(scope.generation);
       const exact = faults.find((f) => f.code?.toLowerCase() === needle);
-      if (exact) return json(exact);
+      if (exact) return scopedJson(scope, exact);
       const fuzzy = faults.filter(
         (f) =>
           f.code?.toLowerCase().includes(needle) ||
           f.title?.toLowerCase().includes(needle) ||
           f.description?.toLowerCase().includes(needle),
       );
-      if (fuzzy.length === 0) return err(`No fault code matching "${code}" was found.`);
-      return json(fuzzy);
+      if (fuzzy.length === 0) {
+        return err(
+          `No fault code matching "${code}" was found for generation ${scope.generation}.`,
+        );
+      }
+      return scopedJson(scope, fuzzy);
     },
   );
 
@@ -117,18 +299,21 @@ export function registerTools(server: McpServer): void {
     'get_spec',
     {
       title: 'Get a specification',
-      description: 'Look up a torque value, capacity, fluid grade or other spec for the car generation.',
+      description:
+        'Look up a torque value, capacity, fluid grade or other spec for ONE car generation. ' +
+        'Pass vehicleId/generation when the garage has multiple models — 981 and 987 specs differ.',
       inputSchema: {
         query: z.string().min(1).describe('What spec you need, e.g. "wheel bolt torque"'),
         category: z.string().optional().describe('Optional category filter, e.g. "torque"'),
         generation: GENERATION_ARG,
+        vehicleId: VEHICLE_ID_ARG,
       },
     },
-    async ({ query, category, generation }, extra) => {
-      const gen = await resolveGeneration(generation, extra.authInfo?.token);
+    async ({ query, category, generation, vehicleId }, extra) => {
+      const scope = await resolveKnowledgeScope(generation, vehicleId, extra.authInfo?.token);
       const q = query.trim().toLowerCase();
       const cat = category?.trim().toLowerCase();
-      const specs = getSpecs(gen).filter((s) => {
+      const specs = getSpecs(scope.generation).filter((s) => {
         const inCat = !cat || s.category?.toLowerCase() === cat;
         const text = [s.name, s.value, s.category, s.notes, ...(s.appliesTo ?? [])]
           .filter(Boolean)
@@ -136,8 +321,10 @@ export function registerTools(server: McpServer): void {
           .toLowerCase();
         return inCat && text.includes(q);
       });
-      if (specs.length === 0) return err(`No spec matching "${query}" was found.`);
-      return json(specs);
+      if (specs.length === 0) {
+        return err(`No spec matching "${query}" was found for generation ${scope.generation}.`);
+      }
+      return scopedJson(scope, specs);
     },
   );
 
@@ -145,7 +332,9 @@ export function registerTools(server: McpServer): void {
     'get_maintenance_schedule',
     {
       title: 'Get the maintenance schedule',
-      description: 'List recommended maintenance items, optionally filtered by system or mileage.',
+      description:
+        'List recommended maintenance items for ONE car generation, optionally filtered by system ' +
+        'or mileage. Pass vehicleId/generation when the garage has multiple models.',
       inputSchema: {
         system: z.string().optional().describe('Filter by system, e.g. "Engine"'),
         dueByMiles: z
@@ -155,12 +344,13 @@ export function registerTools(server: McpServer): void {
           .optional()
           .describe('Only items due at or before this mileage'),
         generation: GENERATION_ARG,
+        vehicleId: VEHICLE_ID_ARG,
       },
     },
-    async ({ system, dueByMiles, generation }, extra) => {
-      const gen = await resolveGeneration(generation, extra.authInfo?.token);
+    async ({ system, dueByMiles, generation, vehicleId }, extra) => {
+      const scope = await resolveKnowledgeScope(generation, vehicleId, extra.authInfo?.token);
       const sys = system?.trim().toLowerCase();
-      const items = getMaintenance(gen).filter((m) => {
+      const items = getMaintenance(scope.generation).filter((m) => {
         const bySystem = !sys || m.system?.toLowerCase() === sys;
         const byMiles =
           dueByMiles == null ||
@@ -168,7 +358,7 @@ export function registerTools(server: McpServer): void {
           m.intervalMiles <= dueByMiles;
         return bySystem && byMiles;
       });
-      return json(items);
+      return scopedJson(scope, items);
     },
   );
 
@@ -176,17 +366,22 @@ export function registerTools(server: McpServer): void {
     'list_known_issues',
     {
       title: 'List known issues',
-      description: 'List documented common problems / weak points for the car generation, optionally filtered by system.',
+      description:
+        'List documented common problems / weak points for ONE car generation. ' +
+        'Pass vehicleId/generation when the garage has multiple models — 981 and 987 issues differ.',
       inputSchema: {
         system: z.string().optional().describe('Filter by system, e.g. "Cooling"'),
         generation: GENERATION_ARG,
+        vehicleId: VEHICLE_ID_ARG,
       },
     },
-    async ({ system, generation }, extra) => {
-      const gen = await resolveGeneration(generation, extra.authInfo?.token);
+    async ({ system, generation, vehicleId }, extra) => {
+      const scope = await resolveKnowledgeScope(generation, vehicleId, extra.authInfo?.token);
       const sys = system?.trim().toLowerCase();
-      const issues = getKnownIssues(gen).filter((i) => !sys || i.system?.toLowerCase() === sys);
-      return json(issues);
+      const issues = getKnownIssues(scope.generation).filter(
+        (i) => !sys || i.system?.toLowerCase() === sys,
+      );
+      return scopedJson(scope, issues);
     },
   );
 
@@ -197,14 +392,17 @@ export function registerTools(server: McpServer): void {
       description:
         'Search the full Porsche OEM parts catalog by part number or keyword, ' +
         'plus the curated catalog (torque/notes) and knowledge base. Returns part numbers, ' +
-        'descriptions and the assembly system. Scoped to the car generation (defaults to your vehicle).',
+        'descriptions and the assembly system. Scoped to ONE car generation — pass vehicleId/' +
+        'generation when the garage has multiple models.',
       inputSchema: {
         query: z.string().min(1).describe('Part name or number, e.g. "oil filter", "9A1 105", "981.351"'),
         generation: GENERATION_ARG,
+        vehicleId: VEHICLE_ID_ARG,
       },
     },
-    async ({ query, generation }, extra) => {
-      const gen = await resolveGeneration(generation, extra.authInfo?.token);
+    async ({ query, generation, vehicleId }, extra) => {
+      const scope = await resolveKnowledgeScope(generation, vehicleId, extra.authInfo?.token);
+      const gen = scope.generation;
       // 1) Full PET parts catalog in Supabase (part-number + full-text search).
       //    Falls back gracefully if env/table is absent.
       let parts: unknown[] = [];
@@ -229,9 +427,9 @@ export function registerTools(server: McpServer): void {
       // 3) Parts mentioned in the knowledge base (specs/articles).
       const fromKnowledge = searchKnowledge(query, { limit: 5, kinds: ['spec', 'article'], generation: gen });
       if (parts.length === 0 && fromCatalog.length === 0 && fromKnowledge.length === 0) {
-        return err(`No part matching "${query}" was found.`);
+        return err(`No part matching "${query}" was found for generation ${gen}.`);
       }
-      return json({ parts, catalog: fromCatalog, knowledge: fromKnowledge });
+      return scopedJson(scope, { parts, catalog: fromCatalog, knowledge: fromKnowledge });
     },
   );
 
@@ -240,31 +438,37 @@ export function registerTools(server: McpServer): void {
     {
       title: 'Search workshop manuals & tech library',
       description:
-        'Full-text search over factory reference docs: the 981 workshop manual plus Mobile Tech Library ' +
+        'Full-text search over factory reference docs: workshop manuals plus Mobile Tech Library ' +
         'diagnostics, Service Information Technik, and training books for 981/987. ' +
+        'ALWAYS scoped to one generation — pass vehicleId/generation when the user has multiple cars. ' +
         'Returns ranked sections with codes/snippets — fetch full text with get_manual_procedure. ' +
         'Requires your garage login (licensed content, not public).',
       inputSchema: {
         query: z.string().min(2).describe('e.g. "bleeding the cooling system", "P0562 PDK", "WM 197019"'),
         limit: z.number().int().min(1).max(20).optional().describe('Max sections (default 8)'),
         generation: GENERATION_ARG,
+        vehicleId: VEHICLE_ID_ARG,
       },
     },
-    async ({ query, limit, generation }, extra) => {
+    async ({ query, limit, generation, vehicleId }, extra) => {
       const user = await resolveUser(extra.authInfo?.token);
       if (!user) return err(AUTH_REQUIRED_MESSAGE);
-      const gen = await resolveGeneration(generation, extra.authInfo?.token);
+      const scope = await resolveKnowledgeScope(generation, vehicleId, extra.authInfo?.token);
       const { data, error } = await user.supabase.rpc('search_manual', {
         q: query,
         lim: limit ?? 8,
-        gen,
+        gen: scope.generation,
         src: null,
       });
       if (error) return err(`Manual search failed: ${error.message}`);
       if (!Array.isArray(data) || data.length === 0) {
-        return err(`No manual/tech-library section matches "${query}". Import with npm run db:import-manual / db:import-mtl.`);
+        return err(
+          `No manual/tech-library section matches "${query}" for generation ${scope.generation}. ` +
+            `Import with npm run db:import-manual / db:import-mtl.`,
+        );
       }
-      return json(
+      return scopedJson(
+        scope,
         (data as any[]).map((r) => {
           const hit = {
             source: r.source,
@@ -345,18 +549,40 @@ export function registerTools(server: McpServer): void {
     'get_my_vehicles',
     {
       title: 'Get my vehicles',
-      description: 'List the vehicles in your garage. Requires authentication.',
+      description:
+        'List every vehicle in the garage with id, generation (981/987/…), model, year, and ' +
+        'which one is primary. Call this FIRST when the user has (or might have) multiple cars, ' +
+        'then pass the matching vehicleId (or generation) into knowledge/manual/garage tools so ' +
+        'answers stay model-specific. Requires authentication.',
       inputSchema: {},
     },
     async (_args, extra) => {
       const user = await resolveUser(extra.authInfo?.token);
       if (!user) return err(AUTH_REQUIRED_MESSAGE);
-      const { data, error } = await user.supabase
-        .from('vehicles')
-        .select('*')
-        .order('created_at', { ascending: true });
-      if (error) return err(`Could not load vehicles: ${error.message}`);
-      return json(data);
+      const vehicles = await listGarageVehicles(extra.authInfo!.token!);
+      const gens = Array.from(new Set(vehicles.map((v) => v.generation)));
+      return json({
+        vehicles: vehicles.map((v) => ({
+          id: v.id,
+          body: v.body,
+          model: v.model,
+          year: v.year,
+          generation: v.generation,
+          isPrimary: !!v.is_primary,
+          label: formatVehicleLabel(v),
+        })),
+        generationsInGarage: gens,
+        vehicleCount: vehicles.length,
+        note:
+          vehicles.length > 1
+            ? 'Multiple vehicles in this garage. Service history and plans are per vehicle — ' +
+              'always pass vehicleId on get_service_history / log_service_record / get_service_plans / ' +
+              'create_service_plan. Also pass vehicleId (or generation) on knowledge/manual tools when ' +
+              'generations differ.'
+            : gens.length === 1
+              ? `Single vehicle, generation ${gens[0]}.`
+              : 'No vehicles yet.',
+      });
     },
   );
 
@@ -365,27 +591,34 @@ export function registerTools(server: McpServer): void {
     {
       title: 'Get service history',
       description:
-        'List service records for a vehicle. Omit vehicleId to use your primary (or first) vehicle. ' +
+        'List service records for ONE vehicle (history is never shared across cars). ' +
+        'Pass vehicleId when the garage has multiple vehicles — call get_my_vehicles first. ' +
         'Requires authentication.',
       inputSchema: {
-        vehicleId: z.string().uuid().optional().describe('Vehicle id; defaults to your primary vehicle'),
+        vehicleId: z
+          .string()
+          .uuid()
+          .optional()
+          .describe('Vehicle id from get_my_vehicles. Required when the garage has multiple cars.'),
       },
     },
     async ({ vehicleId }, extra) => {
       const user = await resolveUser(extra.authInfo?.token);
       if (!user) return err(AUTH_REQUIRED_MESSAGE);
 
-      const id = vehicleId ?? (await resolvePrimaryVehicleId(user.supabase));
-      if (!id) return err('No vehicle found in your garage. Add one first.');
+      const resolved = await resolveGarageVehicle(extra.authInfo!.token!, vehicleId);
+      if (!resolved.ok) return err(resolved.message);
 
       const { data, error } = await user.supabase
         .from('service_records')
         .select('*')
-        .eq('vehicle_id', id)
+        .eq('vehicle_id', resolved.vehicle.id)
         .order('date', { ascending: false })
         .order('created_at', { ascending: false });
       if (error) return err(`Could not load service history: ${error.message}`);
-      return json({ vehicleId: id, records: data });
+      return garageScopedJson(resolved.vehicle, resolved.ambiguous, resolved.garageCount, {
+        records: data,
+      });
     },
   );
 
@@ -394,12 +627,16 @@ export function registerTools(server: McpServer): void {
     {
       title: 'Log a service record',
       description:
-        'Add a maintenance/service record to a vehicle. Items are flexible line items — ' +
-        'each with a name and optional description, OEM part number and per-item cost. ' +
-        'Plain strings are accepted too (treated as item names). Omit vehicleId to use your ' +
-        'primary (or first) vehicle. Requires authentication.',
+        'Add a maintenance/service record to ONE vehicle (never shared across cars). Items are ' +
+        'flexible line items — each with a name and optional description, OEM part number and ' +
+        'per-item cost. Plain strings are accepted too (treated as item names). Pass vehicleId ' +
+        'when the garage has multiple vehicles. Requires authentication.',
       inputSchema: {
-        vehicleId: z.string().uuid().optional().describe('Vehicle id; defaults to your primary vehicle'),
+        vehicleId: z
+          .string()
+          .uuid()
+          .optional()
+          .describe('Vehicle id from get_my_vehicles. Required when the garage has multiple cars.'),
         date: z.string().describe('Service date, YYYY-MM-DD'),
         mileage: z.number().int().min(0).describe('Odometer reading at service'),
         title: z.string().min(1).describe('Short title, e.g. "Annual Oil Service"'),
@@ -417,15 +654,15 @@ export function registerTools(server: McpServer): void {
       const user = await resolveUser(extra.authInfo?.token);
       if (!user) return err(AUTH_REQUIRED_MESSAGE);
 
-      const id = vehicleId ?? (await resolvePrimaryVehicleId(user.supabase));
-      if (!id) return err('No vehicle found in your garage. Add one first.');
+      const resolved = await resolveGarageVehicle(extra.authInfo!.token!, vehicleId);
+      if (!resolved.ok) return err(resolved.message);
 
       // Columns mirror lib/db/service-records.ts addRecord() and the
       // service_records schema in supabase/migrations/0001_init.sql.
       const { data, error } = await user.supabase
         .from('service_records')
         .insert({
-          vehicle_id: id,
+          vehicle_id: resolved.vehicle.id,
           user_id: user.userId,
           date,
           mileage: mileage || null,
@@ -439,7 +676,7 @@ export function registerTools(server: McpServer): void {
         .select('*')
         .single();
       if (error) return err(`Could not save service record: ${error.message}`);
-      return json(data);
+      return garageScopedJson(resolved.vehicle, resolved.ambiguous, resolved.garageCount, data);
     },
   );
 
@@ -452,26 +689,33 @@ export function registerTools(server: McpServer): void {
     {
       title: 'Get service plans',
       description:
-        'List planned/upcoming service plans for a vehicle (the work an owner is gathering parts ' +
-        'and how-to links for). Omit vehicleId to use your primary vehicle. Requires authentication.',
+        'List planned/upcoming service plans for ONE vehicle (plans are never shared across cars). ' +
+        'Pass vehicleId when the garage has multiple vehicles — call get_my_vehicles first. ' +
+        'Requires authentication.',
       inputSchema: {
-        vehicleId: z.string().uuid().optional().describe('Vehicle id; defaults to your primary vehicle'),
+        vehicleId: z
+          .string()
+          .uuid()
+          .optional()
+          .describe('Vehicle id from get_my_vehicles. Required when the garage has multiple cars.'),
       },
     },
     async ({ vehicleId }, extra) => {
       const user = await resolveUser(extra.authInfo?.token);
       if (!user) return err(AUTH_REQUIRED_MESSAGE);
 
-      const id = vehicleId ?? (await resolvePrimaryVehicleId(user.supabase));
-      if (!id) return err('No vehicle found in your garage. Add one first.');
+      const resolved = await resolveGarageVehicle(extra.authInfo!.token!, vehicleId);
+      if (!resolved.ok) return err(resolved.message);
 
       const { data, error } = await user.supabase
         .from('service_plans')
         .select('*')
-        .eq('vehicle_id', id)
+        .eq('vehicle_id', resolved.vehicle.id)
         .order('created_at', { ascending: false });
       if (error) return err(`Could not load service plans: ${error.message}`);
-      return json({ vehicleId: id, plans: data });
+      return garageScopedJson(resolved.vehicle, resolved.ambiguous, resolved.garageCount, {
+        plans: data,
+      });
     },
   );
 
@@ -480,11 +724,15 @@ export function registerTools(server: McpServer): void {
     {
       title: 'Create a service plan',
       description:
-        'Plan an upcoming service. Add flexible items, each with optional description, part number ' +
-        'and reference links (how-to guides, part listings). Omit vehicleId to use your primary ' +
-        'vehicle. Requires authentication.',
+        'Plan an upcoming service on ONE vehicle (plans are never shared across cars). Add flexible ' +
+        'items, each with optional description, part number and reference links. Pass vehicleId when ' +
+        'the garage has multiple vehicles. Requires authentication.',
       inputSchema: {
-        vehicleId: z.string().uuid().optional().describe('Vehicle id; defaults to your primary vehicle'),
+        vehicleId: z
+          .string()
+          .uuid()
+          .optional()
+          .describe('Vehicle id from get_my_vehicles. Required when the garage has multiple cars.'),
         title: z.string().min(1).describe('Plan title, e.g. "Spring major service"'),
         status: PLAN_STATUS_SCHEMA.optional().describe('planning | ordered | scheduled | done (default planning)'),
         targetDate: z.string().optional().describe('Intended service date, YYYY-MM-DD'),
@@ -497,13 +745,13 @@ export function registerTools(server: McpServer): void {
       const user = await resolveUser(extra.authInfo?.token);
       if (!user) return err(AUTH_REQUIRED_MESSAGE);
 
-      const id = vehicleId ?? (await resolvePrimaryVehicleId(user.supabase));
-      if (!id) return err('No vehicle found in your garage. Add one first.');
+      const resolved = await resolveGarageVehicle(extra.authInfo!.token!, vehicleId);
+      if (!resolved.ok) return err(resolved.message);
 
       const { data, error } = await user.supabase
         .from('service_plans')
         .insert({
-          vehicle_id: id,
+          vehicle_id: resolved.vehicle.id,
           user_id: user.userId,
           title,
           status: status ?? 'planning',
@@ -515,7 +763,7 @@ export function registerTools(server: McpServer): void {
         .select('*')
         .single();
       if (error) return err(`Could not create service plan: ${error.message}`);
-      return json(data);
+      return garageScopedJson(resolved.vehicle, resolved.ambiguous, resolved.garageCount, data);
     },
   );
 
@@ -645,15 +893,4 @@ function normalizePlanItems(items: PlanItemInput[] | undefined) {
         done: it.done ?? false,
       };
     });
-}
-
-/** Resolve the user's primary vehicle id (falls back to their oldest vehicle). */
-async function resolvePrimaryVehicleId(supabase: SupabaseClient): Promise<string | null> {
-  const { data } = await supabase
-    .from('vehicles')
-    .select('id, is_primary, created_at')
-    .order('is_primary', { ascending: false })
-    .order('created_at', { ascending: true })
-    .limit(1);
-  return (data as { id: string }[] | null)?.[0]?.id ?? null;
 }

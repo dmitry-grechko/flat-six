@@ -85,7 +85,11 @@ export async function createVehicle(
 ): Promise<StoredVehicle> {
   if (DEMO_MODE) {
     const nv: StoredVehicle = { ...v, id: demoId('veh'), isPrimary: opts.primary ?? false };
-    demoStore().vehicles.push(nv);
+    const s = demoStore();
+    s.vehicles.push(nv);
+    // Each car gets its own empty history + plans — never share across vehicles.
+    s.records[nv.id] = [];
+    s.plans[nv.id] = [];
     return { ...nv };
   }
   const supabase = createClient();
@@ -121,6 +125,8 @@ export async function deleteVehicle(id: string): Promise<void> {
   if (DEMO_MODE) {
     const s = demoStore();
     s.vehicles = s.vehicles.filter((v) => v.id !== id);
+    delete s.records[id];
+    delete s.plans[id];
     return;
   }
   const supabase = createClient();

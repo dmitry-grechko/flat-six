@@ -1,0 +1,67 @@
+{
+  "id": "9872",
+  "label": "987.2 Boxster/Cayman 2009–2011",
+  "source": "Porsche Boxster Cayman 2009-2011 (987.2) Service manual.pdf",
+  "sourcePages": 6309,
+  "dpi": 72,
+  "maxMb": 48,
+  "createdAt": "2026-07-10T16:53:45.416Z",
+  "volumes": [
+    {
+      "id": "987-workshop-9872-v1",
+      "file": "987-workshop-9872-v1.pdf",
+      "startPage": 1,
+      "endPage": 789,
+      "sizeMb": 16.5
+    },
+    {
+      "id": "987-workshop-9872-v2",
+      "file": "987-workshop-9872-v2.pdf",
+      "startPage": 790,
+      "endPage": 1578,
+      "sizeMb": 16.2
+    },
+    {
+      "id": "987-workshop-9872-v3",
+      "file": "987-workshop-9872-v3.pdf",
+      "startPage": 1579,
+      "endPage": 2367,
+      "sizeMb": 19.9
+    },
+    {
+      "id": "987-workshop-9872-v4",
+      "file": "987-workshop-9872-v4.pdf",
+      "startPage": 2368,
+      "endPage": 3156,
+      "sizeMb": 18.7
+    },
+    {
+      "id": "987-workshop-9872-v5",
+      "file": "987-workshop-9872-v5.pdf",
+      "startPage": 3157,
+      "endPage": 3945,
+      "sizeMb": 17
+    },
+    {
+      "id": "987-workshop-9872-v6",
+      "file": "987-workshop-9872-v6.pdf",
+      "startPage": 3946,
+      "endPage": 4734,
+      "sizeMb": 16.7
+    },
+    {
+      "id": "987-workshop-9872-v7",
+      "file": "987-workshop-9872-v7.pdf",
+      "startPage": 4735,
+      "endPage": 5523,
+      "sizeMb": 18
+    },
+    {
+      "id": "987-workshop-9872-v8",
+      "file": "987-workshop-9872-v8.pdf",
+      "startPage": 5524,
+      "endPage": 6309,
+      "sizeMb": 17.7
+    }
+  ]
+}

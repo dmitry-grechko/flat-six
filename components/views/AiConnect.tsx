@@ -142,7 +142,7 @@ function ProviderInstructions({ provider, endpoint }: { provider: Provider; endp
 }
 
 export default function AiConnect() {
-  const { vehicle } = useVehicle();
+  const { vehicle, activeId } = useVehicle();
   const [endpoint, setEndpoint] = useState<string>('/api/mcp');
   const [copied, setCopied] = useState<string>('');
   const [provider, setProvider] = useState<Provider>('claude');
@@ -160,7 +160,13 @@ export default function AiConnect() {
 
   useEffect(() => {
     let active = true;
-    fetch('/api/knowledge/overview')
+    // Optimistic: show the active car's generation immediately while the
+    // overview request is in flight (avoids a stale "981" badge flash).
+    setRagGen(generation);
+    setRagMeta(null);
+    const params = new URLSearchParams({ generation });
+    if (activeId) params.set('vehicleId', activeId);
+    fetch(`/api/knowledge/overview?${params}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (!active || !data) return;
@@ -172,8 +178,10 @@ export default function AiConnect() {
         });
       })
       .catch(() => {});
-    return () => { active = false; };
-  }, [generation, vehicle.body]);
+    return () => {
+      active = false;
+    };
+  }, [generation, activeId, vehicle.body]);
 
   const copy = (value: string, key: string) => {
     if (!value) return;

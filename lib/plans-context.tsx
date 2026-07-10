@@ -29,8 +29,14 @@ export function PlansProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!activeId) return;
+    if (!activeId) {
+      setPlans([]);
+      setLoading(false);
+      return;
+    }
     let cancelled = false;
+    // Clear immediately so a previous car's plans never flash while the next loads.
+    setPlans([]);
     setLoading(true);
     listPlans(activeId)
       .then((ps) => {

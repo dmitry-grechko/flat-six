@@ -61,6 +61,18 @@ function collectLocalFiles() {
     storagePath: `981/workshop/981-workshop-manual-v${n}.pdf`,
     local: path.join(PUBLIC, `manual/981-workshop-manual-v${n}.pdf`),
   }));
+  // 987.1 / 987.2 compressed workshop volumes (from compress-987-workshop.mjs)
+  for (const series of ['9871', '9872']) {
+    const manifestPath = path.join(PUBLIC, `manual/volumes-${series}.json`);
+    if (!fs.existsSync(manifestPath)) continue;
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    for (const v of manifest.volumes ?? []) {
+      volumeFiles.push({
+        storagePath: `987/workshop/${v.file}`,
+        local: path.join(PUBLIC, 'manual', v.file),
+      });
+    }
+  }
   const volumesPresent = volumeFiles.filter((f) => fs.existsSync(f.local));
   if (!mtlOnly) {
     if (volumesPresent.length) {

@@ -28,8 +28,14 @@ export function RecordsProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!activeId) return;
+    if (!activeId) {
+      setRecords([]);
+      setLoading(false);
+      return;
+    }
     let cancelled = false;
+    // Clear immediately so a previous car's log never flashes while the next loads.
+    setRecords([]);
     setLoading(true);
     listRecords(activeId)
       .then((rs) => {

@@ -32,6 +32,19 @@ export default function ServiceHistory() {
 
   return (
     <div className="padView" style={{ padding: 28, maxWidth: 1080 }}>
+      <div style={{ marginBottom: 18 }}>
+        <div style={{ font: "500 11px/1 'JetBrains Mono',monospace", letterSpacing: '.16em', color: '#6E6E73' }}>
+          SERVICE HISTORY
+        </div>
+        <div style={{ marginTop: 6, font: "400 15px/1.3 'Helvetica Neue',Arial,sans-serif", color: '#0B0B0C' }}>
+          {vehicle.year ? `${vehicle.year} ` : ''}
+          {vehicle.model || 'Active vehicle'}
+          <span style={{ color: '#9A9AA0', marginLeft: 8, fontSize: 13 }}>
+            — log is per car; switch vehicles in the sidebar to see another
+          </span>
+        </div>
+      </div>
+
       <div className="statCardsSm" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 24 }}>
         {stats.map((st) => (
           <div key={st.k} style={{ background: '#fff', border: '1px solid #E3E3E5', borderRadius: 4, padding: 18 }}>

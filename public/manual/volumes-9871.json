@@ -1,0 +1,32 @@
+{
+  "id": "9871",
+  "label": "987.1 Cayman 2005–2008",
+  "source": "Porsche Cayman 2005-2008 Service Manual.pdf",
+  "sourcePages": 5278,
+  "dpi": 72,
+  "maxMb": 48,
+  "createdAt": "2026-07-10T16:52:44.352Z",
+  "volumes": [
+    {
+      "id": "987-workshop-9871-v1",
+      "file": "987-workshop-9871-v1.pdf",
+      "startPage": 1,
+      "endPage": 1760,
+      "sizeMb": 30.9
+    },
+    {
+      "id": "987-workshop-9871-v2",
+      "file": "987-workshop-9871-v2.pdf",
+      "startPage": 1761,
+      "endPage": 3520,
+      "sizeMb": 28.2
+    },
+    {
+      "id": "987-workshop-9871-v3",
+      "file": "987-workshop-9871-v3.pdf",
+      "startPage": 3521,
+      "endPage": 5278,
+      "sizeMb": 27.3
+    }
+  ]
+}
