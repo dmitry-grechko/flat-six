@@ -10,7 +10,9 @@ export type DocCategory =
   | 'workshop'
   | 'diagnostic'
   | 'service-info'
-  | 'training';
+  | 'training'
+  | 'maintenance'
+  | 'parts';
 
 export type DocGeneration = '981' | '987' | 'shared';
 
@@ -36,6 +38,18 @@ export interface DocumentMeta {
 const MTL = 'mobile_tech_library';
 
 /**
+ * Model-first Storage object key, e.g. `981/diagnostic/foo.pdf`,
+ * `987/maintenance/bar.pdf`, `shared/training/baz.pdf`. This is how the
+ * `workshop-manual` bucket is organised — clear per-model / per-category
+ * folders. `localUrl` still points at the on-disk file under public/ (which
+ * keeps its original mobile_tech_library layout); only the Storage key is
+ * model-first. tools/manual/upload-docs.mjs mirrors this mapping.
+ */
+function storeKey(model: '981' | '987' | 'shared', category: string, sub: string): string {
+  return `${model}/${category}/${sub}`;
+}
+
+/**
  * Workshop manual volumes (compressed + split for Supabase Free ≤50 MB).
  * Absolute PDF page N maps via `workshopVolumeForPage`. Local full PDF still
  * works in dev when present; prod serves these volumes from Storage.
@@ -47,7 +61,7 @@ export const WORKSHOP_VOLUMES: DocumentMeta[] = [
     subtitle: 'Pages 1–2029 · Cayman · Boxster · GT4 (2013–2016)',
     category: 'workshop',
     generations: ['981'],
-    storagePath: '981-workshop-manual-v1.pdf',
+    storagePath: '981/workshop/981-workshop-manual-v1.pdf',
     localUrl: '/manual/981-workshop-manual-v1.pdf',
     sizeLabel: '~32 MB',
   },
@@ -57,7 +71,7 @@ export const WORKSHOP_VOLUMES: DocumentMeta[] = [
     subtitle: 'Pages 2030–4058 · Cayman · Boxster · GT4 (2013–2016)',
     category: 'workshop',
     generations: ['981'],
-    storagePath: '981-workshop-manual-v2.pdf',
+    storagePath: '981/workshop/981-workshop-manual-v2.pdf',
     localUrl: '/manual/981-workshop-manual-v2.pdf',
     sizeLabel: '~33 MB',
   },
@@ -67,7 +81,7 @@ export const WORKSHOP_VOLUMES: DocumentMeta[] = [
     subtitle: 'Pages 4059–6087 · Cayman · Boxster · GT4 (2013–2016)',
     category: 'workshop',
     generations: ['981'],
-    storagePath: '981-workshop-manual-v3.pdf',
+    storagePath: '981/workshop/981-workshop-manual-v3.pdf',
     localUrl: '/manual/981-workshop-manual-v3.pdf',
     sizeLabel: '~33 MB',
   },
@@ -113,7 +127,7 @@ function diag981(file: string, title: string, subtitle?: string): DocumentMeta {
     subtitle: subtitle ?? '981 Diagnostic Information',
     category: 'diagnostic',
     generations: ['981'],
-    storagePath: rel,
+    storagePath: storeKey('981', 'diagnostic', file),
     localUrl: publicUrl(rel),
   };
 }
@@ -127,7 +141,7 @@ function diag981Nested(subdir: string, file: string, title: string): DocumentMet
     subtitle: '981 Diagnostic Information',
     category: 'diagnostic',
     generations: ['981'],
-    storagePath: rel,
+    storagePath: storeKey('981', 'diagnostic', `${subdir}/${file}`),
     localUrl: publicUrl(rel),
   };
 }
@@ -141,7 +155,7 @@ function diag987(file: string, title: string, subtitle?: string): DocumentMeta {
     subtitle: subtitle ?? '987 Diagnostic Information',
     category: 'diagnostic',
     generations: ['987'],
-    storagePath: rel,
+    storagePath: storeKey('987', 'diagnostic', file),
     localUrl: publicUrl(rel),
   };
 }
@@ -155,7 +169,7 @@ function diag987Nested(subdir: string, file: string, title: string): DocumentMet
     subtitle: '987 Diagnostic Information',
     category: 'diagnostic',
     generations: ['987'],
-    storagePath: rel,
+    storagePath: storeKey('987', 'diagnostic', `${subdir}/${file}`),
     localUrl: publicUrl(rel),
   };
 }
@@ -169,7 +183,7 @@ function sit(file: string, title: string, gens: DocGeneration[]): DocumentMeta {
     subtitle: 'Service Information Technik',
     category: 'service-info',
     generations: gens,
-    storagePath: rel,
+    storagePath: storeKey(gens.includes('987') ? '987' : '981', 'service-info', file),
     localUrl: publicUrl(rel),
   };
 }
@@ -183,8 +197,40 @@ function training(file: string, title: string, gens: DocGeneration[]): DocumentM
     subtitle: 'Porsche Training Book',
     category: 'training',
     generations: gens,
-    storagePath: rel,
+    storagePath: storeKey('shared', 'training', file),
     localUrl: publicUrl(rel),
+  };
+}
+
+/** 987 owner + maintenance material (checklists, schedules, owner guides). */
+function maint987(file: string, title: string, subtitle: string, sizeLabel?: string): DocumentMeta {
+  const id = `mtl-987-maint-${slug(file.replace(/\.pdf$/i, ''))}`;
+  const rel = `${MTL}/987 Maintenance/${file}`;
+  return {
+    id,
+    title,
+    subtitle,
+    category: 'maintenance',
+    generations: ['987'],
+    storagePath: storeKey('987', 'maintenance', file),
+    localUrl: publicUrl(rel),
+    sizeLabel,
+  };
+}
+
+/** 981 parts material (the full PET parts catalog PDF). */
+function parts981(file: string, title: string, subtitle: string, sizeLabel?: string): DocumentMeta {
+  const id = `parts-981-${slug(file.replace(/\.pdf$/i, ''))}`;
+  const rel = `${MTL}/981 Parts/${file}`;
+  return {
+    id,
+    title,
+    subtitle,
+    category: 'parts',
+    generations: ['981'],
+    storagePath: storeKey('981', 'parts', file),
+    localUrl: publicUrl(rel),
+    sizeLabel,
   };
 }
 
@@ -199,6 +245,19 @@ function slug(s: string): string {
 /** Full catalog shown in the Documents tab (981 / 987 scoped). */
 export const DOCUMENTS: DocumentMeta[] = [
   ...WORKSHOP_VOLUMES,
+
+  // ---- 981 Parts ----
+  parts981('981 Parts Catalog 2012-2016.pdf', '981 Parts Catalog', 'Official PET parts catalog · Boxster/Cayman (981) 2012–2016 · 794 pp', '~31 MB'),
+
+  // ---- 987 Owner & Maintenance (official Porsche PNA / owner material) ----
+  maint987('987 Maintenance Schedule.pdf', 'Maintenance Schedule', 'Required maintenance & lubrication service · PNA 000 162 EH', '~80 KB'),
+  maint987('987 Minor Maintenance Checklist 1.pdf', 'Minor Maintenance Checklist 1', 'Minor service (LO 03 24 00) · 12k mi / 1 yr', '~80 KB'),
+  maint987('987 Minor Maintenance Checklist 2.pdf', 'Minor Maintenance Checklist 2', 'Minor service checklist · 987 / 997', '~80 KB'),
+  maint987('987 Major Maintenance Checklist.pdf', 'Major Maintenance Checklist', 'Major service (LO 03 26 00) · 36k mi / 3 yr', '~80 KB'),
+  maint987('987 Boxster Service Guide.pdf', 'Boxster Service Guide', 'Minor & major service scope + intervals (Porsche GB)', '~0.9 MB'),
+  maint987('987 Owners User Guide.pdf', "Owner's User Guide", 'Owner user guide · controls & care', '~3.3 MB'),
+  maint987('987 Service Introduction 2009.pdf', 'Service Introduction (2009)', 'Model-year technical service introduction', '~18 MB'),
+  maint987('987 Boxster Brochure 2009.pdf', 'Boxster Specifications (2009)', 'Model-year overview & specifications', '~60 KB'),
 
   // ---- 981 Diagnostic ----
   diag981('3730 PDK.pdf', 'PDK Diagnosis'),
@@ -318,6 +377,8 @@ export const CATEGORY_LABELS: Record<DocCategory, string> = {
   diagnostic: 'Diagnostic Information',
   'service-info': 'Service Information Technik',
   training: 'Training Books',
+  maintenance: 'Owner & Maintenance',
+  parts: 'Parts Catalog',
 };
 
 export function getDocument(id: string): DocumentMeta | undefined {

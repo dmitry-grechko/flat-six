@@ -7,10 +7,12 @@ import {
   listVehicles,
   createVehicle,
   updateVehicle,
+  deleteVehicle,
   type StoredVehicle,
 } from './db/vehicles';
 import type { Vehicle, BodyType } from './types';
 import { CAR_VARIANTS, variantGlb } from './models';
+import { defaultEngine, defaultTransmission } from './data';
 
 /** Placeholder shown while the garage loads or before onboarding completes. */
 const EMPTY_VEHICLE: Vehicle = {
@@ -51,6 +53,8 @@ interface VehicleCtx {
   select: (id: string) => void;
   /** Add a new vehicle and make it active. */
   addVehicle: (v?: Partial<Vehicle>) => Promise<void>;
+  /** Delete a vehicle; if it was active, fall back to the primary/first car. */
+  remove: (id: string) => Promise<void>;
   /** Reload the garage from the database, discarding any unsaved local edits. */
   reset: () => void;
 }
@@ -115,25 +119,44 @@ export function VehicleProvider({ children }: { children: React.ReactNode }) {
 
   const select = useCallback((id: string) => setActiveId(id), []);
 
-  const addVehicle = useCallback(async (v: Partial<Vehicle> = {}) => {
-    const body = (v.body ?? 'boxster') as BodyType;
-    const variant = CAR_VARIANTS.find((c) => c.id === body) ?? CAR_VARIANTS[0];
-    const created = await createVehicle(
-      {
-        ...EMPTY_VEHICLE,
-        model: variant.modelName,
-        body: variant.id,
-        engine: '3.4 L Flat-Six (S)',
-        trans: '7-Speed PDK',
-        colorName: 'GT Silver Metallic',
-        colorHex: '#C6C8CA',
-        ...v,
-      },
-      { primary: true },
-    );
-    setVehicles((vs) => [...vs, created]);
-    setActiveId(created.id);
-  }, []);
+  const addVehicle = useCallback(
+    async (v: Partial<Vehicle> = {}) => {
+      const body = (v.body ?? 'boxster') as BodyType;
+      const variant = CAR_VARIANTS.find((c) => c.id === body) ?? CAR_VARIANTS[0];
+      // Only the very first car is the primary — otherwise multiple primaries
+      // would make the primary-based active-vehicle fallback ambiguous.
+      const created = await createVehicle(
+        {
+          ...EMPTY_VEHICLE,
+          model: variant.modelName,
+          body: variant.id,
+          engine: defaultEngine(variant.generation),
+          trans: defaultTransmission(variant.generation),
+          colorName: 'GT Silver Metallic',
+          colorHex: '#C6C8CA',
+          ...v,
+        },
+        { primary: vehicles.length === 0 },
+      );
+      setVehicles((vs) => [...vs, created]);
+      setActiveId(created.id);
+    },
+    [vehicles.length],
+  );
+
+  const remove = useCallback(
+    async (id: string) => {
+      await deleteVehicle(id).catch((e) => console.error('Failed to delete vehicle', e));
+      const remaining = vehicles.filter((v) => v.id !== id);
+      setVehicles(remaining);
+      setActiveId((curr) => {
+        if (curr !== id) return curr;
+        if (!remaining.length) return '';
+        return (remaining.find((v) => v.isPrimary) ?? remaining[0]).id;
+      });
+    },
+    [vehicles],
+  );
 
   const reset = useCallback(() => {
     setLoading(true);
@@ -144,7 +167,7 @@ export function VehicleProvider({ children }: { children: React.ReactNode }) {
   }, [load, activeId]);
 
   return (
-    <Ctx.Provider value={{ vehicle, activeId, vehicles, loading, needsSetup, update, select, addVehicle, reset }}>
+    <Ctx.Provider value={{ vehicle, activeId, vehicles, loading, needsSetup, update, select, addVehicle, remove, reset }}>
       {children}
     </Ctx.Provider>
   );

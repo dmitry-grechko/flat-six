@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ENGINES, TRANS, COLORS } from '@/lib/data';
+import { COLORS, enginesFor, transmissionsFor, defaultEngine, defaultTransmission } from '@/lib/data';
 import { useVehicle, MODEL_OPTIONS } from '@/lib/vehicle-context';
+import { generationForBody } from '@/lib/models';
 import { createClient } from '@/lib/supabase/client';
 import { DEMO_MODE, DEMO_EMAIL } from '@/lib/demo';
 
@@ -94,7 +95,13 @@ export default function Settings() {
           {MODEL_OPTIONS.map((m) => (
             <button
               key={m.id}
-              onClick={() => update({ body: m.id, model: m.modelName })}
+              onClick={() => {
+                const g = generationForBody(m.id);
+                const patch: Partial<typeof vehicle> = { body: m.id, model: m.modelName };
+                if (!enginesFor(g).includes(vehicle.engine)) patch.engine = defaultEngine(g);
+                if (!transmissionsFor(g).includes(vehicle.trans)) patch.trans = defaultTransmission(g);
+                update(patch);
+              }}
               style={chip(vehicle.body === m.id)}
             >
               {m.label}
@@ -127,14 +134,14 @@ export default function Settings() {
 
         <label style={fieldLabel}>Engine</label>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
-          {ENGINES.map((e) => (
+          {enginesFor(generationForBody(vehicle.body)).map((e) => (
             <button key={e} onClick={() => update({ engine: e })} style={chip(vehicle.engine === e)}>{e}</button>
           ))}
         </div>
 
         <label style={fieldLabel}>Transmission</label>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
-          {TRANS.map((t) => (
+          {transmissionsFor(generationForBody(vehicle.body)).map((t) => (
             <button key={t} onClick={() => update({ trans: t })} style={chip(vehicle.trans === t)}>{t}</button>
           ))}
         </div>

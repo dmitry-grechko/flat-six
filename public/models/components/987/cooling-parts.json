@@ -1,0 +1,412 @@
+{
+  "glb": "/models/components/987/cooling.glb",
+  "parts": [
+    {
+      "id": "eng-cool-001",
+      "node": "radiatorsLeftRight",
+      "label": "Radiators — front left and right (x2)",
+      "assembly": "Radiators",
+      "system": "Cooling",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Twin aluminium radiators angled into the 987's front bumper corner inlets dissipate engine heat from the mid-mounted flat-six. Their lower corners trap leaves and road debris — the classic 987 corrosion spot; clear the fins and drains yearly.",
+      "componentId": "cooling"
+    },
+    {
+      "id": "eng-cool-002",
+      "node": "radiatorFanModules",
+      "label": "Radiator fan modules (x2)",
+      "assembly": "Radiators",
+      "system": "Cooling",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Electric fan modules draw air through each corner radiator to maintain coolant temperature at low vehicle speeds or when stationary, staged by coolant temperature and A/C demand."
+    },
+    {
+      "id": "eng-cool-003",
+      "node": "coolantThermostat",
+      "label": "Coolant thermostat",
+      "assembly": "Water Pump & Thermostat",
+      "system": "Cooling",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Wax-element thermostat in the engine's coolant outlet housing that opens flow to the long front radiator circuits once the engine is warm (the electronically map-controlled thermostat arrived later, with the 981). Aftermarket low-temperature thermostats are a common 987 track upgrade."
+    },
+    {
+      "id": "eng-cool-004",
+      "node": "waterPumpElectric",
+      "label": "Auxiliary coolant pump (electric)",
+      "assembly": "Water Pump & Thermostat",
+      "system": "Cooling",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Small electric circulation pump that keeps coolant moving after hot shut-down and supports the heater circuit, protecting the mid-engine bay from heat-soak."
+    },
+    {
+      "id": "eng-cool-005",
+      "node": "mainWaterPump",
+      "label": "Coolant pump (belt-driven external module)",
+      "assembly": "Water Pump & Thermostat",
+      "system": "Cooling",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "On the 987.2 9A1 engine the coolant pump is no longer integrated in the crankcase: it is an external belt-driven module on the cylinder bank 1–3 side, with maximum volume flow raised approx. 20% over the 987.1 M96/M97 pump (2009 Service Introduction, doc p23)."
+    },
+    {
+      "id": "eng-cool-006",
+      "node": "coolantExpansionTank",
+      "label": "Coolant expansion tank",
+      "assembly": "Reservoir & Hoses",
+      "system": "Cooling",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Expansion tank in the engine compartment with the pressure cap and cold-level marks (the 996-era luggage-compartment tank is gone). Accommodates coolant volume changes and provides the system fill and bleed point — check cold, never open hot."
+    },
+    {
+      "id": "eng-cool-007",
+      "node": "coolantHoses",
+      "label": "Coolant hoses (engine circuits)",
+      "assembly": "Reservoir & Hoses",
+      "system": "Cooling",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Moulded engine-bay coolant hoses with spring-band clamps connecting the flat-six to the chassis pipes that run the length of the car to the front radiators."
+    },
+    {
+      "id": "eng-cool-008",
+      "node": "engineOilCooler",
+      "label": "Engine oil cooler / heat exchanger",
+      "assembly": "Oil Cooling",
+      "system": "Cooling",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Water-to-oil heat exchanger on the engine transfers excess heat from engine oil into the coolant circuit, warming oil quickly from cold and capping peak oil temperatures."
+    },
+    {
+      "id": "eng-cool-009",
+      "node": "oilTemperatureSensor",
+      "label": "Oil temperature sensor",
+      "assembly": "Oil Cooling",
+      "system": "Cooling",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "NTC oil temperature sensor reports real-time oil temperature to the DME for fuel and ignition mapping adjustments and driver instrument display."
+    },
+    {
+      "id": "cooling-system-new-001",
+      "node": "coolantPumpHousing",
+      "label": "Coolant pump housing",
+      "assembly": "Water Pump & Thermostat",
+      "system": "Cooling",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Cast housing of the external pump module (987.2) enclosing the impeller and routing pressurized coolant into the crankcase passages; on the 987.1 M96/M97 the pump sits in the crankcase itself."
+    },
+    {
+      "id": "cooling-system-new-002",
+      "node": "waterGuideHousing",
+      "label": "Water guide housing",
+      "assembly": "Water Pump & Thermostat",
+      "system": "Cooling",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Engine casting that directs coolant from the pump outlet through defined passages for the cylinder-head cross-flow cooling — revamped on the 9A1 to target the hot spots around the exhaust valve seats (2009 Service Introduction, doc p24)."
+    },
+    {
+      "id": "cooling-system-new-003",
+      "node": "coolantTemperatureSensor",
+      "label": "Coolant temperature sensor (engine)",
+      "assembly": "Reservoir & Hoses",
+      "system": "Cooling",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "NTC sensor mounted in the engine coolant circuit reports coolant temperature to the DME for closed-loop cooling control and dashboard gauge display."
+    },
+    {
+      "id": "cooling-system-new-004",
+      "node": "waterLevelSender",
+      "label": "Water level sender (coolant reservoir)",
+      "assembly": "Reservoir & Hoses",
+      "system": "Cooling",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Float-type sender in the expansion tank triggers a low-coolant warning on the instrument cluster when the coolant level drops below the minimum mark."
+    },
+    {
+      "id": "cooling-system-new-005",
+      "node": "radiatorAirGuideLeft",
+      "label": "Radiator air guide (left and right)",
+      "assembly": "Radiators",
+      "system": "Cooling",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Plastic air-guide panels channel airflow from the bumper corner inlets through the radiator cores and prevent recirculation of hot air around the radiator sides."
+    },
+    {
+      "id": "cooling-system-new-006",
+      "node": "coolantPipes",
+      "label": "Coolant pipes (front-to-rear chassis lines)",
+      "assembly": "Reservoir & Hoses",
+      "system": "Cooling",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Rigid aluminium coolant pipes running along the sills the length of the mid-engine chassis, connecting the front radiators to the engine at the rear — inspect for corrosion where clips trap moisture."
+    },
+    {
+      "id": "cooling-system-new-007",
+      "node": "coolantPumpPulley",
+      "label": "Coolant pump pulley",
+      "assembly": "Water Pump & Thermostat",
+      "system": "Cooling",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Pulley on the external coolant pump module driven by the accessory belt — the 987.2 pump is belt-driven from outside the crankcase, simplifying pump replacement."
+    },
+    {
+      "id": "cooling-system-new-008",
+      "node": "thermostatSeal",
+      "label": "Thermostat housing seal / O-ring",
+      "assembly": "Water Pump & Thermostat",
+      "system": "Cooling",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Elastomeric seal between the thermostat and its housing prevents coolant leaks at the junction under operating pressure and temperature cycling."
+    },
+    {
+      "id": "cooling-system-new-009",
+      "node": "coolantReservoirCap",
+      "label": "Coolant reservoir pressure cap",
+      "assembly": "Reservoir & Hoses",
+      "system": "Cooling",
+      "tier": "sub",
+      "partNumber": "996.106.447.04",
+      "function": "Pressure-relief cap on the expansion tank maintains system pressure at the specified rating — a weak cap causes slow pressure loss and is the first cheap check for unexplained coolant loss on a 987."
+    },
+    {
+      "id": "cooling-system-new-010",
+      "node": "radiatorFanSecondary",
+      "label": "Centre radiator (optional third radiator)",
+      "assembly": "Radiators",
+      "system": "Cooling",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Auxiliary centre radiator low between the two corner units — fitted to hot-climate cars and automatic-transmission cars (Tiptronic S on the 987.1, common with PDK on the 987.2), and a popular retrofit for track use."
+    },
+    {
+      "id": "eng-cool-010",
+      "node": "upperRadiatorHose",
+      "label": "Coolant feed line — engine to radiators",
+      "assembly": "Reservoir & Hoses",
+      "system": "Cooling",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Carries hot coolant from the engine outlet forward to the top of the front radiators; the high-pressure leg of the 987's long mid-engine cooling loop."
+    },
+    {
+      "id": "eng-cool-011",
+      "node": "lowerRadiatorHose",
+      "label": "Coolant return line — radiators to pump",
+      "assembly": "Reservoir & Hoses",
+      "system": "Cooling",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Returns cooled coolant from the radiator bottom tanks back along the chassis to the coolant pump inlet; the low-pressure return leg of the main circuit."
+    },
+    {
+      "id": "eng-cool-012",
+      "node": "heaterHoseSupply",
+      "label": "Heater hose — supply (engine to heater core)",
+      "assembly": "Reservoir & Hoses",
+      "system": "Cooling",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Flexible hose that routes hot coolant from the engine forward to the cabin heater core to provide interior heating."
+    },
+    {
+      "id": "eng-cool-013",
+      "node": "heaterHoseReturn",
+      "label": "Heater hose — return (heater core to engine)",
+      "assembly": "Reservoir & Hoses",
+      "system": "Cooling",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Returns cooled coolant from the heater core back to the engine inlet completing the cabin heating sub-circuit."
+    },
+    {
+      "id": "eng-cool-014",
+      "node": "heaterPipeline",
+      "label": "Heater pipeline (HVAC coolant line)",
+      "assembly": "Reservoir & Hoses",
+      "system": "Cooling",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Rigid coolant pipeline routed through the front structure connecting the HVAC heater circuit to the main engine cooling loop.",
+      "parent": "eng-cool-012"
+    },
+    {
+      "id": "eng-cool-015",
+      "node": "crossoverPipeLeft",
+      "label": "Crossover pipe — left circuit",
+      "assembly": "Reservoir & Hoses",
+      "system": "Cooling",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Rigid pipe bridging the left-side coolant circuit between the engine and the left front radiator; maintains balanced flow in the split cooling layout."
+    },
+    {
+      "id": "eng-cool-016",
+      "node": "crossoverPipeRight",
+      "label": "Crossover pipe — right circuit",
+      "assembly": "Reservoir & Hoses",
+      "system": "Cooling",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Rigid pipe bridging the right-side coolant circuit between the engine and the right front radiator; mirrors the left crossover for symmetrical flow distribution."
+    },
+    {
+      "id": "eng-cool-017",
+      "node": "expansionTankFeedHose",
+      "label": "Expansion tank feed hose",
+      "assembly": "Reservoir & Hoses",
+      "system": "Cooling",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Connects the pressurized cooling circuit to the expansion tank, allowing coolant to flow into the reservoir as temperature and pressure rise.",
+      "parent": "eng-cool-006"
+    },
+    {
+      "id": "eng-cool-018",
+      "node": "coolantOverflowHose",
+      "label": "Coolant overflow hose",
+      "assembly": "Reservoir & Hoses",
+      "system": "Cooling",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Routes excess coolant vented from the reservoir pressure cap to a safe drain path, preventing spillage on hot engine-bay components.",
+      "parent": "eng-cool-006"
+    },
+    {
+      "id": "eng-cool-019",
+      "node": "distributerTubeLeft",
+      "label": "Coolant distributor tube — left bank",
+      "assembly": "Reservoir & Hoses",
+      "system": "Cooling",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Internal distribution tube directing coolant to multiple outlets on the left cylinder bank for the flat-six's cross-flow jacket cooling."
+    },
+    {
+      "id": "eng-cool-020",
+      "node": "distributerTubeRight",
+      "label": "Coolant distributor tube — right bank",
+      "assembly": "Reservoir & Hoses",
+      "system": "Cooling",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Internal distribution tube directing coolant to multiple outlets on the right cylinder bank for the flat-six's cross-flow jacket cooling."
+    },
+    {
+      "id": "eng-cool-021",
+      "node": "coolantBleederScrew",
+      "label": "Coolant bleeder screw",
+      "assembly": "Reservoir & Hoses",
+      "system": "Cooling",
+      "tier": "sub",
+      "partNumber": "999.926.030.01",
+      "function": "Bleed screw at the high point of the cooling circuit allows trapped air to be purged during fill — essential on the 987's long front-radiator plumbing to prevent air-lock."
+    },
+    {
+      "id": "eng-cool-022",
+      "node": "coolantTempSensorRadiatorOutlet",
+      "label": "Coolant temperature sensor — radiator outlet",
+      "assembly": "Radiators",
+      "system": "Cooling",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Second NTC temperature sensor at the radiator outlet monitors coolant temperature returning from the front radiators; used by the DME and the electric fan control logic."
+    },
+    {
+      "id": "eng-cool-023",
+      "node": "coolantDrainPlug",
+      "label": "Coolant drain plug / sealing plug",
+      "assembly": "Reservoir & Hoses",
+      "system": "Cooling",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Block-mounted sealing plug opened during coolant service to gravity-drain the engine passages; re-sealed with a new washer to prevent weeping."
+    },
+    {
+      "id": "eng-cool-024",
+      "node": "radiatorFanLeft",
+      "label": "Radiator fan — left (electric)",
+      "assembly": "Radiators",
+      "system": "Cooling",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Left-side electric fan mounted behind the left front radiator, activated on coolant temperature or A/C compressor demand."
+    },
+    {
+      "id": "eng-cool-025",
+      "node": "fanControlModule",
+      "label": "Fan control module (radiator fan controller)",
+      "assembly": "Radiators",
+      "system": "Cooling",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Electronic module receives DME and A/C signals to regulate electric radiator fan speed, enabling staged / variable cooling management.",
+      "parent": "eng-cool-002"
+    },
+    {
+      "id": "eng-cool-026",
+      "node": "breatherLine",
+      "label": "Coolant breather / vent line",
+      "assembly": "Reservoir & Hoses",
+      "system": "Cooling",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Small-bore flexible line that vents air from the high points of the front radiator circuit back to the expansion tank, keeping the long 987 system liquid-filled."
+    },
+    {
+      "id": "eng-cool-027",
+      "node": "waterPipeInternal",
+      "label": "Internal coolant water pipe (crankcase)",
+      "assembly": "Water Pump & Thermostat",
+      "system": "Cooling",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Water pipe inside the crankcase routing coolant from the pump outlet into the internal galleries for cylinder and head cooling.",
+      "parent": "eng-cool-005"
+    },
+    {
+      "id": "eng-cool-028",
+      "node": "acCondenserAirGuide",
+      "label": "A/C condenser air guide",
+      "assembly": "Radiators",
+      "system": "Cooling",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Air-guide duct ahead of the A/C condenser ensures ram air flows through the condenser before the radiator core; condenser heat rejected here adds to the frontal heat load the fans must manage — another reason to keep the 987's inlets clear of debris."
+    },
+    {
+      "id": "eng-cool-029",
+      "node": "pDKFluidCooler",
+      "label": "PDK fluid cooler (transmission oil cooler)",
+      "assembly": "Oil Cooling",
+      "system": "Cooling",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Coolant-to-oil heat exchanger for the PDK dual-clutch transaxle on PDK-equipped 987.2 cars, warming transmission fluid from cold and capping peak temperatures. 987.1 Tiptronic S uses its own ATF cooling circuit instead."
+    },
+    {
+      "id": "eng-cool-030",
+      "node": "coolantWaterHoseReservoir",
+      "label": "Water hose — reservoir circuit",
+      "assembly": "Reservoir & Hoses",
+      "system": "Cooling",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Short connecting hose between the expansion tank and the main coolant circuit neck, completing the pressurized reservoir loop.",
+      "parent": "eng-cool-006"
+    }
+  ]
+}

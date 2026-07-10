@@ -2,20 +2,20 @@
 
 import { useEffect, useRef, useState, type FC } from 'react';
 import { useRouter } from 'next/navigation';
-import { COMPONENTS, SYSTEMS, COLORS, diffDots, DIFF_LABELS } from '@/lib/data';
+import { COMPONENTS, SYSTEMS, COLORS, diffDots, DIFF_LABELS, componentsForGeneration } from '@/lib/data';
 import { catalogForSystem, formatPartNumber } from '@/lib/catalog';
 import { lookupPart, type CatalogPartRow } from '@/lib/parts-lookup';
 import { exteriorPartsFor } from '@/lib/exterior-parts';
 import { useVehicle, modelGlb } from '@/lib/vehicle-context';
-import { getVariant } from '@/lib/models';
-import { MODEL_CREDITS, CUTAWAY_CREDIT, ENGINE_CUTAWAY_CREDIT } from '@/lib/credits';
+import { getVariant, generationForBody } from '@/lib/models';
+import { MODEL_CREDITS, cutawayImageFor, engineRefFor } from '@/lib/credits';
 import type { Component, SystemName, Vehicle, EnginePart } from '@/lib/types';
 // GLBViewer is a forwardRef wrapper; it dynamically imports the R3F Canvas
 // (ssr:false) internally so we can keep a working ref through it.
 import GLBViewer, { type GLBViewerHandle } from './GLBViewer';
 import UnifiedViewer, { type UnifiedViewerHandle } from './UnifiedViewer';
-import { XRAY_ASSEMBLIES, type XrayAssembly, loadAssemblyParts, isPrimary, childrenOf } from './xray-assemblies';
-import { FLOW_SYSTEMS, XRAY_LAYERS, flowsForLayer, type FlowSystem, type XrayLayer } from './flow-systems';
+import { XRAY_ASSEMBLIES, xrayAssembliesFor, type XrayAssembly, loadAssemblyParts, isPrimary, childrenOf } from './xray-assemblies';
+import { FLOW_SYSTEMS, XRAY_LAYERS, flowsForLayer, flowSystemsFor, type FlowSystem, type XrayLayer } from './flow-systems';
 
 const mono = "'JetBrains Mono',monospace";
 const RED = 'var(--red)';
@@ -38,20 +38,24 @@ export default function ComponentExplorer() {
   // Paint follows the vehicle's colour unless the user picks a swatch here.
   const activePaint = paint ?? vehicle.colorHex;
 
-  // Whether this variant has per-part internals (X-ray + 2D cutaway hotspots).
-  // Only the 981 does today; the 987 renders exterior-only, so we hide the
-  // internals surfaces (X-RAY toggle + FRONT/ENGINE cutaway tabs) for it.
+  // Generation-scoped capabilities: 981 + 987 both have the 2D cutaway; only
+  // the 981 has the 3D X-ray internals today (987 renders exterior 3D + 2D).
   const variant = getVariant(vehicle.body);
-  const hasInternals = variant.hasInternals;
+  const generation = generationForBody(vehicle.body);
+  const hasCutaway2D = variant.hasCutaway2D;
+  const hasXray3D = variant.hasXray3D;
+  const activeComponents = componentsForGeneration(generation);
+  // X-ray assembly + flow sets are generation-scoped (981 vs 987 GLB sets).
+  const assemblies = xrayAssembliesFor(generation);
 
   // null = all systems unified view; non-null = focused single assembly.
   const [assemblyId, setAssemblyId] = useState<XrayAssembly['id'] | null>(null);
-  const assembly = assemblyId ? (XRAY_ASSEMBLIES.find((a) => a.id === assemblyId) ?? null) : null;
+  const assembly = assemblyId ? (assemblies.find((a) => a.id === assemblyId) ?? null) : null;
 
   // Unified-scene layer (all / mechanical / air / lines) + highlighted flow system.
   const [layer, setLayer] = useState<XrayLayer>('all');
   const [flowId, setFlowId] = useState<FlowSystem['id'] | null>(null);
-  const selectedFlow = flowId ? (FLOW_SYSTEMS.find((f) => f.id === flowId) ?? null) : null;
+  const selectedFlow = flowId ? (flowSystemsFor(generation).find((f) => f.id === flowId) ?? null) : null;
   const switchLayer = (l: XrayLayer) => { setLayer(l); setFlowId(null); };
 
   // Parts manifest for the active assembly (lazy, cached per assembly).
@@ -61,11 +65,14 @@ export default function ComponentExplorer() {
   // Which primary part is expanded into its sub-parts (drill-down tier).
   const [drillId, setDrillId] = useState<string | null>(null);
 
-  // Load all 9 assembly manifests when X-RAY activates so part counts and
+  // Load all assembly manifests when X-RAY activates so part counts and
   // search are available immediately without per-assembly lazy fetches.
+  // partsByAssembly is a real dep: each load adds a key, the effect re-runs
+  // and finds everything present — and after the generation-switch reset below
+  // it re-runs against the empty map and reloads the new set.
   useEffect(() => {
     if (!xray) return;
-    XRAY_ASSEMBLIES.forEach((a) => {
+    assemblies.forEach((a) => {
       if (!partsByAssembly[a.id]) {
         loadAssemblyParts(a.manifest).then((p) =>
           setPartsByAssembly((m) => ({ ...m, [a.id]: p }))
@@ -73,19 +80,32 @@ export default function ComponentExplorer() {
       }
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [xray]);
+  }, [xray, assemblies, partsByAssembly]);
 
-  // Variants without internals (e.g. 987) have no X-ray or 2D cutaway data, so
-  // force the exterior 3D view and clear any X-ray state when one is selected.
+  // Assembly ids repeat across generations — drop cached parts + selections
+  // when the garage vehicle switches generation so 981 manifests don't leak
+  // into the 987 view (and vice versa).
   useEffect(() => {
-    if (!hasInternals) {
+    setPartsByAssembly({});
+    setAssemblyId(null);
+    setSelectedPartId(null);
+    setDrillId(null);
+    setFlowId(null);
+  }, [generation]);
+
+  // Keep view state consistent with the active variant's capabilities: if it
+  // has no 3D X-ray, force X-ray off; if it has no 2D cutaway, leave the image
+  // tabs for the 3D view. (987 keeps the cutaway; only X-ray is unavailable.)
+  useEffect(() => {
+    if (!hasXray3D) {
       setXray(false);
       setAssemblyId(null);
-      setView('3d');
-      setSelectedId(null);
-      setActiveSystem('All');
     }
-  }, [hasInternals]);
+    if (!hasCutaway2D) {
+      setView((v) => (v === 'front' || v === 'rear' ? '3d' : v));
+      setSelectedId(null);
+    }
+  }, [hasXray3D, hasCutaway2D]);
 
   // Exterior panel pins (3D view, X-RAY off) — panels / lamps / lids, not internals.
   const exteriorParts = exteriorPartsFor(vehicle.body);
@@ -139,9 +159,10 @@ export default function ComponentExplorer() {
   // Reset whichever viewer is mounted (unified stripped scene or focused GLB).
   const resetView = () => { viewerRef.current?.reset(); unifiedRef.current?.reset(); };
 
-  const selected = COMPONENTS.find((c) => c.id === selectedId) || null;
+  const selected = activeComponents.find((c) => c.id === selectedId) || null;
   const isImage = view === 'front' || view === 'rear';
-  const viewComponents = COMPONENTS.filter((c) => c.view === view);
+  const viewComponents = activeComponents.filter((c) => c.view === view);
+  const cutaway = cutawayImageFor(generation, isImage ? view : 'front');
 
   // segmented + chip styles
   const segBtn = (on: boolean): React.CSSProperties => ({
@@ -157,13 +178,13 @@ export default function ComponentExplorer() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', flexShrink: 0, background: '#fff', border: '1px solid #DDDDE0', borderRadius: 3, overflow: 'hidden' }}>
             <button onClick={() => setView('3d')} style={segBtn(view === '3d')}>3D</button>
-            {hasInternals && <button onClick={() => setView('front')} style={segBtn(view === 'front')}>FRONT</button>}
-            {hasInternals && <button onClick={() => setView('rear')} style={segBtn(view === 'rear')}>ENGINE</button>}
+            {hasCutaway2D && <button onClick={() => setView('front')} style={segBtn(view === 'front')}>{cutawayImageFor(generation, 'front').tabLabel}</button>}
+            {hasCutaway2D && <button onClick={() => setView('rear')} style={segBtn(view === 'rear')}>{cutawayImageFor(generation, 'rear').tabLabel}</button>}
           </div>
 
           {view === '3d' ? (
             <>
-              {hasInternals && (
+              {hasXray3D && (
                 <button
                   onClick={() => { const next = !xray; if (!next) switchAssembly(null); setXray(next); }}
                   style={{
@@ -227,8 +248,7 @@ export default function ComponentExplorer() {
             <div>
               {view === '3d'
                 ? (xray ? (assemblyId ? `X-RAY · ${assembly?.label.toUpperCase()}` : `ALL SYSTEMS · ${layer === 'all' ? 'STRIPPED' : `${layer.toUpperCase()} LAYER`}`) : '3D MODEL · EXTERIOR')
-                : view === 'front' ? 'FRONT 3/4 · FACTORY CUTAWAY'
-                : 'ENGINE BAY · FACTORY CUTAWAY'}
+                : cutaway.caption}
             </div>
           </div>
 
@@ -243,6 +263,7 @@ export default function ComponentExplorer() {
                   layer={layer}
                   selectedFlowId={flowId}
                   onSelectFlow={(id) => setFlowId(id as FlowSystem['id'] | null)}
+                  generation={generation}
                 />
               ) : (
                 /* ── Exterior (xray=false) or focused single assembly (xray=true + assemblyId set) ── */
@@ -311,18 +332,18 @@ export default function ComponentExplorer() {
             <>
               {/* © Porsche AG factory cutaway — attribution required for the press render. */}
               <div style={{ position: 'absolute', right: 18, bottom: 14, zIndex: 2, font: `500 9px/1.5 ${mono}`, letterSpacing: '.04em', color: '#A6A6AB', textAlign: 'right', maxWidth: 280 }}>
-                {CUTAWAY_CREDIT.title}<br />
-                <a href={CUTAWAY_CREDIT.source} target="_blank" rel="noreferrer" style={{ color: '#6E6E73' }}>{CUTAWAY_CREDIT.author}</a> · {CUTAWAY_CREDIT.license}
+                {cutaway.credit.title}<br />
+                <a href={cutaway.credit.source} target="_blank" rel="noreferrer" style={{ color: '#6E6E73' }}>{cutaway.credit.author}</a> · {cutaway.credit.license}
               </div>
               <div style={{ position: 'relative', width: '96%', maxWidth: 760 }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/assets/cutaway-981.jpg"
-                  alt="Porsche 981 factory cutaway"
+                  src={cutaway.src}
+                  alt={cutaway.alt}
                   style={{ width: '100%', display: 'block', filter: 'drop-shadow(0 24px 36px rgba(0,0,0,.24))' }}
                 />
                 {showPins && activeSystem !== 'None' && viewComponents.map((c) => {
-                  const n = COMPONENTS.indexOf(c) + 1;
+                  const n = activeComponents.indexOf(c) + 1;
                   const dim = activeSystem !== 'All' && c.system !== activeSystem;
                   const active = c.id === selectedId;
                   const dotBg = active ? RED : dim ? '#9A9AA0' : '#0B0B0C';
@@ -360,6 +381,8 @@ export default function ComponentExplorer() {
       <aside className="xplrRail" style={{ width: 344, flexShrink: 0, background: '#fff', borderLeft: '1px solid #E0E0E2', display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
         {xray ? (
           <XraySidebar
+            assemblies={assemblies}
+            generation={generation}
             assemblyId={assemblyId}
             assembly={assembly}
             partsByAssembly={partsByAssembly}
@@ -382,7 +405,7 @@ export default function ComponentExplorer() {
           <div style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.16em', color: '#9A9AA0', marginBottom: 12 }}>SYSTEMS</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
             {(['None', ...SYSTEMS] as const).map((name) => {
-              const pool = view === '3d' && !xray ? exteriorParts : COMPONENTS;
+              const pool = view === '3d' && !xray ? exteriorParts : activeComponents;
               const count = name === 'None'
                 ? 0
                 : name === 'All'
@@ -428,7 +451,8 @@ export default function ComponentExplorer() {
             key={selected.id}
             comp={selected}
             vehicle={vehicle}
-            n={COMPONENTS.indexOf(selected) + 1}
+            generation={generation}
+            n={activeComponents.indexOf(selected) + 1}
             onClose={() => setSelectedId(null)}
             onLog={() => router.push('/history/new')}
             onAsk={(p) => setAiPrompt(p)}
@@ -440,9 +464,9 @@ export default function ComponentExplorer() {
               {activeSystem === 'None'
                 ? 'Pins hidden — pick ALL or a system above to show panel dots again.'
                 : view === '3d'
-                  ? (hasInternals
+                  ? (hasXray3D
                     ? 'Click a numbered panel dot on the exterior, or filter by system above. Toggle X-RAY for mechanical internals.'
-                    : `Click a numbered panel dot on the ${variant.label} exterior, or filter by system above. Mechanical X-RAY isn’t available for this generation yet.`)
+                    : `Click a numbered panel dot on the ${variant.label} exterior, or open the CUTAWAY / ENGINE tabs for component details. Mechanical X-RAY isn’t available for this generation yet.`)
                   : 'Select a numbered node on the diagram to see part numbers, specs, torque values and the DIY procedure.'}
             </div>
           </div>
@@ -456,12 +480,15 @@ export default function ComponentExplorer() {
   );
 }
 
-function DetailPanel({ comp, vehicle, n, onClose, onLog, onAsk }: {
-  comp: Component; vehicle: Vehicle; n: number; onClose: () => void; onLog: () => void; onAsk: (p: string) => void;
+function DetailPanel({ comp, vehicle, generation, n, onClose, onLog, onAsk }: {
+  comp: Component; vehicle: Vehicle; generation: string; n: number; onClose: () => void; onLog: () => void; onAsk: (p: string) => void;
 }) {
+  const engineRef = engineRefFor(generation);
   const dots = diffDots(comp.diff);
   const diffLabel = DIFF_LABELS[comp.diff - 1];
-  const catalog = catalogForSystem(comp.system);
+  // The static porscheontario.com catalog is 981-specific — don't show its part
+  // numbers on other generations (they'd be misleading).
+  const catalog = generation === '981' ? catalogForSystem(comp.system) : [];
   const specRows: [string, string][] = [
     ['Part No.', comp.part], ['Spec / Fill', comp.spec], ['Interval', comp.interval], ['Torque', comp.torque],
   ];
@@ -495,16 +522,16 @@ function DetailPanel({ comp, vehicle, n, onClose, onLog, onAsk }: {
 
       {comp.system === 'Engine' && (
         <figure style={{ margin: '18px 0 0' }}>
-          <div style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.16em', color: '#9A9AA0', marginBottom: 11 }}>FLAT-SIX REFERENCE</div>
+          <div style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.16em', color: '#9A9AA0', marginBottom: 11 }}>{engineRef.label}</div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/assets/engine-flat-six.jpg"
-            alt="Porsche flat-six engine cutaway"
+            src={engineRef.src}
+            alt={engineRef.alt}
             style={{ width: '100%', display: 'block', borderRadius: 3, background: '#fff' }}
           />
           <figcaption style={{ marginTop: 7, font: `500 9px/1.5 ${mono}`, letterSpacing: '.03em', color: '#A6A6AB' }}>
-            {ENGINE_CUTAWAY_CREDIT.title} ·{' '}
-            <a href={ENGINE_CUTAWAY_CREDIT.source} target="_blank" rel="noreferrer" style={{ color: '#6E6E73' }}>{ENGINE_CUTAWAY_CREDIT.author}</a> · {ENGINE_CUTAWAY_CREDIT.license}
+            {engineRef.credit.title} ·{' '}
+            <a href={engineRef.credit.source} target="_blank" rel="noreferrer" style={{ color: '#6E6E73' }}>{engineRef.credit.author}</a> · {engineRef.credit.license}
           </figcaption>
         </figure>
       )}
@@ -840,10 +867,10 @@ function GroupedAssemblySidebar({
   );
 }
 
-function FlowDetailCard({ flow, vehicle, onClose, onInspectParts, onAsk }: {
-  flow: FlowSystem; vehicle: Vehicle; onClose: () => void; onInspectParts: () => void; onAsk: (p: string) => void;
+function FlowDetailCard({ flow, assemblies, vehicle, onClose, onInspectParts, onAsk }: {
+  flow: FlowSystem; assemblies: XrayAssembly[]; vehicle: Vehicle; onClose: () => void; onInspectParts: () => void; onAsk: (p: string) => void;
 }) {
-  const related = XRAY_ASSEMBLIES.find((a) => a.id === flow.relatedAssembly);
+  const related = assemblies.find((a) => a.id === flow.relatedAssembly);
   const askPrompt = `I have a ${vehicle.year} ${vehicle.model}. Explain the ${flow.label.toLowerCase()} routing on this car — ${flow.desc} What should I inspect, what are the common failure points, and are there any service intervals?`;
 
   return (
@@ -873,10 +900,12 @@ function FlowDetailCard({ flow, vehicle, onClose, onInspectParts, onAsk }: {
 }
 
 function XraySidebar({
-  assemblyId, assembly, partsByAssembly, visibleParts, drillPart, selectedPart,
+  assemblies, generation, assemblyId, assembly, partsByAssembly, visibleParts, drillPart, selectedPart,
   layer, selectedFlow, onSelectFlow,
   onSelectAssembly, onSelectPart, onExitDrill, vehicle, onLog, onAsk,
 }: {
+  assemblies: XrayAssembly[];
+  generation: string;
   assemblyId: XrayAssembly['id'] | null;
   assembly: XrayAssembly | null;
   partsByAssembly: Record<string, EnginePart[]>;
@@ -893,11 +922,11 @@ function XraySidebar({
   onLog: () => void;
   onAsk: (p: string) => void;
 }) {
-  const loadedCount = XRAY_ASSEMBLIES.filter((a) => partsByAssembly[a.id]).length;
-  const totalParts = XRAY_ASSEMBLIES.reduce((n, a) => n + (partsByAssembly[a.id]?.filter(isPrimary).length ?? 0), 0);
+  const loadedCount = assemblies.filter((a) => partsByAssembly[a.id]).length;
+  const totalParts = assemblies.reduce((n, a) => n + (partsByAssembly[a.id]?.filter(isPrimary).length ?? 0), 0);
 
   const showAssemblies = layer === 'all' || layer === 'mechanical';
-  const flows = flowsForLayer(layer);
+  const flows = flowsForLayer(layer, generation);
   const airFlows = flows.filter((f) => f.layer === 'air');
   const lineFlows = flows.filter((f) => f.layer === 'lines');
   const wiringFlows = flows.filter((f) => f.layer === 'wiring');
@@ -941,7 +970,7 @@ function XraySidebar({
         >
           <span style={{ font: `600 11px/1 ${mono}`, letterSpacing: '.1em' }}>ALL SYSTEMS</span>
           <span style={{ marginLeft: 'auto', font: `500 10px/1 ${mono}`, opacity: .55 }}>
-            {loadedCount < XRAY_ASSEMBLIES.length ? `${loadedCount}/${XRAY_ASSEMBLIES.length}` : `${totalParts}`}
+            {loadedCount < assemblies.length ? `${loadedCount}/${assemblies.length}` : `${totalParts}`}
           </span>
         </button>
       </div>
@@ -952,6 +981,7 @@ function XraySidebar({
           {selectedFlow && (
             <FlowDetailCard
               flow={selectedFlow}
+              assemblies={assemblies}
               vehicle={vehicle}
               onClose={() => onSelectFlow(null)}
               onInspectParts={() => onSelectAssembly(selectedFlow.relatedAssembly)}
@@ -988,7 +1018,7 @@ function XraySidebar({
                 <div style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.14em', color: '#B4B4B8', padding: `${flows.length ? 12 : 8}px 8px ${flows.length ? 10 : 12}px` }}>
                   CLICK A SYSTEM TO INSPECT ITS PARTS
                 </div>
-                {XRAY_ASSEMBLIES.map((a) => {
+                {assemblies.map((a) => {
                   const count = (partsByAssembly[a.id] ?? []).filter(isPrimary).length;
                   return (
                     <button

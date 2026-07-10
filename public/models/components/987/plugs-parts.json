@@ -1,0 +1,206 @@
+{
+  "glb": "/models/components/987/plugs.glb",
+  "parts": [
+    {
+      "id": "eng-ign-001",
+      "node": "ignitionCoils",
+      "label": "Ignition Coils (x6, Rod-Type)",
+      "assembly": "Ignition Coils",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1.602.104.05",
+      "function": "Rod-type ignition modules with the output driver integrated on the internal circuit board (no separate heat sink). One per cylinder, fired individually in the order 1-6-2-4-3-5 by the DME; diagnostics and current limiting are built in — a failed coil also cuts fuel to that cylinder. Sealed at the 4-pin plug and in the plug recess against spray water; the module pulls straight out of the recess without tilting (2009 Service Introduction, p49/50).",
+      "componentId": "plugs"
+    },
+    {
+      "id": "eng-ign-002",
+      "node": "sparkPlugs",
+      "label": "Spark Plugs (x6, Surface-Gap)",
+      "assembly": "Spark Plugs",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "eng-ign-001",
+      "partNumber": null,
+      "function": "Surface-gap spark plugs with four ground electrodes arranged around the ceramic insulator: the spark crosses the insulator surface then arcs to a ground electrode, self-cleaning the insulator tip (2009 Service Introduction, p50). Replace at 40,000 mi / 4 yr (987.2) or 36,000 mi / 4 yr (987.1); torque 30 Nm into the alloy heads.",
+      "componentId": "plugs"
+    },
+    {
+      "id": "eng-ign-003",
+      "node": "knockSensors",
+      "label": "Knock Sensors (x2)",
+      "assembly": "Sensors",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "One knock sensor fastened to each crankcase side for cylinder-selective knock control: the DME retards timing only for the knocking cylinder. If a sensor fails, a safety-retarded map for all cylinders applies (2009 Service Introduction, p49)."
+    },
+    {
+      "id": "eng-ign-004",
+      "node": "ignitionCoilMountingHardware",
+      "label": "Ignition Coil Mounting Hardware (x6)",
+      "assembly": "Ignition Coils",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "eng-ign-001",
+      "partNumber": null,
+      "function": "Fastening bolt through each coil module's eyelet into the camshaft cover — the rod coil is secured mechanically by bolt and connected via the short high-voltage plug. Torque 9 Nm."
+    },
+    {
+      "id": "eng-ign-005",
+      "node": "sparkPlugThreadRepairKit",
+      "label": "Spark Plug Thread Repair Kit (M14×1.25)",
+      "assembly": "Spark Plugs",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "eng-ign-002",
+      "partNumber": null,
+      "function": "Heli-Coil/Time-Sert M14×1.25 thread insert kit for repairing stripped spark plug threads in the aluminium heads (M96/M97 and 9A1 alike) — a known service item on high-mileage examples."
+    },
+    {
+      "id": "eng-ign-006",
+      "node": "sparkPlugGapSpec",
+      "label": "Spark Plug Gap Specification",
+      "assembly": "Spark Plugs",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "eng-ign-002",
+      "partNumber": "N/A",
+      "function": "The 987.2 surface-gap plugs have no conventional side electrode gap to adjust — never re-gap them; replace at the service interval. On 987.1 plugs, check against the figure on the plug box and replace rather than bend electrodes."
+    },
+    {
+      "id": "eng-ign-007",
+      "node": "crankshaftPositionSensor",
+      "label": "Crankshaft Position Sensor (CKP)",
+      "assembly": "Sensors",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Inductive speed/position sensor reading the toothed reluctor ring to supply engine speed and TDC reference to the DME for ignition timing and injection control."
+    },
+    {
+      "id": "eng-ign-008",
+      "node": "camPositionSensors",
+      "label": "Camshaft Position Sensors (x4)",
+      "assembly": "Sensors",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Hall-effect sensors — one per camshaft (intake/exhaust, bank 1/bank 2) — that report cam phase angle to the DME for VarioCam Plus control and sequential injection sequencing."
+    },
+    {
+      "id": "eng-fuel-002",
+      "node": "hpFuelRailBank1",
+      "label": "High-Pressure Fuel Rail Bank 1 (DFI)",
+      "assembly": "Fuel Delivery",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1.110.859.02",
+      "function": "Stainless rail below the intake system feeding the three bank 1 injectors at 40–120 bar (580–1740 psi). Rail volume approx. 100 ccm damps pressure pulsations. Fitted to the 3.4-litre DFI engines (987.2 S); the 2.9 uses intake manifold injection instead (2009 Service Introduction, p41/45)."
+    },
+    {
+      "id": "eng-fuel-003",
+      "node": "hpFuelRailBank2",
+      "label": "High-Pressure Fuel Rail Bank 2 (DFI)",
+      "assembly": "Fuel Delivery",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1.110.860.03",
+      "function": "Bank 2 rail fed from rail 1 via the high-pressure connecting line; both rails carry identical 40–120 bar pressure to all six injectors. The rail-pressure sensor (DS) is threaded into this rail (2009 Service Introduction, p45/46)."
+    },
+    {
+      "id": "eng-fuel-004",
+      "node": "directInjectors",
+      "label": "DFI High-Pressure Injectors (x6)",
+      "assembly": "Fuel Delivery",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "eng-fuel-002",
+      "partNumber": "9A1.110.128.20",
+      "function": "Electromagnetic injectors on the intake side of the heads spraying a swirled, finely atomised conical jet (spray cone ~69°, bend angle ~15°) directly into the chamber at 40–120 bar. Delivery spans ~7.35 mg/stroke (40 bar, 0.6 ms) to ~77 mg/stroke (120 bar, 5.2 ms); below ~3,100 rpm fuel can be split over two injections (2009 Service Introduction, p47)."
+    },
+    {
+      "id": "ignition---fuel-new-001",
+      "node": "highPressureFuelPump",
+      "label": "Fuel High-Pressure Pump (3-Piston)",
+      "assembly": "Fuel Delivery",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1.110.315.06",
+      "function": "Three-piston pump on the cylinder head of bank 1, driven by the exhaust camshaft: builds 40–120 bar with up to ~180 l/h at 120 bar. Integrates the flow control valve (0–2 A from the DME), a pressure control valve (safety opening ~140 bar), a bypass valve for limp-home (~5 bar), a temperature compensator and a 50-micron intake strainer. After replacement the high-pressure adaptation must be reset (2009 Service Introduction, p42–44)."
+    },
+    {
+      "id": "ignition---fuel-new-002",
+      "node": "lowPressureFuelPump",
+      "label": "Fuel Pump (In-Tank, Demand-Controlled)",
+      "assembly": "Fuel Delivery",
+      "system": "Fuel & Exhaust",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Electric in-tank pump with a sucking-jet pump filling its chamber, supplying ~5.0 bar to the high-pressure pump on the bank 1 head (returnless system). Delivery is demand-controlled by PWM (~60–90% duty, 6–14 A), which reduces fuel heating in the tank. Tank capacity approx. 64 l incl. 10 l reserve (2009 Service Introduction, p39/40)."
+    },
+    {
+      "id": "eng-fuel-005",
+      "node": "fuelPressureRegulator",
+      "label": "Fuel Pressure Regulator (In-Tank)",
+      "assembly": "Fuel Delivery",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "ignition---fuel-new-001",
+      "partNumber": null,
+      "function": "Pressure regulator in the fuel tank holding the low-pressure side at approx. 5.0 bar on DFI cars (approx. 4.0 bar on the 2.9 MPI engines). To avoid vapour bubbles, sustained pressure should stay above 4.0 bar for 20 minutes after shut-off (2009 Service Introduction, p39/40)."
+    },
+    {
+      "id": "eng-fuel-006",
+      "node": "fuelRailPressureSensor",
+      "label": "Fuel Pressure Sensor (Rail Bank 2, 40–120 bar)",
+      "assembly": "Fuel Delivery",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "eng-fuel-002",
+      "partNumber": "9A1.110.881.00",
+      "function": "Fitted on the high-pressure rail for bank 2; reports instantaneous rail pressure (40–120 bar) so the DME can regulate fuel quantity via the flow control valve in closed loop (2009 Service Introduction, p46)."
+    },
+    {
+      "id": "eng-fuel-007",
+      "node": "fuelFilter",
+      "label": "Fuel Filter (Lifetime, In-Tank)",
+      "assembly": "Fuel Delivery",
+      "system": "Fuel & Exhaust",
+      "tier": "sub",
+      "parent": "ignition---fuel-new-002",
+      "partNumber": null,
+      "function": "Filter integrated in the in-tank pump module, designed to last the service life of the vehicle (2009 Service Introduction, p39) — there is no external serviceable fuel filter on the 987. The pump module is replaced as an assembly if filtration is compromised."
+    },
+    {
+      "id": "eng-fuel-008",
+      "node": "fuelPumpRelay",
+      "label": "Fuel Pump Control Unit / Relay",
+      "assembly": "Fuel Delivery",
+      "system": "Electrical",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "On DFI cars a dedicated fuel pump control unit on the right-hand side of the plenum panel drives the in-tank pump with a PWM signal from the DME: ~3 s prime at ignition-on, ~5 s at high voltage during start, then continuously matched to consumption (>8 V at idle). Power is cut on engine-off or crash signal (2009 Service Introduction, p40)."
+    },
+    {
+      "id": "eng-fuel-009",
+      "node": "injectorSeals",
+      "label": "Injector Seals (x6 sets)",
+      "assembly": "Fuel Delivery",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "eng-fuel-004",
+      "partNumber": "9A1.110.319.00",
+      "function": "Per injector: O-ring on the hydraulic connection to the rail, spacer ring, external corrosion protection and a Teflon sealing ring to the combustion chamber (2009 Service Introduction, p47, Fig 2_20_09). Replace whenever injectors are removed, and leak-test all high-pressure unions afterwards."
+    },
+    {
+      "id": "eng-fuel-010",
+      "node": "fuelTankFillerNeckCheckValve",
+      "label": "Fuel Tank Filler Neck Check Valve",
+      "assembly": "Fuel Delivery",
+      "system": "Fuel & Exhaust",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Spring-loaded one-way valve at the base of the filler neck that prevents backflow and fuel vapour escape through the filler pipe when the cap is removed. Also prevents siphoning through the filler neck."
+    }
+  ]
+}

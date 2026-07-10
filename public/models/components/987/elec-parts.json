@@ -1,0 +1,106 @@
+{
+  "glb": "/models/components/987/elec.glb",
+  "parts": [
+    {
+      "id": "ELEC-PWR-001",
+      "node": "batteryAgm",
+      "label": "Battery 12V (Front Trunk)",
+      "assembly": "Power & Charging",
+      "system": "Electrical",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Group-48 / H6 12 V battery under the front luggage-compartment floor panel, supplying all vehicle electrical systems and engine start. Use a memory saver before disconnecting; negative off first, positive on first; re-register if switching to AGM."
+    },
+    {
+      "id": "ELEC-PWR-002",
+      "node": "alternator",
+      "label": "Alternator",
+      "assembly": "Power & Charging",
+      "system": "Electrical",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Belt-driven generator on the mid-mounted flat-six charging the battery and powering the 12 V system while the engine runs; on the 987.2 it hangs on the 9A1's single accessory belt alongside the external coolant pump and the power-steering pump."
+    },
+    {
+      "id": "ELEC-PWR-003",
+      "node": "starterMotor",
+      "label": "Starter Motor",
+      "assembly": "Power & Charging",
+      "system": "Electrical",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Electric motor low on the bellhousing that cranks the flat-six during start; engages the flywheel ring gear via a solenoid-actuated pinion. Long positive cable run from the frunk battery to the rear engine bay."
+    },
+    {
+      "id": "ELEC-PWR-004",
+      "node": "junctionBox",
+      "label": "Fuse Panel / Relay Carrier",
+      "assembly": "Power & Charging",
+      "system": "Electrical",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Main fuse panel behind the driver-side footwell / dash end panel housing blade fuses and relay carriers that protect and route the primary electrical circuits — the first stop for any dead-circuit diagnosis on a 987."
+    },
+    {
+      "id": "ELEC-CH-001",
+      "node": "psmModule",
+      "label": "PSM Control Unit (Stability Management)",
+      "assembly": "Chassis Electronics",
+      "system": "Electrical",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Porsche Stability Management control unit processing wheel-speed, yaw and lateral-acceleration signals to command ABS, ABD, ASR, MSR and EBD interventions; standard on all 987s, with brake pre-filling, brake assist and drive-off assistant added for the 987.2 (2009 Service Introduction)."
+    },
+    {
+      "id": "ELEC-CH-002",
+      "node": "bcmFront",
+      "label": "Front Body Control Module",
+      "assembly": "Chassis Electronics",
+      "system": "Electrical",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Front body control electronics governing exterior lighting, horn, rain/light sensor integration and comfort functions on the 987's CAN network."
+    },
+    {
+      "id": "ELEC-CH-003",
+      "node": "combiInstrument",
+      "label": "Instrument Cluster / Combi-Instrument",
+      "assembly": "Chassis Electronics",
+      "system": "Electrical",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Central driver display combining the analogue centre rev-counter with speedometer, fuel/temperature gauges, warning indicators and the on-board computer; also hosts the TPM tire-pressure warnings on the 987.2."
+    },
+    {
+      "id": "ELEC-CH-004",
+      "node": "sportChronoModule",
+      "label": "Sport Chrono Module",
+      "assembly": "Chassis Electronics",
+      "system": "Electrical",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Control unit of the optional Sport Chrono Package (Plus) managing the sharper engine map, PASM and PSM thresholds in Sport mode, and driving the dash-top analogue/digital stopwatch for lap timing."
+    },
+    {
+      "id": "ELEC-CH-005",
+      "node": "sportChronoSwitch",
+      "label": "Sport / Sport Plus Button",
+      "assembly": "Chassis Electronics",
+      "system": "Electrical",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Centre-console SPORT button (SPORT PLUS with Sport Chrono Package Plus and PDK on the 987.2) requesting the dynamic engine, PASM damping and shift maps; also relaxes PSM brake-assist thresholds for sporty driving."
+    },
+    {
+      "id": "ELEC-HVAC-001",
+      "node": "cabinParticleFilter",
+      "label": "Cabin Particle / Pollen Filter",
+      "assembly": "HVAC",
+      "system": "Electrical",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Particle filter in the heater/air-conditioning intake behind the front-compartment firewall trim, cleaning cabin air before the blower. A clogged element is the number-one cause of weak airflow and musty A/C on a 987 — replaced at every minor service.",
+      "componentId": "elec"
+    }
+  ]
+}

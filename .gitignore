@@ -16,6 +16,9 @@ next-env.d.ts
 *.pem
 .vscode
 
+# scratch / source material dropped in for processing (© various — local only)
+/temp/
+
 # debug
 npm-debug.log*
 yarn-debug.log*

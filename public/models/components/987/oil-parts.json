@@ -1,0 +1,318 @@
+{
+  "glb": "/models/components/987/oil.glb",
+  "parts": [
+    {
+      "id": "eng-lube-001",
+      "node": "oilPump",
+      "label": "Oil Pump (Demand-Controlled, 5-Stage)",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1.107.050.11",
+      "componentId": "oil",
+      "function": "987.2 (9A1): electronically demand-controlled oil pressure pump — the DME map sets a control valve that axially displaces the pump gear wheel, so pressure and volume match each operating state and drive losses drop. Sits in the oil pan on the pulley side, chain-driven directly by the crankshaft, sharing its shaft with four cylinder-head extraction pumps (five pumps total; 2009 Service Introduction, p20–22). The 987.1 M96/M97 uses a conventional fixed-displacement pump."
+    },
+    {
+      "id": "eng-lube-002",
+      "node": "oilFilterHousing",
+      "label": "Oil Filter Housing",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1.107.020.11",
+      "componentId": "oil",
+      "function": "Cartridge filter housing with integrated pressure relief valve on the oil-filter console. On the mid-engine 987.2 the filter is accessed from beneath (unlike the 911, which is serviced from above — 2009 Service Introduction, p21). The 987.1 M96/M97 uses the Mahle OX254D4 cartridge in a spin-down housing instead. Cover torque 25 Nm."
+    },
+    {
+      "id": "eng-lube-003",
+      "node": "oilPressureSensor",
+      "label": "Oil Pressure Sensor",
+      "assembly": "Sensors",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Fitted on top of the oil-filter console (2009 Service Introduction, p21). Monitors engine oil pressure for the DME and gauge; triggers a warning if pressure drops below the safe threshold."
+    },
+    {
+      "id": "eng-lube-004",
+      "node": "oilGalleries",
+      "label": "Oil Galleries",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "eng-lube-001",
+      "partNumber": "Part of engine block assembly (9A1.101.xxx)",
+      "function": "Internal block passages that distribute pressurised oil to bearings, camshafts, and piston cooling jets. Cast into the block; not individually serviceable."
+    },
+    {
+      "id": "eng-lube-005",
+      "node": "pistonCoolingJets",
+      "label": "Piston Cooling Jets (×6)",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "eng-lube-001",
+      "partNumber": "Part of engine block assembly (9A1.101.xxx)",
+      "function": "Oil squirters pressed into the block galleries that direct a jet of oil at the underside of each piston crown for direct cooling. Integral to the block; replaced with block if failed."
+    },
+    {
+      "id": "eng-lube-006",
+      "node": "oilFillerCap",
+      "label": "Oil Filler Cap & Dipstick",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1.107.016.22",
+      "componentId": "oil",
+      "function": "Oil filler access cap and dipstick tube used to check and top up engine oil level. Filler cap torque 25 Nm; use a new crush washer on the drain plug at every change."
+    },
+    {
+      "id": "oil---lubrication-new-001",
+      "node": "oilSump",
+      "label": "Oil Sump (Integrated Dry Sump)",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1.107.032.75",
+      "function": "Lower crankcase oil reservoir of the 9A1 integrated dry-sump system. The revised 987.2 oil supply guarantees lubrication under very high lateral and axial acceleration and adds a watertight sheet-metal panel between crankcase and oil pan (2009 Service Introduction, p20)."
+    },
+    {
+      "id": "oil---lubrication-new-002",
+      "node": "oilSumpUpperPart",
+      "label": "Oil Sump Upper Part",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "oil---lubrication-new-001",
+      "partNumber": "9A1.107.031.20",
+      "function": "Upper section of the two-piece oil pan that forms the lower crankcase enclosure."
+    },
+    {
+      "id": "oil---lubrication-new-003",
+      "node": "oilSumpGasket",
+      "label": "Oil Sump Gasket",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "oil---lubrication-new-001",
+      "partNumber": "9A1.107.315.03",
+      "function": "Sealing gasket between the oil sump and engine block that prevents oil leaks at the pan mating surface."
+    },
+    {
+      "id": "oil---lubrication-new-004",
+      "node": "oilFilterInsert",
+      "label": "Oil Filter Insert",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "eng-lube-002",
+      "partNumber": "9A1.107.224.00",
+      "function": "Replaceable paper filter element for the 987.2 9A1 engine. 987.1 M96/M97 cars take the Mahle OX254D4 element instead — the two are not interchangeable."
+    },
+    {
+      "id": "oil---lubrication-new-005",
+      "node": "oilFilterSet",
+      "label": "Oil Filter Set",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "eng-lube-002",
+      "partNumber": "9A1.107.024.00",
+      "function": "Complete service kit including filter element and sealing rings for an oil filter change on the 987.2 9A1 engine."
+    },
+    {
+      "id": "oil---lubrication-new-006",
+      "node": "oilSeparator",
+      "label": "Oil Mist Separator (Crankcase Ventilation)",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1.107.042.00",
+      "function": "Two-stage oil mist separator — a pre-separator plus a fine separator (2009 Service Introduction, p19) — that strips oil from crankcase blow-by gases before they are recirculated into the intake, protecting knock resistance, emissions and oil consumption."
+    },
+    {
+      "id": "oil---lubrication-new-007",
+      "node": "oilSumpSeparator",
+      "label": "Oil Separator (Sump)",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "oil---lubrication-new-006",
+      "partNumber": "9A1.107.380.01",
+      "function": "Secondary oil separator mounted in the lower sump area that recovers oil droplets carried in crankcase ventilation flow."
+    },
+    {
+      "id": "oil---lubrication-new-008",
+      "node": "oilConductingHousing",
+      "label": "Oil-Conducting Housing / Filter Console",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1.107.020.11",
+      "function": "Integrated console that routes oil flow between the filter, cooler and main galleries. Carries the filter mounting interface underneath and the oil pressure sensor on top (2009 Service Introduction, p21)."
+    },
+    {
+      "id": "oil---lubrication-new-009",
+      "node": "oilHeatExchanger",
+      "label": "Oil Heat Exchanger (Oil Cooler)",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": "9A1.107.450.10",
+      "function": "Engine oil-to-coolant heat exchanger that maintains optimal oil temperature by transferring excess heat into the coolant circuit."
+    },
+    {
+      "id": "oil---lubrication-new-010",
+      "node": "oilLevelSensor",
+      "label": "Oil Level Sensor",
+      "assembly": "Sensors",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Sensor in the oil sump that measures the oil level, reported via the instrument cluster / on-board display (the 987 also retains a physical dipstick)."
+    },
+    {
+      "id": "oil---lubrication-new-011",
+      "node": "oilSuctionTube",
+      "label": "Oil Suction Tube",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "eng-lube-001",
+      "partNumber": "9A1.107.075.10",
+      "function": "Pickup tube submerged in the oil sump that feeds oil from the reservoir to the inlet of the oil pump."
+    },
+    {
+      "id": "oil---lubrication-new-012",
+      "node": "sealingFlange",
+      "label": "Sealing Flange (Oil Sump)",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "oil---lubrication-new-001",
+      "partNumber": "9A1.107.330.01",
+      "function": "Rear crankshaft sealing flange at the oil sump that retains the rear main oil seal and closes the lower crankcase."
+    },
+    {
+      "id": "oil---lubrication-new-013",
+      "node": "oilPipe",
+      "label": "Oil Supply Pipe",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "eng-lube-001",
+      "partNumber": "9A1.107.025.01",
+      "function": "Rigid oil pipe that carries pressurised oil from the pump outlet to the main oil gallery distribution points."
+    },
+    {
+      "id": "eng-lube-007",
+      "node": "oilDrainPlugWasher",
+      "label": "Oil Drain Plug Sealing Washer",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "oil---lubrication-new-001",
+      "partNumber": null,
+      "function": "Aluminium crush washer that seals the oil drain plug against the sump. Must be replaced at every oil change to prevent seepage. Drain plug torque approx. 37 Nm."
+    },
+    {
+      "id": "eng-lube-008",
+      "node": "oilTemperatureSensor",
+      "label": "Oil Temperature Sensor",
+      "assembly": "Sensors",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "NTC thermistor in the oil circuit that feeds oil temperature data to the DME for fuelling corrections and cluster display."
+    },
+    {
+      "id": "eng-lube-009",
+      "node": "oilPressureReliefValve",
+      "label": "Oil Pressure Relief Valve",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "eng-lube-002",
+      "partNumber": "Part of oil filter housing assembly (9A1.107.020.11)",
+      "function": "Spring-loaded bypass valve integrated into the oil filter housing that protects the circuit from over-pressure and allows cold-start flow before the filter warms up. On the 987.2, normal pressure regulation is handled upstream by the demand-controlled pump itself."
+    },
+    {
+      "id": "eng-lube-010",
+      "node": "oilPumpDriveChain",
+      "label": "Oil Pump Drive Chain & Sprocket",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "eng-lube-001",
+      "partNumber": "9A1.105.225.02",
+      "componentId": "oil",
+      "function": "Roller chain and crankshaft sprocket that drive the oil pump shaft directly from the crankshaft (2009 Service Introduction, p21). The same shaft also spins the four cylinder-head extraction pump stages."
+    },
+    {
+      "id": "eng-lube-011",
+      "node": "imsLubricationCircuit",
+      "label": "Intermediate Shaft (IMS) — 987.1 Only",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "eng-lube-001",
+      "partNumber": "Part of engine block assembly",
+      "function": "Applies to 987.1 M96/M97 engines only: their intermediate shaft runs the cam chains and its sealed ball bearing (the notorious 'IMS bearing') is the model's best-known failure point — many owners retrofit an improved bearing at clutch services. The 987.2 9A1 engine has no intermediate shaft at all: each bank's camshafts are driven directly by the crankshaft via a duplex chain (2009 Service Introduction, p16)."
+    },
+    {
+      "id": "eng-lube-012",
+      "node": "oilCoolerBypassThermostat",
+      "label": "Oil Cooler Bypass Thermostat",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "oil---lubrication-new-009",
+      "partNumber": "Part of oil-conducting housing assembly (9A1.107.020.11)",
+      "function": "Thermostatic bypass element in the oil-conducting housing that diverts oil around the cooler until operating temperature is reached, accelerating warm-up and preventing overcooling."
+    },
+    {
+      "id": "eng-lube-013",
+      "node": "oilFilterHousingORing",
+      "label": "Oil Filter Housing O-Ring / Gasket",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "eng-lube-002",
+      "partNumber": null,
+      "function": "Rubber O-ring that seals the oil filter cover against the housing body. Replaced with every filter service kit."
+    },
+    {
+      "id": "eng-lube-014",
+      "node": "oilFillerNeckSeal",
+      "label": "Oil Filler Neck Seal",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "eng-lube-006",
+      "partNumber": "9A1.107.327.00",
+      "function": "Rubber seal ring at the base of the oil filler / dipstick tube where it enters the camshaft housing or valve cover, preventing oil mist escape and ingress of contamination."
+    },
+    {
+      "id": "eng-lube-015",
+      "node": "timingChainVVTOilFeed",
+      "label": "Timing Chain & VarioCam Lubrication Jets",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "sub",
+      "parent": "eng-lube-001",
+      "partNumber": "Part of engine block/head assembly (9A1.105.xxx)",
+      "function": "Pressurised oil nozzles in the timing chain cavities that lubricate the duplex cam chains, guides and tensioners, and supply hydraulic pressure to the VarioCam Plus adjusters. The 987.2 adds one extra oil extraction point per cylinder head so oil is scavenged at two points per head (2009 Service Introduction, p20/22)."
+    },
+    {
+      "id": "eng-lube-016",
+      "node": "engineOil",
+      "label": "Engine Oil (0W-40, Porsche A40)",
+      "assembly": "Lubrication",
+      "system": "Engine",
+      "tier": "primary",
+      "partNumber": null,
+      "componentId": "oil",
+      "function": "Porsche A40-approved fully synthetic oil (e.g. Mobil 1 0W-40). Capacity approx. 8.3 L with filter on the 987.2 3.4; change yearly / 10,000 mi. Same specification family for 987.1 M96/M97 cars — many owners shorten the interval on tracked or short-trip cars."
+    }
+  ]
+}

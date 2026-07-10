@@ -2,6 +2,7 @@ import type {
   Component, Fault, ServiceRecord, Vehicle, PaintColor,
   McpTool, RagSource, SystemName,
 } from './types';
+import { COMPONENTS_987 } from './data-987';
 
 export const SYSTEMS: (SystemName | 'All')[] = [
   'All', 'Engine', 'Brakes', 'Cooling', 'Transmission', 'HVAC',
@@ -29,8 +30,33 @@ export const COLORS: PaintColor[] = [
   { name: 'AGATE GREY', hex: '#5B5F63' }, { name: 'AMARANTH', hex: '#7A2230' },
 ];
 
-export const ENGINES = ['2.7 L Flat-Six', '3.4 L Flat-Six (S)', '3.4 L Flat-Six (GTS)', '3.8 L Flat-Six (Spyder)'];
-export const TRANS = ['6-Speed Manual', '7-Speed PDK'];
+// Engine + transmission options are GENERATION-SPECIFIC:
+//  • 981 (2012–2016): 2.7 / 3.4 S / 3.4 GTS / 3.8 Spyder-GT4; manual or PDK (never Tiptronic).
+//  • 987 (2005–2012): 2.7 (987.1) / 2.9 (987.2) / 3.4 S; manual, 5-spd Tiptronic S (987.1)
+//    or 7-spd PDK (987.2, which replaced Tiptronic). PDK did NOT exist before 2009.
+export const ENGINES_981 = ['2.7 L Flat-Six', '3.4 L Flat-Six (S)', '3.4 L Flat-Six (GTS)', '3.8 L Flat-Six (Spyder/GT4)'];
+export const ENGINES_987 = ['2.7 L Flat-Six', '2.9 L Flat-Six', '3.4 L Flat-Six (S)'];
+export const TRANS_981 = ['6-Speed Manual', '7-Speed PDK'];
+export const TRANS_987 = ['5-Speed Manual', '6-Speed Manual', '5-Speed Tiptronic S', '7-Speed PDK'];
+
+// Back-compat aliases (default to the 981 sets).
+export const ENGINES = ENGINES_981;
+export const TRANS = TRANS_981;
+
+export function enginesFor(generation: string): string[] {
+  return generation === '987' ? ENGINES_987 : ENGINES_981;
+}
+export function transmissionsFor(generation: string): string[] {
+  return generation === '987' ? TRANS_987 : TRANS_981;
+}
+/** Sensible default engine — every variant we ship is an "S" model. */
+export function defaultEngine(_generation: string): string {
+  return '3.4 L Flat-Six (S)';
+}
+/** Default transmission: 981 → PDK; 987 → manual (valid across 987.1 + 987.2). */
+export function defaultTransmission(generation: string): string {
+  return generation === '987' ? '6-Speed Manual' : '7-Speed PDK';
+}
 
 // view/ix/iy come from the mockup's VIEWMAP (hotspot positions on the 2D cutaways).
 export const COMPONENTS: Component[] = [
@@ -73,42 +99,42 @@ export const COMPONENTS: Component[] = [
     part: 'PN 981.110.131.00 (panel)', spec: 'Single panel element', interval: '6 yr / 40k (yearly if tracked)', torque: 'Airbox screws 4 Nm',
     notes: 'Airbox sits in the engine bay under the rear lid. Quick win for breathing; pairs with throttle-body clean.',
     steps: ['Open rear engine lid', 'Release airbox lid clips/screws', 'Lift out panel filter', 'Wipe housing clean', 'Fit new element, reseat lid'],
-    view: 'rear', ix: 60, iy: 37 },
+    view: 'rear', ix: 15, iy: 52 },
   { id: 'plugs', label: 'Spark Plugs & Coils', sub: 'Ignition · flat-six', system: 'Engine', diff: 3, time: '~2 hr',
     part: 'NGK 95170 · PN 999.170.225.90 (×6)', spec: 'Gap 0.8 mm · 6 cyl', interval: '4 yr / 40k mi', torque: 'Plug 30 Nm · coil bolt 9 Nm',
     notes: 'Access is tight through the engine bay sides. Anti-seize lightly, do not over-torque the alloy heads.',
     steps: ['Remove rear lid & intake covers', 'Unbolt coil packs (9 Nm), label cylinders', 'Remove plugs with 14 mm thin-wall socket', 'Gap-check & fit new plugs to 30 Nm', 'Refit coils, clear adaptation'],
-    view: 'rear', ix: 66, iy: 44 },
+    view: 'rear', ix: 26, iy: 42 },
   { id: 'oil', label: 'Engine Oil & Filter', sub: 'Lubrication · flat-six', system: 'Engine', diff: 1, time: '~45 min',
     part: 'Mahle OX 366D · PN 9A1.107.225.00', spec: 'Mobil 1 0W-40 · 7.5 L w/ filter', interval: 'Yearly / 10k mi', torque: 'Drain plug 50 Nm · cap 25 Nm',
     notes: 'Mid-mounted DFI six. Drain from below; filter cap is on top via the lid. Use a new crush washer every time.',
     steps: ['Warm engine, lift & level the car', 'Remove underbody panel, drain via 8 mm hex', 'New crush washer, drain plug to 50 Nm', 'Swap OX 366D element under 24 mm cap (25 Nm)', 'Refill 7.5 L 0W-40, verify on iPM', 'Reset oil-service interval'],
-    view: 'rear', ix: 62, iy: 57 },
+    view: 'rear', ix: 52, iy: 24 },
   { id: 'belt', label: 'Accessory Drive Belt', sub: 'Serpentine / poly-V', system: 'Engine', diff: 3, time: '~60 min',
     part: 'PN 999.192.082.50', spec: 'Poly-V, auto-tensioned', interval: '6 yr / 60k mi', torque: 'Tensioner bolt 43 Nm',
     notes: 'Drives alternator and A/C. Inspect for glazing and cracks; squeal usually means tensioner or pulley bearing.',
     steps: ['Open rear lid, note belt routing', 'Release auto-tensioner with 1/2" bar', 'Slip old belt off pulleys', 'Route new belt per diagram', 'Confirm tensioner seats, spin check'],
-    view: 'rear', ix: 55, iy: 52 },
+    view: 'rear', ix: 13, iy: 34 },
   { id: 'coolant', label: 'Coolant Expansion Tank', sub: 'Cooling reservoir', system: 'Cooling', diff: 1, time: '~15 min',
     part: 'Tank 981.106.147 · cap 996.106.447', spec: 'G40 pink · cold level mid-mark', interval: 'Cap & level yearly', torque: 'n/a',
     notes: 'A weak cap causes slow pressure loss. Check level cold; never open hot. Brown crust = mixing old coolant.',
     steps: ['Check level cold at seam mark', 'Inspect cap seal for cracks', 'Top up with G40 only', 'Squeeze hoses for brittleness', 'Bleed if air introduced'],
-    view: 'rear', ix: 57, iy: 35 },
+    view: 'rear', ix: 46, iy: 12 },
   { id: 'trans', label: 'PDK / Manual Gearbox', sub: 'Transaxle · rear-mounted', system: 'Transmission', diff: 4, time: '~2.5 hr',
     part: 'PDK fluid 999.917.547.00 · filter 981.307.115', spec: 'PDK ~7.5 L ATF · Manual 75W-90 (~2.8 L)', interval: 'PDK 4 yr/40k (factory 120k)', torque: 'Drain/fill 45 Nm',
     notes: 'Sooner-than-factory PDK fluid + filter is cheap insurance against mechatronic wear. Manual gear oil is simpler.',
     steps: ['Lift & level, warm to temp', 'Drain transaxle, measure quantity', 'Replace PDK filter / clean magnet', 'Refill exact amount via fill port', 'Fill plug to 45 Nm, road-test shifts'],
-    view: 'rear', ix: 76, iy: 51 },
+    view: 'rear', ix: 60, iy: 52 },
   { id: 'rbrakes', label: 'Rear Brakes', sub: 'Pads · discs', system: 'Brakes', diff: 3, time: '~80 min',
     part: 'Pads 981.352.939.01 · Discs 981.352.045', spec: '299 mm discs · integrated park brake', interval: 'Inspect yearly', torque: 'Wheel bolts 130 Nm · caliper 85 Nm',
     notes: 'Drum-in-hat parking brake. Retract pistons squarely; release park brake fully before service.',
     steps: ['Loosen bolts, lift & support rear', 'Release park brake, remove caliper', 'Fit new pads, lube pins', 'Seat caliper, torque 85 Nm', 'Wheel bolts 130 Nm in star'],
-    view: 'rear', ix: 83, iy: 67 },
+    view: 'front', ix: 83, iy: 67 },
   { id: 'exhaust', label: 'Exhaust & Sport System', sub: 'Cats · muffler · PSE', system: 'Exhaust', diff: 3, time: '~90 min',
     part: 'Rear muffler 981.111.025 · PSE valve', spec: 'Vacuum-actuated valve (PSE)', interval: 'Inspect yearly', torque: 'Clamp nut 23 Nm · hanger 23 Nm',
     notes: 'Check for blowing gaskets at the cat joints and split rubber hangers. PSE valve sticks if vacuum line perishes.',
     steps: ['Inspect from cats rearward for leaks', 'Check hangers & heat shields', 'Test PSE valve open/close vacuum', 'Replace gaskets at flanges', 'Clamp nuts to 23 Nm'],
-    view: 'rear', ix: 72, iy: 72 },
+    view: 'rear', ix: 80, iy: 56 },
   { id: 'wheels', label: 'Wheels & Tyres', sub: 'Rims · tyres · TPMS', system: 'Wheels', diff: 1, time: '~30 min',
     part: '235/40ZR19 fr · 265/40ZR19 rr (S, N-rated)', spec: 'Pressures 2.4 / 2.9 bar (cold)', interval: 'Rotate & inspect / check pressures', torque: 'Wheel bolts 130 Nm',
     notes: 'Run N-spec tyres for correct handling. Square setup means no cross rotation; check inner-edge wear from camber.',
@@ -138,23 +164,31 @@ export const COMPONENTS: Component[] = [
     part: 'DME 981.618.601 (variant-specific)', spec: 'Bosch MED · under rear lid / firewall', interval: 'Software as needed', torque: 'Bracket bolts 9 Nm',
     notes: 'Coding is VIN-locked. After battery work some adaptations need a drive cycle; flashing is dealer/PIWIS territory.',
     steps: ['Confirm codes with a capable scanner', 'Check power/ground at the ECU connector', 'Inspect for water ingress at the connector', 'Do not swap ECUs without coding', 'Clear adaptations after legitimate repairs'],
-    view: 'rear', ix: 70, iy: 40 },
+    view: 'rear', ix: 33, iy: 18 },
   { id: 'throttle', label: 'Throttle Body & Plenum', sub: 'Drive-by-wire', system: 'Engine', diff: 2, time: '~40 min',
     part: 'Throttle body 9A1.133.062 · cleaner', spec: 'Electronic TB · adaptation required', interval: 'Clean 40k / if idle rough', torque: 'TB bolts 9 Nm',
     notes: 'Carbon on the butterfly causes unstable idle. After cleaning, run throttle adaptation with a scan tool.',
     steps: ['Remove intake tube to TB', 'Clean butterfly & bore (TB-safe cleaner)', 'Do not force the flap open hard', 'Refit tube, clear adaptations', 'Idle-learn with scan tool'],
-    view: 'rear', ix: 64, iy: 48 },
+    view: 'rear', ix: 40, iy: 36 },
   { id: 'undertray', label: 'Engine Undertray', sub: 'Underbody panels', system: 'Body', diff: 1, time: '~20 min',
     part: 'Rear undertray 981.504.141', spec: 'Plastic shields · push-pins + bolts', interval: 'Inspect after track / kerbs', torque: 'Shield bolts 9 Nm',
     notes: 'Missing trays upset underbody airflow and expose the oil pan. Refit every pin — loose trays shred on the motorway.',
     steps: ['Lift and support safely', 'Inspect trays for cracks / missing pins', 'Replace damaged fasteners', 'Torque bolts to 9 Nm', 'Confirm clearance to exhaust'],
-    view: 'rear', ix: 68, iy: 78 },
+    view: 'front', ix: 68, iy: 78 },
   { id: 'pse', label: 'Sport Exhaust Valve', sub: 'PSE vacuum actuator', system: 'Exhaust', diff: 2, time: '~30 min',
     part: 'Valve / diaphragm 981.111.215 · vacuum line', spec: 'Vacuum-actuated flap in muffler', interval: 'Inspect yearly', torque: 'Clamp 23 Nm',
     notes: 'If Sport mode is quiet, check the vacuum line and diaphragm before condemning the muffler.',
     steps: ['Select Sport, listen for flap', 'Inspect vacuum hose to the actuator', 'Apply hand vacuum to test diaphragm', 'Replace hose or valve as needed', 'Confirm open/close with Sport toggle'],
-    view: 'rear', ix: 78, iy: 70 },
+    view: 'rear', ix: 87, iy: 66 },
 ];
+
+/**
+ * Cutaway components for a generation. 981 uses COMPONENTS; 987 uses its own
+ * set (lib/data-987.ts). Mirrors the generation fork in lib/knowledge.
+ */
+export function componentsForGeneration(generation: string | null | undefined): Component[] {
+  return generation === '987' ? COMPONENTS_987 : COMPONENTS;
+}
 
 export const FAULTS: Fault[] = [
   { id: 'f1', title: 'Coolant loss / sweet smell', system: 'COOLING', sev: 'MED', causes: ['Front coolant pipe joints seeping', 'Water-pump weep hole', 'Tired expansion-tank cap'], checks: ['Pressure-test to 1.5 bar', 'Inspect front pipe junction underneath', 'Check pump weep hole for stain'], parts: 'Water pump 981.106.011 · G40 coolant · cap 996.106.447' },

@@ -26,8 +26,28 @@ Refs: `tools/gen/wm-refs/981/<section>/`
 
 Trace notes: [`tools/gen/wm-refs/notes/wm-trace-findings.md`](../../tools/gen/wm-refs/notes/wm-trace-findings.md), [`wave-trace-catalog.md`](../../tools/gen/wm-refs/notes/wave-trace-catalog.md)
 
-## 987 (future)
+## 987 Boxster / Cayman (987.2-flavored)
 
-| Assembly | Status |
-| --- | --- |
-| *(same ids)* | todo after PDF lands |
+Source: `temp/987_material_1/Service Introduction for 2009 models.pdf` (194pp, 987.2 / 9A1 / PDK; doc page ≈ PDF page − 7)
+Refs: `tools/gen/wm-refs/987/{engine,fuel-intake-exhaust,pdk,chassis}/`
+Gen scripts: `tools/gen/components/987/` (delegate to 981 builders unless forked) — build via `npm run gen:components -- --gen 987` (`--only id1,id2` for subsets)
+Parts JSON: `public/models/components/987/<id>-parts.json` · placement: `components/garage/xray-assemblies-987.ts` · flows: `flow-systems-987.ts`
+
+| Assembly | Gen script | WM hints (PDF page) | Status |
+| --- | --- | --- | --- |
+| `engine` | *(none — real 9A1 GLB copy, never rebuild)* | 10–33 | silhouette |
+| `cooling` | `987/coolingRadiator.mjs` (delegates 981) | 30–33 | silhouette |
+| `airfilter` | `987/airIntake.mjs` | ~58 (air routing) | done |
+| `exhaust` | `987/exhaust.mjs` | 60–69 | done |
+| `oil` | `987/oilSystem.mjs` | ~27 (oil supply) | done |
+| `plugs` | `987/ignitionFuel.mjs` | 46–56 (DFI) | done |
+| `trans` | `987/transaxle.mjs` | 70–112 (PDK) | done |
+| `susp` | `987/suspension.mjs` | 115–118 (+ hydraulic PS) | done |
+| `fbrakes` | `987/frontBrake.mjs` | ~126 | done |
+| `rbrakes` | `987/rearBrake.mjs` | ~126 | done |
+| `driveline` | `987/driveline.mjs` (delegates 981) | — | silhouette |
+| `fuel` | `987/fuelSystem.mjs` (delegates 981) | 45–48 | silhouette |
+| `elec` | `987/electrical.mjs` (delegates 981) | 163+ | silhouette |
+
+Findings: `tools/gen/wm-refs/notes/987-{air,drivetrain,chassis}-findings.md`  
+Layout: `npm run gen:layout -- --gen 987` → 0 errors (2026-07-10)

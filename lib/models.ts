@@ -19,17 +19,27 @@ export interface CarVariant {
   /** public path of the exterior GLB */
   glb: string;
   /**
-   * Whether we have per-part internals (X-ray parts manifests) for this variant.
-   * Only the 981 has them today; other generations render exterior + recolor
-   * and reuse the shared/procedural internals until their own are authored.
+   * Whether we have the 2D cutaway hotspot experience (front + engine images
+   * with clickable component pins) for this variant. Both 981 and 987 do.
    */
-  hasInternals: boolean;
+  hasCutaway2D: boolean;
+  /**
+   * Whether we have per-part 3D X-ray internals (assembly GLBs + parts
+   * manifests + flow systems) for this variant. 981 and 987 both do — the
+   * 987 set lives under /models/components/987/ (xray-assemblies-987).
+   */
+  hasXray3D: boolean;
 }
 
 export const CAR_VARIANTS: CarVariant[] = [
-  { id: 'boxster', generation: '981', bodyStyle: 'boxster', label: 'Boxster (981)', modelName: 'Boxster S (981)', glb: '/models/boxster-real.glb', hasInternals: true },
-  { id: 'cayman', generation: '981', bodyStyle: 'cayman', label: 'Cayman (981)', modelName: 'Cayman S (981)', glb: '/models/cayman.glb', hasInternals: true },
-  { id: 'cayman-987', generation: '987', bodyStyle: 'cayman', label: 'Cayman (987)', modelName: 'Cayman S (987)', glb: '/models/cayman-987.glb', hasInternals: false },
+  { id: 'boxster', generation: '981', bodyStyle: 'boxster', label: 'Boxster (981)', modelName: 'Boxster S (981)', glb: '/models/boxster-real.glb', hasCutaway2D: true, hasXray3D: true },
+  { id: 'cayman', generation: '981', bodyStyle: 'cayman', label: 'Cayman (981)', modelName: 'Cayman S (981)', glb: '/models/cayman.glb', hasCutaway2D: true, hasXray3D: true },
+  { id: 'cayman-987', generation: '987', bodyStyle: 'cayman', label: 'Cayman (987)', modelName: 'Cayman S (987)', glb: '/models/cayman-987.glb', hasCutaway2D: true, hasXray3D: true },
+  // No Boxster 987 GLB yet — reuse the Cayman 987 model for the 3D exterior.
+  // Same generation, so it shares the 987 cutaway + knowledge + documents.
+  { id: 'boxster-987', generation: '987', bodyStyle: 'boxster', label: 'Boxster (987)', modelName: 'Boxster S (987)', glb: '/models/cayman-987.glb', hasCutaway2D: true, hasXray3D: true },
+  // Boxster Spyder (987.2) — dedicated exterior GLB; shares 987 cutaway + X-ray.
+  { id: 'spyder-987', generation: '987', bodyStyle: 'boxster', label: 'Spyder (987)', modelName: 'Boxster Spyder (987)', glb: '/models/spyder-987.glb', hasCutaway2D: true, hasXray3D: true },
 ];
 
 export function getVariant(id: BodyType): CarVariant {

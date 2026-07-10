@@ -1,0 +1,387 @@
+{
+  "glb": "/models/components/987/exhaust.glb",
+  "parts": [
+    {
+      "id": "header-r",
+      "node": "headerBank_R",
+      "label": "Exhaust Manifold (Right Bank)",
+      "assembly": "Manifold",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": null,
+      "componentId": "exhaust",
+      "function": "Tubular manifold collecting exhaust from the three right-bank cylinders. On the 987.2 the manifolds were redesigned with enlarged tube cross sections, nearly equal pipe lengths and the main catalytic converter integrated into the manifold."
+    },
+    {
+      "id": "header-l",
+      "node": "headerBank_L",
+      "label": "Exhaust Manifold (Left Bank)",
+      "assembly": "Manifold",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Tubular manifold collecting exhaust from the three left-bank cylinders. On the 987.2 the manifolds were redesigned with enlarged tube cross sections, nearly equal pipe lengths and the main catalytic converter integrated into the manifold."
+    },
+    {
+      "id": "manifold-gasket-r",
+      "node": "manifoldGasket_R",
+      "label": "Exhaust Manifold Gasket (Right)",
+      "assembly": "Manifold",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": null,
+      "parent": "header-r",
+      "function": "Gasket sealing the right-bank exhaust manifold-to-cylinder-head joint against combustion gas leakage."
+    },
+    {
+      "id": "manifold-gasket-l",
+      "node": "manifoldGasket_L",
+      "label": "Exhaust Manifold Gasket (Left)",
+      "assembly": "Manifold",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": null,
+      "parent": "header-l",
+      "function": "Gasket sealing the left-bank exhaust manifold-to-cylinder-head joint against combustion gas leakage."
+    },
+    {
+      "id": "manifold-stud-r",
+      "node": "manifoldStuds_R",
+      "label": "Exhaust Manifold Studs & Nuts (Right, x3)",
+      "assembly": "Manifold",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": null,
+      "parent": "header-r",
+      "function": "Threaded studs pressed into the right cylinder head with self-locking nuts that clamp the exhaust manifold flange (manifold nuts 23 Nm)."
+    },
+    {
+      "id": "manifold-stud-l",
+      "node": "manifoldStuds_L",
+      "label": "Exhaust Manifold Studs & Nuts (Left, x3)",
+      "assembly": "Manifold",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": null,
+      "parent": "header-l",
+      "function": "Threaded studs pressed into the left cylinder head with self-locking nuts that clamp the exhaust manifold flange (manifold nuts 23 Nm)."
+    },
+    {
+      "id": "flex-pipe-r",
+      "node": "flexPipe_R",
+      "label": "Decoupling Element (Right Connecting Pipe)",
+      "assembly": "Manifold",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Corrugated flexible section in the right connecting pipe ahead of the rear silencer, absorbing engine movement and thermal expansion of the long mid-engine exhaust run."
+    },
+    {
+      "id": "flex-pipe-l",
+      "node": "flexPipe_L",
+      "label": "Decoupling Element (Left Connecting Pipe)",
+      "assembly": "Manifold",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Corrugated flexible section in the left connecting pipe ahead of the rear silencer, absorbing engine movement and thermal expansion of the long mid-engine exhaust run."
+    },
+    {
+      "id": "cat-r",
+      "node": "cat_R",
+      "label": "Main Catalytic Converter (Right, integrated)",
+      "assembly": "Aftertreatment",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Main catalytic converter integrated into the right manifold (987.2) — first of two ceramic monoliths in series. Larger diameter than the earlier pre-cats for lower backpressure; the 987.1 instead carried its main cats inside the rear silencers."
+    },
+    {
+      "id": "cat-l",
+      "node": "cat_L",
+      "label": "Main Catalytic Converter (Left, integrated)",
+      "assembly": "Aftertreatment",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Main catalytic converter integrated into the left manifold (987.2) — first of two ceramic monoliths in series. Larger diameter than the earlier pre-cats for lower backpressure; the 987.1 instead carried its main cats inside the rear silencers."
+    },
+    {
+      "id": "heat-shield-cat-r",
+      "node": "heatShield_catR",
+      "label": "Heat Shield — Integrated Cat (Right)",
+      "assembly": "Aftertreatment",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": null,
+      "parent": "cat-r",
+      "function": "Heat shield wrapped around the right manifold-integrated catalytic converter to protect the mid-engine bay components from radiant heat."
+    },
+    {
+      "id": "heat-shield-cat-l",
+      "node": "heatShield_catL",
+      "label": "Heat Shield — Integrated Cat (Left)",
+      "assembly": "Aftertreatment",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": null,
+      "parent": "cat-l",
+      "function": "Heat shield wrapped around the left manifold-integrated catalytic converter to protect the mid-engine bay components from radiant heat."
+    },
+    {
+      "id": "heat-shield-underbody",
+      "node": "heatShield_underbody",
+      "label": "Heat Shield — Underbody / Mid-Section",
+      "assembly": "Aftertreatment",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Large underbody heat shield over the integrated cats and connecting pipes, critical on the mid-engine layout to protect fuel lines, wiring and the body floor from exhaust heat."
+    },
+    {
+      "id": "eng-exh-002",
+      "node": "preCatO2Sensor_R",
+      "label": "Oxygen Sensor LSU 4.9 (Right, Upstream)",
+      "assembly": "Aftertreatment",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Broadband lambda sensor LSU 4.9 (fitted worldwide on the 987.2) ahead of the right catalytic converter, providing closed-loop fuelling feedback to the DME."
+    },
+    {
+      "id": "eng-exh-002b",
+      "node": "preCatO2Sensor_L",
+      "label": "Oxygen Sensor LSU 4.9 (Left, Upstream)",
+      "assembly": "Aftertreatment",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Broadband lambda sensor LSU 4.9 (fitted worldwide on the 987.2) ahead of the left catalytic converter, providing closed-loop fuelling feedback to the DME."
+    },
+    {
+      "id": "eng-exh-004",
+      "node": "postCatO2Sensor_R",
+      "label": "Oxygen Sensor LSF (Right, behind first monolith)",
+      "assembly": "Aftertreatment",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Step-type lambda sensor LSF behind the first catalytic monolith on the right bank, monitoring converter efficiency for the DME."
+    },
+    {
+      "id": "eng-exh-004b",
+      "node": "postCatO2Sensor_L",
+      "label": "Oxygen Sensor LSF (Left, behind first monolith)",
+      "assembly": "Aftertreatment",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Step-type lambda sensor LSF behind the first catalytic monolith on the left bank, monitoring converter efficiency for the DME."
+    },
+    {
+      "id": "eng-exh-005",
+      "node": "midPipe",
+      "label": "Connecting Pipes — Silencer Crossover (x2)",
+      "assembly": "Mid-Section",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "The two connecting pipes between the left and right rear silencers that mix the exhaust gases from cylinder banks 1 and 2 before they escape from the tailpipes."
+    },
+    {
+      "id": "eng-exh-006",
+      "node": "secondaryCat",
+      "label": "Second Catalytic Monolith (per bank)",
+      "assembly": "Aftertreatment",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Second ceramic monolith in series inside each manifold-integrated converter housing (987.2 concept: one larger main cat with two monoliths per bank, replacing the 987.1 underbody/silencer cats)."
+    },
+    {
+      "id": "heat-shield-midpipe",
+      "node": "heatShield_midPipe",
+      "label": "Heat Shield — Crossover Section",
+      "assembly": "Mid-Section",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": null,
+      "parent": "eng-exh-005",
+      "function": "Heat shield protecting the rear body panel and bumper area from the radiant heat of the silencer crossover pipes and mixing chamber."
+    },
+    {
+      "id": "resonator",
+      "node": "resonator",
+      "label": "Centre Mixing Chamber / Tailpipe Connection",
+      "assembly": "Mid-Section",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Central connection between the two rear silencers where the mixed gases of both banks are carried to the tailpipes — the classic 987 centre-exit layout."
+    },
+    {
+      "id": "muffler-inlet-gasket-r",
+      "node": "mufflerInletGasket_R",
+      "label": "Silencer Inlet Gasket (Right)",
+      "assembly": "Silencing",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": null,
+      "parent": "muffler-r",
+      "function": "Sealing ring at the joint between the right connecting pipe and the front-outboard inlet of the right rear silencer."
+    },
+    {
+      "id": "muffler-inlet-gasket-l",
+      "node": "mufflerInletGasket_L",
+      "label": "Silencer Inlet Gasket (Left)",
+      "assembly": "Silencing",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": null,
+      "parent": "muffler-l",
+      "function": "Sealing ring at the joint between the left connecting pipe and the front-outboard inlet of the left rear silencer."
+    },
+    {
+      "id": "muffler-r",
+      "node": "muffler_R",
+      "label": "Rear Silencer (Right)",
+      "assembly": "Silencing",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Right rear silencer, laid diagonally from its front-outboard inlet to its rear-inboard outlet. On the 987.2 the main cats were removed from the silencers and the internals redesigned for a fuller, rounder tone; 987.1 silencers still housed the main catalytic converters."
+    },
+    {
+      "id": "muffler-l",
+      "node": "muffler_L",
+      "label": "Rear Silencer (Left)",
+      "assembly": "Silencing",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Left rear silencer, laid diagonally from its front-outboard inlet to its rear-inboard outlet. On the 987.2 the main cats were removed from the silencers and the internals redesigned for a fuller, rounder tone; 987.1 silencers still housed the main catalytic converters."
+    },
+    {
+      "id": "pse-valve",
+      "node": "pseValve",
+      "label": "Sport Exhaust (PSE) Bypass Valve — option",
+      "assembly": "Silencing",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Vacuum-actuated bypass valve of the optional Porsche Sport Exhaust, opening an alternative path around silencer baffling for a louder, sportier note. A sticking valve is usually a perished vacuum line."
+    },
+    {
+      "id": "pse-actuator",
+      "node": "pseActuator",
+      "label": "PSE Valve Actuator (Vacuum Unit)",
+      "assembly": "Silencing",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": null,
+      "parent": "pse-valve",
+      "function": "Pneumatic actuator canister that translates vacuum into mechanical displacement to open and close the PSE bypass valve flap."
+    },
+    {
+      "id": "tailpipe-r",
+      "node": "tip_R_0",
+      "label": "Tailpipe Tip (Right of centre pair)",
+      "assembly": "Silencing",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Right tip of the central tailpipe. S models (3.4) run a brushed stainless twin tailpipe designed as a true twin-pipe system with two separate pipe connections (987.2); base 2.9 models use a single enlarged oval tip instead."
+    },
+    {
+      "id": "tailpipe-l",
+      "node": "tip_L_0",
+      "label": "Tailpipe Tip (Left of centre pair)",
+      "assembly": "Silencing",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Left tip of the central tailpipe. S models (3.4) run a brushed stainless twin tailpipe designed as a true twin-pipe system with two separate pipe connections (987.2); base 2.9 models use a single enlarged oval tip instead."
+    },
+    {
+      "id": "hanger-r",
+      "node": "hanger_R",
+      "label": "Exhaust Hanger (Right)",
+      "assembly": "Mounting",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Rubber hanger suspending the right rear silencer from the body (hanger bolts 23 Nm). Perished hangers are a common 987 inspection find."
+    },
+    {
+      "id": "hanger-l",
+      "node": "hanger_L",
+      "label": "Exhaust Hanger (Left)",
+      "assembly": "Mounting",
+      "system": "Exhaust",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Rubber hanger suspending the left rear silencer from the body (hanger bolts 23 Nm). Perished hangers are a common 987 inspection find."
+    },
+    {
+      "id": "exhaust-new-001",
+      "node": "pseVacuumLine",
+      "label": "PSE Vacuum Line",
+      "assembly": "Silencing",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": null,
+      "parent": "pse-actuator",
+      "function": "Vacuum supply line routing actuating vacuum from the intake side to the PSE bypass valve actuator."
+    },
+    {
+      "id": "exhaust-new-002",
+      "node": "exhaustClamp",
+      "label": "Exhaust Pipe Clamp",
+      "assembly": "Mounting",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Band clamp securing the connecting-pipe-to-silencer joint (clamp nuts 23 Nm), preventing leaks and relative movement."
+    },
+    {
+      "id": "exhaust-new-003",
+      "node": "exhaustClampingSleeve",
+      "label": "Exhaust Clamping Sleeve",
+      "assembly": "Mounting",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": "987.111.220.00",
+      "function": "Slip-on clamping sleeve joining exhaust pipe sections at the silencer inlet connections."
+    },
+    {
+      "id": "exhaust-new-004",
+      "node": "lambdaProbeHolder",
+      "label": "Lambda Probe Wiring Holder",
+      "assembly": "Aftertreatment",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Bracket that supports and positions the lambda sensor wiring harness along the exhaust routing near the integrated cats."
+    },
+    {
+      "id": "exhaust-new-005",
+      "node": "silencerBracketPSE",
+      "label": "Rear Silencer Holder / Bracket",
+      "assembly": "Mounting",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Steel holder bridging above the two rear silencers, attaching the silencer assembly to the body structure."
+    },
+    {
+      "id": "exhaust-new-006",
+      "node": "manifoldBracket",
+      "label": "Exhaust Manifold Bracket",
+      "assembly": "Manifold",
+      "system": "Exhaust",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Support bracket that braces the exhaust manifold against vibration and thermal movement."
+    }
+  ]
+}

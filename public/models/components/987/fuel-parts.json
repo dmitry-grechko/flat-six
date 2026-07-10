@@ -1,0 +1,95 @@
+{
+  "glb": "/models/components/987/fuel.glb",
+  "parts": [
+    {
+      "id": "FUEL-001",
+      "node": "fuelTank",
+      "label": "Fuel Tank (~64 L)",
+      "assembly": "Fuel Tank",
+      "system": "Fuel",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Plastic fuel tank low ahead of the cabin, between front axle and bulkhead. Capacity approx. 64 litres (16.9 gal) including approx. 10 litres reserve (2009 Service Introduction, doc p39). Designed for 93-octane premium; the DME knock control adapts to 90 octane."
+    },
+    {
+      "id": "FUEL-002",
+      "node": "fuelTankProtectivePan",
+      "label": "Fuel Tank Protective Pan & Straps",
+      "assembly": "Fuel Tank",
+      "system": "Fuel",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Underbody protective pan and retaining straps securing the tank against the floor structure and shielding it from road debris."
+    },
+    {
+      "id": "FUEL-003",
+      "node": "fuelLevelSender",
+      "label": "Fuel Level Sender",
+      "assembly": "Fuel Tank",
+      "system": "Fuel",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "In-tank fuel level sender with float arm reporting tank contents to the instrument cluster; accessed through the tank service opening under the front luggage compartment / cabin cover."
+    },
+    {
+      "id": "FUEL-004",
+      "node": "fuelSenderLockRing",
+      "label": "Fuel Sender Locking Ring",
+      "assembly": "Fuel Tank",
+      "system": "Fuel",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Threaded locking ring clamping the pump/sender flange to the tank opening (torqued to spec with a new seal ring whenever the module is disturbed)."
+    },
+    {
+      "id": "FUEL-005",
+      "node": "fuelPump",
+      "label": "In-Tank Fuel Pump Module",
+      "assembly": "Fuel Tank",
+      "system": "Fuel",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Electric in-tank pump module with sucking-jet pump filling its swirl chamber, LIFETIME fuel filter and approx. 5.0 bar pressure regulator (returnless system). On the 987.2 DFI the DME's fuel pump control unit varies pump voltage on demand — it feeds the engine's high-pressure pump; the 987.1 2.9/MPI regulates approx. 4 bar at the injectors."
+    },
+    {
+      "id": "FUEL-006",
+      "node": "carbonCanister",
+      "label": "Carbon Canister & Leak Diagnosis",
+      "assembly": "EVAP",
+      "system": "Fuel",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "EVAP carbon canister storing tank vapours for purge into the intake, with the leakage diagnosis unit (USA/Canada) that pressure-tests the tank system for the OBD evaporative monitor."
+    },
+    {
+      "id": "FUEL-007",
+      "node": "fuelFillerNeck",
+      "label": "Fuel Filler Neck & Cap",
+      "assembly": "Fuel Tank",
+      "system": "Fuel",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Filler neck from the right-front fender flap down to the tank, with the sealing fuel cap — a worn cap seal is a classic EVAP small-leak fault code cause."
+    },
+    {
+      "id": "FUEL-008",
+      "node": "tankVentLine",
+      "label": "Tank Vent Line",
+      "assembly": "EVAP",
+      "system": "Fuel",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Vent line between tank and carbon canister allowing the tank to breathe through the canister so fuel vapour never vents to atmosphere."
+    },
+    {
+      "id": "FUEL-009",
+      "node": "fuelLinesToEngine",
+      "label": "Fuel Line to Engine (Low-Pressure)",
+      "assembly": "Fuel Lines",
+      "system": "Fuel",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Single low-pressure supply line (approx. 5.0 bar, returnless) running aft from the in-tank pump module to the engine — on the 987.2 DFI it feeds the mechanical high-pressure pump on cylinder bank 1 (engine side); relieve rail pressure before opening any union on a DFI car."
+    }
+  ]
+}

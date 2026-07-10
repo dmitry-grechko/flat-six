@@ -1,4 +1,5 @@
 import type { XrayAssembly } from './xray-assemblies';
+import { FLOW_SYSTEMS_987 } from './flow-systems-987';
 
 /**
  * X-RAY layer modes for the unified scene:
@@ -55,7 +56,7 @@ export interface FlowNode {
 }
 
 export interface FlowSystem {
-  id: 'intake' | 'exhaust-flow' | 'coolant' | 'oil-lines' | 'fuel' | 'brake-lines' | 'harness';
+  id: 'intake' | 'exhaust-flow' | 'coolant' | 'oil-lines' | 'fuel' | 'ps-lines' | 'brake-lines' | 'harness';
   layer: FlowLayerId;
   label: string;
   /** System accent — used for the animated pulses, clamp fittings and label. */
@@ -229,8 +230,14 @@ export const FLOW_SYSTEMS: FlowSystem[] = [
   },
 ];
 
-export function flowsForLayer(layer: XrayLayer): FlowSystem[] {
+/** Flow set per garage generation ('981' default, '987' has its own file). */
+export function flowSystemsFor(generation: string): FlowSystem[] {
+  return generation === '987' ? FLOW_SYSTEMS_987 : FLOW_SYSTEMS;
+}
+
+export function flowsForLayer(layer: XrayLayer, generation = '981'): FlowSystem[] {
+  const systems = flowSystemsFor(generation);
   if (layer === 'mechanical') return [];
-  if (layer === 'all') return FLOW_SYSTEMS;
-  return FLOW_SYSTEMS.filter((f) => f.layer === layer);
+  if (layer === 'all') return systems;
+  return systems.filter((f) => f.layer === layer);
 }

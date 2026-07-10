@@ -1,0 +1,98 @@
+[
+  {
+    "id": "trans",
+    "label": "PDK Transaxle",
+    "system": "Transmission",
+    "glb": "/models/components/987/trans.glb",
+    "node": "transaxle",
+    "hotspot3d": "0 0 -1.4"
+  },
+  {
+    "id": "exhaust",
+    "label": "Exhaust & Sport System",
+    "system": "Exhaust",
+    "glb": "/models/components/987/exhaust.glb",
+    "node": "exhaust",
+    "hotspot3d": "0 -0.7 -1.6"
+  },
+  {
+    "id": "fbrakes",
+    "label": "Front Brake (318mm)",
+    "system": "Brakes",
+    "glb": "/models/components/987/fbrakes.glb",
+    "node": "frontBrake",
+    "hotspot3d": "0 0.78 0"
+  },
+  {
+    "id": "rbrakes",
+    "label": "Rear Brake (299mm)",
+    "system": "Brakes",
+    "glb": "/models/components/987/rbrakes.glb",
+    "node": "rearBrake",
+    "hotspot3d": "0 0.7 0"
+  },
+  {
+    "id": "cooling",
+    "label": "Front Radiator & Condenser",
+    "system": "Cooling",
+    "glb": "/models/components/987/cooling.glb",
+    "node": "coolingRadiator",
+    "hotspot3d": "0 0 0"
+  },
+  {
+    "id": "oil",
+    "label": "Oil & Lubrication",
+    "system": "Engine",
+    "glb": "/models/components/987/oil.glb",
+    "node": "oilSystem",
+    "hotspot3d": "0 -0.4 0"
+  },
+  {
+    "id": "airfilter",
+    "label": "Air Intake",
+    "system": "Engine",
+    "glb": "/models/components/987/airfilter.glb",
+    "node": "airIntake",
+    "hotspot3d": "0 0 0"
+  },
+  {
+    "id": "plugs",
+    "label": "Ignition & Fuel",
+    "system": "Engine",
+    "glb": "/models/components/987/plugs.glb",
+    "node": "ignitionFuel",
+    "hotspot3d": "0 0.2 0"
+  },
+  {
+    "id": "susp",
+    "label": "Suspension & Steering",
+    "system": "Suspension",
+    "glb": "/models/components/987/susp.glb",
+    "node": "suspension",
+    "hotspot3d": "0 0 0"
+  },
+  {
+    "id": "elec",
+    "label": "Electrical System",
+    "system": "Electrical",
+    "glb": "/models/components/987/elec.glb",
+    "node": "electrical",
+    "hotspot3d": "0 0 0"
+  },
+  {
+    "id": "driveline",
+    "label": "Driveline",
+    "system": "Transmission",
+    "glb": "/models/components/987/driveline.glb",
+    "node": "driveline",
+    "hotspot3d": "0 0 0"
+  },
+  {
+    "id": "fuel",
+    "label": "Fuel Tank & Supply",
+    "system": "Fuel",
+    "glb": "/models/components/987/fuel.glb",
+    "node": "fuelSystem",
+    "hotspot3d": "0 -0.1 0.9"
+  }
+]

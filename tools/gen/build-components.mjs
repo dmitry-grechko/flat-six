@@ -12,7 +12,7 @@
 
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 
 import { writeGLB } from './lib/glb-writer.mjs';
 
@@ -31,11 +31,23 @@ import * as driveline from './components/driveline.mjs';
 import * as fuelSystem from './components/fuelSystem.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const OUT_DIR = join(__dirname, '..', '..', 'public', 'models', 'components');
-const PUBLIC_PREFIX = '/models/components';
+
+// Generation select: `--gen 987` builds the 987 registry into a per-gen
+// subdirectory. Default (981) is unchanged.
+const genArg = process.argv.indexOf('--gen');
+const GEN = genArg >= 0 ? process.argv[genArg + 1] : '981';
+if (!['981', '987'].includes(GEN)) throw new Error(`unknown generation: ${GEN}`);
+const GEN_SUFFIX = GEN === '981' ? '' : `/${GEN}`;
+
+const OUT_DIR = join(__dirname, '..', '..', 'public', 'models', 'components', ...(GEN === '981' ? [] : [GEN]));
+const PUBLIC_PREFIX = `/models/components${GEN_SUFFIX}`;
 
 // Registry: each item is { meta, build }. Add new ones here.
-const COMPONENTS = [
+// NOTE: the 981 engine.glb on disk is a real downloaded 9A1 model — running the
+// full 981 build overwrites it with the procedural one. The 987 registry
+// (tools/gen/components/987/registry.mjs) excludes engine for the same reason:
+// its engine.glb is a copy of that real model.
+const COMPONENTS_981 = [
   engine,
   transaxle,
   exhaust,
@@ -50,6 +62,21 @@ const COMPONENTS = [
   driveline,
   fuelSystem,
 ];
+
+const ALL_COMPONENTS = GEN === '981'
+  ? COMPONENTS_981
+  : (await import(`./components/${GEN}/registry.mjs`)).COMPONENTS;
+
+// `--only id1,id2` builds a subset (parallel calibration agents rebuild just
+// their own assemblies without racing each other). Subset builds skip the
+// manifest rewrite so concurrent runs can't clobber it — run a full build
+// (no --only) once at the end.
+const onlyArg = process.argv.indexOf('--only');
+const ONLY = onlyArg >= 0 ? new Set(process.argv[onlyArg + 1].split(',')) : null;
+const COMPONENTS = ONLY ? ALL_COMPONENTS.filter((c) => ONLY.has(c.meta.id)) : ALL_COMPONENTS;
+if (ONLY && COMPONENTS.length !== ONLY.size) {
+  throw new Error(`--only: unknown id(s) in ${[...ONLY].join(',')}`);
+}
 
 // ---- Verify a written GLB by re-parsing it. ----
 function verifyGLB(filePath) {
@@ -88,7 +115,7 @@ function fmtBytes(b) {
 }
 
 async function main() {
-  if (!existsSync(OUT_DIR)) throw new Error(`output dir missing: ${OUT_DIR}`);
+  if (!existsSync(OUT_DIR)) mkdirSync(OUT_DIR, { recursive: true });
 
   const manifest = [];
   const rows = [];
@@ -127,7 +154,7 @@ async function main() {
   }
 
   const manifestPath = join(OUT_DIR, 'manifest.json');
-  writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
+  if (!ONLY) writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
 
   // ---- Summary table ----
   const pad = (s, n) => String(s).padEnd(n);
@@ -139,7 +166,7 @@ async function main() {
   }
   console.log('-'.repeat(58));
   console.log(`${rows.length} components -> ${OUT_DIR}`);
-  console.log(`manifest -> ${manifestPath}\n`);
+  console.log(ONLY ? 'manifest unchanged (--only subset build)\n' : `manifest -> ${manifestPath}\n`);
 }
 
 main().catch((err) => {

@@ -1,0 +1,105 @@
+{
+  "glb": "/models/components/987/driveline.glb",
+  "parts": [
+    {
+      "id": "DL-001",
+      "node": "engineToPdkAdapter",
+      "label": "Engine-to-Transaxle Adapter / Bellhousing Interface",
+      "assembly": "Engine Mounts",
+      "system": "Driveline",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Adapter / bellhousing interface mating the mid-mounted flat-six to the rear transaxle — PDK dual-clutch or 6-speed manual on the 987.2, Tiptronic S or 5/6-speed manual on the 987.1."
+    },
+    {
+      "id": "DL-002",
+      "node": "engineMounts",
+      "label": "Engine Mounts x2 — Hydraulic Rubber Mounts",
+      "assembly": "Engine Mounts",
+      "system": "Driveline",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Pair of hydraulic rubber engine mounts isolating the mid-mounted flat-six from the chassis. Tired mounts show up as clunks on throttle lift and gear changes — a common 987 age item."
+    },
+    {
+      "id": "DL-003",
+      "node": "pdkTransmissionMount",
+      "label": "Transaxle / Transmission Mount",
+      "assembly": "Engine Mounts",
+      "system": "Driveline",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Rubber mount supporting the rear of the transaxle (PDK, Tiptronic S or manual) against the rear subframe, completing the three-point drivetrain suspension."
+    },
+    {
+      "id": "DL-004",
+      "node": "differential",
+      "label": "Differential / Final Drive Housing",
+      "assembly": "Final Drive",
+      "system": "Driveline",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Final-drive differential integrated in the transaxle with the half-shaft output flanges. A mechanical rear differential lock was optional on the 987.2 (paired with adapted rear anti-roll bars, 2009 Service Introduction)."
+    },
+    {
+      "id": "DL-005-L",
+      "node": "rearDriveShaftLeft",
+      "label": "Rear Drive Shaft / Half-Shaft (Left)",
+      "assembly": "Drive Shafts",
+      "system": "Driveline",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Left rear half-shaft from the transaxle output flange to the rear wheel hub, with inner and outer constant-velocity joints and protective bellows."
+    },
+    {
+      "id": "DL-005-R",
+      "node": "rearDriveShaftRight",
+      "label": "Rear Drive Shaft / Half-Shaft (Right)",
+      "assembly": "Drive Shafts",
+      "system": "Driveline",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Right rear half-shaft from the transaxle output flange to the rear wheel hub, with inner and outer constant-velocity joints and protective bellows."
+    },
+    {
+      "id": "DL-006",
+      "node": "innerCVJoints",
+      "label": "Inner CV Joints (Transaxle Side) x2",
+      "assembly": "Drive Shafts",
+      "system": "Driveline",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Constant-velocity joints at the transaxle flanges accommodating drivetrain movement; bolted to the output flanges with socket-head screws."
+    },
+    {
+      "id": "DL-007",
+      "node": "outerCVJoints",
+      "label": "Outer CV Joints (Wheel Side) x2",
+      "assembly": "Drive Shafts",
+      "system": "Driveline",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Constant-velocity joints at the wheel carrier / hub end of each rear drive shaft, following the McPherson rear axle through bump and rebound travel."
+    },
+    {
+      "id": "DL-008",
+      "node": "cvBellows",
+      "label": "CV Joint Bellows / Boots x4",
+      "assembly": "Drive Shafts",
+      "system": "Driveline",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Corrugated protective bellows over the inner and outer CV joints retaining grease and excluding grit — a split boot (clicking on full lock) is the classic 987 drive-shaft failure mode; inspect yearly."
+    },
+    {
+      "id": "DL-WHL-005",
+      "node": "lugBolts",
+      "label": "Lug Bolts M14x1.5 Ball-Seat x20",
+      "assembly": "Wheels & Hubs",
+      "system": "Driveline",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Set of M14x1.5 ball-seat lug bolts securing the wheels to the hub flanges; torqued to 130 Nm in a star pattern."
+    }
+  ]
+}

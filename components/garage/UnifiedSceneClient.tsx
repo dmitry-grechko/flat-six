@@ -7,7 +7,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Environment, useGLTF, ContactShadows, Html, Line } from '@react-three/drei';
 import * as THREE from 'three';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
-import { XRAY_ASSEMBLIES } from './xray-assemblies';
+import { XRAY_ASSEMBLIES, xrayAssembliesFor } from './xray-assemblies';
 import { flowsForLayer, type FlowNode, type FlowPathDef, type FlowSystem, type XrayLayer } from './flow-systems';
 
 type ConnectionType = 'mechanical' | 'exhaust' | 'fluid' | 'air' | 'electrical';
@@ -36,6 +36,8 @@ export type UnifiedSceneProps = {
   layer: XrayLayer;
   selectedFlowId: string | null;
   onSelectFlow: (id: string | null) => void;
+  /** Garage vehicle generation — picks the assembly + flow set ('981' default). */
+  generation?: string;
   handleRef?: { current: { reset: () => void } | null };
 };
 
@@ -490,12 +492,16 @@ function AssemblyMesh({ assembly, isSelected, anySelected, ghosted, onSelect }: 
   );
 }
 
-export default function UnifiedSceneClient({ selectedAssemblyId, onSelectAssembly, layer, selectedFlowId, onSelectFlow, handleRef }: UnifiedSceneProps) {
+export default function UnifiedSceneClient({ selectedAssemblyId, onSelectAssembly, layer, selectedFlowId, onSelectFlow, generation = '981', handleRef }: UnifiedSceneProps) {
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
   useImperativeHandle(handleRef, () => ({ reset: () => controlsRef.current?.reset() }));
 
+  const assemblies = useMemo(() => xrayAssembliesFor(generation), [generation]);
+  // Warm the generation's GLBs (981 set is already preloaded at module load).
+  useMemo(() => assemblies.forEach((a) => useGLTF.preload(a.glb)), [assemblies]);
+
   const anySelected = selectedAssemblyId !== null;
-  const flows = flowsForLayer(layer);
+  const flows = flowsForLayer(layer, generation);
   const anyFlowSelected = selectedFlowId !== null;
   // Assemblies recede when a flow layer is in focus (or a flow is selected)
   // so the tubes read against the ghosted mechanicals.
@@ -520,7 +526,7 @@ export default function UnifiedSceneClient({ selectedAssemblyId, onSelectAssembl
       <directionalLight position={[0, 3, -7]} intensity={1.0} />
 
       <Suspense fallback={null}>
-        {XRAY_ASSEMBLIES.map((a) => (
+        {assemblies.map((a) => (
           <Suspense key={a.id} fallback={null}>
             <AssemblyMesh
               assembly={a}
@@ -545,8 +551,8 @@ export default function UnifiedSceneClient({ selectedAssemblyId, onSelectAssembl
 
         {/* Dashed concept connections — mechanical layer only (flows replace them) */}
         {layer === 'mechanical' && !anySelected && CONNECTIONS.map((c) => {
-          const fa = XRAY_ASSEMBLIES.find((a) => a.id === c.from);
-          const ta = XRAY_ASSEMBLIES.find((a) => a.id === c.to);
+          const fa = assemblies.find((a) => a.id === c.from);
+          const ta = assemblies.find((a) => a.id === c.to);
           if (!fa || !ta) return null;
           const fp = fa.hotspot3d.split(' ').map(Number);
           const tp = ta.hotspot3d.split(' ').map(Number);

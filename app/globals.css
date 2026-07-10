@@ -30,6 +30,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .navitem:hover { background: #fff !important; color: #0B0B0C !important; }
+.vehrow:hover { background: rgba(255,255,255,.05) !important; }
 .swatch:hover { transform: scale(1.06); }
 .recrow:hover { background: #FAFAFA !important; }
 .hs:hover .hslabel { opacity: 1 !important; }

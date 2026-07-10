@@ -8,6 +8,8 @@ import { useVehicle } from '@/lib/vehicle-context';
 import { createClient } from '@/lib/supabase/client';
 import { isAdminEmail } from '@/lib/admin';
 import { DEMO_MODE } from '@/lib/demo';
+import VehicleSwitcher from './VehicleSwitcher';
+import AddVehicleModal from './AddVehicleModal';
 
 const NAV: { no: string; label: string; href: string }[] = [
   { no: '01', label: 'Garage', href: '/garage' },
@@ -29,7 +31,9 @@ export default function Sidebar({
   onClose?: () => void;
 } = {}) {
   const pathname = usePathname();
-  const { vehicle: VEHICLE, needsSetup } = useVehicle();
+  const { vehicle: VEHICLE, vehicles, needsSetup } = useVehicle();
+  const [switcherOpen, setSwitcherOpen] = useState(false);
+  const [showAdd, setShowAdd] = useState(false);
 
   // The admin usage panel is visible only to the admin account (or in demo mode,
   // so it can be tested without a real session). The /api/admin route enforces
@@ -62,22 +66,48 @@ export default function Sidebar({
             </div>
           ) : (
             <>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ width: 30, height: 30, borderRadius: 3, background: VEHICLE.colorHex || '#2A2A2E', border: '1px solid rgba(255,255,255,.18)', flexShrink: 0 }} />
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ font: "500 13px/1.2 'Helvetica Neue',Arial,sans-serif", color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{VEHICLE.model || 'Your car'}</div>
-                  <div style={{ font: `500 10px/1.3 ${mono}`, letterSpacing: '.08em', color: '#76767B', marginTop: 2 }}>
-                    {[VEHICLE.year, VEHICLE.plate].filter(Boolean).join(' · ') || '—'}
+              <button
+                type="button"
+                onClick={() => setSwitcherOpen((o) => !o)}
+                aria-expanded={switcherOpen}
+                aria-label="Switch vehicle"
+                style={{ display: 'block', width: '100%', textAlign: 'left', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 30, height: 30, borderRadius: 3, background: VEHICLE.colorHex || '#2A2A2E', border: '1px solid rgba(255,255,255,.18)', flexShrink: 0 }} />
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <div style={{ font: "500 13px/1.2 'Helvetica Neue',Arial,sans-serif", color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{VEHICLE.model || 'Your car'}</div>
+                    <div style={{ font: `500 10px/1.3 ${mono}`, letterSpacing: '.08em', color: '#76767B', marginTop: 2 }}>
+                      {[VEHICLE.year, VEHICLE.plate].filter(Boolean).join(' · ') || '—'}
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexShrink: 0 }}>
+                    {vehicles.length > 1 && (
+                      <span style={{ font: `600 9px/1 ${mono}`, letterSpacing: '.08em', color: '#76767B' }}>{vehicles.length} CARS</span>
+                    )}
+                    <span style={{ font: `400 10px/1 ${mono}`, color: '#9A9AA0', transition: 'transform .18s', transform: switcherOpen ? 'rotate(180deg)' : 'none' }}>▾</span>
                   </div>
                 </div>
-              </div>
-              <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between', font: `500 10px/1 ${mono}`, letterSpacing: '.08em', color: '#76767B' }}>
-                <span>ODO</span><span style={{ color: '#fff' }}>{VEHICLE.mileage ? fmtMiles(VEHICLE.mileage) : '—'}</span>
-              </div>
+                <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between', font: `500 10px/1 ${mono}`, letterSpacing: '.08em', color: '#76767B' }}>
+                  <span>ODO</span><span style={{ color: '#fff' }}>{VEHICLE.mileage ? fmtMiles(VEHICLE.mileage) : '—'}</span>
+                </div>
+              </button>
+
+              {switcherOpen && (
+                <VehicleSwitcher
+                  onAdd={() => {
+                    setShowAdd(true);
+                    setSwitcherOpen(false);
+                  }}
+                  onPicked={() => setSwitcherOpen(false)}
+                />
+              )}
             </>
           )}
         </div>
       </div>
+
+      <AddVehicleModal open={showAdd} onClose={() => setShowAdd(false)} />
 
       <nav style={{ padding: '14px 12px', flex: 1 }}>
         {items.map((it) => {

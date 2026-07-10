@@ -58,7 +58,7 @@
     "intervalMiles": 40000,
     "intervalMonths": 48,
     "system": "Engine",
-    "notes": "987.1 only (M96/M97, 2005-2008). Six plugs. Commonly cited as 4yr/40k; some sources/owners cite the earlier 987.1 figure as 36k mi - treat exact mileage as MEDIUM confidence, but the 4-year time limit is firm. Replace even on low-mileage cars to avoid seizing in the alloy head.",
+    "notes": "987.1 only (M96/M97, 2005-2008). Six plugs. NOTE: the official 987.1 checklists (PNA 000 162 EC/ED/EE, 2008) specify 36,000 mi / 4 years - treat 36k as the authoritative 987.1 figure; the 40k shown here matches Porsche's later 2009 (987.2) schedule (PNA 000 162 EH). Either way the 4-year time limit is firm. Replace even on low-mileage cars to avoid seizing in the alloy head.",
     "source": "https://rennlist.com/forums/981-forum/1140352-spark-plug-replace-time-or-mileage-dependent.html"
   },
   {
@@ -93,7 +93,7 @@
     "intervalMiles": 60000,
     "intervalMonths": 72,
     "system": "Engine",
-    "notes": "Inspect at each service; replace around 6yr / 60k. Applies to all 987.1 and 987.2.",
+    "notes": "Inspect at each service; replace around 6yr / 60k. Official cadence: CHECK the poly-V drive belt at 40k/100k/160k mi (2009 987.2 schedule PNA 000 162 EH) or 36k/84k/132k mi (2008 987.1 checklists), and REPLACE it at 60,000 mi / 6 years (LO 03 83 00). Applies to all 987.1 and 987.2.",
     "source": "https://www.pcarwise.com/local-help/porsche-maintenance-schedules/boxster-maintenance/987-boxster-maintenance-schedule/"
   },
   {
@@ -128,7 +128,7 @@
     "intervalMiles": 60000,
     "intervalMonths": 72,
     "system": "Transmission",
-    "notes": "987.1 Tiptronic S only (ZF 5HP19 5-speed auto, 2005-2008). Porsche officially calls this a lifetime/'fill-for-life' fluid (no scheduled change), which is heavily debated - specialists and owners strongly recommend servicing every ~4-6yr / 40-60k (interval shown reflects that recommendation, MEDIUM confidence; there is NO firm factory mileage). A drain-and-fill only recovers ~3.5 L because the torque converter retains the rest. Use ZF Lifeguard 5 ATF.",
+    "notes": "987.1 Tiptronic S only (ZF 5HP19 5-speed auto, 2005-2008). Porsche markets this as a lifetime/'fill-for-life' fluid for normal use, but the official 2008 checklists (PNA 000 162 EC/EE) DO schedule a Tiptronic ATF + ATF-filter change at 108,000 mi / 12 years. Specialists and owners strongly recommend an interim service every ~4-6yr / 40-60k (the 60k/6yr interval shown reflects that specialist recommendation, MEDIUM confidence). A drain-and-fill only recovers ~3.5 L because the torque converter retains the rest. Use ZF Lifeguard 5 ATF.",
     "source": "https://www.pelicanparts.com/techarticles/Boxster_Tech/35-TRANS-Auto_Fluid_Change/35-TRANS-Auto_Fluid_Change.htm"
   },
   {
@@ -137,7 +137,7 @@
     "intervalMiles": 60000,
     "intervalMonths": 72,
     "system": "Transmission",
-    "notes": "987.1 Tiptronic only. On the auto the final drive is SEPARATE from the ATF (~0.8 L of 75W-90). There is no drain plug - old oil is suctioned out and refilled via the fill plug. No official interval; service alongside the ATF (LOW confidence on interval).",
+    "notes": "987.1 Tiptronic only. On the auto the final drive is SEPARATE from the ATF (~0.8 L of 75W-90). There is no drain plug - old oil is suctioned out and refilled via the fill plug. The official 2008 Porsche checklists (PNA 000 162 EC/EE) schedule this final-drive oil change at 108,000 mi / 12 years, alongside the Tiptronic ATF + filter service.",
     "source": "https://www.pca.org/tech/2008-base-boxster-9871-tiptronic-does-the-differential-final-drive-contain-approximately-08liters-of-75w90-gear-oil-can-i-change-this-oil-by-suctionin"
   },
   {
@@ -206,5 +206,83 @@
     "system": "HVAC",
     "notes": "No fixed factory A/C service interval. Operation and vent temperature are checked at scheduled services; recharge R134a and service the receiver/drier only as needed (interval shown is a practical check cadence, LOW confidence). All 987 years.",
     "source": "https://houseautogroup.com/porsche-boxster-cayman-maintenance-guide/"
+  },
+  {
+    "id": "maint-minor-service",
+    "task": "Minor maintenance service (scope)",
+    "intervalMiles": 12000,
+    "intervalMonths": 12,
+    "system": "Body",
+    "notes": "Porsche's official 'Minor Maintenance' operation (Labor Operation 03 24 00), due every 12,000 mi / 1 year on the 987.1 (mileage cadence 12k/48k/84k/120k; time cadence 1/4/7/10 yr). Scope: read fault memory & reset the service-interval indicator, change engine oil & filter, replace the pollen/cabin filter, check coolant level & antifreeze, and a full visual inspection of leaks, coolant hoses, radiators/air intakes, brake pads/discs/hoses/lines, drive-shaft boots, tyres, body drains, lighting and battery, plus a road test. The engine air-filter element is NOT part of the minor service (renewed at the major service). On the 987.2 (2009-2012) Porsche instead schedules the oil change every 10k mi/1yr with the larger 'Maintenance' items at 40k/4yr. Recent Porsche literature widened some Boxster minor intervals to 20k mi/2yr - defer to the owner's manual.",
+    "source": "Porsche PNA 000 162 EC — 987/997 Minor Maintenance Checklist (LO 03 24 00, Edition 11/07)"
+  },
+  {
+    "id": "maint-major-service",
+    "task": "Major maintenance service (scope)",
+    "intervalMiles": 36000,
+    "intervalMonths": 36,
+    "system": "Body",
+    "notes": "Porsche's official 'Major Maintenance' operation (Labor Operation 03 26 00) for the 987.1, due every 36,000 mi / 3 years (36k/72k/108k/144k mi; 3/6/9/12 yr). Includes everything in the minor service PLUS renewing the engine air-filter element, plus added chassis/driveline checks: fuel lines, parking-brake free play, clutch pedal play & end position, steering-gear and axle-joint / tie-rod / drive-shaft dust boots, exhaust system, seat belts, and all rubber/hydraulic running-gear mounts. On the 987.2 (2009-2012) the equivalent is the 'Maintenance' operation (LO 03 16 00) performed every 40,000 mi / 4 years alongside the annual oil change.",
+    "source": "Porsche PNA 000 162 EE — 987/997 Major Maintenance Checklist (LO 03 26 00, Edition 11/07); 987.2 per PNA 000 162 EH (2009)"
+  },
+  {
+    "id": "maint-convertible-top",
+    "task": "Convertible top service (clean, lubricate & care)",
+    "intervalMiles": 20000,
+    "intervalMonths": 24,
+    "system": "Body",
+    "notes": "Boxster only (Labor Operation 03 70 00) - clean, lubricate and care for the convertible-top mechanism and seals. The 2009 987.2 schedule (PNA 000 162 EH) lists 20,000 mi / 2 years; the earlier 2008 987.1 checklists list 12,000 mi / 1 year. Not applicable to the Cayman (fixed roof).",
+    "source": "Porsche PNA 000 162 EH (2009, 20k/2yr) and PNA 000 162 EC (2008, 12k/1yr) — 987/997 maintenance checklists"
+  },
+  {
+    "id": "maint-tpm-battery",
+    "task": "Tyre-pressure-monitoring (TPM) system battery check",
+    "intervalMonths": 48,
+    "system": "Wheels",
+    "notes": "For cars with the Tire Pressure Monitoring option: the in-wheel TPM sensors run on non-replaceable batteries. Porsche schedules a first check after 4 years, then every 2 years thereafter (time-based only). A depleted sensor must be replaced as a unit. Applies to all 987 so equipped.",
+    "source": "Porsche PNA 000 162 EH (2009) / EC / EE — 987/997 maintenance checklists"
+  },
+  {
+    "id": "maint-airbag-inspection",
+    "task": "Airbag (SRS) restraint-system inspection",
+    "intervalMonths": 48,
+    "system": "Body",
+    "notes": "Porsche schedules an airbag / restraint-system inspection after 4 years, again at 8 and 10 years, then every 2 years thereafter. Time-based only (no mileage trigger). Applies to all 987.1 and 987.2.",
+    "source": "Porsche PNA 000 162 EH (2009) / EC / EE — 987/997 maintenance checklists"
+  },
+  {
+    "id": "maint-rollover-protection",
+    "task": "Roll-over protection system check (Boxster)",
+    "intervalMonths": 24,
+    "system": "Body",
+    "notes": "Boxster (Cabriolet) only - the pop-up roll-over bars behind the seats are function-checked every 2 years, performed together with the biennial brake-fluid change. Not applicable to the Cayman.",
+    "source": "Porsche PNA 000 162 EH (2009) / EC / EE — 987/997 maintenance checklists"
+  },
+  {
+    "id": "maint-exhaust-inspection",
+    "task": "Exhaust system inspection",
+    "intervalMiles": 36000,
+    "intervalMonths": 36,
+    "system": "Exhaust",
+    "notes": "Visual inspection of the exhaust system for leaks and damage, and of its mounting and heat shields - performed at each major service (36k mi/3yr on the 987.1; part of the 40k/4yr Maintenance on the 987.2). All 987 years.",
+    "source": "Porsche PNA 000 162 EE — 987/997 Major Maintenance Checklist (LO 03 26 00, Edition 11/07)"
+  },
+  {
+    "id": "maint-suspension-inspection",
+    "task": "Running-gear / suspension inspection (joints, boots, mounts)",
+    "intervalMiles": 36000,
+    "intervalMonths": 36,
+    "system": "Suspension",
+    "notes": "Major-service chassis check: axle-joint and tie-rod play plus dust boots, drive-shaft CV boots, security of the front/rear running-gear (alignment) adjustment fasteners, and a visual inspection of all rubber/hydraulic assembly & running-gear mounts for damage. Every 36k mi/3yr on the 987.1 (part of the 40k/4yr Maintenance on the 987.2). All 987 years.",
+    "source": "Porsche PNA 000 162 EE — 987/997 Major Maintenance Checklist (LO 03 26 00, Edition 11/07)"
+  },
+  {
+    "id": "maint-steering-inspection",
+    "task": "Steering gear inspection & power-steering fluid check",
+    "intervalMiles": 36000,
+    "intervalMonths": 36,
+    "system": "Steering",
+    "notes": "Visual inspection of the steering-gear dust boots for damage plus a power-steering fluid-level check (the 987 uses HYDRAULIC steering with CHF 11S/202, unlike the electric-assist 981). Done at the major service (36k mi/3yr on the 987.1; part of the 40k/4yr Maintenance on the 987.2). All 987 years.",
+    "source": "Porsche PNA 000 162 EE — 987/997 Major Maintenance Checklist (Edition 11/07); Porsche GB Boxster Service Manual"
   }
 ]

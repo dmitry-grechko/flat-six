@@ -16,7 +16,7 @@ import WorkshopManual from '@/components/views/WorkshopManual';
 
 const mono = "'JetBrains Mono',monospace";
 
-const CATEGORY_ORDER: DocCategory[] = ['workshop', 'diagnostic', 'service-info', 'training'];
+const CATEGORY_ORDER: DocCategory[] = ['workshop', 'maintenance', 'parts', 'diagnostic', 'service-info', 'training'];
 
 export default function DocumentLibrary() {
   const router = useRouter();

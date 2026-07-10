@@ -13,6 +13,19 @@ license (CC BY 4.0 — https://creativecommons.org/licenses/by/4.0/). Required a
   licensed under [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/).
   Served as `public/models/cayman.glb`.
 
+- **"Porsche Cayman 987"** (https://skfb.ly/oQzBB) by **Mona x Supercars**,
+  licensed under [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/).
+  Served as `public/models/cayman-987.glb`.
+
+- **"2010 Porsche Boxster Spyder"** (https://skfb.ly/pBAu9) by **Ddiaz Design**,
+  licensed under [CC BY-NC-SA 4.0](http://creativecommons.org/licenses/by-nc-sa/4.0/).
+  Served as `public/models/spyder-987.glb`.
+
+  > ⚠ **Licence caveat:** unlike the CC-BY models above, this asset is
+  > **NonCommercial + ShareAlike**. FLAT·SIX is a non-commercial project, so the
+  > NonCommercial term is fine — but any redistributed derivative of this model
+  > must stay under the same CC BY-NC-SA licence.
+
 The in-app attribution is shown in the Garage 3D viewer (exterior view).
 
 ## Procedural models (internals)

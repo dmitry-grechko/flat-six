@@ -33,6 +33,11 @@ const TARGETS = [
     dir: path.join(PUBLIC, 'mobile_tech_library/Diagnostic Information/987 Boxster-Cayman'),
   },
   {
+    generation: '987',
+    source: 'mtl-service',
+    dir: path.join(PUBLIC, 'mobile_tech_library/987 Maintenance'),
+  },
+  {
     generation: null,
     source: 'mtl-sit',
     dir: path.join(PUBLIC, 'mobile_tech_library/Service Information Technik/Boxster-Cayman'),
@@ -190,7 +195,8 @@ function chunkPdf(pdfPath, { generation, source, uniqueId }) {
   const groupLabel =
     source === 'mtl-diagnostic' ? 'Diagnostic' :
     source === 'mtl-sit' ? 'Service Information' :
-    source === 'mtl-training' ? 'Training' : null;
+    source === 'mtl-training' ? 'Training' :
+    source === 'mtl-service' ? 'Maintenance' : null;
 
   for (let ci = 0; ci < chunks.length; ci++) {
     const c = chunks[ci];

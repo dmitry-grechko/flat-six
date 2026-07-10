@@ -2,14 +2,17 @@
 // Verifies that every PRIMARY part in each *-parts.json has a matching named
 // node in the corresponding generated GLB (so the app can place a pin on it).
 //
-//   node tools/gen/verify-coverage.mjs
+//   node tools/gen/verify-coverage.mjs            # 981 (default)
+//   node tools/gen/verify-coverage.mjs --gen 987  # 987 set
 
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { readFileSync } from 'node:fs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const DIR = join(__dirname, '..', '..', 'public', 'models', 'components');
+const genArg = process.argv.indexOf('--gen');
+const GEN = genArg >= 0 ? process.argv[genArg + 1] : '981';
+const DIR = join(__dirname, '..', '..', 'public', 'models', 'components', ...(GEN === '981' ? [] : [GEN]));
 
 function glbNodeNames(path) {
   const buf = readFileSync(path);

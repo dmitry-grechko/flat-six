@@ -1,0 +1,214 @@
+{
+  "glb": "/models/components/987/fbrakes.glb",
+  "parts": [
+    {
+      "id": "susp-brk-001",
+      "node": "frontBrakeRotorLeft",
+      "label": "Front Brake Rotor — 318mm Cross-Drilled Vented (Left)",
+      "assembly": "Rotors",
+      "system": "Brakes",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "318 x 28 mm cross-drilled, involute-shaped internally vented cast-iron disc. On the 987.2 (from MY2009) all models run this front disc — the basic Boxster/Cayman moved up from the 987.1's 298 x 24 mm to the S size.",
+      "componentId": "fbrakes"
+    },
+    {
+      "id": "susp-brk-001-r",
+      "node": "frontBrakeRotorRight",
+      "label": "Front Brake Rotor — 318mm Cross-Drilled Vented (Right)",
+      "assembly": "Rotors",
+      "system": "Brakes",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "318 x 28 mm cross-drilled, involute-shaped internally vented cast-iron disc. On the 987.2 (from MY2009) all models run this front disc — the basic Boxster/Cayman moved up from the 987.1's 298 x 24 mm to the S size.",
+      "componentId": "fbrakes"
+    },
+    {
+      "id": "susp-brk-003",
+      "node": "frontBrakeCaliperLeft",
+      "label": "Front Brake Caliper — 4-Piston Monobloc (Left)",
+      "assembly": "Calipers",
+      "system": "Brakes",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Fixed 4-piston aluminium monobloc caliper clamping the pads against the front left rotor. Black anodized on the 2.9 base cars, red on Boxster S / Cayman S, yellow with the optional PCCB ceramic brake.",
+      "componentId": "fbrakes"
+    },
+    {
+      "id": "susp-brk-003-r",
+      "node": "frontBrakeCaliperRight",
+      "label": "Front Brake Caliper — 4-Piston Monobloc (Right)",
+      "assembly": "Calipers",
+      "system": "Brakes",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Fixed 4-piston aluminium monobloc caliper clamping the pads against the front right rotor. Black anodized on the 2.9 base cars, red on Boxster S / Cayman S, yellow with the optional PCCB ceramic brake.",
+      "componentId": "fbrakes"
+    },
+    {
+      "id": "susp-brk-005-front",
+      "node": "frontBrakePads",
+      "label": "Front Brake Pads",
+      "assembly": "Calipers",
+      "system": "Brakes",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Friction pads inside the fixed monobloc caliper. Front-left carries the wear sensor; bed new pads in gently over the first ~200 miles.",
+      "parent": "susp-brk-003"
+    },
+    {
+      "id": "susp-brk-006",
+      "node": "brakeMasterCylinder",
+      "label": "Brake Master Cylinder",
+      "assembly": "Hydraulics",
+      "system": "Brakes",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Tandem master cylinder converting brake pedal force into hydraulic pressure for both brake circuits, mounted on the booster at the front bulkhead.",
+      "componentId": "fbrakes"
+    },
+    {
+      "id": "susp-brk-007",
+      "node": "brakeBooster",
+      "label": "Brake Booster (Vacuum Servo)",
+      "assembly": "Hydraulics",
+      "system": "Brakes",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Vacuum servo amplifying pedal input before the master cylinder. For MY2009 the boost ratio was raised to i=5.0 with the steel-disc brake (i=4.5 is retained with PCCB).",
+      "parent": "susp-brk-006"
+    },
+    {
+      "id": "susp-brk-008",
+      "node": "absHydraulicControlUnit",
+      "label": "ABS/PSM Hydraulic Control Unit",
+      "assembly": "Hydraulics",
+      "system": "Brakes",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "PSM hydraulic modulator (4-channel ABS, ABD, ASR, MSR, EBD) regulating pressure per wheel. The 987.2 unit adds enhanced longitudinal dynamics control: brake pre-filling, brake assist and drive-off assistant.",
+      "componentId": "fbrakes"
+    },
+    {
+      "id": "susp-brk-009-front",
+      "node": "frontBrakeLines",
+      "label": "Front Brake Lines — Hard Lines and Flex Hoses",
+      "assembly": "Hydraulics",
+      "system": "Brakes",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Transmits hydraulic fluid pressure from the ABS/PSM unit to the front brake calipers via steel hard lines and flexible hoses at the struts.",
+      "parent": "susp-brk-008"
+    },
+    {
+      "id": "susp-brk-011",
+      "node": "brakeFluidReservoir",
+      "label": "Brake Fluid Reservoir",
+      "assembly": "Hydraulics",
+      "system": "Brakes",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Stores and supplies brake fluid to the master cylinder while accommodating fluid volume changes as pads wear. Fluid change every 2 years on the 987 schedule.",
+      "parent": "susp-brk-006"
+    },
+    {
+      "id": "susp-brk-012-fl",
+      "node": "wheelSpeedSensorFrontLeft",
+      "label": "Wheel Speed Sensor — Front Left",
+      "assembly": "Sensors",
+      "system": "Brakes",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Provides real-time front left wheel rotational speed data to the ABS/PSM control unit for slip detection and stability interventions.",
+      "componentId": "fbrakes"
+    },
+    {
+      "id": "susp-brk-012-fr",
+      "node": "wheelSpeedSensorFrontRight",
+      "label": "Wheel Speed Sensor — Front Right",
+      "assembly": "Sensors",
+      "system": "Brakes",
+      "tier": "primary",
+      "partNumber": null,
+      "function": "Provides real-time front right wheel rotational speed data to the ABS/PSM control unit for slip detection and stability interventions.",
+      "componentId": "fbrakes"
+    },
+    {
+      "id": "front-brakes-new-001",
+      "node": "frontBrakeDustShieldLeft",
+      "label": "Front Brake Dust Shield (Cover Plate) — Left",
+      "assembly": "Rotors",
+      "system": "Brakes",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Shields the front left brake rotor and caliper from road debris, splash water, and dirt ingress.",
+      "parent": "susp-brk-001"
+    },
+    {
+      "id": "front-brakes-new-002",
+      "node": "frontBrakeDustShieldRight",
+      "label": "Front Brake Dust Shield (Cover Plate) — Right",
+      "assembly": "Rotors",
+      "system": "Brakes",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Shields the front right brake rotor and caliper from road debris, splash water, and dirt ingress.",
+      "parent": "susp-brk-001-r"
+    },
+    {
+      "id": "front-brakes-new-003",
+      "node": "frontCaliperRepairSet",
+      "label": "Front Brake Caliper Repair Set (Seals & Pistons)",
+      "assembly": "Calipers",
+      "system": "Brakes",
+      "tier": "sub",
+      "partNumber": "996.351.915.00",
+      "function": "Replacement seal and piston kit for rebuilding the front fixed caliper to restore hydraulic integrity and prevent fluid leaks.",
+      "parent": "susp-brk-003"
+    },
+    {
+      "id": "front-brakes-new-004",
+      "node": "brakeFluidBottle",
+      "label": "Brake Fluid (DOT 4)",
+      "assembly": "Hydraulics",
+      "system": "Brakes",
+      "tier": "sub",
+      "partNumber": "000.043.210.82",
+      "function": "High-performance DOT 4 hydraulic fluid filling the brake circuit to transmit pedal force to all four calipers; replace every 2 years (hygroscopic).",
+      "parent": "susp-brk-011"
+    },
+    {
+      "id": "front-brakes-new-005",
+      "node": "caliperBleederValve",
+      "label": "Brake Caliper Bleeder Valve",
+      "assembly": "Calipers",
+      "system": "Brakes",
+      "tier": "sub",
+      "partNumber": "997.352.919.00",
+      "function": "One-way valve on each caliper used to purge air from the brake hydraulic circuit during bleeding.",
+      "parent": "susp-brk-003"
+    },
+    {
+      "id": "front-brakes-new-006",
+      "node": "absHydraulicUnitBracket",
+      "label": "ABS Hydraulic Unit Mounting Bracket",
+      "assembly": "Hydraulics",
+      "system": "Brakes",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Secures the ABS/PSM hydraulic control unit to the chassis to prevent vibration-induced damage to hydraulic connections.",
+      "parent": "susp-brk-008"
+    },
+    {
+      "id": "front-brakes-new-007",
+      "node": "brakeBoosterVacuumLine",
+      "label": "Brake Booster Vacuum Line",
+      "assembly": "Hydraulics",
+      "system": "Brakes",
+      "tier": "sub",
+      "partNumber": null,
+      "function": "Supplies engine vacuum to the brake servo booster to maintain pedal assistance under all operating conditions.",
+      "parent": "susp-brk-007"
+    }
+  ]
+}

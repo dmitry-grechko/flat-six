@@ -1,4 +1,5 @@
 import type { EnginePart, PartsManifest } from '@/lib/types';
+import { XRAY_ASSEMBLIES_987 } from './xray-assemblies-987';
 
 /** The inspectable assemblies available in the X-RAY view. */
 export interface XrayAssembly {
@@ -87,6 +88,11 @@ export const XRAY_ASSEMBLIES: XrayAssembly[] = [
   // Fuel tank packaging (WM 20 Overview Of Fuel Tank Component ~4310) — low ahead of cabin.
   { id: 'fuel',      label: 'Fuel Tank',         glb: '/models/components/fuel.glb',      manifest: '/models/components/fuel-parts.json',      hotspot3d: '0 -0.08 0.95', displayRadius: 0.55 },
 ];
+
+/** Assembly set per garage generation ('981' default, '987' has its own file). */
+export function xrayAssembliesFor(generation: string): XrayAssembly[] {
+  return generation === '987' ? XRAY_ASSEMBLIES_987 : XRAY_ASSEMBLIES;
+}
 
 /**
  * Fetch + cache a parts manifest per assembly. Resolves to [] if the manifest

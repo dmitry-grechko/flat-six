@@ -28,13 +28,37 @@ if (!url || !key) {
   process.exit(1);
 }
 
+// Map a local path (relative to public/, POSIX) → model-first Storage key.
+// MUST match lib/documents.ts `storeKey(...)` so signed URLs resolve.
+function storageKeyFor(rel) {
+  const r = rel.split(path.sep).join('/');
+  let m;
+  if ((m = r.match(/^manual\/(981-workshop-manual-v[123]\.pdf)$/))) return `981/workshop/${m[1]}`;
+  const MTL = 'mobile_tech_library/';
+  if (r.startsWith(MTL)) {
+    const sub = r.slice(MTL.length);
+    if ((m = sub.match(/^Diagnostic Information\/981 Boxster-Cayman\/(.+)$/))) return `981/diagnostic/${m[1]}`;
+    if ((m = sub.match(/^Diagnostic Information\/987 Boxster-Cayman\/(.+)$/))) return `987/diagnostic/${m[1]}`;
+    if ((m = sub.match(/^Service Information Technik\/Boxster-Cayman\/(.+)$/))) {
+      const file = m[1];
+      const year = parseInt(file.slice(0, 4), 10);
+      const gen = Number.isFinite(year) && year >= 2012 ? '981' : '987';
+      return `${gen}/service-info/${file}`;
+    }
+    if ((m = sub.match(/^Training Books\/(.+)$/))) return `shared/training/${m[1]}`;
+    if ((m = sub.match(/^987 Maintenance\/(.+)$/))) return `987/maintenance/${m[1]}`;
+    if ((m = sub.match(/^981 Parts\/(.+)$/))) return `981/parts/${m[1]}`;
+  }
+  return r; // fallback: unchanged
+}
+
 function collectLocalFiles() {
   const files = [];
 
   // Prefer compressed Free-tier volumes (<50 MB each). Fall back to the full
   // 213 MB PDF only when volumes are missing (will 413 on Free plans).
   const volumeFiles = [1, 2, 3].map((n) => ({
-    storagePath: `981-workshop-manual-v${n}.pdf`,
+    storagePath: `981/workshop/981-workshop-manual-v${n}.pdf`,
     local: path.join(PUBLIC, `manual/981-workshop-manual-v${n}.pdf`),
   }));
   const volumesPresent = volumeFiles.filter((f) => fs.existsSync(f.local));
@@ -44,7 +68,7 @@ function collectLocalFiles() {
     } else {
       const workshop = path.join(PUBLIC, 'manual/981-workshop-manual.pdf');
       if (fs.existsSync(workshop)) {
-        files.push({ storagePath: '981-workshop-manual.pdf', local: workshop });
+        files.push({ storagePath: '981/workshop/981-workshop-manual.pdf', local: workshop });
       }
     }
   }
@@ -76,13 +100,15 @@ function collectLocalFiles() {
       if (ent.isDirectory()) walk(p, filter);
       else if (ent.name.toLowerCase().endsWith('.pdf') && (!filter || filter(ent.name))) {
         const rel = path.relative(PUBLIC, p).split(path.sep).join('/');
-        files.push({ storagePath: rel, local: p });
+        files.push({ storagePath: storageKeyFor(rel), local: p });
       }
     }
   }
 
   walk(path.join(PUBLIC, 'mobile_tech_library/Diagnostic Information/981 Boxster-Cayman'));
   walk(path.join(PUBLIC, 'mobile_tech_library/Diagnostic Information/987 Boxster-Cayman'));
+  walk(path.join(PUBLIC, 'mobile_tech_library/987 Maintenance'));
+  walk(path.join(PUBLIC, 'mobile_tech_library/981 Parts'));
   walk(path.join(PUBLIC, 'mobile_tech_library/Service Information Technik/Boxster-Cayman'), (n) => sitAllow.has(n));
   walk(path.join(PUBLIC, 'mobile_tech_library/Training Books'), (n) => trainAllow.has(n));
   return files;

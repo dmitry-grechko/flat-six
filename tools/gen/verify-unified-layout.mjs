@@ -21,9 +21,15 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..', '..');
-const ASSEMBLIES_TS = join(ROOT, 'components/garage/xray-assemblies.ts');
-const FLOW_TS = join(ROOT, 'components/garage/flow-systems.ts');
-const OUT_MD = join(ROOT, 'tools/gen/wm-refs/notes/unified-layout-report.md');
+
+// Generation select: `--gen 987` validates the 987 assembly/flow set.
+const genArg = process.argv.indexOf('--gen');
+const GEN = genArg >= 0 ? process.argv[genArg + 1] : '981';
+const GEN_SUFFIX = GEN === '981' ? '' : `-${GEN}`;
+const ASSEMBLIES_TS = join(ROOT, `components/garage/xray-assemblies${GEN_SUFFIX}.ts`);
+const FLOW_TS = join(ROOT, `components/garage/flow-systems${GEN_SUFFIX}.ts`);
+const ASSEMBLIES_MARKER = `export const XRAY_ASSEMBLIES${GEN === '981' ? '' : `_${GEN}`}`;
+const OUT_MD = join(ROOT, `tools/gen/wm-refs/notes/unified-layout-report${GEN_SUFFIX}.md`);
 
 const AXLE = { frontZ: 1.5, rearZ: -1.5, halfTrack: 0.82, hubY: -0.35 };
 
@@ -74,7 +80,7 @@ const writeReport = !process.argv.includes('--no-report');
 // ── Parse assemblies from TS (single source of truth) ───────────────────────
 
 function extractAssembliesArray(src) {
-  const marker = 'export const XRAY_ASSEMBLIES';
+  const marker = ASSEMBLIES_MARKER;
   const start = src.indexOf(marker);
   if (start < 0) throw new Error('XRAY_ASSEMBLIES not found');
   // Skip the TypeScript `Type[]` and land on the value's opening `[`
