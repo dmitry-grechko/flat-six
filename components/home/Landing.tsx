@@ -78,6 +78,7 @@ export default function Landing() {
             {[
               ['#inspect', 'Inspect'],
               ['#do', 'Features'],
+              ['#tools', 'Tools'],
               ['#documents', 'Documents'],
               ['#ai', 'Assistant'],
               ['#opensource', 'Open source'],
@@ -111,7 +112,7 @@ export default function Landing() {
               <span style={{ fontWeight: 500 }}>Ask any AI.</span>
             </h1>
             <p style={{ maxWidth: 440, margin: '24px 0 0', font: `400 16px/1.65 ${sans}`, color: '#9A9AA0' }}>
-              A multi-car garage for the 987 and 981: full 3D X-ray, 17,000+ pages of factory documents, service history &amp; plans — connected to Claude, OpenAI, or Gemini.
+              A multi-car garage for the 987 and 981: full 3D X-ray, 17,000+ pages of factory documents, service history, plans &amp; DIY wheel/alignment tools — connected to Claude, OpenAI, or Gemini.
             </p>
             <div style={{ marginTop: 32, display: 'flex', gap: 13, flexWrap: 'wrap' }}>
               <Link href={GARAGE} className="cta" style={{ ...ctaStyle, height: 50, display: 'flex', alignItems: 'center', gap: 10, padding: '0 26px' }}>
@@ -251,8 +252,18 @@ export default function Landing() {
         visual={<DocumentsPanel />}
       />
 
-      {/* Row 5: multi-vehicle */}
+      {/* Row 5: DIY tools */}
       <FeatureRow
+        id="tools"
+        kicker="DIY TOOLS"
+        title="Will it fit? Do the math."
+        body="Native wheel & tyre tools — save the disks you own and check any tyre against them (rim fit, rolling diameter, speedo error, poke &amp; clearance), plus tyre-size, offset, staggered-diameter and alignment calculators with visual diagrams. Our own math, no third-party site."
+        visual={<ToolsPanel />}
+      />
+
+      {/* Row 6: multi-vehicle */}
+      <FeatureRow
+        reverse
         kicker="MULTI-CAR GARAGE"
         title="Run more than one Porsche."
         body="Add every Boxster and Cayman you own — 987 or 981 — and switch between them in one click. History, plans, documents and AI context stay scoped to the car you're looking at."
@@ -499,6 +510,34 @@ function FaultPanel() {
             >
               {f.likely.toUpperCase()}
             </span>
+          </div>
+        ))}
+      </div>
+    </Screenshot>
+  );
+}
+
+const FIT_CHECKS = [
+  { label: 'Tyre ↔ rim', text: 'Ideal — 265 on 9.5J', warn: false },
+  { label: 'Diameter', text: '−4 mm (−0.6%) vs OEM', warn: false },
+  { label: 'Speedo', text: 'reads high 0.6%', warn: false },
+  { label: 'Clearance', text: '+6 mm poke — check fender', warn: true },
+];
+
+function ToolsPanel() {
+  return (
+    <Screenshot tab="FLAT·SIX / TOOLS">
+      <div style={{ padding: 18 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 3 }}>
+          <span style={{ font: `700 11px/1 ${mono}`, letterSpacing: '.08em', color: '#1E8E4E' }}>FITS</span>
+          <span style={{ font: `400 15px/1.2 ${sans}`, color: '#0B0B0C' }}>265/40R19 on 9.5J</span>
+        </div>
+        <div style={{ font: `500 9px/1 ${mono}`, letterSpacing: '.12em', color: '#9A9AA0', marginBottom: 12 }}>WILL IT FIT? · REAR</div>
+        {FIT_CHECKS.map((c, i) => (
+          <div key={c.label} style={{ display: 'flex', gap: 10, alignItems: 'baseline', padding: '9px 0', borderTop: i ? '1px solid #F0F0F1' : 'none' }}>
+            <span style={{ width: 7, height: 7, borderRadius: '50%', flexShrink: 0, background: c.warn ? '#C77700' : '#1E8E4E', transform: 'translateY(1px)' }} />
+            <span style={{ font: `500 10px/1.3 ${mono}`, letterSpacing: '.04em', color: '#9A9AA0', width: 74, flexShrink: 0, textTransform: 'uppercase' }}>{c.label}</span>
+            <span style={{ font: `400 13px/1.4 ${sans}`, color: '#3A3A3E' }}>{c.text}</span>
           </div>
         ))}
       </div>
