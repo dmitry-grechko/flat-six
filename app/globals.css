@@ -42,6 +42,7 @@ a { color: inherit; text-decoration: none; }
 .pin:hover .pinlabel { opacity: 1 !important; }
 .cta:hover { background: #B00018 !important; }
 .ghost:hover { border-color: #0B0B0C !important; color: #0B0B0C !important; }
+.ghostDark:hover { border-color: #fff !important; color: #fff !important; }
 
 /* Landing page (home) responsive — collapse the multi-column sections */
 @media (max-width: 880px) {
@@ -119,6 +120,7 @@ model-viewer { width: 100%; height: 100%; --poster-color: transparent; }
   .landing h1 { font-size: 42px !important; }
   .landing h2 { font-size: 30px !important; }
   .landingMcpGrid { grid-template-columns: 1fr 1fr !important; }
+  .heroValueStrip { grid-template-columns: 1fr !important; }
 }
 @media (max-width: 440px) {
   .landingMcpGrid { grid-template-columns: 1fr !important; }

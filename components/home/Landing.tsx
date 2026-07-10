@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 
 const mono = "'JetBrains Mono',monospace";
@@ -14,39 +13,26 @@ const SIGN_IN = '/auth/login';
 const GITHUB_REPO = 'https://github.com/dmitry-grechko/flat-six';
 const GITHUB_ISSUES = 'https://github.com/dmitry-grechko/flat-six/issues';
 
-type Pin = {
-  id: string;
-  name: string;
-  sys: string;
-  ix: number;
-  iy: number;
-  part: string;
-  torque: string;
-  interval: string;
-};
-
-const PREVIEW: Record<'front' | 'engine', Pin[]> = {
-  front: [
-    { id: 'cabin', name: 'Cabin / Pollen Filter', sys: 'HVAC', ix: 31, iy: 42, part: '991.572.219.01', torque: 'Clip-in', interval: 'Yearly / 20k mi' },
-    { id: 'battery', name: 'Auxiliary Battery', sys: 'ELECTRICAL', ix: 19, iy: 41, part: 'AGM 12V 70Ah', torque: 'Terminal 6 Nm', interval: '4–6 yr' },
-    { id: 'cooling', name: 'Front Radiators', sys: 'COOLING', ix: 14, iy: 54, part: '981.106.034', torque: 'Clamp 4 Nm', interval: 'Coolant 4 yr' },
-    { id: 'fbrakes', name: 'Front Brakes', sys: 'BRAKES', ix: 21, iy: 66, part: 'Pads 981.351.939', torque: 'Bolts 130 Nm', interval: 'Inspect yearly' },
-  ],
-  engine: [
-    { id: 'airfilter', name: 'Air Filter & Intake', sys: 'ENGINE', ix: 60, iy: 37, part: '981.110.131.00', torque: 'Airbox 4 Nm', interval: '6 yr / 40k mi' },
-    { id: 'plugs', name: 'Spark Plugs', sys: 'ENGINE', ix: 66, iy: 44, part: 'NGK 999.170.225.90 ×6', torque: '30 Nm', interval: '4 yr / 40k mi' },
-    { id: 'oil', name: 'Engine Oil & Filter', sys: 'ENGINE', ix: 62, iy: 57, part: 'Mahle OX 366D', torque: 'Drain 50 Nm', interval: 'Yearly · 0W-40 7.5 L' },
-    { id: 'trans', name: 'PDK Transaxle', sys: 'TRANSMISSION', ix: 76, iy: 51, part: 'Fluid 999.917.547.00', torque: '45 Nm', interval: '4 yr / 40k mi' },
-  ],
-};
-
 const COLORS = ['#C6C8CA', '#E8E8EA', '#131316', '#D5001C', '#27364E', '#EFC03B'];
 
+const HERO_VALUE = [
+  { k: 'X-RAY', v: 'Every system stripped' },
+  { k: '17k+', v: 'Workshop pages' },
+  { k: 'AI', v: 'Claude · OpenAI · Gemini' },
+];
+
 const STATS = [
-  { k: '2+', label: 'generations supported' },
-  { k: '987 · 981', label: 'Boxster & Cayman' },
-  { k: '130 Nm', label: 'wheel-bolt torque' },
-  { k: 'More', label: 'models coming' },
+  { k: '17k+', label: 'workshop manual pages' },
+  { k: '100+', label: 'factory documents' },
+  { k: '3 GB', label: 'of searchable knowledge' },
+  { k: 'Multi', label: 'vehicles per garage' },
+];
+
+const DOC_CATS = [
+  { cat: 'WORKSHOP', title: 'Factory service manuals', meta: '987.1 · 987.2 · 981 · ~17,700 pages' },
+  { cat: 'DIAGNOSTIC', title: 'DME, PDK, OBD & Mode 6', meta: 'Trouble codes · summary tables' },
+  { cat: 'TRAINING', title: 'Porsche training books', meta: 'Engine · chassis · electrical' },
+  { cat: 'SIT', title: 'Service Information Technik', meta: 'Yearbooks · model intros' },
 ];
 
 // Faithful sample data for the in-page "screenshots" of the real app screens.
@@ -79,27 +65,6 @@ const ctaStyle: React.CSSProperties = {
 };
 
 export default function Landing() {
-  const [view, setView] = useState<'front' | 'engine'>('front');
-  const [sel, setSel] = useState<string | null>(null);
-
-  const list = PREVIEW[view];
-  const selected = list.find((c) => c.id === sel) || null;
-  const setLayer = (v: 'front' | 'engine') => {
-    setView(v);
-    setSel(null);
-  };
-
-  const seg = (on: boolean): React.CSSProperties => ({
-    height: 30,
-    padding: '0 14px',
-    border: 'none',
-    font: `600 10px/1 ${mono}`,
-    letterSpacing: '.08em',
-    cursor: 'pointer',
-    background: on ? '#0B0B0C' : 'transparent',
-    color: on ? '#fff' : '#6E6E73',
-  });
-
   return (
     <div className="landing" style={{ fontFamily: sans, color: '#0B0B0C', background: '#ECECEE' }}>
       {/* ===== NAV ===== */}
@@ -113,6 +78,7 @@ export default function Landing() {
             {[
               ['#inspect', 'Inspect'],
               ['#do', 'Features'],
+              ['#documents', 'Documents'],
               ['#ai', 'Assistant'],
               ['#opensource', 'Open source'],
             ].map(([href, label]) => (
@@ -135,145 +101,75 @@ export default function Landing() {
       {/* ===== HERO ===== */}
       <section style={{ position: 'relative', background: '#0B0B0C', color: '#fff', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', right: -40, top: 48, font: `700 280px/.8 ${mono}`, color: '#121214', letterSpacing: '-.04em', userSelect: 'none', pointerEvents: 'none' }}>FLAT</div>
-        <div style={{ position: 'relative', maxWidth: 1200, margin: '0 auto', padding: '84px 28px 92px', display: 'grid', gridTemplateColumns: '1.05fr .95fr', gap: 56, alignItems: 'center' }} className="heroGrid landingHero">
+        <div style={{ position: 'relative', maxWidth: 1200, margin: '0 auto', padding: '72px 28px 40px', display: 'grid', gridTemplateColumns: '1fr 1.15fr', gap: 48, alignItems: 'center' }} className="heroGrid landingHero">
           {/* copy */}
           <div style={{ animation: 'fadeUp .5s ease' }}>
             <div style={{ font: `500 12px/1 ${mono}`, letterSpacing: '.26em', color: RED, marginBottom: 22 }}>FREE &amp; OPEN SOURCE · BOXSTER &amp; CAYMAN</div>
-            <h1 style={{ margin: 0, font: `300 56px/1.04 ${sans}`, letterSpacing: '-.02em' }}>
-              Every component<br />of your mid-engine<br />Porsche.
-              <br />
-              <span style={{ fontWeight: 500 }}>One garage.</span>
+            <h1 style={{ margin: 0, font: `300 52px/1.04 ${sans}`, letterSpacing: '-.02em' }}>
+              Know every system.<br />
+              Keep every record.<br />
+              <span style={{ fontWeight: 500 }}>Ask any AI.</span>
             </h1>
-            <p style={{ maxWidth: 468, margin: '26px 0 0', font: `400 16px/1.65 ${sans}`, color: '#9A9AA0' }}>
-              Built for the 987 and 981 — with more generations on the way. Explore your car in 3D, look up faults and specs for your generation, keep a full service history, and let an AI assistant help with all of it. Free, and open source.
+            <p style={{ maxWidth: 440, margin: '24px 0 0', font: `400 16px/1.65 ${sans}`, color: '#9A9AA0' }}>
+              A multi-car garage for the 987 and 981: full 3D X-ray, 17,000+ pages of factory documents, service history &amp; plans — connected to Claude, OpenAI, or Gemini.
             </p>
-            <div style={{ marginTop: 34, display: 'flex', gap: 13, flexWrap: 'wrap' }}>
+            <div style={{ marginTop: 32, display: 'flex', gap: 13, flexWrap: 'wrap' }}>
               <Link href={GARAGE} className="cta" style={{ ...ctaStyle, height: 50, display: 'flex', alignItems: 'center', gap: 10, padding: '0 26px' }}>
                 Start your garage <span style={{ fontFamily: mono }}>→</span>
               </Link>
-              <a href="#inspect" className="ghost" style={{ height: 50, display: 'flex', alignItems: 'center', padding: '0 24px', background: 'transparent', color: '#C9C9CD', border: '1px solid #313135', borderRadius: 2, font: `600 12px/1 ${sans}`, letterSpacing: '.1em', textTransform: 'uppercase', transition: 'all .15s' }}>
+              <a href="#inspect" className="ghostDark" style={{ height: 50, display: 'flex', alignItems: 'center', padding: '0 24px', background: 'transparent', color: '#C9C9CD', border: '1px solid #313135', borderRadius: 2, font: `600 12px/1 ${sans}`, letterSpacing: '.1em', textTransform: 'uppercase', transition: 'all .15s' }}>
                 See what it does
               </a>
             </div>
-            <div style={{ marginTop: 46, display: 'flex', gap: 30, flexWrap: 'wrap', font: `500 11px/1 ${mono}`, letterSpacing: '.14em', color: '#5C5C61' }}>
-              <span>987 · 981</span>
-              <span>BOXSTER · CAYMAN</span>
-              <span>MORE COMING</span>
-            </div>
           </div>
 
-          {/* inspector card */}
+          {/* product shot — full X-ray */}
           <div style={{ animation: 'fadeUp .6s ease' }}>
-            <div style={{ background: '#fff', borderRadius: 6, boxShadow: '0 30px 70px rgba(0,0,0,.5)', overflow: 'hidden' }}>
-              <div style={{ height: 46, borderBottom: '1px solid #EAEAEC', display: 'flex', alignItems: 'center', gap: 9, padding: '0 14px' }}>
-                <div style={{ display: 'flex', background: '#F4F4F5', border: '1px solid #E2E2E4', borderRadius: 3, overflow: 'hidden' }}>
-                  <button onClick={() => setLayer('front')} style={seg(view === 'front')}>FRONT</button>
-                  <button onClick={() => setLayer('engine')} style={seg(view === 'engine')}>ENGINE</button>
-                </div>
-                <div style={{ marginLeft: 'auto', font: `500 9px/1 ${mono}`, letterSpacing: '.12em', color: '#B4B4B8' }}>981 FACTORY CUTAWAY</div>
+            <div style={{ background: '#fff', borderRadius: 8, boxShadow: '0 30px 70px rgba(0,0,0,.55)', overflow: 'hidden' }}>
+              <div style={{ height: 44, borderBottom: '1px solid #EAEAEC', display: 'flex', alignItems: 'center', gap: 10, padding: '0 14px' }}>
+                <span style={{ width: 8, height: 8, borderRadius: '50%', background: RED }} />
+                <span style={{ font: `600 10px/1 ${mono}`, letterSpacing: '.12em', color: '#0B0B0C' }}>X-RAY ON</span>
+                <span style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.1em', color: '#9A9AA0' }}>ALL SYSTEMS · STRIPPED</span>
+                <span style={{ marginLeft: 'auto', font: `500 9px/1 ${mono}`, letterSpacing: '.12em', color: '#B4B4B8' }}>987 · 981</span>
               </div>
-              <div style={{ position: 'relative', background: 'radial-gradient(120% 95% at 50% 35%,#FCFCFD,#E7E7EA)', padding: 20 }}>
-                <div style={{ position: 'relative', width: '100%' }}>
-                  <img
-                    src="/assets/cutaway-981.jpg"
-                    alt={`Porsche 981 ${view} cutaway`}
-                    style={{ width: '100%', display: 'block', filter: 'drop-shadow(0 16px 26px rgba(0,0,0,.2))' }}
-                  />
-                  {list.map((p, i) => {
-                    const active = p.id === sel;
-                    return (
-                      <button
-                        key={p.id}
-                        className="pin"
-                        onClick={() => setSel((cur) => (cur === p.id ? null : p.id))}
-                        style={{ position: 'absolute', left: `${p.ix}%`, top: `${p.iy}%`, transform: 'translate(-50%,-50%)', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', zIndex: active ? 20 : 10 }}
-                      >
-                        <span
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            width: 26,
-                            height: 26,
-                            borderRadius: '50%',
-                            background: active ? RED : '#0B0B0C',
-                            color: '#fff',
-                            font: `600 11px/1 ${mono}`,
-                            border: '2px solid #fff',
-                            boxShadow: '0 2px 7px rgba(0,0,0,.4)',
-                            animation: active ? 'hsPulse 1.6s infinite' : undefined,
-                          }}
-                        >
-                          {i + 1}
-                        </span>
-                        <span
-                          className="pinlabel"
-                          style={{
-                            pointerEvents: 'none',
-                            position: 'absolute',
-                            left: '50%',
-                            bottom: 34,
-                            transform: 'translateX(-50%)',
-                            whiteSpace: 'nowrap',
-                            background: '#0B0B0C',
-                            color: '#fff',
-                            padding: '4px 8px',
-                            borderRadius: 3,
-                            font: `500 9px/1 ${mono}`,
-                            opacity: active ? 1 : 0,
-                            transition: 'opacity .15s',
-                          }}
-                        >
-                          {p.name}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* detail / hint */}
-                {selected ? (
-                  <div style={{ marginTop: 14, background: '#0B0B0C', color: '#fff', borderRadius: 4, padding: '14px 16px', animation: 'fadeUp .2s ease' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 9 }}>
-                      <span style={{ font: `600 9px/1 ${mono}`, letterSpacing: '.1em', color: RED, border: `1px solid ${RED}`, borderRadius: 2, padding: '4px 6px' }}>{selected.sys}</span>
-                      <span style={{ font: `500 14px/1 ${sans}` }}>{selected.name}</span>
-                    </div>
-                    <div style={{ display: 'flex', gap: 22, flexWrap: 'wrap' }}>
-                      {[
-                        ['PART', selected.part],
-                        ['TORQUE', selected.torque],
-                        ['INTERVAL', selected.interval],
-                      ].map(([k, v]) => (
-                        <div key={k}>
-                          <div style={{ font: `500 8.5px/1 ${mono}`, letterSpacing: '.1em', color: '#76767B', marginBottom: 4 }}>{k}</div>
-                          <div style={{ font: `500 11px/1.3 ${mono}`, color: '#fff' }}>{v}</div>
-                        </div>
-                      ))}
-                    </div>
+              <div style={{ background: '#F4F4F5', padding: '10px 10px 0' }}>
+                <img
+                  src="/assets/xray-full.png"
+                  alt="Full X-ray view of every Porsche system — engine, brakes, cooling, wiring and more"
+                  style={{ width: '100%', display: 'block', borderRadius: 4 }}
+                />
+              </div>
+              <div className="heroValueStrip" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', borderTop: '1px solid #EAEAEC' }}>
+                {HERO_VALUE.map((item, i) => (
+                  <div
+                    key={item.k}
+                    style={{
+                      padding: '14px 16px',
+                      borderLeft: i > 0 ? '1px solid #EAEAEC' : undefined,
+                    }}
+                  >
+                    <div style={{ font: `600 11px/1 ${mono}`, letterSpacing: '.1em', color: RED }}>{item.k}</div>
+                    <div style={{ marginTop: 6, font: `400 12px/1.3 ${sans}`, color: '#6E6E73' }}>{item.v}</div>
                   </div>
-                ) : (
-                  <div style={{ marginTop: 14, border: '1px dashed #D2D2D6', borderRadius: 4, padding: '13px 16px', font: `400 12px/1.4 ${sans}`, color: '#9A9AA0', textAlign: 'center' }}>
-                    Click a numbered node to see part numbers, torque &amp; intervals
-                  </div>
-                )}
+                ))}
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ===== INSPECT: 3D + INTERNALS (real renders) ===== */}
+      {/* ===== INSPECT: 3D + CUTAWAY ===== */}
       <section id="inspect" style={{ maxWidth: 1200, margin: '0 auto', padding: '86px 28px 24px' }}>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 30, flexWrap: 'wrap', marginBottom: 28 }}>
           <div>
             <div style={{ font: `500 11px/1 ${mono}`, letterSpacing: '.22em', color: RED, marginBottom: 14 }}>THE INSPECTOR</div>
             <h2 style={{ margin: 0, font: `300 38px/1.1 ${sans}`, letterSpacing: '-.015em', color: '#0B0B0C', maxWidth: 560 }}>
-              See the whole car —<br />outside and in.
+              Outside, X-ray,<br />and every line.
             </h2>
           </div>
           <p style={{ maxWidth: 380, margin: 0, font: `400 15px/1.65 ${sans}`, color: '#6E6E73' }}>
-            A real 3D model you can orbit, zoom and repaint to your colour. On the 981, X-ray the assemblies or drop into
-            factory cutaways to see exactly where every part lives.
+            Orbit a real 3D model in your colour, strip it to every assembly in X-ray, or follow coolant, fuel, air and
+            wiring through the car — each part tied to numbers, torque and intervals for your generation.
           </p>
         </div>
 
@@ -297,16 +193,17 @@ export default function Landing() {
             </div>
           </div>
 
-          {/* internals — real X-ray render */}
+          {/* systems / flow layer */}
           <div style={{ background: '#fff', border: '1px solid #E3E3E5', borderRadius: 8, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ flex: 1, background: 'radial-gradient(120% 100% at 50% 40%,#FCFCFD,#ECECEE)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-              <img src="/assets/xray-internals.png" alt="Porsche 981 internals X-ray view" style={{ width: '100%', maxWidth: 520, display: 'block', filter: 'drop-shadow(0 16px 26px rgba(0,0,0,.16))' }} />
+            <div style={{ flex: 1, background: '#eff0f2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <img src="/assets/xray-systems.png" alt="X-ray systems view with coolant, fuel, air and exhaust lines" style={{ width: '100%', display: 'block' }} />
             </div>
             <div style={{ padding: '20px 26px 24px' }}>
-              <div style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.16em', color: '#9A9AA0' }}>LAYER 02 · X-RAY &amp; CUTAWAY · 981</div>
-              <h3 style={{ margin: '12px 0 8px', font: `400 22px/1.15 ${sans}`, color: '#0B0B0C' }}>See what&rsquo;s underneath</h3>
+              <div style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.16em', color: '#9A9AA0' }}>LAYER 02 · LINES &amp; FLOWS</div>
+              <h3 style={{ margin: '12px 0 8px', font: `400 22px/1.15 ${sans}`, color: '#0B0B0C' }}>Where every part lives</h3>
               <p style={{ margin: 0, font: `400 14px/1.6 ${sans}`, color: '#6E6E73' }}>
-                On the 981: engine, oil filter, plugs, transaxle — every system pinned to a real part number, torque and interval. Generation-specific knowledge for every supported car.
+                Trace coolant, fuel, air, exhaust and wiring through the car — then open any system for part numbers,
+                torque and the matching service interval.
               </p>
             </div>
           </div>
@@ -344,6 +241,24 @@ export default function Landing() {
         visual={<FaultPanel />}
       />
 
+      {/* Row 4: documents library */}
+      <FeatureRow
+        id="documents"
+        reverse
+        kicker="DOCUMENTS"
+        title="The factory library, in your garage."
+        body="Workshop manuals, diagnostic books, Service Information Technik, and Porsche training material — over 100 factory documents and ~17,000 workshop pages, scoped to whichever car you're working on. Searchable by your AI assistant too."
+        visual={<DocumentsPanel />}
+      />
+
+      {/* Row 5: multi-vehicle */}
+      <FeatureRow
+        kicker="MULTI-CAR GARAGE"
+        title="Run more than one Porsche."
+        body="Add every Boxster and Cayman you own — 987 or 981 — and switch between them in one click. History, plans, documents and AI context stay scoped to the car you're looking at."
+        visual={<VehiclesPanel />}
+      />
+
       {/* ===== AI ASSISTANT (chat) ===== */}
       <section id="ai" style={{ background: '#0B0B0C', color: '#fff', marginTop: 40 }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '84px 28px', display: 'grid', gridTemplateColumns: '.92fr 1.08fr', gap: 56, alignItems: 'center' }} className="aiGrid">
@@ -356,9 +271,26 @@ export default function Landing() {
               Manage it all<br />just by chatting.
             </h2>
             <p style={{ maxWidth: 440, margin: '22px 0 0', font: `400 15px/1.65 ${sans}`, color: '#9A9AA0' }}>
-              Connect your garage to Claude (or another AI assistant) and simply talk to it. It logs services, looks up
-              specs and plans what&rsquo;s next — updating your garage with your approval. No commands to learn.
+              Connect your garage to Claude, OpenAI, or Gemini over MCP and simply talk to it. It searches the factory
+              docs, logs services, looks up specs and plans what&rsquo;s next — updating your garage with your approval.
             </p>
+            <div style={{ marginTop: 22, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              {['Claude', 'OpenAI', 'Gemini'].map((name) => (
+                <span
+                  key={name}
+                  style={{
+                    font: `500 11px/1 ${mono}`,
+                    letterSpacing: '.08em',
+                    color: '#C9C9CD',
+                    border: '1px solid #313135',
+                    borderRadius: 2,
+                    padding: '8px 12px',
+                  }}
+                >
+                  {name}
+                </span>
+              ))}
+            </div>
           </div>
           <ChatThread />
         </div>
@@ -421,7 +353,7 @@ export default function Landing() {
           <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)', font: `700 220px/.8 ${mono}`, color: '#121214', userSelect: 'none', pointerEvents: 'none' }}>FLAT</div>
           <div style={{ position: 'relative' }}>
             <h2 style={{ margin: 0, font: `300 40px/1.1 ${sans}`, letterSpacing: '-.02em', color: '#fff' }}>Know your car inside out.</h2>
-            <p style={{ margin: '18px auto 0', maxWidth: 460, font: `400 15px/1.6 ${sans}`, color: '#9A9AA0' }}>It&rsquo;s free. Add a 987 or 981, pick your spec, and open the garage — more models are on the way.</p>
+            <p style={{ margin: '18px auto 0', maxWidth: 480, font: `400 15px/1.6 ${sans}`, color: '#9A9AA0' }}>It&rsquo;s free. Add one car or several, dig into the factory docs, and connect the AI you already use — more models are on the way.</p>
             <Link href={GARAGE} className="cta" style={{ ...ctaStyle, marginTop: 30, height: 52, display: 'inline-flex', alignItems: 'center', gap: 10, padding: '0 30px' }}>
               Start your garage <span style={{ fontFamily: mono }}>→</span>
             </Link>
@@ -434,7 +366,7 @@ export default function Landing() {
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '30px 28px', display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
           <div style={{ width: 10, height: 10, background: RED }} />
           <div style={{ font: `700 12px/1 ${mono}`, letterSpacing: '.28em', color: '#0B0B0C' }}>FLAT·SIX</div>
-          <div style={{ font: `400 12px/1 ${sans}`, color: '#9A9AA0' }}>Free &amp; open-source DIY maintenance for the Porsche Boxster &amp; Cayman — 987, 981 &amp; more</div>
+          <div style={{ font: `400 12px/1 ${sans}`, color: '#9A9AA0' }}>Free &amp; open-source DIY maintenance for the Porsche Boxster &amp; Cayman — multi-car, 987, 981 &amp; more</div>
           <a href={GITHUB_REPO} target="_blank" rel="noopener noreferrer" style={{ font: `400 12px/1 ${sans}`, color: '#6E6E73', transition: 'color .15s' }}>GitHub</a>
           <Link href="/legal" style={{ font: `400 12px/1 ${sans}`, color: '#6E6E73', transition: 'color .15s' }}>Privacy &amp; Terms</Link>
           <div style={{ marginLeft: 'auto', font: `500 10px/1 ${mono}`, letterSpacing: '.1em', color: '#B4B4B8' }}>NOT AFFILIATED WITH PORSCHE AG</div>
@@ -455,15 +387,17 @@ function FeatureRow({
   body,
   visual,
   reverse,
+  id,
 }: {
   kicker: string;
   title: string;
   body: string;
   visual: React.ReactNode;
   reverse?: boolean;
+  id?: string;
 }) {
   return (
-    <section style={{ maxWidth: 1200, margin: '0 auto', padding: '34px 28px' }}>
+    <section id={id} style={{ maxWidth: 1200, margin: '0 auto', padding: '34px 28px' }}>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 56, alignItems: 'center' }} className="twoCol">
         <div style={{ order: reverse ? 2 : 1 }}>
           <div style={{ font: `500 11px/1 ${mono}`, letterSpacing: '.22em', color: RED, marginBottom: 14 }}>{kicker}</div>
@@ -572,6 +506,67 @@ function FaultPanel() {
   );
 }
 
+function DocumentsPanel() {
+  return (
+    <Screenshot tab="FLAT·SIX / DOCUMENTS">
+      <div style={{ padding: '14px 18px 6px', display: 'flex', alignItems: 'center', gap: 10, borderBottom: '1px solid #F0F0F1' }}>
+        <span style={{ font: `600 9px/1 ${mono}`, letterSpacing: '.1em', color: RED, background: 'rgba(213,0,28,.1)', padding: '4px 7px', borderRadius: 2 }}>987</span>
+        <span style={{ font: `500 11px/1 ${mono}`, color: '#9A9AA0' }}>69 documents · factory library</span>
+      </div>
+      {DOC_CATS.map((d, i) => (
+        <div key={d.title} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderTop: i ? '1px solid #F0F0F1' : 'none' }}>
+          <span style={{ font: `600 8px/1 ${mono}`, letterSpacing: '.1em', color: '#76767B', width: 78, flexShrink: 0 }}>{d.cat}</span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ font: `400 14px/1.25 ${sans}`, color: '#0B0B0C' }}>{d.title}</div>
+            <div style={{ marginTop: 4, font: `500 10px/1 ${mono}`, color: '#9A9AA0' }}>{d.meta}</div>
+          </div>
+          <span style={{ font: `500 14px/1 ${mono}`, color: '#C9C9CD' }}>→</span>
+        </div>
+      ))}
+    </Screenshot>
+  );
+}
+
+function VehiclesPanel() {
+  const cars = [
+    { name: 'Boxster Spyder', gen: '987', year: '2011', mi: '42,500 mi', active: true },
+    { name: 'Cayman S', gen: '981', year: '2014', mi: '38,120 mi', active: false },
+  ];
+  return (
+    <Screenshot tab="FLAT·SIX / YOUR GARAGE">
+      <div style={{ padding: '12px 18px 4px', font: `500 9px/1 ${mono}`, letterSpacing: '.12em', color: '#9A9AA0' }}>2 CARS</div>
+      {cars.map((c, i) => (
+        <div
+          key={c.name}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 14,
+            padding: '14px 18px',
+            borderTop: i ? '1px solid #F0F0F1' : 'none',
+            background: c.active ? 'rgba(213,0,28,.04)' : '#fff',
+          }}
+        >
+          <div style={{ width: 10, height: 10, borderRadius: '50%', background: c.active ? RED : '#D2D2D6', flexShrink: 0 }} />
+          <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ font: `400 15px/1.2 ${sans}`, color: '#0B0B0C' }}>{c.name}</span>
+              <span style={{ font: `600 8px/1 ${mono}`, letterSpacing: '.1em', color: c.active ? RED : '#9A9AA0', background: c.active ? 'rgba(213,0,28,.1)' : '#F4F4F5', padding: '3px 6px', borderRadius: 2 }}>{c.gen}</span>
+            </div>
+            <div style={{ marginTop: 5, font: `500 10px/1 ${mono}`, color: '#9A9AA0' }}>{c.year} · {c.mi}</div>
+          </div>
+          {c.active && <span style={{ font: `600 9px/1 ${mono}`, letterSpacing: '.1em', color: RED }}>ACTIVE</span>}
+        </div>
+      ))}
+      <div style={{ padding: '14px 18px 18px', borderTop: '1px solid #F0F0F1' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, height: 34, padding: '0 14px', border: '1px dashed #CFCFD3', borderRadius: 2, font: `600 10px/1 ${sans}`, letterSpacing: '.1em', textTransform: 'uppercase', color: '#6E6E73' }}>
+          + Add another car
+        </div>
+      </div>
+    </Screenshot>
+  );
+}
+
 function ChatThread() {
   const userBubble: React.CSSProperties = {
     alignSelf: 'flex-end',
@@ -599,7 +594,7 @@ function ChatThread() {
     <div style={{ background: '#0F0F11', border: '1px solid #232327', borderRadius: 14, padding: 18, display: 'flex', flexDirection: 'column', gap: 12, boxShadow: '0 24px 60px rgba(0,0,0,.5)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingBottom: 6, borderBottom: '1px solid #1C1C1F' }}>
         <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#3CD37A' }} />
-        <span style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.14em', color: '#9A9AA0' }}>FLAT·SIX MCP · CONNECTED</span>
+        <span style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.14em', color: '#9A9AA0' }}>FLAT·SIX MCP · CLAUDE · OPENAI · GEMINI</span>
       </div>
 
       <div style={userBubble}>
