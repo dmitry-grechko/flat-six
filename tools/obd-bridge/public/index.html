@@ -168,15 +168,19 @@
 
   <main>
     <section class="card">
-      <h2>Mac setup — Bluetooth dongle (e.g. Ancel)</h2>
+      <h2>Setup — USB or Bluetooth Classic</h2>
       <div class="body">
+        <p style="margin:0 0 14px;color:#3a3a3e;font-size:14px">
+          Works with <strong>USB ELM327</strong> and <strong>Bluetooth Classic</strong> dongles that appear as a serial port
+          (<code>COMx</code> on Windows, <code>/dev/cu.…</code> on Mac). BLE-only sticks (e.g. Ancel BD200) are not supported.
+        </p>
         <ol class="steps">
-          <li>Plug the dongle into the car’s <strong>OBD port</strong> (under dash, driver side).</li>
-          <li>Turn ignition <strong>ON</strong> (engine running is best for live RPM).</li>
-          <li>On Mac: <strong>System Settings → Bluetooth</strong> — pair the dongle (often named OBDII, OBD, ELM327, CHX…).</li>
-          <li>Start the bridge in Terminal: <code>npm run obd-bridge</code> from the repo root.</li>
-          <li>Click <strong>Refresh ports</strong> below — pick the new <code>/dev/cu.…</code> entry (not <em>Bluetooth-Incoming-Port</em>).</li>
-          <li>Leave baud at <strong>38400</strong> first; try 9600 or 115200 if connect fails.</li>
+          <li>Dongle in the car’s <strong>OBD port</strong>, ignition <strong>ON</strong> (engine running helps RPM).</li>
+          <li><strong>USB:</strong> plug into the PC. On Windows check Device Manager → Ports for a new <code>COMx</code>. Leave MS/HS switch on <strong>HS-CAN</strong>.</li>
+          <li><strong>Bluetooth Classic:</strong> pair in OS Bluetooth settings until a serial/COM port appears (not BLE app-only).</li>
+          <li>Start the bridge: <code>npm run obd-bridge</code> from the repo root.</li>
+          <li><strong>Refresh ports</strong> → pick the USB or BT serial entry → baud <strong>38400</strong> (try 9600 / 115200 if needed).</li>
+          <li><strong>Connect</strong> → toggle <strong>Live poll</strong>. Use Debug log if anything fails.</li>
         </ol>
       </div>
     </section>
@@ -293,6 +297,8 @@
     function renderMeta(st) {
       if (!st) { $('meta').textContent = ''; return; }
       const bits = [];
+      if (st.platform) bits.push(st.platform);
+      if (st.transport) bits.push('Transport: ' + st.transport);
       if (st.adapter) bits.push('Adapter: ' + st.adapter);
       if (st.protocol) bits.push('Protocol: ' + st.protocol);
       if (st.path) bits.push('Port: ' + st.path + ' @ ' + st.baudRate);
@@ -320,16 +326,21 @@
       for (const p of data.ports) {
         const opt = document.createElement('option');
         opt.value = p.path;
+        const tag = p.transport === 'usb' ? 'USB'
+          : p.transport === 'bluetooth-classic' ? 'BT Classic'
+          : (p.transport || 'serial').toUpperCase();
         const hint = p.hint ? ` · ${p.hint}` : '';
-        opt.textContent = p.path + hint;
+        const mfg = p.manufacturer ? ` · ${p.manufacturer}` : '';
+        opt.textContent = `[${tag}] ${p.path}${mfg}${hint}`;
         sel.appendChild(opt);
       }
       if (cur) sel.value = cur;
-      // Auto-select likely OBD port if nothing selected
-      if (!sel.value) {
-        const likely = data.ports.find((p) =>
-          /obd|elm|chx|spp/i.test(p.path) && !/incoming|debug/i.test(p.path)
-        );
+      // Prefer USB, then Bluetooth Classic, then any scored port
+      if (!sel.value && data.ports.length) {
+        const likely = data.ports.find((p) => p.transport === 'usb')
+          || data.ports.find((p) => p.transport === 'bluetooth-classic')
+          || data.ports.find((p) => p.score > 0)
+          || data.ports[0];
         if (likely) sel.value = likely.path;
       }
     }

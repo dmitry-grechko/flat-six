@@ -1,18 +1,25 @@
 #!/usr/bin/env node
 /**
- * FLAT·SIX local OBD bridge — ELM327 over serial (USB or Bluetooth SPP on Mac).
- * Serves a test UI at http://127.0.0.1:8765
+ * FLAT·SIX local OBD bridge — ELM327 over serial.
+ *
+ * Transports (same API):
+ *   - USB ELM327  → /dev/cu.usbserial* (Mac) or COMx (Windows)
+ *   - Bluetooth Classic SPP → paired dongle as serial port (NOT BLE-only like Ancel BD200)
+ *
+ * Serves test UI at http://127.0.0.1:8765
  */
 
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
+import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { Elm327 } from './elm327.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.OBD_BRIDGE_PORT || 8765);
 const PUBLIC = path.join(__dirname, 'public');
+const PLATFORM = process.platform; // darwin | win32 | linux
 
 /** @type {Elm327 | null} */
 let session = null;
@@ -43,6 +50,9 @@ const server = http.createServer(async (req, res) => {
         connected: session?.isOpen() === true,
         port: session?.path ?? null,
         baud: session?.baudRate ?? null,
+        platform: PLATFORM,
+        transports: ['usb-serial', 'bluetooth-classic-spp'],
+        note: 'BLE-only dongles (e.g. Ancel BD200) are not supported — need USB or Classic BT serial.',
       });
     }
 
@@ -50,17 +60,10 @@ const server = http.createServer(async (req, res) => {
       const { SerialPort } = await import('serialport');
       const list = await SerialPort.list();
       const ports = list
-        .map((p) => ({
-          path: p.path,
-          manufacturer: p.manufacturer || null,
-          serialNumber: p.serialNumber || null,
-          vendorId: p.vendorId || null,
-          productId: p.productId || null,
-          // macOS BT dongles often only show path
-          hint: guessPortHint(p.path),
-        }))
-        .sort((a, b) => a.path.localeCompare(b.path));
-      return json(res, { ports });
+        .map((p) => classifyPort(p))
+        .filter((p) => !p.ignore)
+        .sort((a, b) => b.score - a.score || a.path.localeCompare(b.path));
+      return json(res, { platform: PLATFORM, ports });
     }
 
     if (req.method === 'GET' && url.pathname === '/status') {
@@ -68,10 +71,12 @@ const server = http.createServer(async (req, res) => {
         connected: session?.isOpen() === true,
         path: session?.path ?? null,
         baudRate: session?.baudRate ?? null,
+        transport: session ? classifyPath(session.path).transport : null,
         adapter: session?.adapterInfo ?? null,
         protocol: session?.protocol ?? null,
         polling: pollTimer != null,
         lastSnapshot,
+        platform: PLATFORM,
       });
     }
 
@@ -122,6 +127,8 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === 'GET' && url.pathname === '/debug') {
       return json(res, {
+        platform: PLATFORM,
+        hostname: os.hostname(),
         log: session?.getDebugLog() ?? [],
         lastSnapshot,
       });
@@ -150,7 +157,8 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, '127.0.0.1', () => {
-  console.log(`\n  FLAT·SIX OBD bridge running`);
+  console.log(`\n  FLAT·SIX OBD bridge running (${PLATFORM})`);
+  console.log(`  Transports: USB serial + Bluetooth Classic SPP`);
   console.log(`  Test UI:  http://127.0.0.1:${PORT}`);
   console.log(`  Health:   http://127.0.0.1:${PORT}/health\n`);
 });
@@ -178,10 +186,12 @@ async function statusPayload() {
     connected: session?.isOpen() === true,
     path: session?.path ?? null,
     baudRate: session?.baudRate ?? null,
+    transport: session ? classifyPath(session.path).transport : null,
     adapter: session?.adapterInfo ?? null,
     protocol: session?.protocol ?? null,
     polling: pollTimer != null,
     lastSnapshot,
+    platform: PLATFORM,
   };
 }
 
@@ -220,21 +230,100 @@ function readJson(req) {
   });
 }
 
-function guessPortHint(portPath) {
-  const p = portPath.toLowerCase();
-  if (p.includes('bluetooth-incoming')) return 'Not your OBD dongle';
-  if (p.includes('debug-console')) return 'Not your OBD dongle';
-  if (p.includes('obd') || p.includes('elm') || p.includes('chx') || p.includes('spp')) {
-    return 'Likely Bluetooth OBD dongle';
+/**
+ * Classify a serialport list entry for UI hints + ranking.
+ * @param {{ path: string, manufacturer?: string|null, vendorId?: string|null, productId?: string|null, serialNumber?: string|null }} p
+ */
+function classifyPort(p) {
+  const base = classifyPath(p.path, p.manufacturer);
+  return {
+    path: p.path,
+    manufacturer: p.manufacturer || null,
+    serialNumber: p.serialNumber || null,
+    vendorId: p.vendorId || null,
+    productId: p.productId || null,
+    ...base,
+  };
+}
+
+function classifyPath(portPath, manufacturer = null) {
+  const p = String(portPath || '').toLowerCase();
+  const mfg = String(manufacturer || '').toLowerCase();
+  const blob = `${p} ${mfg}`;
+
+  // Noise — hide from UI
+  if (
+    p.includes('bluetooth-incoming') ||
+    p.includes('debug-console') ||
+    p.includes('bluetooth-modem') ||
+    /^\/dev\/tty\./.test(p) // prefer /dev/cu.* on macOS (caller may still list tty)
+  ) {
+    // On macOS SerialPort often lists both tty.* and cu.* — keep cu only
+    if (PLATFORM === 'darwin' && p.startsWith('/dev/tty.')) {
+      return { transport: 'other', hint: 'Duplicate tty (use cu.*)', score: -100, ignore: true };
+    }
+    if (p.includes('bluetooth-incoming') || p.includes('debug-console')) {
+      return { transport: 'other', hint: 'Not your OBD dongle', score: -50, ignore: true };
+    }
   }
-  if (p.includes('usb') || p.includes('usbserial') || p.includes('wch') || p.includes('slab')) {
-    return 'Likely USB serial adapter';
+
+  // USB serial (CH340 / FTDI / CP210x / etc.)
+  if (
+    /usb|usbserial|wch|ch340|ch341|ftdi|cp210|silabs|slab|prolific|pl2303|arduino/.test(blob) ||
+    (PLATFORM === 'win32' && /usb/.test(blob))
+  ) {
+    return {
+      transport: 'usb',
+      hint: 'USB ELM327 / USB-serial',
+      score: 100,
+      ignore: false,
+    };
   }
-  if (p.startsWith('/dev/cu.')) return 'macOS serial — may be paired BT dongle';
-  return null;
+
+  // Bluetooth Classic SPP (pairs as serial — NOT BLE-only Ancel BD200)
+  if (/bluetooth|bt-|rfcomm|spp|obd|elm|chx|bafang/.test(blob)) {
+    return {
+      transport: 'bluetooth-classic',
+      hint: 'Bluetooth Classic serial (SPP)',
+      score: 80,
+      ignore: false,
+    };
+  }
+
+  // Windows COM ports without metadata — still show them
+  if (PLATFORM === 'win32' && /^com\d+$/i.test(portPath)) {
+    return {
+      transport: 'serial',
+      hint: 'Windows COM port (USB or paired BT)',
+      score: 60,
+      ignore: false,
+    };
+  }
+
+  // macOS cu.* unknown
+  if (p.startsWith('/dev/cu.')) {
+    return {
+      transport: 'serial',
+      hint: 'macOS serial — may be USB or paired BT',
+      score: 40,
+      ignore: false,
+    };
+  }
+
+  return {
+    transport: 'other',
+    hint: null,
+    score: 10,
+    ignore: false,
+  };
 }
 
 process.on('SIGINT', async () => {
+  await disconnect();
+  process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
   await disconnect();
   process.exit(0);
 });

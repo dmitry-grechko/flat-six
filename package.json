@@ -27,7 +27,7 @@
     "manual:parse-987": "node tools/manual/parse-987-workshop.mjs",
     "manual:upload": "node tools/manual/upload-pdf.mjs",
     "docs:upload": "node tools/manual/upload-docs.mjs",
-    "obd-bridge": "cd tools/obd-bridge && npm install --no-fund --no-audit && node server.mjs",
+    "obd-bridge": "npm --prefix tools/obd-bridge install --no-fund --no-audit && npm --prefix tools/obd-bridge start",
     "parts:parse": "node tools/parts/parse-parts.mjs",
     "postinstall": "cp node_modules/pdfjs-dist/build/pdf.worker.min.mjs public/pdf.worker.min.mjs 2>/dev/null || true"
   },
