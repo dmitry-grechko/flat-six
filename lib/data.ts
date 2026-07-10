@@ -23,11 +23,28 @@ export const VEHICLE: Vehicle = {
   plate: 'YT14 BXS',
 };
 
+// Factory paint offered on the 981 & 987 Boxster/Cayman (2005–2016). Swatch hexes
+// are display approximations, not paint-match values. Shared across models — the
+// picker is not generation-filtered today.
 export const COLORS: PaintColor[] = [
-  { name: 'GT SILVER', hex: '#C6C8CA' }, { name: 'CARRARA WHITE', hex: '#E8E8EA' },
-  { name: 'JET BLACK', hex: '#131316' }, { name: 'GUARDS RED', hex: '#D5001C' },
-  { name: 'SAPPHIRE BLUE', hex: '#27364E' }, { name: 'RACING YELLOW', hex: '#EFC03B' },
-  { name: 'AGATE GREY', hex: '#5B5F63' }, { name: 'AMARANTH', hex: '#7A2230' },
+  // Whites / silvers / greys
+  { name: 'CARRARA WHITE', hex: '#E8E8EA' }, { name: 'CLASSIC SILVER', hex: '#BFC3C6' },
+  { name: 'ARCTIC SILVER', hex: '#C6C9CC' }, { name: 'GT SILVER', hex: '#C6C8CA' },
+  { name: 'PLATINUM SILVER', hex: '#B4B7BA' }, { name: 'RHODIUM SILVER', hex: '#97999C' },
+  { name: 'METEOR GREY', hex: '#45484B' }, { name: 'AGATE GREY', hex: '#5B5F63' },
+  // Blacks
+  { name: 'JET BLACK', hex: '#131316' }, { name: 'BASALT BLACK', hex: '#1B1C1E' },
+  // Blues
+  { name: 'AQUA BLUE', hex: '#5E97A8' }, { name: 'SAPPHIRE BLUE', hex: '#27364E' },
+  { name: 'COBALT BLUE', hex: '#22417C' }, { name: 'MIDNIGHT BLUE', hex: '#1E2A44' },
+  // Reds
+  { name: 'GUARDS RED', hex: '#D5001C' }, { name: 'CARMINE RED', hex: '#97011F' },
+  { name: 'AMARANTH', hex: '#7A2230' },
+  // Yellows / greens / earth
+  { name: 'RACING YELLOW', hex: '#EFC03B' }, { name: 'SPEED YELLOW', hex: '#F5C400' },
+  { name: 'MALACHITE GREEN', hex: '#2E4A3B' }, { name: 'LIME GOLD', hex: '#7F8447' },
+  { name: 'MACADAMIA', hex: '#B7A98B' }, { name: 'NORDIC GOLD', hex: '#96865F' },
+  { name: 'MAHOGANY', hex: '#3C2B25' },
 ];
 
 // Engine + transmission options are GENERATION-SPECIFIC:
