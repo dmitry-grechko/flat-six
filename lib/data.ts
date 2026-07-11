@@ -39,6 +39,8 @@ export const COLORS: PaintColor[] = [
   { name: 'COBALT BLUE', hex: '#22417C' }, { name: 'MIDNIGHT BLUE', hex: '#1E2A44' },
   // Reds
   { name: 'GUARDS RED', hex: '#D5001C' }, { name: 'CARMINE RED', hex: '#97011F' },
+  // Carmona Red Metallic (M3W / E4) — wine metallic; display approx, not paint-match
+  { name: 'CARMONA RED METALLIC', hex: '#6B1A28' },
   { name: 'AMARANTH', hex: '#7A2230' },
   // Yellows / greens / earth
   { name: 'RACING YELLOW', hex: '#EFC03B' }, { name: 'SPEED YELLOW', hex: '#F5C400' },

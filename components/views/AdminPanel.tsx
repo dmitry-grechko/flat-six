@@ -130,6 +130,13 @@ export default function AdminPanel() {
         { k: 'SERVICE PLANS', v: data.totalPlans, color: '#0B0B0C' },
         { k: 'MCP CONNECTED', v: data.mcpConnectedUsers, color: '#1E8E4E' },
         { k: 'VEHICLES', v: data.totalVehicles, color: '#0B0B0C' },
+        ...Object.entries(data.vehiclesByGeneration ?? {})
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([gen, count]) => ({
+            k: `${gen} CARS`,
+            v: count,
+            color: '#0B0B0C' as string,
+          })),
       ]
     : [];
 

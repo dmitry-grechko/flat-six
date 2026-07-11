@@ -27,6 +27,8 @@ export interface AdminOverview {
   totalRecords: number;
   totalPlans: number;
   mcpConnectedUsers: number;
+  /** Vehicle counts keyed by generation (e.g. { '981': 12, '987': 5 }). */
+  vehiclesByGeneration: Record<string, number>;
   users: AdminUser[];
   /** true when served from demo placeholder data rather than the real DB. */
   demo?: boolean;

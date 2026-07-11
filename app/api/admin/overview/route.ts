@@ -3,8 +3,18 @@ import { createClient as createServiceClient } from '@supabase/supabase-js';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 import { DEMO_MODE } from '@/lib/demo';
 import { ADMIN_EMAIL, isAdminEmail, type AdminOverview, type AdminUser } from '@/lib/admin';
+import { generationForBody } from '@/lib/models';
 
 export const dynamic = 'force-dynamic';
+
+function countVehiclesByGeneration(bodies: (string | null)[]): Record<string, number> {
+  const map: Record<string, number> = {};
+  for (const body of bodies) {
+    const gen = generationForBody(body);
+    map[gen] = (map[gen] ?? 0) + 1;
+  }
+  return map;
+}
 
 // Placeholder data so the panel is fully testable in demo mode (no DB/auth).
 function demoOverview(): AdminOverview {
@@ -21,6 +31,7 @@ function demoOverview(): AdminOverview {
     totalRecords: users.reduce((n, u) => n + u.recordCount, 0),
     totalPlans: users.reduce((n, u) => n + u.planCount, 0),
     mcpConnectedUsers: users.filter((u) => u.mcpConnected).length,
+    vehiclesByGeneration: { '981': 4, '987': 0 },
     users,
     demo: true,
   };
@@ -61,7 +72,7 @@ export async function GET() {
     { data: oauthCodes, error: oErr },
   ] = await Promise.all([
     admin.from('profiles').select('id, display_name, created_at, documents_access').order('created_at', { ascending: true }),
-    admin.from('vehicles').select('user_id, model'),
+    admin.from('vehicles').select('user_id, model, body'),
     admin.from('service_records').select('user_id'),
     admin.from('service_plans').select('user_id'),
     admin.from('oauth_codes').select('user_id').eq('used', true),
@@ -80,6 +91,7 @@ export async function GET() {
   const recordsByUser = countByUser(records);
   const plansByUser = countByUser(plans);
   const mcpUsers = new Set((oauthCodes ?? []).map((c) => c.user_id));
+  const vehiclesByGeneration = countVehiclesByGeneration((vehicles ?? []).map((v) => v.body));
 
   const users: AdminUser[] = (profiles ?? []).map((p) => {
     const models = byUser.get(p.id) ?? [];
@@ -103,6 +115,7 @@ export async function GET() {
     totalRecords: users.reduce((n, u) => n + u.recordCount, 0),
     totalPlans: users.reduce((n, u) => n + u.planCount, 0),
     mcpConnectedUsers: users.filter((u) => u.mcpConnected).length,
+    vehiclesByGeneration,
     users,
   };
   return NextResponse.json(overview);
