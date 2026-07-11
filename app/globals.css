@@ -21,6 +21,17 @@ input[type='number']::-webkit-inner-spin-button,
 input[type='number']::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 input[type='number'] { -moz-appearance: textfield; appearance: textfield; }
 
+/* Colour-swatch tooltip — shows the paint name on hover (no layout shift). */
+.colorSwatch { position: relative; display: inline-flex; }
+.colorSwatchTip {
+  position: absolute; bottom: calc(100% + 7px); left: 50%; transform: translateX(-50%);
+  background: #0B0B0C; color: #fff;
+  font: 500 10px/1 'JetBrains Mono', monospace; letter-spacing: .03em; white-space: nowrap;
+  padding: 6px 8px; border-radius: 3px; opacity: 0; visibility: hidden;
+  transition: opacity .12s ease; pointer-events: none; z-index: 30;
+}
+.colorSwatch:hover .colorSwatchTip { opacity: 1; visibility: visible; }
+
 a { color: inherit; text-decoration: none; }
 
 @keyframes hsPulse {

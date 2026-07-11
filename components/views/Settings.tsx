@@ -154,16 +154,18 @@ export default function Settings() {
         <label style={fieldLabel}>Paint — {vehicle.colorName}</label>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 4 }}>
           {COLORS.map((c) => (
-            <button
-              key={c.hex}
-              title={c.name}
-              onClick={() => update({ colorName: c.name, colorHex: c.hex })}
-              style={{
-                width: 30, height: 30, borderRadius: 4, cursor: 'pointer', padding: 0, background: c.hex,
-                border: vehicle.colorHex === c.hex ? '2px solid var(--red, #D5001C)' : '1px solid #D2D2D6',
-                boxShadow: vehicle.colorHex === c.hex ? '0 0 0 3px rgba(213,0,28,.15)' : 'none',
-              }}
-            />
+            <span key={c.hex} className="colorSwatch">
+              <button
+                aria-label={c.name}
+                onClick={() => update({ colorName: c.name, colorHex: c.hex })}
+                style={{
+                  width: 30, height: 30, borderRadius: 4, cursor: 'pointer', padding: 0, background: c.hex,
+                  border: vehicle.colorHex === c.hex ? '2px solid var(--red, #D5001C)' : '1px solid #D2D2D6',
+                  boxShadow: vehicle.colorHex === c.hex ? '0 0 0 3px rgba(213,0,28,.15)' : 'none',
+                }}
+              />
+              <span className="colorSwatchTip">{c.name}</span>
+            </span>
           ))}
         </div>
       </div>

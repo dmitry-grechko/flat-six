@@ -31,6 +31,7 @@ export default function ComponentExplorer() {
   const [activeSystem, setActiveSystem] = useState<SystemName | 'All' | 'None'>('All');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [paint, setPaint] = useState<string | null>(null);
+  const [paintOpen, setPaintOpen] = useState(false);
   const [xray, setXray] = useState(false);
   const [autoSpin, setAutoSpin] = useState(false);
   const [aiPrompt, setAiPrompt] = useState<string | null>(null);
@@ -278,31 +279,60 @@ export default function ComponentExplorer() {
                 />
               )}
 
-              {!xray && (
-                <div style={{ position: 'absolute', left: 18, bottom: 16, display: 'flex', alignItems: 'center', gap: 11, zIndex: 3 }}>
-                  <span style={{ font: `500 9px/1 ${mono}`, letterSpacing: '.14em', color: '#9A9AA0' }}>PAINT</span>
-                  <div style={{ display: 'flex', gap: 7 }}>
-                    {COLORS.map((c) => (
+              {/* Bottom overlay: controls row (paint popover + reset) with the model credit below.
+                  pointer-events:none on the container keeps the canvas draggable between the controls. */}
+              <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 3, padding: '0 14px 12px', display: 'flex', flexDirection: 'column', gap: 8, pointerEvents: 'none' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 10 }}>
+                  {!xray ? (
+                    <div style={{ position: 'relative', pointerEvents: 'auto' }}>
+                      {paintOpen && (
+                        <div style={{ position: 'absolute', left: 0, bottom: 'calc(100% + 8px)', width: 'min(236px, 72vw)', background: 'rgba(255,255,255,.98)', border: '1px solid #E3E3E5', borderRadius: 8, boxShadow: '0 12px 30px rgba(0,0,0,.18)', padding: 12 }}>
+                          <div style={{ font: `600 9px/1 ${mono}`, letterSpacing: '.14em', color: '#9A9AA0', marginBottom: 10 }}>PAINT</div>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                            {COLORS.map((c) => (
+                              <span key={c.hex} className="colorSwatch">
+                                <button
+                                  onClick={() => { setPaint(c.hex); setPaintOpen(false); }}
+                                  aria-label={c.name}
+                                  style={{ width: 22, height: 22, borderRadius: '50%', cursor: 'pointer', padding: 0, background: c.hex, border: activePaint === c.hex ? `2px solid ${RED}` : '1px solid #D2D2D6' }}
+                                />
+                                <span className="colorSwatchTip">{c.name}</span>
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                       <button
-                        key={c.hex}
-                        onClick={() => setPaint(c.hex)}
-                        title={c.name}
-                        style={{
-                          width: 20, height: 20, borderRadius: '50%', cursor: 'pointer', padding: 0, background: c.hex,
-                          border: activePaint === c.hex ? `2px solid ${RED}` : '1px solid rgba(0,0,0,.18)', boxShadow: '0 1px 3px rgba(0,0,0,.2)',
-                        }}
-                      />
-                    ))}
-                  </div>
+                        onClick={() => setPaintOpen((o) => !o)}
+                        aria-expanded={paintOpen}
+                        style={{ display: 'flex', alignItems: 'center', gap: 8, height: 30, padding: '0 12px 0 8px', background: 'rgba(255,255,255,.92)', border: '1px solid #DDDDE0', borderRadius: 20, cursor: 'pointer' }}
+                      >
+                        <span style={{ width: 16, height: 16, borderRadius: '50%', background: activePaint, border: '1px solid rgba(0,0,0,.2)' }} />
+                        <span style={{ font: `600 10px/1 ${mono}`, letterSpacing: '.1em', color: '#46464A' }}>PAINT</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <span />
+                  )}
+                  <button
+                    onClick={resetView}
+                    style={{ pointerEvents: 'auto', height: 30, padding: '0 13px', background: 'rgba(255,255,255,.92)', border: '1px solid #DDDDE0', borderRadius: 3, font: `600 10px/1 ${mono}`, letterSpacing: '.08em', color: '#46464A', cursor: 'pointer', whiteSpace: 'nowrap' }}
+                  >
+                    RESET VIEW
+                  </button>
                 </div>
-              )}
-
-              <button
-                onClick={resetView}
-                style={{ position: 'absolute', right: 18, bottom: 14, zIndex: 3, height: 30, padding: '0 13px', background: 'rgba(255,255,255,.92)', border: '1px solid #DDDDE0', borderRadius: 3, font: `600 10px/1 ${mono}`, letterSpacing: '.08em', color: '#46464A', cursor: 'pointer' }}
-              >
-                RESET VIEW
-              </button>
+                {!xray && (
+                  <div style={{ pointerEvents: 'auto', font: `500 9px/1.5 ${mono}`, letterSpacing: '.04em', color: '#A6A6AB', textAlign: 'center' }}>
+                    {MODEL_CREDITS[vehicle.body].title} ·{' '}
+                    <a href={MODEL_CREDITS[vehicle.body].source} target="_blank" rel="noreferrer" style={{ color: '#6E6E73' }}>
+                      {MODEL_CREDITS[vehicle.body].author}
+                    </a>{' '}·{' '}
+                    <a href={MODEL_CREDITS[vehicle.body].licenseUrl} target="_blank" rel="noreferrer" style={{ color: '#6E6E73' }}>
+                      {MODEL_CREDITS[vehicle.body].license}
+                    </a>
+                  </div>
+                )}
+              </div>
               <div style={{ position: 'absolute', right: 14, top: 14, zIndex: 3, display: 'flex', alignItems: 'center', gap: 7, background: 'rgba(11,11,12,.8)', padding: '6px 11px', borderRadius: 20, font: `500 9px/1 ${mono}`, letterSpacing: '.08em', color: '#fff', whiteSpace: 'nowrap' }}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: RED }} />
                 {xray
@@ -314,17 +344,6 @@ export default function ComponentExplorer() {
                   : `${vehicle.model.toUpperCase()} · REAL MODEL`}
               </div>
 
-              {!xray && (
-                <div style={{ position: 'absolute', left: '50%', bottom: 14, transform: 'translateX(-50%)', zIndex: 3, font: `500 9px/1.5 ${mono}`, letterSpacing: '.04em', color: '#A6A6AB', textAlign: 'center', whiteSpace: 'nowrap' }}>
-                  {MODEL_CREDITS[vehicle.body].title} ·{' '}
-                  <a href={MODEL_CREDITS[vehicle.body].source} target="_blank" rel="noreferrer" style={{ color: '#6E6E73' }}>
-                    {MODEL_CREDITS[vehicle.body].author}
-                  </a>{' '}·{' '}
-                  <a href={MODEL_CREDITS[vehicle.body].licenseUrl} target="_blank" rel="noreferrer" style={{ color: '#6E6E73' }}>
-                    {MODEL_CREDITS[vehicle.body].license}
-                  </a>
-                </div>
-              )}
             </div>
           )}
 

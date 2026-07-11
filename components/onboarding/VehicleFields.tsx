@@ -170,22 +170,24 @@ export default function VehicleFields({
       <label style={fieldLabel}>Paint — {value.colorName}</label>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
         {COLORS.map((c) => (
-          <button
-            key={c.hex}
-            type="button"
-            title={c.name}
-            onClick={() => onChange({ colorName: c.name, colorHex: c.hex })}
-            style={{
-              width: 30,
-              height: 30,
-              borderRadius: 4,
-              cursor: 'pointer',
-              padding: 0,
-              background: c.hex,
-              border: value.colorHex === c.hex ? '2px solid var(--red, #D5001C)' : '1px solid #D2D2D6',
-              boxShadow: value.colorHex === c.hex ? '0 0 0 3px rgba(213,0,28,.15)' : 'none',
-            }}
-          />
+          <span key={c.hex} className="colorSwatch">
+            <button
+              type="button"
+              aria-label={c.name}
+              onClick={() => onChange({ colorName: c.name, colorHex: c.hex })}
+              style={{
+                width: 30,
+                height: 30,
+                borderRadius: 4,
+                cursor: 'pointer',
+                padding: 0,
+                background: c.hex,
+                border: value.colorHex === c.hex ? '2px solid var(--red, #D5001C)' : '1px solid #D2D2D6',
+                boxShadow: value.colorHex === c.hex ? '0 0 0 3px rgba(213,0,28,.15)' : 'none',
+              }}
+            />
+            <span className="colorSwatchTip">{c.name}</span>
+          </span>
         ))}
       </div>
     </>
