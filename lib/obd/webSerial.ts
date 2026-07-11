@@ -1,6 +1,6 @@
 /**
  * Web Serial ELM327 transport for desktop Chrome (USB only).
- * Shared by main-app Live OBD and apps/track PWA.
+ * Used by main-app Live OBD (desktop Chrome/Edge USB ELM).
  */
 
 import { Elm327 } from './elm327';
@@ -142,7 +142,6 @@ export function createWebSerialClient(): ObdClient {
     adapter: session?.adapterInfo ?? null,
     protocol: session?.protocol ?? null,
     adapterKind: 'elm327',
-    experimental: false,
     pollSupported: true,
     polling,
     lastLive: session?.lastLive ?? null,
@@ -195,9 +194,6 @@ export function createWebSerialClient(): ObdClient {
     },
 
     async connect(opts: ConnectOptions) {
-      if (opts.adapter === 'vas6154') {
-        throw new Error('VAS6154 is not available over Web Serial');
-      }
       stopPoll();
       if (session?.isOpen()) await session.close();
       const baud = opts.baudRate ?? 38400;

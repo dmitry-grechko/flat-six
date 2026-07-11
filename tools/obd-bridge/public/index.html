@@ -255,7 +255,7 @@
   <header>
     <div class="mark"></div>
     <h1>FLAT·SIX</h1>
-    <div class="sub">OBD BRIDGE · ADAPTERS</div>
+    <div class="sub">OBD BRIDGE · ELM327</div>
     <span id="bridgeHealth">checking…</span>
   </header>
 
@@ -274,22 +274,14 @@
         <h2>Setup</h2>
         <div class="body">
           <p style="margin:0 0 14px;color:#3a3a3e;font-size:14px">
-            Pick an <strong>adapter</strong> below. <strong>ELM327</strong> is the production path (USB / Bluetooth Classic serial).
-            <strong>VAS 6154</strong> is experimental (J2534 PassThru / DoIP raw transcript on Windows) — not a full UDS product stack.
+            <strong>ELM327</strong> over USB serial or Bluetooth Classic SPP. BLE-only dongles (e.g. Ancel BD200) are not supported.
           </p>
-          <ol class="steps" id="setupStepsElm">
+          <ol class="steps">
             <li>Dongle in the car’s <strong>OBD port</strong>, ignition <strong>ON</strong> (engine running helps RPM).</li>
             <li><strong>USB:</strong> plug into the PC. Device Manager → Ports for a new <code>COMx</code>. Leave MS/HS on <strong>HS-CAN</strong>.</li>
             <li><strong>Bluetooth Classic:</strong> pair until a serial/COM port appears (not BLE app-only).</li>
             <li>Start the bridge: <code>npm run obd-bridge</code> (or <code>npm start</code> in <code>tools/obd-bridge</code>).</li>
             <li><strong>Refresh ports</strong> → pick port → baud <strong>38400</strong> → <strong>Connect</strong> → Live poll.</li>
-          </ol>
-          <ol class="steps" id="setupStepsVas" style="display:none">
-            <li>Install <strong>I+ME Actia VAS6154 PassThru</strong> drivers (J2534 FunctionLibrary in the registry).</li>
-            <li>VAS in car OBD port, ignition ON. Prefer USB for lab; note Wi‑Fi / RNDIS IP if using DoIP.</li>
-            <li>Choose mode <strong>PassThru</strong> (DLL) or <strong>DoIP</strong> (host:13400), or <strong>Auto</strong>.</li>
-            <li>Check <strong>Experimental</strong> → <strong>Connect</strong> → open <strong>Debug</strong> for raw TX/RX.</li>
-            <li>See <code>tools/obd-bridge/README.md</code> for DLL / DoIP assumptions.</li>
           </ol>
         </div>
       </section>
@@ -302,73 +294,17 @@
           </div>
 
           <div class="row">
-            <label for="adapter">Adapter</label>
-            <select id="adapter" style="min-width:280px">
-              <option value="elm327">ELM327 (USB / BT Classic)</option>
-              <option value="vas6154">VAS 6154 (Experimental)</option>
+            <label for="port">Serial port</label>
+            <select id="port"><option value="">— refresh ports —</option></select>
+            <button class="action btn-ghost" id="btnRefresh">Refresh ports</button>
+          </div>
+          <div class="row">
+            <label for="baud">Baud</label>
+            <select id="baud">
+              <option value="38400" selected>38400</option>
+              <option value="9600">9600</option>
+              <option value="115200">115200</option>
             </select>
-          </div>
-
-          <div id="elmFields">
-            <div class="row">
-              <label for="port">Serial port</label>
-              <select id="port"><option value="">— refresh ports —</option></select>
-              <button class="action btn-ghost" id="btnRefresh">Refresh ports</button>
-            </div>
-            <div class="row">
-              <label for="baud">Baud</label>
-              <select id="baud">
-                <option value="38400" selected>38400</option>
-                <option value="9600">9600</option>
-                <option value="115200">115200</option>
-              </select>
-            </div>
-          </div>
-
-          <div id="vasFields" style="display:none">
-            <div class="note" style="border-color:#f0b4bc;background:#fff8f8">
-              <strong>Experimental.</strong> Opens PassThru and/or DoIP, dumps raw traffic to Debug.
-              No multi-module UDS product features. Does not replace ELM live PIDs.
-            </div>
-            <div class="row">
-              <label for="vasMode">Mode</label>
-              <select id="vasMode" style="min-width:200px">
-                <option value="auto">Auto (PassThru → DoIP)</option>
-                <option value="passthru">PassThru (J2534)</option>
-                <option value="doip">DoIP (TCP)</option>
-              </select>
-              <button class="action btn-ghost" id="btnJ2534">Refresh J2534</button>
-              <button class="action btn-ghost" id="btnDoipDiscover">DoIP discover</button>
-            </div>
-            <div class="row" id="vasPtRow">
-              <label for="dllPath">PassThru DLL</label>
-              <select id="dllPath" style="min-width:320px;max-width:100%"><option value="">— auto / refresh J2534 —</option></select>
-            </div>
-            <div class="row" id="vasPtProtoRow">
-              <label for="vasProtocol">Protocol</label>
-              <select id="vasProtocol">
-                <option value="ISO15765" selected>ISO15765 (CAN ISO-TP)</option>
-                <option value="CAN">CAN</option>
-                <option value="ISO13400">ISO13400 / DoIP (vendor)</option>
-              </select>
-              <label for="vasBaud">CAN baud</label>
-              <select id="vasBaud">
-                <option value="500000" selected>500000</option>
-                <option value="250000">250000</option>
-              </select>
-            </div>
-            <div class="row" id="vasDoipRow">
-              <label for="doipHost">DoIP host</label>
-              <input id="doipHost" type="text" placeholder="169.254.x.x or VAS Wi‑Fi IP" style="min-width:220px" />
-              <label for="doipPort">Port</label>
-              <input id="doipPort" type="number" value="13400" style="min-width:100px" />
-            </div>
-            <div class="row">
-              <label class="toggle" id="expToggle" title="Required to connect VAS">
-                <span class="switch" id="expSwitch"></span>
-                I understand this is Experimental
-              </label>
-            </div>
           </div>
 
           <div class="row">
@@ -376,7 +312,7 @@
             <button class="action btn-ghost" id="btnDisconnect" disabled>Disconnect</button>
             <button class="action btn-ghost" id="btnSnapshot" disabled>Full read</button>
           </div>
-          <div class="row" id="pollRow">
+          <div class="row">
             <label class="toggle" id="pollToggle">
               <span class="switch" id="pollSwitch"></span>
               Live poll (~2s priority · full every ~8s)
@@ -462,7 +398,6 @@
     const $ = (id) => document.getElementById(id);
 
     let connected = false;
-    let experimentalOk = false;
 
     async function api(path, opts = {}) {
       const res = await fetch(API + path, {
@@ -492,30 +427,8 @@
       $('btnLiveRefresh').disabled = !on;
       $('btnFaultsRefresh').disabled = !on;
       $('btnVehicleRefresh').disabled = !on;
-      $('adapter').disabled = on;
-    }
-
-    function selectedAdapter() {
-      return $('adapter').value || 'elm327';
-    }
-
-    function syncAdapterUi() {
-      const vas = selectedAdapter() === 'vas6154';
-      $('elmFields').style.display = vas ? 'none' : '';
-      $('vasFields').style.display = vas ? '' : 'none';
-      $('setupStepsElm').style.display = vas ? 'none' : '';
-      $('setupStepsVas').style.display = vas ? '' : 'none';
-      $('pollRow').style.display = vas ? 'none' : '';
-      syncVasModeUi();
-    }
-
-    function syncVasModeUi() {
-      const mode = $('vasMode').value;
-      const showPt = mode === 'passthru' || mode === 'auto';
-      const showDoip = mode === 'doip' || mode === 'auto';
-      $('vasPtRow').style.display = showPt ? '' : 'none';
-      $('vasPtProtoRow').style.display = showPt ? '' : 'none';
-      $('vasDoipRow').style.display = showDoip ? '' : 'none';
+      $('port').disabled = on;
+      $('baud').disabled = on;
     }
 
     // Tabs
@@ -528,21 +441,9 @@
       });
     });
 
-    $('adapter').onchange = () => {
-      showError($('connError'), '');
-      syncAdapterUi();
-    };
-    $('vasMode').onchange = syncVasModeUi;
-
-    $('expToggle').onclick = () => {
-      experimentalOk = !experimentalOk;
-      $('expSwitch').classList.toggle('on', experimentalOk);
-    };
-
     function renderMeta(st) {
       if (!st) { $('meta').textContent = ''; return; }
       const bits = [];
-      if (st.adapterKind) bits.push('Adapter: ' + st.adapterKind + (st.experimental ? ' (exp)' : ''));
       if (st.platform) bits.push(st.platform);
       if (st.transport) bits.push('Transport: ' + st.transport);
       if (st.adapter) bits.push(st.adapter);
@@ -705,8 +606,7 @@
           rows.push(['DID ' + k, val]);
         }
       }
-      wrap.innerHTML = `${v.experimental ? '<div class="note" style="border-color:#f0b4bc">Experimental identify — verify against Debug transcript.</div>' : ''}
-        <div class="kv">${rows.map(([k, val]) => `
+      wrap.innerHTML = `<div class="kv">${rows.map(([k, val]) => `
         <div class="k">${k}</div><div class="v">${fmt(val)}</div>`).join('')}</div>
         ${v.supportedPids?.length ? `<div style="margin-top:16px"><h3>Supported Mode 01 PIDs</h3>
           <div style="font:500 11px/1.5 var(--mono);color:#3a3a3e;word-break:break-all">${v.supportedPids.join(' ')}</div></div>` : ''}
@@ -715,8 +615,6 @@
 
     function applyStatus(st) {
       setConnected(st.connected, st.connected ? 'CONNECTED' : 'DISCONNECTED');
-      if (st.adapterKind) $('adapter').value = st.adapterKind;
-      syncAdapterUi();
       renderMeta(st);
       $('pollSwitch').classList.toggle('on', !!st.polling);
       if (st.lastLive) renderLive(st.lastLive);
@@ -765,27 +663,6 @@
       }
     }
 
-    async function refreshJ2534() {
-      const data = await api('/j2534');
-      const sel = $('dllPath');
-      const cur = sel.value;
-      sel.innerHTML = '<option value="">— auto-select VAS / first device —</option>';
-      for (const d of data.devices || []) {
-        const opt = document.createElement('option');
-        opt.value = d.dllPath;
-        opt.textContent = `${d.name}${d.vendor ? ' · ' + d.vendor : ''} — ${d.dllPath}`;
-        sel.appendChild(opt);
-      }
-      if (cur) sel.value = cur;
-      if (!data.supported) {
-        showError($('connError'), 'J2534 registry discovery is Windows-only. Use DoIP mode with a host IP.');
-      } else if (!(data.devices || []).length) {
-        showError($('connError'), 'No PassThru devices in registry. Install Actia VAS6154 PassThru drivers.');
-      } else {
-        showError($('connError'), '');
-      }
-    }
-
     async function refreshStatus() {
       const st = await api('/status');
       applyStatus(st);
@@ -797,60 +674,21 @@
       try { await refreshPorts(); } catch (e) { showError($('connError'), e.message); }
     };
 
-    $('btnJ2534').onclick = async () => {
-      try { await refreshJ2534(); } catch (e) { showError($('connError'), e.message); }
-    };
-
-    $('btnDoipDiscover').onclick = async () => {
-      showError($('connError'), '');
-      try {
-        const data = await api('/doip/discover', { method: 'POST', body: JSON.stringify({ timeoutMs: 2500 }) });
-        if (data.found?.length) {
-          $('doipHost').value = data.found[0].address;
-          showError($('connError'), '');
-          $('meta').textContent = 'DoIP found: ' + data.found.map((f) => f.address + (f.vin ? ' VIN ' + f.vin : '')).join(', ');
-        } else {
-          showError($('connError'), 'No DoIP vehicles answered UDP discovery. Enter host IP manually.');
-        }
-      } catch (e) { showError($('connError'), e.message); }
-    };
-
     $('btnConnect').onclick = async () => {
       showError($('connError'), '');
-      const adapter = selectedAdapter();
+      const port = $('port').value;
+      if (!port) {
+        setConnected(false, 'FAILED');
+        return showError($('connError'), 'Select a serial port first.');
+      }
       try {
         setConnected(false, 'CONNECTING…');
-        let body;
-        if (adapter === 'vas6154') {
-          if (!experimentalOk) {
-            setConnected(false, 'FAILED');
-            return showError($('connError'), 'Enable “I understand this is Experimental” before connecting VAS.');
-          }
-          body = {
-            adapter: 'vas6154',
-            experimental: true,
-            mode: $('vasMode').value,
-            dllPath: $('dllPath').value || undefined,
-            protocol: $('vasProtocol').value,
-            baudRate: Number($('vasBaud').value),
-            host: $('doipHost').value.trim() || undefined,
-            doipPort: Number($('doipPort').value) || 13400,
-          };
-        } else {
-          const port = $('port').value;
-          if (!port) {
-            setConnected(false, 'FAILED');
-            return showError($('connError'), 'Select a serial port first.');
-          }
-          body = {
-            adapter: 'elm327',
-            port,
-            baudRate: Number($('baud').value),
-          };
-        }
         await api('/connect', {
           method: 'POST',
-          body: JSON.stringify(body),
+          body: JSON.stringify({
+            port,
+            baudRate: Number($('baud').value),
+          }),
         });
         await refreshStatus();
         await loadDebug();
@@ -907,9 +745,6 @@
 
     $('pollToggle').onclick = async () => {
       showError($('connError'), '');
-      if (selectedAdapter() === 'vas6154') {
-        return showError($('connError'), 'Live poll is ELM327-only. Use Debug for VAS raw RX.');
-      }
       const on = $('pollSwitch').classList.contains('on');
       try {
         if (on) {
@@ -935,10 +770,8 @@
 
     (async function boot() {
       try {
-        syncAdapterUi();
         await checkHealth();
         await refreshPorts();
-        try { await refreshJ2534(); } catch { /* non-Windows ok */ }
         await refreshStatus();
         await loadDebug();
         setInterval(async () => {

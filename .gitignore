@@ -1,12 +1,13 @@
 # dependencies
 /node_modules
 tools/obd-bridge/node_modules
-apps/track/node_modules
-apps/track/dist
-apps/track-electron/node_modules
-apps/track-electron/release
-apps/track-electron/obd-host-runner.mjs
-apps/track-electron/ui
+apps/desktop/node_modules
+apps/desktop/release
+apps/desktop/standalone
+apps/desktop/obd-host-runner.mjs
+apps/desktop/build/icon.png
+apps/desktop/build/icon.ico
+apps/desktop/build/icon.icns
 /.pnp
 .pnp.js
 
@@ -15,8 +16,21 @@ apps/track-electron/ui
 /out/
 next-env.d.ts
 
+# PWA / Workbox generated into public/
+/public/sw.js
+/public/sw.js.map
+/public/workbox-*.js
+/public/workbox-*.js.map
+/public/swe-worker-*.js
+
 # production
 /build
+
+# desktop electron
+apps/desktop/node_modules
+apps/desktop/release
+apps/desktop/obd-host-runner.mjs
+apps/desktop/standalone
 
 # misc
 .DS_Store

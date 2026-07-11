@@ -2,7 +2,25 @@
  * Node.js serialport ByteTransport for ELM327 (USB + Bluetooth Classic SPP).
  */
 
+import { createRequire } from 'node:module';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { ByteTransport } from './types';
+
+type SerialPortMod = {
+  SerialPort: {
+    new (opts: { path: string; baudRate: number; autoOpen: boolean }): SerialPortLike;
+    list: () => Promise<
+      {
+        path: string;
+        manufacturer?: string | null;
+        vendorId?: string | null;
+        productId?: string | null;
+        serialNumber?: string | null;
+      }[]
+    >;
+  };
+};
 
 type SerialPortLike = {
   isOpen: boolean;
@@ -13,6 +31,33 @@ type SerialPortLike = {
   on: (event: string, cb: (...args: unknown[]) => void) => void;
   off: (event: string, cb: (...args: unknown[]) => void) => void;
 };
+
+/** Resolve serialport from cwd / bridge / desktop installs (lib/obd has no own deps). */
+async function loadSerialport(): Promise<SerialPortMod> {
+  try {
+    return (await import('serialport')) as unknown as SerialPortMod;
+  } catch {
+    /* fall through */
+  }
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  const candidates = [
+    path.join(here, '../../tools/obd-bridge/package.json'),
+    path.join(here, '../../apps/desktop/package.json'),
+    path.join(here, '../../apps/track-electron/package.json'),
+    path.join(process.cwd(), 'package.json'),
+  ];
+  for (const pkg of candidates) {
+    try {
+      const req = createRequire(pkg);
+      return req('serialport') as SerialPortMod;
+    } catch {
+      /* try next */
+    }
+  }
+  throw new Error(
+    'Cannot find package "serialport". Install it in tools/obd-bridge (or the Desktop app) and restart.',
+  );
+}
 
 export class NodeSerialTransport implements ByteTransport {
   readonly path: string;
@@ -48,7 +93,7 @@ export class NodeSerialTransport implements ByteTransport {
   }
 
   async open(): Promise<void> {
-    const { SerialPort } = await import('serialport');
+    const { SerialPort } = await loadSerialport();
     if (this.#port?.isOpen) await this.close();
 
     this.#port = new SerialPort({
@@ -114,6 +159,6 @@ export async function listSerialPorts(): Promise<
     serialNumber?: string | null;
   }[]
 > {
-  const { SerialPort } = await import('serialport');
+  const { SerialPort } = await loadSerialport();
   return SerialPort.list();
 }

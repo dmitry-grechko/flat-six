@@ -6,6 +6,4 @@ export * from './decode';
 export * from './ports';
 export * from './adapter';
 export { Elm327 } from './elm327';
-export { Vas6154Stub } from './vas6154';
 export { createHttpObdClient, bridgeBaseUrl } from './httpClient';
-export { createWebSerialClient, webSerialAvailable } from './webSerial';

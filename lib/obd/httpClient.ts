@@ -57,9 +57,8 @@ function normalizeStatus(raw: Record<string, unknown>): ObdStatus {
     adapter: (raw.adapter as string) ?? null,
     protocol: (raw.protocol as string) ?? null,
     adapterKind: (raw.adapterKind as AdapterKind) ?? caps?.adapterKind ?? 'elm327',
-    experimental: Boolean(raw.experimental) || ((raw.adapterKind as AdapterKind) === 'vas6154'),
-    pollSupported: raw.pollSupported !== undefined ? Boolean(raw.pollSupported) : (raw.adapterKind as AdapterKind) !== 'vas6154',
     polling: Boolean(raw.polling),
+    pollSupported: raw.pollSupported !== undefined ? Boolean(raw.pollSupported) : true,
     lastLive: (raw.lastLive as LiveData) ?? null,
     lastFaults: (raw.lastFaults as FaultsData) ?? null,
     lastVehicle: (raw.lastVehicle as VehicleInfo) ?? null,
@@ -87,17 +86,8 @@ export function createHttpObdClient(baseUrl: string = bridgeBaseUrl()): ObdClien
         method: 'POST',
         body: JSON.stringify({
           port: opts.port,
-          baudRate: opts.baudRate,
+          baudRate: opts.baudRate ?? 38400,
           adapter: opts.adapter ?? 'elm327',
-          experimental: opts.experimental,
-          mode: opts.mode,
-          dllPath: opts.dllPath,
-          host: opts.host,
-          doipPort: opts.doipPort,
-          protocol: opts.protocol,
-          sourceAddress: opts.sourceAddress,
-          targetAddress: opts.targetAddress,
-          readDids: opts.readDids,
         }),
       });
       return { ok: data.ok, status: normalizeStatus(data.status || {}) };
@@ -175,25 +165,6 @@ export function createHttpObdClient(baseUrl: string = bridgeBaseUrl()): ObdClien
         lastVehicle: VehicleInfo | null;
         capabilities: Capabilities | null;
       }>(base, '/debug');
-    },
-
-    async listJ2534() {
-      return request<{
-        platform: string;
-        supported: boolean;
-        devices: { name: string; vendor?: string; dllPath: string }[];
-        note?: string;
-      }>(base, '/j2534');
-    },
-
-    async discoverDoip(opts?: { timeoutMs?: number; port?: number }) {
-      return request<{ found: { address: string; [k: string]: unknown }[] }>(base, '/doip/discover', {
-        method: 'POST',
-        body: JSON.stringify({
-          timeoutMs: opts?.timeoutMs ?? 2500,
-          port: opts?.port ?? 13400,
-        }),
-      });
     },
   };
 }

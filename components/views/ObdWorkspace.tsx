@@ -1,12 +1,13 @@
 'use client';
 
-import { useMemo, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import Link from 'next/link';
 import { useObdBridge } from '@/lib/obd/useObdBridge';
 import { useVehicle } from '@/lib/vehicle-context';
 import { mono, sans } from '@/components/tools/ui';
-import type { AdapterKind, FaultModule, LiveData, PortInfo, VehicleInfo } from '@/lib/obd/types';
+import type { FaultModule, LiveData, PortInfo, VehicleInfo } from '@/lib/obd/types';
 import { BetaBadge } from '@/components/shell/BetaBadge';
+import { useObdFocus } from '@/lib/obd/ObdFocusContext';
 
 const TABS = [
   { id: 'connection', label: 'Connection' },
@@ -17,7 +18,6 @@ const TABS = [
 ] as const;
 
 type TabId = (typeof TABS)[number]['id'];
-type VasMode = 'passthru' | 'doip' | 'auto';
 
 function isLikelyMac(): boolean {
   if (typeof navigator === 'undefined') return false;
@@ -38,8 +38,8 @@ const card: CSSProperties = {
 
 const cardHead: CSSProperties = {
   margin: 0,
-  padding: '14px 18px',
-  font: `600 11px/1 ${mono}`,
+  padding: '16px 20px',
+  font: `600 12px/1 ${mono}`,
   letterSpacing: '.14em',
   color: '#D5001C',
   borderBottom: '1px solid #F0F0F1',
@@ -47,15 +47,29 @@ const cardHead: CSSProperties = {
 };
 
 const btnBase: CSSProperties = {
-  height: 36,
-  padding: '0 14px',
-  borderRadius: 2,
-  font: `600 11px/1 ${sans}`,
+  minHeight: 44,
+  padding: '0 18px',
+  borderRadius: 4,
+  font: `600 12px/1 ${sans}`,
   letterSpacing: '.08em',
   textTransform: 'uppercase',
   cursor: 'pointer',
   border: 'none',
 };
+
+const tabBtn = (active: boolean): CSSProperties => ({
+  minHeight: 44,
+  padding: '0 16px',
+  borderRadius: 4,
+  border: active ? '1px solid #0B0B0C' : '1px solid #C9C9CD',
+  background: active ? '#0B0B0C' : '#fff',
+  color: active ? '#fff' : '#0B0B0C',
+  font: `600 12px/1 ${mono}`,
+  letterSpacing: '.1em',
+  textTransform: 'uppercase',
+  cursor: 'pointer',
+  whiteSpace: 'nowrap',
+});
 
 function fmt(v: unknown): string {
   if (v == null) return '—';
@@ -67,23 +81,22 @@ function fmt(v: unknown): string {
 export default function ObdWorkspace() {
   const { vehicle: garageVehicle } = useVehicle();
   const obd = useObdBridge();
+  const { focus: obdFocus, setFocus: setObdFocus, toggleFocus } = useObdFocus();
   const [tab, setTab] = useState<TabId>('connection');
   const [port, setPort] = useState('');
   const [baud, setBaud] = useState('38400');
-  const [adapterKind, setAdapterKind] = useState<AdapterKind>('elm327');
-  const [experimentalOk, setExperimentalOk] = useState(false);
-  const [vasMode, setVasMode] = useState<VasMode>(() => (isLikelyMac() ? 'doip' : 'passthru'));
-  const [dllPath, setDllPath] = useState('');
-  const [doipHost, setDoipHost] = useState('');
-  const [doipPort, setDoipPort] = useState('13400');
-  const [j2534, setJ2534] = useState<{ name: string; vendor?: string; dllPath: string }[]>([]);
-  const [j2534Note, setJ2534Note] = useState<string | null>(null);
+  const [onMac, setOnMac] = useState(false);
+  const [onWindows, setOnWindows] = useState(false);
 
   const selectedPort = port || obd.ports[0]?.path || '';
   const isWebSerial = obd.mode === 'web-serial';
-  const onMac = useMemo(() => isLikelyMac(), []);
-  const onWindows = useMemo(() => isLikelyWindows(), []);
-  const pollOk = obd.status?.pollSupported !== false && adapterKind === 'elm327';
+  const pollOk = obd.status?.pollSupported !== false;
+
+  // Platform UA only after mount — keeps SSR HTML identical to the first client paint.
+  useEffect(() => {
+    setOnMac(isLikelyMac());
+    setOnWindows(isLikelyWindows());
+  }, []);
 
   const vinMatch = useMemo(() => {
     const obdVin = obd.vehicleInfo?.vin?.toUpperCase();
@@ -92,81 +105,18 @@ export default function ObdWorkspace() {
     return obdVin === garageVin || obdVin.endsWith(garageVin) || garageVin.endsWith(obdVin);
   }, [obd.vehicleInfo?.vin, garageVehicle.vin]);
 
-  async function selectAdapter(kind: AdapterKind) {
-    setAdapterKind(kind);
-    obd.setError(null);
-    if (kind === 'vas6154' && obd.mode === 'web-serial') {
-      await obd.setMode('bridge');
-    }
-  }
-
-  async function refreshJ2534() {
-    try {
-      const fn = obd.client.listJ2534;
-      if (!fn) {
-        setJ2534Note('J2534 list needs the local bridge.');
-        return;
-      }
-      const data = await fn();
-      setJ2534(data.devices || []);
-      setJ2534Note(data.note || null);
-      if (!dllPath && data.devices?.[0]?.dllPath) setDllPath(data.devices[0].dllPath);
-    } catch (e) {
-      setJ2534([]);
-      setJ2534Note(e instanceof Error ? e.message : String(e));
-    }
-  }
-
-  async function discoverDoip() {
-    try {
-      const fn = obd.client.discoverDoip;
-      if (!fn) {
-        obd.setError('DoIP discovery needs the local bridge.');
-        return;
-      }
-      const data = await fn({ port: Number(doipPort) || 13400 });
-      const first = data.found?.[0]?.address;
-      if (first) setDoipHost(first);
-      else obd.setError('No DoIP hosts found — enter the VAS Wi‑Fi / RNDIS IP manually.');
-    } catch (e) {
-      obd.setError(e instanceof Error ? e.message : String(e));
-    }
-  }
-
   async function handleConnect() {
-    if (adapterKind === 'vas6154') {
-      if (!experimentalOk) {
-        obd.setError('VAS 6154 is experimental — enable the Experimental toggle to connect.');
-        return;
-      }
-      if (isWebSerial) {
-        obd.setError('VAS needs Local bridge. Switch transport and try again.');
-        return;
-      }
-    } else if (!isWebSerial && !selectedPort) {
+    if (!isWebSerial && !selectedPort) {
       obd.setError('Select a serial port first.');
       return;
     }
     try {
-      await obd.connect(
-        adapterKind === 'vas6154'
-          ? {
-              adapter: 'vas6154',
-              experimental: true,
-              mode: vasMode,
-              dllPath: dllPath || undefined,
-              host: doipHost.trim() || undefined,
-              doipPort: Number(doipPort) || 13400,
-              baudRate: Number(baud) || 500000,
-              readDids: true,
-            }
-          : {
-              adapter: 'elm327',
-              port: isWebSerial ? 'web-serial' : selectedPort,
-              baudRate: Number(baud) || 38400,
-            },
-      );
-      setTab(adapterKind === 'vas6154' ? 'debug' : 'live');
+      await obd.connect({
+        adapter: 'elm327',
+        port: isWebSerial ? 'web-serial' : selectedPort,
+        baudRate: Number(baud) || 38400,
+      });
+      setTab('live');
     } catch {
       /* error already set */
     }
@@ -174,9 +124,41 @@ export default function ObdWorkspace() {
 
   return (
     <div
-      className="padView"
-      style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 1100, padding: 28 }}
+      className={obdFocus ? 'obdFocusRoot' : 'padView'}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 16,
+        maxWidth: obdFocus ? 'none' : 1100,
+        padding: obdFocus ? undefined : 28,
+        minHeight: obdFocus ? '100%' : undefined,
+      }}
     >
+      <div className={obdFocus ? 'obdFocusChrome obdTopChrome' : 'obdTopChrome'}>
+        <ObdToolbar
+          focus={obdFocus}
+          onToggleFocus={toggleFocus}
+          onExitFocus={() => setObdFocus(false)}
+          connected={obd.connected}
+          modeLabel={isWebSerial ? 'Web Serial (USB)' : `Bridge${obd.health?.platform ? ` · ${obd.health.platform}` : ''}`}
+        />
+
+        <div className="obdTabBar">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, overflowX: 'auto', paddingBottom: 2 }}>
+            {TABS.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setTab(t.id)}
+                style={tabBtn(t.id === tab)}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
       <PlatformCompatNote onMac={onMac} onWindows={onWindows} />
 
       {obd.needsBridge && (
@@ -198,7 +180,7 @@ export default function ObdWorkspace() {
               LOCAL OBD HELPER OFFLINE
             </div>
             <div style={{ font: `400 14px/1.5 ${sans}`, color: '#3A3A3E' }}>
-              Start the serial bridge for Classic BT / VAS, or switch to <strong>Web Serial</strong> for USB ELM
+              Start the serial bridge for Classic Bluetooth, or switch to <strong>Web Serial</strong> for USB ELM
               (desktop Chrome — no helper). Setup under{' '}
               <Link href="/downloads" style={{ color: '#D5001C', fontWeight: 500, textDecoration: 'none' }}>
                 Downloads
@@ -219,7 +201,7 @@ export default function ObdWorkspace() {
             </code>
           </div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            {obd.webSerialOk && adapterKind === 'elm327' && (
+            {obd.webSerialOk && (
               <button
                 type="button"
                 style={{ ...btnBase, background: '#D5001C', color: '#fff' }}
@@ -254,17 +236,17 @@ export default function ObdWorkspace() {
           flexWrap: 'wrap',
           gap: 12,
           alignItems: 'center',
-          padding: '12px 16px',
+          padding: '14px 18px',
         }}
       >
         <StatusDot on={obd.connected} label={obd.connected ? 'CONNECTED' : 'DISCONNECTED'} />
-        <span style={{ font: `500 11px/1.3 ${mono}`, color: '#6E6E73' }}>
-          {adapterKind === 'vas6154' ? 'VAS 6154' : 'ELM327'}
+        <span style={{ font: `500 12px/1.3 ${mono}`, color: '#6E6E73' }}>
+          ELM327
           {' · '}
           {isWebSerial ? 'Web Serial (USB)' : `Bridge${obd.health?.platform ? ` · ${obd.health.platform}` : ''}`}
         </span>
         {obd.status?.path && (
-          <span style={{ font: `500 11px/1.3 ${mono}`, color: '#6E6E73' }}>
+          <span style={{ font: `500 12px/1.3 ${mono}`, color: '#6E6E73' }}>
             {obd.status.path} @ {obd.status.baudRate}
             {obd.status.adapter ? ` · ${obd.status.adapter}` : ''}
             {obd.status.protocol ? ` · ${obd.status.protocol}` : ''}
@@ -275,14 +257,16 @@ export default function ObdWorkspace() {
             marginLeft: 'auto',
             display: 'inline-flex',
             alignItems: 'center',
-            gap: 10,
+            gap: 12,
             cursor: obd.connected && pollOk ? 'pointer' : 'not-allowed',
             opacity: obd.connected && pollOk ? 1 : 0.45,
-            font: `600 11px/1 ${mono}`,
+            font: `600 12px/1 ${mono}`,
             letterSpacing: '.08em',
             userSelect: 'none',
+            minHeight: 44,
+            padding: '4px 0',
           }}
-          title={!pollOk ? 'Live poll is ELM327-only' : undefined}
+          title={!pollOk ? 'Live poll unavailable for this adapter' : undefined}
           onClick={() => {
             if (!obd.connected || obd.busy || !pollOk) return;
             obd.setPolling(!obd.polling, 2000);
@@ -290,21 +274,22 @@ export default function ObdWorkspace() {
         >
           <span
             style={{
-              width: 44,
-              height: 24,
-              borderRadius: 12,
+              width: 52,
+              height: 28,
+              borderRadius: 14,
               background: obd.polling ? '#D5001C' : '#D2D2D6',
               position: 'relative',
               transition: 'background .15s',
+              flexShrink: 0,
             }}
           >
             <span
               style={{
                 position: 'absolute',
                 top: 3,
-                left: obd.polling ? 23 : 3,
-                width: 18,
-                height: 18,
+                left: obd.polling ? 27 : 3,
+                width: 22,
+                height: 22,
                 borderRadius: '50%',
                 background: '#fff',
                 transition: 'left .15s',
@@ -330,32 +315,6 @@ export default function ObdWorkspace() {
         </div>
       )}
 
-      {/* Tabs */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, overflowX: 'auto', paddingBottom: 2 }}>
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            onClick={() => setTab(t.id)}
-            style={{
-              height: 36,
-              padding: '0 14px',
-              borderRadius: 2,
-              border: t.id === tab ? '1px solid #0B0B0C' : '1px solid #C9C9CD',
-              background: t.id === tab ? '#0B0B0C' : '#fff',
-              color: t.id === tab ? '#fff' : '#0B0B0C',
-              font: `600 11px/1 ${mono}`,
-              letterSpacing: '.1em',
-              textTransform: 'uppercase',
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-
       {tab === 'connection' && (
         <ConnectionPanel
           obd={obd}
@@ -363,23 +322,6 @@ export default function ObdWorkspace() {
           setPort={setPort}
           baud={baud}
           setBaud={setBaud}
-          adapterKind={adapterKind}
-          onSelectAdapter={selectAdapter}
-          experimentalOk={experimentalOk}
-          setExperimentalOk={setExperimentalOk}
-          vasMode={vasMode}
-          setVasMode={setVasMode}
-          dllPath={dllPath}
-          setDllPath={setDllPath}
-          doipHost={doipHost}
-          setDoipHost={setDoipHost}
-          doipPort={doipPort}
-          setDoipPort={setDoipPort}
-          j2534={j2534}
-          j2534Note={j2534Note}
-          onRefreshJ2534={refreshJ2534}
-          onDiscoverDoip={discoverDoip}
-          onMac={onMac}
           onConnect={handleConnect}
         />
       )}
@@ -403,6 +345,106 @@ export default function ObdWorkspace() {
         />
       )}
       {tab === 'debug' && <DebugPanel obd={obd} />}
+    </div>
+  );
+}
+
+function ObdToolbar({
+  focus,
+  onToggleFocus,
+  onExitFocus,
+  connected,
+  modeLabel,
+}: {
+  focus: boolean;
+  onToggleFocus: () => void;
+  onExitFocus: () => void;
+  connected: boolean;
+  modeLabel: string;
+}) {
+  return (
+    <div
+      className="obdToolbar"
+      style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        gap: 10,
+        padding: focus ? '12px 0 4px' : '4px 0',
+      }}
+    >
+      {focus && (
+        <div style={{ minWidth: 0, flex: '1 1 140px' }}>
+          <div style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.16em', color: '#9A9AA0' }}>DIAGNOSTICS</div>
+          <div
+            style={{
+              font: "400 18px/1.2 'Helvetica Neue',Arial,sans-serif",
+              color: '#0B0B0C',
+              marginTop: 4,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              flexWrap: 'wrap',
+            }}
+          >
+            <span>Live OBD</span>
+            <BetaBadge tone="page" />
+          </div>
+        </div>
+      )}
+      {focus && (
+        <span
+          style={{
+            font: `600 11px/1 ${mono}`,
+            letterSpacing: '.08em',
+            color: connected ? '#1A7A42' : '#6E6E73',
+            padding: '10px 12px',
+            background: '#fff',
+            border: '1px solid #E3E3E5',
+            borderRadius: 4,
+          }}
+        >
+          {connected ? 'CONNECTED' : 'DISCONNECTED'} · {modeLabel}
+        </span>
+      )}
+      <div style={{ marginLeft: focus ? 'auto' : 0, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        {focus ? (
+          <button
+            type="button"
+            onClick={onExitFocus}
+            aria-label="Exit focus mode"
+            style={{
+              ...btnBase,
+              background: '#0B0B0C',
+              color: '#fff',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+            }}
+          >
+            <span aria-hidden style={{ fontSize: 16, lineHeight: 1 }}>×</span>
+            Exit focus
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={onToggleFocus}
+            aria-label="Enter focus mode"
+            style={{
+              ...btnBase,
+              background: '#fff',
+              color: '#0B0B0C',
+              border: '1px solid #C9C9CD',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+            }}
+          >
+            <span aria-hidden style={{ fontSize: 14, lineHeight: 1 }}>⤢</span>
+            Focus
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -432,15 +474,7 @@ function PlatformCompatNote({ onMac, onWindows }: { onMac: boolean; onWindows: b
           bridge needed.
         </li>
         <li>
-          <strong>ELM327 Classic Bluetooth</strong> — needs the local bridge (or Electron Track), not Web Serial.
-        </li>
-        <li>
-          <strong>VAS 6154 PassThru</strong> — Windows + local bridge only (J2534 DLL). Not available in the
-          browser or on Mac PassThru.
-        </li>
-        <li>
-          <strong>VAS 6154 DoIP</strong> — experimental over the bridge if the VCI has a reachable IP (Wi‑Fi /
-          RNDIS). Possible on Mac, but lab-only — not full Live OBD.
+          <strong>ELM327 Classic Bluetooth</strong> — needs the local bridge (or FLAT·SIX Desktop), not Web Serial.
         </li>
       </ul>
       {onMac && (
@@ -454,8 +488,8 @@ function PlatformCompatNote({ onMac, onWindows }: { onMac: boolean; onWindows: b
             color: '#6E6E73',
           }}
         >
-          On this Mac, plan on <strong>USB ELM + Web Serial</strong> for Live OBD. Use Windows for VAS PassThru
-          testing.
+          On this Mac, use <strong>USB ELM + Web Serial</strong> for the simplest Live OBD path, or the local bridge
+          for Classic Bluetooth adapters.
         </p>
       )}
     </div>
@@ -468,20 +502,22 @@ function StatusDot({ on, label }: { on: boolean; label: string }) {
       style={{
         display: 'inline-flex',
         alignItems: 'center',
-        gap: 8,
-        font: `600 11px/1 ${mono}`,
+        gap: 10,
+        font: `600 12px/1 ${mono}`,
         letterSpacing: '.1em',
-        padding: '8px 12px',
-        borderRadius: 3,
+        padding: '10px 14px',
+        borderRadius: 4,
         background: '#F4F4F5',
+        minHeight: 44,
       }}
     >
       <span
         style={{
-          width: 8,
-          height: 8,
+          width: 10,
+          height: 10,
           borderRadius: '50%',
           background: on ? '#3CD37A' : '#B4B4B8',
+          flexShrink: 0,
         }}
       />
       {label}
@@ -495,23 +531,6 @@ function ConnectionPanel({
   setPort,
   baud,
   setBaud,
-  adapterKind,
-  onSelectAdapter,
-  experimentalOk,
-  setExperimentalOk,
-  vasMode,
-  setVasMode,
-  dllPath,
-  setDllPath,
-  doipHost,
-  setDoipHost,
-  doipPort,
-  setDoipPort,
-  j2534,
-  j2534Note,
-  onRefreshJ2534,
-  onDiscoverDoip,
-  onMac,
   onConnect,
 }: {
   obd: ReturnType<typeof useObdBridge>;
@@ -519,279 +538,81 @@ function ConnectionPanel({
   setPort: (v: string) => void;
   baud: string;
   setBaud: (v: string) => void;
-  adapterKind: AdapterKind;
-  onSelectAdapter: (k: AdapterKind) => void;
-  experimentalOk: boolean;
-  setExperimentalOk: (v: boolean) => void;
-  vasMode: VasMode;
-  setVasMode: (v: VasMode) => void;
-  dllPath: string;
-  setDllPath: (v: string) => void;
-  doipHost: string;
-  setDoipHost: (v: string) => void;
-  doipPort: string;
-  setDoipPort: (v: string) => void;
-  j2534: { name: string; vendor?: string; dllPath: string }[];
-  j2534Note: string | null;
-  onRefreshJ2534: () => void;
-  onDiscoverDoip: () => void;
-  onMac: boolean;
   onConnect: () => void;
 }) {
   const isWebSerial = obd.mode === 'web-serial';
-  const isVas = adapterKind === 'vas6154';
-  const showDoip = isVas && (vasMode === 'doip' || vasMode === 'auto');
-  const showPassThru = isVas && (vasMode === 'passthru' || vasMode === 'auto');
-  const canConnect = isVas
-    ? obd.bridgeOnline && !obd.connected && !obd.busy && experimentalOk && !isWebSerial
-    : isWebSerial
-      ? !obd.connected && !obd.busy
-      : obd.bridgeOnline && !obd.connected && !obd.busy;
+  const canConnect = isWebSerial
+    ? !obd.connected && !obd.busy
+    : obd.bridgeOnline && !obd.connected && !obd.busy;
 
   const fieldLabel: CSSProperties = {
-    font: `500 11px/1 ${mono}`,
+    font: `500 12px/1 ${mono}`,
     letterSpacing: '.08em',
     color: '#6E6E73',
     textTransform: 'uppercase',
+    minHeight: 44,
+    display: 'inline-flex',
+    alignItems: 'center',
   };
   const selectStyle: CSSProperties = {
-    height: 38,
+    minHeight: 44,
     border: '1px solid #D2D2D6',
-    borderRadius: 3,
-    padding: '0 12px',
-    font: `500 12px/1 ${mono}`,
+    borderRadius: 4,
+    padding: '0 14px',
+    font: `500 13px/1 ${mono}`,
     background: '#fff',
-  };
-  const inputStyle: CSSProperties = {
-    ...selectStyle,
-    minWidth: 180,
   };
 
   return (
     <section style={card}>
       <h2 style={cardHead}>Connection</h2>
-      <div style={{ padding: '18px 20px 22px' }}>
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ ...fieldLabel, marginBottom: 8 }}>Adapter</div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-            <button
-              type="button"
-              disabled={obd.connected || obd.busy}
-              onClick={() => onSelectAdapter('elm327')}
-              style={{
-                ...btnBase,
-                background: !isVas ? '#0B0B0C' : '#fff',
-                color: !isVas ? '#fff' : '#0B0B0C',
-                border: !isVas ? 'none' : '1px solid #C9C9CD',
-              }}
-            >
-              ELM327
-            </button>
-            <button
-              type="button"
-              disabled={obd.connected || obd.busy}
-              onClick={() => onSelectAdapter('vas6154')}
-              style={{
-                ...btnBase,
-                background: isVas ? '#0B0B0C' : '#fff',
-                color: isVas ? '#fff' : '#0B0B0C',
-                border: isVas ? 'none' : '1px solid #C9C9CD',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-              }}
-            >
-              VAS 6154
-              <BetaBadge tone={isVas ? 'dark' : 'page'} />
-            </button>
-          </div>
-          <p style={{ margin: '10px 0 0', font: `400 13px/1.5 ${sans}`, color: '#6E6E73' }}>
-            {isVas
-              ? 'Experimental lab path — J2534 PassThru (Windows) and/or DoIP raw transcript. Not a full UDS stack; use Debug for RX.'
-              : 'Production path — USB / Classic BT serial. Generic OBD talks to the DME only.'}
-          </p>
-        </div>
-
-        {isVas && (
-          <div
-            style={{
-              marginBottom: 16,
-              padding: '14px 14px',
-              background: '#F8F8F9',
-              border: '1px solid #E3E3E5',
-              borderRadius: 4,
-            }}
-          >
-            <label
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 10,
-                cursor: obd.connected ? 'not-allowed' : 'pointer',
-                font: `600 11px/1 ${mono}`,
-                letterSpacing: '.08em',
-                opacity: obd.connected ? 0.5 : 1,
-              }}
-              onClick={() => {
-                if (!obd.connected) setExperimentalOk(!experimentalOk);
-              }}
-            >
-              <span
-                style={{
-                  width: 44,
-                  height: 24,
-                  borderRadius: 12,
-                  background: experimentalOk ? '#D5001C' : '#D2D2D6',
-                  position: 'relative',
-                  transition: 'background .15s',
-                }}
-              >
-                <span
-                  style={{
-                    position: 'absolute',
-                    top: 3,
-                    left: experimentalOk ? 23 : 3,
-                    width: 18,
-                    height: 18,
-                    borderRadius: '50%',
-                    background: '#fff',
-                    transition: 'left .15s',
-                  }}
-                />
-              </span>
-              EXPERIMENTAL — I UNDERSTAND
-            </label>
-            {onMac && (
-              <p style={{ margin: '10px 0 0', font: `400 13px/1.5 ${sans}`, color: '#8A0011' }}>
-                PassThru will not work on Mac. Use mode <strong>DoIP</strong> with a reachable VCI IP, or test
-                PassThru on Windows.
-              </p>
-            )}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center', marginTop: 14 }}>
-              <label style={fieldLabel}>Mode</label>
-              <select
-                value={vasMode}
-                onChange={(e) => setVasMode(e.target.value as VasMode)}
-                disabled={obd.connected}
-                style={selectStyle}
-              >
-                <option value="passthru">PassThru (Windows)</option>
-                <option value="doip">DoIP (TCP)</option>
-                <option value="auto">Auto (PassThru → DoIP)</option>
-              </select>
-            </div>
-            {showPassThru && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center', marginTop: 12 }}>
-                <label style={fieldLabel}>PassThru DLL</label>
-                <select
-                  value={dllPath}
-                  onChange={(e) => setDllPath(e.target.value)}
-                  disabled={obd.connected || !obd.bridgeOnline}
-                  style={{ ...selectStyle, minWidth: 260, maxWidth: '100%' }}
-                >
-                  <option value="">— auto / refresh J2534 —</option>
-                  {j2534.map((d) => (
-                    <option key={d.dllPath} value={d.dllPath}>
-                      {d.name}
-                      {d.vendor ? ` · ${d.vendor}` : ''} — {d.dllPath}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  type="button"
-                  style={{ ...btnBase, background: '#fff', color: '#0B0B0C', border: '1px solid #C9C9CD' }}
-                  disabled={!obd.bridgeOnline || obd.busy || obd.connected}
-                  onClick={onRefreshJ2534}
-                >
-                  Refresh J2534
-                </button>
-              </div>
-            )}
-            {j2534Note && showPassThru && (
-              <p style={{ margin: '8px 0 0', font: `400 12px/1.45 ${sans}`, color: '#9A9AA0' }}>{j2534Note}</p>
-            )}
-            {showDoip && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center', marginTop: 12 }}>
-                <label style={fieldLabel}>DoIP host</label>
-                <input
-                  value={doipHost}
-                  onChange={(e) => setDoipHost(e.target.value)}
-                  disabled={obd.connected}
-                  placeholder="169.254.x.x or VAS Wi‑Fi IP"
-                  style={inputStyle}
-                />
-                <label style={fieldLabel}>Port</label>
-                <input
-                  value={doipPort}
-                  onChange={(e) => setDoipPort(e.target.value)}
-                  disabled={obd.connected}
-                  style={{ ...inputStyle, minWidth: 90, width: 100 }}
-                />
-                <button
-                  type="button"
-                  style={{ ...btnBase, background: '#fff', color: '#0B0B0C', border: '1px solid #C9C9CD' }}
-                  disabled={!obd.bridgeOnline || obd.busy || obd.connected}
-                  onClick={onDiscoverDoip}
-                >
-                  Discover
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-
+      <div style={{ padding: '20px 22px 24px' }}>
         <p style={{ margin: '0 0 14px', font: `400 14px/1.5 ${sans}`, color: '#3A3A3E' }}>
-          {!isVas && isWebSerial
-            ? 'Desktop Chrome/Edge talks to the USB ELM327 directly (Web Serial) — no local helper. Leave MS/HS on HS-CAN.'
-            : !isVas
-              ? 'USB or Bluetooth Classic via the local bridge (COM / cu.*). Leave MS/HS on HS-CAN.'
-              : 'VAS uses the local bridge only — Web Serial cannot open PassThru/DoIP.'}
+          USB or Bluetooth Classic serial via ELM327. Generic OBD talks to the DME only. Leave MS/HS on HS-CAN.
         </p>
 
-        {!isVas && (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
-            <button
-              type="button"
-              disabled={!obd.webSerialOk || obd.connected || obd.busy}
-              onClick={() => obd.setMode('web-serial')}
-              style={{
-                ...btnBase,
-                background: isWebSerial ? '#0B0B0C' : '#fff',
-                color: isWebSerial ? '#fff' : '#0B0B0C',
-                border: isWebSerial ? 'none' : '1px solid #C9C9CD',
-                opacity: obd.webSerialOk ? 1 : 0.45,
-              }}
-            >
-              Web Serial (USB)
-            </button>
-            <button
-              type="button"
-              disabled={obd.connected || obd.busy}
-              onClick={() => obd.setMode('bridge')}
-              style={{
-                ...btnBase,
-                background: !isWebSerial ? '#0B0B0C' : '#fff',
-                color: !isWebSerial ? '#fff' : '#0B0B0C',
-                border: !isWebSerial ? 'none' : '1px solid #C9C9CD',
-              }}
-            >
-              Local bridge
-            </button>
-            {!obd.webSerialOk && (
-              <span style={{ font: `400 13px/1.4 ${sans}`, color: '#6E6E73', alignSelf: 'center' }}>
-                Web Serial needs desktop Chrome or Edge
-              </span>
-            )}
-          </div>
-        )}
+        <p style={{ margin: '0 0 14px', font: `400 14px/1.5 ${sans}`, color: '#3A3A3E' }}>
+          {isWebSerial
+            ? 'Desktop Chrome/Edge talks to the USB ELM327 directly (Web Serial) — no local helper.'
+            : 'USB or Bluetooth Classic via the local bridge (COM / cu.*).'}
+        </p>
 
-        {isVas && (
-          <div style={{ marginBottom: 14, font: `500 12px/1.4 ${mono}`, color: '#6E6E73' }}>
-            Transport: local bridge (required)
-          </div>
-        )}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 16 }}>
+          <button
+            type="button"
+            disabled={!obd.webSerialOk || obd.connected || obd.busy}
+            onClick={() => obd.setMode('web-serial')}
+            style={{
+              ...btnBase,
+              background: isWebSerial ? '#0B0B0C' : '#fff',
+              color: isWebSerial ? '#fff' : '#0B0B0C',
+              border: isWebSerial ? 'none' : '1px solid #C9C9CD',
+              opacity: obd.webSerialOk ? 1 : 0.45,
+            }}
+          >
+            Web Serial (USB)
+          </button>
+          <button
+            type="button"
+            disabled={obd.connected || obd.busy}
+            onClick={() => obd.setMode('bridge')}
+            style={{
+              ...btnBase,
+              background: !isWebSerial ? '#0B0B0C' : '#fff',
+              color: !isWebSerial ? '#fff' : '#0B0B0C',
+              border: !isWebSerial ? 'none' : '1px solid #C9C9CD',
+            }}
+          >
+            Local bridge
+          </button>
+          {!obd.webSerialOk && (
+            <span style={{ font: `400 13px/1.4 ${sans}`, color: '#6E6E73', alignSelf: 'center' }}>
+              Web Serial needs desktop Chrome or Edge
+            </span>
+          )}
+        </div>
 
-        {!isWebSerial && !isVas && (
+        {!isWebSerial && (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center', marginBottom: 14 }}>
             <label style={fieldLabel}>Port</label>
             <select
@@ -820,29 +641,19 @@ function ConnectionPanel({
         )}
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
-          {!isVas && (
-            <>
-              <label style={fieldLabel}>Baud</label>
-              <select value={baud} onChange={(e) => setBaud(e.target.value)} style={selectStyle}>
-                <option value="38400">38400</option>
-                <option value="9600">9600</option>
-                <option value="115200">115200</option>
-              </select>
-            </>
-          )}
+          <label style={fieldLabel}>Baud</label>
+          <select value={baud} onChange={(e) => setBaud(e.target.value)} style={selectStyle}>
+            <option value="38400">38400</option>
+            <option value="9600">9600</option>
+            <option value="115200">115200</option>
+          </select>
           <button
             type="button"
             style={{ ...btnBase, background: '#D5001C', color: '#fff' }}
             disabled={!canConnect}
             onClick={onConnect}
           >
-            {obd.busy && !obd.connected
-              ? 'Connecting…'
-              : isVas
-                ? 'Connect VAS'
-                : isWebSerial
-                  ? 'Connect USB ELM'
-                  : 'Connect'}
+            {obd.busy && !obd.connected ? 'Connecting…' : isWebSerial ? 'Connect USB ELM' : 'Connect'}
           </button>
           <button
             type="button"
@@ -876,8 +687,8 @@ function LivePanel({
   return (
     <section style={card}>
       <h2 style={cardHead}>Live data</h2>
-      <div style={{ padding: '18px 20px 22px' }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
+      <div style={{ padding: '20px 22px 24px' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 16 }}>
           <button
             type="button"
             style={{ ...btnBase, background: '#fff', color: '#0B0B0C', border: '1px solid #C9C9CD' }}
@@ -908,27 +719,27 @@ function LivePanel({
               <div
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
-                  gap: 12,
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(148px, 1fr))',
+                  gap: 14,
                 }}
               >
                 {(groups[group] || []).map((m) => (
                   <div
                     key={m.key}
-                    style={{ background: '#141416', color: '#fff', borderRadius: 6, padding: '14px 16px' }}
+                    style={{ background: '#141416', color: '#fff', borderRadius: 8, padding: '16px 18px', minHeight: 88 }}
                   >
                     <div
                       style={{
-                        font: `500 9px/1 ${mono}`,
+                        font: `500 10px/1 ${mono}`,
                         letterSpacing: '.12em',
                         color: '#76767B',
-                        marginBottom: 8,
+                        marginBottom: 10,
                       }}
                     >
                       {m.label}
                     </div>
-                    <div style={{ font: `300 26px/1 ${sans}`, wordBreak: 'break-word' }}>{fmt(m.value)}</div>
-                    <div style={{ font: `500 11px/1 ${mono}`, color: '#9A9AA0', marginTop: 6 }}>
+                    <div style={{ font: `300 30px/1.1 ${sans}`, wordBreak: 'break-word' }}>{fmt(m.value)}</div>
+                    <div style={{ font: `500 12px/1 ${mono}`, color: '#9A9AA0', marginTop: 8 }}>
                       {m.unit || `PID ${m.pid}`}
                     </div>
                   </div>
@@ -987,12 +798,15 @@ function Chip({ children, ok }: { children: ReactNode; ok?: boolean }) {
   return (
     <span
       style={{
-        font: `500 11px/1 ${mono}`,
-        padding: '6px 10px',
-        borderRadius: 3,
+        font: `500 12px/1 ${mono}`,
+        padding: '10px 14px',
+        borderRadius: 4,
         border: `1px solid ${border}`,
         color,
         background: '#fff',
+        minHeight: 44,
+        display: 'inline-flex',
+        alignItems: 'center',
       }}
     >
       {children}
@@ -1014,7 +828,7 @@ function FaultsPanel({
   return (
     <section style={card}>
       <h2 style={cardHead}>Fault codes</h2>
-      <div style={{ padding: '18px 20px 22px' }}>
+      <div style={{ padding: '20px 22px 24px' }}>
         <p style={{ margin: '0 0 14px', font: `400 14px/1.5 ${sans}`, color: '#3A3A3E' }}>
           Generic OBD Mode 03 / 07 / 0A reads the engine emissions ECU (DME) only. Click a code to look it up in Fault
           Finding.
@@ -1117,17 +931,31 @@ function ModuleCard({ module: m }: { module: FaultModule }) {
 
 function DtcList({ label, codes }: { label: string; codes: string[] }) {
   return (
-    <div style={{ marginBottom: 10 }}>
-      <div style={{ font: `600 10px/1 ${mono}`, letterSpacing: '.08em', color: '#9A9AA0', marginBottom: 6 }}>
+    <div style={{ marginBottom: 12 }}>
+      <div style={{ font: `600 11px/1 ${mono}`, letterSpacing: '.08em', color: '#9A9AA0', marginBottom: 8 }}>
         {label}
       </div>
       {!codes?.length ? (
-        <div style={{ color: '#6E6E73', font: `400 14px/1.4 ${sans}` }}>(none)</div>
+        <div style={{ color: '#6E6E73', font: `400 14px/1.4 ${sans}`, padding: '8px 0' }}>(none)</div>
       ) : (
-        <ul style={{ margin: 0, paddingLeft: 18, font: `500 13px/1.5 ${mono}` }}>
+        <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
           {codes.map((c) => (
-            <li key={c} style={{ margin: '4px 0' }}>
-              <Link href={`/faults?q=${encodeURIComponent(c)}`} style={{ color: '#D5001C', textDecoration: 'none' }}>
+            <li key={c} style={{ margin: '6px 0' }}>
+              <Link
+                href={`/faults?q=${encodeURIComponent(c)}`}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  minHeight: 44,
+                  padding: '10px 14px',
+                  borderRadius: 4,
+                  border: '1px solid #E3E3E5',
+                  background: '#fff',
+                  color: '#D5001C',
+                  textDecoration: 'none',
+                  font: `600 14px/1.3 ${mono}`,
+                }}
+              >
                 {c}
               </Link>
             </li>
@@ -1168,7 +996,7 @@ function VehiclePanel({
   return (
     <section style={card}>
       <h2 style={cardHead}>Vehicle info</h2>
-      <div style={{ padding: '18px 20px 22px' }}>
+      <div style={{ padding: '20px 22px 24px' }}>
         <button
           type="button"
           style={{ ...btnBase, background: '#fff', color: '#0B0B0C', border: '1px solid #C9C9CD', marginBottom: 14 }}
@@ -1243,7 +1071,7 @@ function DebugPanel({ obd }: { obd: ReturnType<typeof useObdBridge> }) {
   return (
     <section style={card}>
       <h2 style={cardHead}>Debug log</h2>
-      <div style={{ padding: '18px 20px 22px' }}>
+      <div style={{ padding: '20px 22px 24px' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
           <button
             type="button"

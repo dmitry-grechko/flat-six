@@ -3,21 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Local OBD bridge + test UI for FLAT·SIX (ELM327 + experimental VAS6154)",
+  "description": "Local ELM327 OBD bridge + test UI for FLAT·SIX",
   "scripts": {
     "start": "node --import tsx server.mjs",
     "dev": "node --import tsx --watch server.mjs"
   },
   "dependencies": {
-    "koffi": "^2.11.0",
     "serialport": "^13.0.0",
-    "tsx": "^4.23.0"
+    "tsx": "^4.20.0"
   },
   "engines": {
     "node": ">=22"
-  },
-  "allowScripts": {
-    "koffi@2.16.2": true,
-    "@serialport/bindings-cpp@13.0.0": true
   }
 }

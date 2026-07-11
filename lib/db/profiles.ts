@@ -33,16 +33,26 @@ export async function getMyProfile(): Promise<Profile | null> {
       createdAt: new Date().toISOString(),
     };
   }
-  const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('id, display_name, units, documents_access, created_at')
-    .eq('id', user.id)
-    .maybeSingle();
-  if (error || !data) return null;
-  return rowToProfile(data as ProfileRow);
+
+  const { getCachedProfile, isProbablyOffline } = await import('@/lib/offline/sync');
+  if (isProbablyOffline()) {
+    return (await getCachedProfile()) ?? null;
+  }
+
+  try {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return null;
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, display_name, units, documents_access, created_at')
+      .eq('id', user.id)
+      .maybeSingle();
+    if (error || !data) return null;
+    return rowToProfile(data as ProfileRow);
+  } catch {
+    return (await getCachedProfile()) ?? null;
+  }
 }
 
 /** Whether the signed-in user may open the factory PDF library / deep links. */

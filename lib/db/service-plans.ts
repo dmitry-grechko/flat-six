@@ -96,14 +96,30 @@ function itemsForDb(items: ServicePlanItem[] | undefined) {
 
 export async function listPlans(vehicleId: string): Promise<ServicePlan[]> {
   if (DEMO_MODE) return (demoStore().plans[vehicleId] ?? []).map((p) => ({ ...p }));
-  const supabase = createClient();
-  const { data, error } = await supabase
-    .from('service_plans')
-    .select('*')
-    .eq('vehicle_id', vehicleId)
-    .order('created_at', { ascending: false });
-  if (error) throw error;
-  return (data as PlanRow[]).map(rowToPlan);
+
+  const { getCachedPlans, isProbablyOffline, rememberPlansCache } = await import('@/lib/offline/sync');
+  if (isProbablyOffline()) {
+    const cached = await getCachedPlans(vehicleId);
+    if (cached) return cached;
+    return [];
+  }
+
+  try {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('service_plans')
+      .select('*')
+      .eq('vehicle_id', vehicleId)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    const list = (data as PlanRow[]).map(rowToPlan);
+    void rememberPlansCache(vehicleId, list);
+    return list;
+  } catch (e) {
+    const cached = await getCachedPlans(vehicleId);
+    if (cached) return cached;
+    throw e;
+  }
 }
 
 export async function addPlan(vehicleId: string, plan: NewServicePlan): Promise<ServicePlan> {
@@ -116,6 +132,20 @@ export async function addPlan(vehicleId: string, plan: NewServicePlan): Promise<
     s.plans[vehicleId] = [created, ...(s.plans[vehicleId] ?? [])];
     return { ...created };
   }
+
+  const { isProbablyOffline, localId, queuePlanAdd } = await import('@/lib/offline/sync');
+  if (isProbablyOffline()) {
+    const id = localId('plan');
+    await queuePlanAdd(vehicleId, plan, id);
+    return {
+      ...plan,
+      id,
+      status: plan.status ?? 'planning',
+      items: plan.items ?? [],
+      createdAt: new Date().toISOString(),
+    };
+  }
+
   const supabase = createClient();
   const {
     data: { user },
@@ -154,23 +184,49 @@ export async function updatePlan(id: string, patch: PlanPatch): Promise<ServiceP
     if (!updated) throw new Error('Plan not found');
     return updated;
   }
-  const supabase = createClient();
-  const row: Record<string, unknown> = {};
-  if (patch.title !== undefined) row.title = patch.title;
-  if (patch.notes !== undefined) row.notes = patch.notes || null;
-  if (patch.status !== undefined) row.status = patch.status;
-  if (patch.targetDate !== undefined) row.target_date = patch.targetDate || null;
-  if (patch.targetMileage !== undefined) row.target_mileage = patch.targetMileage || null;
-  if (patch.items !== undefined) row.items = itemsForDb(patch.items);
 
-  const { data, error } = await supabase
-    .from('service_plans')
-    .update(row)
-    .eq('id', id)
-    .select('*')
-    .single();
-  if (error) throw error;
-  return rowToPlan(data as PlanRow);
+  const { isProbablyOffline, queuePlanUpdate, getCachedPlans, loadSnapshot } = await import(
+    '@/lib/offline/sync'
+  );
+  if (isProbablyOffline()) {
+    await queuePlanUpdate(id, patch);
+    const snap = await loadSnapshot();
+    for (const vid of Object.keys(snap?.plans ?? {})) {
+      const found = (await getCachedPlans(vid))?.find((p) => p.id === id);
+      if (found) return found;
+    }
+    throw new Error('Plan not found in offline cache');
+  }
+
+  try {
+    const supabase = createClient();
+    const row: Record<string, unknown> = {};
+    if (patch.title !== undefined) row.title = patch.title;
+    if (patch.notes !== undefined) row.notes = patch.notes || null;
+    if (patch.status !== undefined) row.status = patch.status;
+    if (patch.targetDate !== undefined) row.target_date = patch.targetDate || null;
+    if (patch.targetMileage !== undefined) row.target_mileage = patch.targetMileage || null;
+    if (patch.items !== undefined) row.items = itemsForDb(patch.items);
+
+    const { data, error } = await supabase
+      .from('service_plans')
+      .update(row)
+      .eq('id', id)
+      .select('*')
+      .single();
+    if (error) throw error;
+    return rowToPlan(data as PlanRow);
+  } catch (e) {
+    if (isProbablyOffline()) {
+      await queuePlanUpdate(id, patch);
+      const snap = await loadSnapshot();
+      for (const vid of Object.keys(snap?.plans ?? {})) {
+        const found = (await getCachedPlans(vid))?.find((p) => p.id === id);
+        if (found) return found;
+      }
+    }
+    throw e;
+  }
 }
 
 export async function deletePlan(id: string): Promise<void> {
@@ -179,7 +235,22 @@ export async function deletePlan(id: string): Promise<void> {
     for (const k of Object.keys(s.plans)) s.plans[k] = s.plans[k].filter((p) => p.id !== id);
     return;
   }
-  const supabase = createClient();
-  const { error } = await supabase.from('service_plans').delete().eq('id', id);
-  if (error) throw error;
+
+  const { isProbablyOffline, queuePlanDelete } = await import('@/lib/offline/sync');
+  if (isProbablyOffline()) {
+    await queuePlanDelete(id);
+    return;
+  }
+
+  try {
+    const supabase = createClient();
+    const { error } = await supabase.from('service_plans').delete().eq('id', id);
+    if (error) throw error;
+  } catch (e) {
+    if (isProbablyOffline()) {
+      await queuePlanDelete(id);
+      return;
+    }
+    throw e;
+  }
 }

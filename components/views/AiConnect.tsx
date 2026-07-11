@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { MCP_TOOLS } from '@/lib/data';
 import { generationForBody } from '@/lib/models';
 import { useVehicle } from '@/lib/vehicle-context';
+import { OnlineRequiredBanner } from '@/components/shell/OnlineRequiredBanner';
 
 type RagSource = {
   name: string;
@@ -204,6 +205,10 @@ export default function AiConnect() {
 
   return (
     <div className="padView" style={{ padding: 28, maxWidth: 880 }}>
+      <OnlineRequiredBanner
+        feature="AI assistant / MCP"
+        detail="embeddings and cloud providers need a connection"
+      />
       <div style={{ background: '#0B0B0C', borderRadius: 4, padding: 24, marginBottom: 18, color: '#fff' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
           <span style={{ color: 'var(--red, #D5001C)', fontFamily: "'JetBrains Mono',monospace", fontSize: 18 }}>&lowast;</span>

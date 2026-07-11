@@ -1,7 +1,10 @@
+import withPWAInit from '@ducanh2912/next-pwa';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // model-viewer is a web component loaded from CDN; nothing to transpile.
+  // Electron desktop packs the standalone server output.
+  output: 'standalone',
 
   // The OAuth discovery documents must live under /.well-known, but Next ignores
   // dot-folders in app/. Serve them from normal route handlers via rewrites.
@@ -27,4 +30,17 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+const withPWA = withPWAInit({
+  dest: 'public',
+  disable: process.env.NODE_ENV === 'development',
+  register: true,
+  fallbacks: {
+    document: '/offline',
+  },
+  workboxOptions: {
+    // Keep API + auth online; cache app shell / static.
+    navigateFallbackDenylist: [/^\/api\//, /^\/auth\//],
+  },
+});
+
+export default withPWA(nextConfig);

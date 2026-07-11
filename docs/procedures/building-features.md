@@ -36,17 +36,17 @@ Factory PDF preview (`/manual`) is gated by `profiles.documents_access` (default
 off for new accounts; toggle in Admin). Embeddings / manual search stay available.
 
 **Live OBD** (`/obd`) is a first-class nav destination (marked **BETA**). Connection
-tab lets you pick **ELM327** or **VAS 6154 (experimental)**. On desktop Chrome/Edge,
-ELM prefers **Web Serial** (USB, no helper). Classic BT and VAS need the local helper
-(`tools/obd-bridge`, `npm run obd-bridge`). VAS PassThru is Windows-only; DoIP can be
-tried on Mac if the VCI has an IP. Client: `lib/obd/httpClient.ts`, `webSerial.ts`,
-`useObdBridge`; UI: `components/views/ObdWorkspace.tsx`. Shared with Track PWA.
-No MCP tool yet (local hardware). DTC chips deep-link to `/faults?q=CODE`.
+tab is **ELM327-only**. On desktop Chrome/Edge, USB ELM prefers **Web Serial** (no
+helper). Classic Bluetooth needs the local helper (`tools/obd-bridge`,
+`npm run obd-bridge`) or FLAT·SIX Desktop. Client: `lib/obd/httpClient.ts`,
+`webSerial.ts`, `useObdBridge`; UI: `components/views/ObdWorkspace.tsx`; immersive
+**Focus** mode via `lib/obd/ObdFocusContext.tsx` (hides shell nav/header, Escape to
+exit). Desktop uses `lib/obd/electronClient.ts`. No MCP tool yet (local hardware).
+DTC chips deep-link to `/faults?q=CODE`.
 
-**Downloads** (`/downloads`, **BETA**) lists Track Desktop (Windows + Mac), Track
-PWA, and the lab OBD Bridge. Catalog: `lib/downloads.ts` — set `href` / `hrefMac`
-when GitHub Release assets are published. Owners use Electron; Bridge is for
-contributors / lab.
+**Downloads** (`/downloads`, **BETA**) lists FLAT·SIX Desktop + PWA (full garage)
+and lab OBD Bridge. Catalog: `lib/downloads.ts` — set `href` / `hrefMac` when
+GitHub Release assets are published. No npm commands in the UI.
 
 ## 3. If it touches the backend
 

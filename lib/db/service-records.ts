@@ -66,15 +66,31 @@ function rowToRecord(r: RecordRow): ServiceRecord {
 
 export async function listRecords(vehicleId: string): Promise<ServiceRecord[]> {
   if (DEMO_MODE) return (demoStore().records[vehicleId] ?? []).map((r) => ({ ...r }));
-  const supabase = createClient();
-  const { data, error } = await supabase
-    .from('service_records')
-    .select('*')
-    .eq('vehicle_id', vehicleId)
-    .order('date', { ascending: false })
-    .order('created_at', { ascending: false });
-  if (error) throw error;
-  return (data as RecordRow[]).map(rowToRecord);
+
+  const { getCachedRecords, isProbablyOffline, rememberRecordsCache } = await import('@/lib/offline/sync');
+  if (isProbablyOffline()) {
+    const cached = await getCachedRecords(vehicleId);
+    if (cached) return cached;
+    return [];
+  }
+
+  try {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('service_records')
+      .select('*')
+      .eq('vehicle_id', vehicleId)
+      .order('date', { ascending: false })
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    const list = (data as RecordRow[]).map(rowToRecord);
+    void rememberRecordsCache(vehicleId, list);
+    return list;
+  } catch (e) {
+    const cached = await getCachedRecords(vehicleId);
+    if (cached) return cached;
+    throw e;
+  }
 }
 
 export async function addRecord(
@@ -87,6 +103,14 @@ export async function addRecord(
     s.records[vehicleId] = [created, ...(s.records[vehicleId] ?? [])];
     return { ...created };
   }
+
+  const { isProbablyOffline, localId, queueRecordAdd } = await import('@/lib/offline/sync');
+  if (isProbablyOffline()) {
+    const id = localId('rec');
+    await queueRecordAdd(vehicleId, rec, id);
+    return { ...rec, id, items: rec.items ?? [] };
+  }
+
   const supabase = createClient();
   const {
     data: { user },
@@ -129,25 +153,39 @@ export async function updateRecord(
     }
     throw new Error('Record not found');
   }
-  const supabase = createClient();
-  // RLS limits the update to the owner; vehicle_id / user_id stay immutable.
-  const { data, error } = await supabase
-    .from('service_records')
-    .update({
-      date: rec.date,
-      mileage: rec.mileage || null,
-      title: rec.title,
-      system: rec.system || null,
-      diy: rec.diy,
-      cost: rec.cost || null,
-      notes: rec.notes || null,
-      items: rec.items ?? [],
-    })
-    .eq('id', id)
-    .select('*')
-    .single();
-  if (error) throw error;
-  return rowToRecord(data as RecordRow);
+
+  const { isProbablyOffline, queueRecordUpdate } = await import('@/lib/offline/sync');
+  if (isProbablyOffline()) {
+    await queueRecordUpdate(id, rec);
+    return { ...rec, id, items: rec.items ?? [] };
+  }
+
+  try {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('service_records')
+      .update({
+        date: rec.date,
+        mileage: rec.mileage || null,
+        title: rec.title,
+        system: rec.system || null,
+        diy: rec.diy,
+        cost: rec.cost || null,
+        notes: rec.notes || null,
+        items: rec.items ?? [],
+      })
+      .eq('id', id)
+      .select('*')
+      .single();
+    if (error) throw error;
+    return rowToRecord(data as RecordRow);
+  } catch (e) {
+    if (isProbablyOffline()) {
+      await queueRecordUpdate(id, rec);
+      return { ...rec, id, items: rec.items ?? [] };
+    }
+    throw e;
+  }
 }
 
 export async function deleteRecord(id: string): Promise<void> {
@@ -156,7 +194,22 @@ export async function deleteRecord(id: string): Promise<void> {
     for (const k of Object.keys(s.records)) s.records[k] = s.records[k].filter((r) => r.id !== id);
     return;
   }
-  const supabase = createClient();
-  const { error } = await supabase.from('service_records').delete().eq('id', id);
-  if (error) throw error;
+
+  const { isProbablyOffline, queueRecordDelete } = await import('@/lib/offline/sync');
+  if (isProbablyOffline()) {
+    await queueRecordDelete(id);
+    return;
+  }
+
+  try {
+    const supabase = createClient();
+    const { error } = await supabase.from('service_records').delete().eq('id', id);
+    if (error) throw error;
+  } catch (e) {
+    if (isProbablyOffline()) {
+      await queueRecordDelete(id);
+      return;
+    }
+    throw e;
+  }
 }

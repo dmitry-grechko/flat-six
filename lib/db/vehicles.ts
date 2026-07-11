@@ -73,13 +73,30 @@ function vehicleToRow(v: Partial<Vehicle>): Record<string, unknown> {
 
 export async function listVehicles(): Promise<StoredVehicle[]> {
   if (DEMO_MODE) return demoStore().vehicles.map((v) => ({ ...v }));
-  const supabase = createClient();
-  const { data, error } = await supabase
-    .from('vehicles')
-    .select('*')
-    .order('created_at', { ascending: true });
-  if (error) throw error;
-  return (data as VehicleRow[]).map(rowToVehicle);
+
+  const { getCachedVehicles, isProbablyOffline, rememberVehiclesCache } = await import('@/lib/offline/sync');
+
+  if (isProbablyOffline()) {
+    const cached = await getCachedVehicles();
+    if (cached) return cached;
+    throw new Error('Offline — no cached garage yet. Connect once to sync.');
+  }
+
+  try {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('vehicles')
+      .select('*')
+      .order('created_at', { ascending: true });
+    if (error) throw error;
+    const list = (data as VehicleRow[]).map(rowToVehicle);
+    void rememberVehiclesCache(list);
+    return list;
+  } catch (e) {
+    const cached = await getCachedVehicles();
+    if (cached) return cached;
+    throw e;
+  }
 }
 
 export async function createVehicle(
@@ -90,11 +107,18 @@ export async function createVehicle(
     const nv: StoredVehicle = { ...v, id: demoId('veh'), isPrimary: opts.primary ?? false };
     const s = demoStore();
     s.vehicles.push(nv);
-    // Each car gets its own empty history + plans — never share across vehicles.
     s.records[nv.id] = [];
     s.plans[nv.id] = [];
     return { ...nv };
   }
+
+  const { isProbablyOffline, localId, queueVehicleCreate } = await import('@/lib/offline/sync');
+  if (isProbablyOffline()) {
+    const id = localId('veh');
+    await queueVehicleCreate(v, opts.primary ?? false, id);
+    return { ...v, id, isPrimary: opts.primary ?? false };
+  }
+
   const supabase = createClient();
   const {
     data: { user },
@@ -116,12 +140,27 @@ export async function updateVehicle(id: string, patch: Partial<Vehicle>): Promis
     s.vehicles = s.vehicles.map((v) => (v.id === id ? { ...v, ...patch } : v));
     return;
   }
-  const supabase = createClient();
-  const { error } = await supabase
-    .from('vehicles')
-    .update({ ...vehicleToRow(patch), updated_at: new Date().toISOString() })
-    .eq('id', id);
-  if (error) throw error;
+
+  const { isProbablyOffline, queueVehicleUpdate } = await import('@/lib/offline/sync');
+  if (isProbablyOffline()) {
+    await queueVehicleUpdate(id, patch);
+    return;
+  }
+
+  try {
+    const supabase = createClient();
+    const { error } = await supabase
+      .from('vehicles')
+      .update({ ...vehicleToRow(patch), updated_at: new Date().toISOString() })
+      .eq('id', id);
+    if (error) throw error;
+  } catch (e) {
+    if (isProbablyOffline()) {
+      await queueVehicleUpdate(id, patch);
+      return;
+    }
+    throw e;
+  }
 }
 
 export async function deleteVehicle(id: string): Promise<void> {
@@ -132,7 +171,22 @@ export async function deleteVehicle(id: string): Promise<void> {
     delete s.plans[id];
     return;
   }
-  const supabase = createClient();
-  const { error } = await supabase.from('vehicles').delete().eq('id', id);
-  if (error) throw error;
+
+  const { isProbablyOffline, queueVehicleDelete } = await import('@/lib/offline/sync');
+  if (isProbablyOffline()) {
+    await queueVehicleDelete(id);
+    return;
+  }
+
+  try {
+    const supabase = createClient();
+    const { error } = await supabase.from('vehicles').delete().eq('id', id);
+    if (error) throw error;
+  } catch (e) {
+    if (isProbablyOffline()) {
+      await queueVehicleDelete(id);
+      return;
+    }
+    throw e;
+  }
 }

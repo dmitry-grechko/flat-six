@@ -5,6 +5,9 @@ import { usePathname } from 'next/navigation';
 import Sidebar from './Sidebar';
 import { BetaBadge } from './BetaBadge';
 import { useVehicle } from '@/lib/vehicle-context';
+import { useOffline } from '@/lib/offline/OfflineProvider';
+import { useObdFocus } from '@/lib/obd/ObdFocusContext';
+import { DesktopUpdateBanner } from './DesktopUpdateBanner';
 
 const mono = "'JetBrains Mono',monospace";
 
@@ -35,20 +38,25 @@ export default function AppShell({
 }) {
   const pathname = usePathname();
   const { vehicle: VEHICLE } = useVehicle();
+  const { online, pendingCount, syncing } = useOffline();
   const [kicker, title] = PAGE_META[pathname] ?? PAGE_META['/garage'];
   const showBeta = BETA_PATHS.has(pathname);
   const [navOpen, setNavOpen] = useState(false);
+  const { focus: obdFocus } = useObdFocus();
+  const immersiveObd = pathname === '/obd' && obdFocus;
 
   return (
     <div style={{ display: 'flex', height: '100dvh', overflow: 'hidden', background: '#ECECEE' }}>
-      <Sidebar open={navOpen} onClose={() => setNavOpen(false)} />
-      <div
-        className={'sidebarBackdrop' + (navOpen ? ' open' : '')}
-        onClick={() => setNavOpen(false)}
-        aria-hidden
-      />
+      {!immersiveObd && <Sidebar open={navOpen} onClose={() => setNavOpen(false)} />}
+      {!immersiveObd && (
+        <div
+          className={'sidebarBackdrop' + (navOpen ? ' open' : '')}
+          onClick={() => setNavOpen(false)}
+          aria-hidden
+        />
+      )}
       <main style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-        <header
+        {!immersiveObd && <header
           className="appHeader"
           style={{
             height: 68, flexShrink: 0, background: '#fff', borderBottom: '1px solid #E0E0E2',
@@ -74,11 +82,29 @@ export default function AppShell({
             </div>
           </div>
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
+            {(!online || pendingCount > 0 || syncing) && (
+              <div
+                style={{
+                  font: `600 9px/1 ${mono}`,
+                  letterSpacing: '.1em',
+                  textTransform: 'uppercase',
+                  color: online ? '#6E6E73' : '#D5001C',
+                  border: `1px solid ${online ? '#E3E3E5' : 'rgba(213,0,28,.35)'}`,
+                  padding: '6px 8px',
+                  borderRadius: 2,
+                }}
+                title={online ? 'Syncing queued garage changes' : 'Working offline from local cache'}
+              >
+                {!online ? 'Offline' : syncing ? 'Syncing' : `${pendingCount} pending`}
+              </div>
+            )}
             {headerActions ?? (
               <div className="hideOnMobile" style={{ font: `500 11px/1 ${mono}`, letterSpacing: '.1em', color: '#9A9AA0' }}>VIN {VEHICLE.vin}</div>
             )}
           </div>
-        </header>
+        </header>}
+
+        <DesktopUpdateBanner />
 
         <div style={{ flex: 1, minHeight: 0, overflow: 'auto' }}>{children}</div>
       </main>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
 import Link from 'next/link';
 import { DOWNLOADS, REPO_URL, type DownloadItem } from '@/lib/downloads';
 import { BetaBadge } from '@/components/shell/BetaBadge';
@@ -30,22 +30,9 @@ const btnBase: CSSProperties = {
   textDecoration: 'none',
 };
 
-function CopyCommand({ command }: { command: string }) {
-  const [copied, setCopied] = useState(false);
-  return (
-    <button
-      type="button"
-      style={{ ...btnBase, background: '#0B0B0C', color: '#fff' }}
-      onClick={() => {
-        void navigator.clipboard.writeText(command).then(() => {
-          setCopied(true);
-          window.setTimeout(() => setCopied(false), 1600);
-        });
-      }}
-    >
-      {copied ? 'Copied' : 'Copy command'}
-    </button>
-  );
+function audienceLabel(a: DownloadItem['audience']) {
+  if (a === 'owners') return { text: 'For owners', color: '#D5001C', border: 'rgba(213,0,28,.35)' };
+  return { text: 'Contributors / lab', color: '#9A9AA0', border: '#E3E3E5' };
 }
 
 function SoonButton({ label }: { label: string }) {
@@ -66,7 +53,7 @@ function SoonButton({ label }: { label: string }) {
 }
 
 function DownloadCard({ item }: { item: DownloadItem }) {
-  const isOwner = item.audience === 'owners';
+  const chip = audienceLabel(item.audience);
   return (
     <article style={card}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, flexWrap: 'wrap' }}>
@@ -86,13 +73,13 @@ function DownloadCard({ item }: { item: DownloadItem }) {
             font: `600 9px/1 ${mono}`,
             letterSpacing: '.1em',
             textTransform: 'uppercase',
-            color: isOwner ? '#D5001C' : '#9A9AA0',
-            border: `1px solid ${isOwner ? 'rgba(213,0,28,.35)' : '#E3E3E5'}`,
+            color: chip.color,
+            border: `1px solid ${chip.border}`,
             padding: '5px 8px',
             borderRadius: 2,
           }}
         >
-          {isOwner ? 'For owners' : 'Contributors / lab'}
+          {chip.text}
         </span>
       </div>
       <div
@@ -123,22 +110,6 @@ function DownloadCard({ item }: { item: DownloadItem }) {
           </li>
         ))}
       </ul>
-      {item.command && (
-        <code
-          style={{
-            display: 'block',
-            marginBottom: 14,
-            font: `500 12px/1.4 ${mono}`,
-            background: '#F4F4F5',
-            padding: '10px 12px',
-            borderRadius: 3,
-            color: '#0B0B0C',
-            overflowX: 'auto',
-          }}
-        >
-          {item.command}
-        </code>
-      )}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
         {item.href ? (
           <a href={item.href} style={{ ...btnBase, background: '#D5001C', color: '#fff' }} target="_blank" rel="noreferrer">
@@ -160,7 +131,6 @@ function DownloadCard({ item }: { item: DownloadItem }) {
           ) : (
             <SoonButton label={item.ctaMac} />
           ))}
-        {item.command && item.audience === 'contributors' && <CopyCommand command={item.command} />}
         <a
           href={REPO_URL}
           target="_blank"
@@ -180,19 +150,19 @@ export default function Downloads() {
       <div style={{ ...card, borderColor: 'rgba(213,0,28,.28)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, flexWrap: 'wrap' }}>
           <div style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.16em', color: '#9A9AA0' }}>
-            COMPANION APPS
+            ONE PRODUCT
           </div>
           <BetaBadge tone="page" />
         </div>
         <p style={{ margin: 0, font: `400 14px/1.55 ${sans}`, color: '#3A3A3E' }}>
-          <strong style={{ fontWeight: 600 }}>Track Desktop</strong> is the owner path (Windows + Mac) —
-          live OBD without a terminal. <strong style={{ fontWeight: 600 }}>Track PWA</strong> is the same
-          Track UI installable from Chrome. The OBD Bridge is for contributors / lab only. In-browser{' '}
+          <strong style={{ fontWeight: 600 }}>FLAT·SIX Desktop</strong> and the{' '}
+          <strong style={{ fontWeight: 600 }}>PWA</strong> are the full garage. Sync garage data for
+          offline use; Documents and AI stay online. In-browser{' '}
           <Link href="/obd" style={{ color: '#D5001C', textDecoration: 'none', fontWeight: 500 }}>
             Live OBD
           </Link>{' '}
-          already covers USB ELM327 on desktop Chrome/Edge via Web Serial. Installers land on GitHub
-          Releases after testing — buttons say “soon” until then.
+          already supports USB Web Serial on desktop Chrome. Installers land on GitHub Releases after
+          testing.
         </p>
       </div>
 

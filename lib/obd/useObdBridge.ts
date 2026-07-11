@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { bridgeBaseUrl, createHttpObdClient } from './httpClient';
 import { createWebSerialClient, webSerialAvailable } from './webSerial';
+import { createElectronObdClient, isElectronShell } from './electronClient';
 import type {
   ConnectOptions,
   DebugLogEntry,
@@ -14,7 +15,7 @@ import type {
   VehicleInfo,
 } from './types';
 
-export type ObdTransportMode = 'web-serial' | 'bridge';
+export type ObdTransportMode = 'web-serial' | 'bridge' | 'electron';
 
 export type BridgeHealth = {
   ok: boolean;
@@ -27,26 +28,31 @@ export type BridgeHealth = {
   shell?: string;
 };
 
+/** Browser-only — call after mount so SSR and the first client paint match. */
 function pickDefaultMode(): ObdTransportMode {
-  if (typeof window === 'undefined') return 'bridge';
+  if (isElectronShell()) return 'electron';
   if (webSerialAvailable()) return 'web-serial';
   return 'bridge';
 }
 
 function clientForMode(mode: ObdTransportMode): ObdClient {
+  if (mode === 'electron') return createElectronObdClient();
   if (mode === 'web-serial') return createWebSerialClient();
   return createHttpObdClient(bridgeBaseUrl());
 }
 
 export function useObdBridge(initialMode?: ObdTransportMode) {
-  const [mode, setModeState] = useState<ObdTransportMode>(() => initialMode ?? pickDefaultMode());
-  const webSerialOk = useMemo(() => webSerialAvailable(), []);
+  // Stable default for SSR + first paint — upgrade in useEffect after mount.
+  const [mode, setModeState] = useState<ObdTransportMode>(() => initialMode ?? 'bridge');
+  const [webSerialOk, setWebSerialOk] = useState(false);
+  const [envReady, setEnvReady] = useState(false);
+  const autoPicked = useRef(!!initialMode);
 
   const client = useMemo(() => clientForMode(mode), [mode]);
   const clientRef = useRef(client);
   clientRef.current = client;
 
-  const [bridgeOnline, setBridgeOnline] = useState(mode === 'web-serial');
+  const [bridgeOnline, setBridgeOnline] = useState(false);
   const [health, setHealth] = useState<BridgeHealth | null>(null);
   const [status, setStatus] = useState<ObdStatus | null>(null);
   const [ports, setPorts] = useState<PortInfo[]>([]);
@@ -66,7 +72,7 @@ export function useObdBridge(initialMode?: ObdTransportMode) {
     setDebugLog([]);
     setError(null);
     setModeState(next);
-    setBridgeOnline(next === 'web-serial');
+    setBridgeOnline(next === 'web-serial' || next === 'electron');
   }, [mode]);
 
   const refreshHealth = useCallback(async () => {
@@ -126,16 +132,11 @@ export function useObdBridge(initialMode?: ObdTransportMode) {
     setBusy(true);
     setError(null);
     try {
-      const adapter = opts.adapter ?? 'elm327';
-      if (adapter === 'vas6154' && mode === 'web-serial') {
-        throw new Error('VAS 6154 needs the local bridge (PassThru on Windows, or DoIP). Switch transport to Local bridge.');
-      }
       const res = await clientRef.current.connect({
         ...opts,
         port: mode === 'web-serial' ? 'web-serial' : opts.port,
         baudRate: opts.baudRate ?? 38400,
-        adapter,
-        experimental: adapter === 'vas6154' ? true : opts.experimental,
+        adapter: opts.adapter ?? 'elm327',
       });
       setStatus(res.status);
       setBridgeOnline(true);
@@ -232,8 +233,23 @@ export function useObdBridge(initialMode?: ObdTransportMode) {
     }
   }, []);
 
+  // Prefer Web Serial / Electron once we know the environment (avoids hydration mismatch).
+  useEffect(() => {
+    setWebSerialOk(webSerialAvailable());
+    if (!autoPicked.current) {
+      autoPicked.current = true;
+      const preferred = pickDefaultMode();
+      if (preferred !== 'bridge') {
+        setModeState(preferred);
+        setBridgeOnline(true);
+      }
+    }
+    setEnvReady(true);
+  }, []);
+
   // Health check on mount + when mode changes
   useEffect(() => {
+    if (!envReady) return;
     let cancelled = false;
     const tick = async () => {
       if (cancelled) return;
@@ -245,10 +261,11 @@ export function useObdBridge(initialMode?: ObdTransportMode) {
       cancelled = true;
       clearInterval(id);
     };
-  }, [refreshHealth, mode]);
+  }, [refreshHealth, mode, envReady]);
 
   // Status poll while online (keeps live tiles fresh when polling)
   useEffect(() => {
+    if (!envReady) return;
     if (!bridgeOnline && mode === 'bridge') return;
     let cancelled = false;
     const tick = async () => {
@@ -261,21 +278,23 @@ export function useObdBridge(initialMode?: ObdTransportMode) {
       cancelled = true;
       clearInterval(id);
     };
-  }, [bridgeOnline, mode, refreshStatus]);
+  }, [bridgeOnline, mode, refreshStatus, envReady]);
 
   // Load ports when transport is ready
   useEffect(() => {
+    if (!envReady) return;
     if (mode === 'web-serial' || bridgeOnline) {
       refreshPorts().catch(() => {});
     }
-  }, [bridgeOnline, mode, refreshPorts]);
+  }, [bridgeOnline, mode, refreshPorts, envReady]);
 
   const live: LiveData | null = status?.lastLive ?? null;
   const faults: FaultsData | null = status?.lastFaults ?? null;
   const vehicle: VehicleInfo | null = status?.lastVehicle ?? null;
   const connected = status?.connected === true;
   const polling = status?.polling === true;
-  const needsBridge = mode === 'bridge' && !bridgeOnline;
+  // Don't show the bridge-offline banner until we've picked the real transport.
+  const needsBridge = envReady && mode === 'bridge' && !bridgeOnline;
 
   return {
     client,

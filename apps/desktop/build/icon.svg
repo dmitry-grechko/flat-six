@@ -1,0 +1,18 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="FLAT·SIX flat-six boxer engine mark">
+  <rect width="512" height="512" rx="116" fill="#0B0B0C"/>
+  <polygon points="256,54 432,155 432,357 256,458 80,357 80,155" fill="none" stroke="#D5001C" stroke-opacity="0.28" stroke-width="6"/>
+  <g fill="#D5001C">
+    <rect x="232" y="150" width="48" height="212" rx="16"/>
+    <rect x="120" y="161" width="120" height="38" rx="10"/><rect x="92" y="152" width="34" height="56" rx="9"/>
+    <rect x="272" y="161" width="120" height="38" rx="10"/><rect x="386" y="152" width="34" height="56" rx="9"/>
+    <rect x="120" y="237" width="120" height="38" rx="10"/><rect x="92" y="228" width="34" height="56" rx="9"/>
+    <rect x="272" y="237" width="120" height="38" rx="10"/><rect x="386" y="228" width="34" height="56" rx="9"/>
+    <rect x="120" y="313" width="120" height="38" rx="10"/><rect x="92" y="304" width="34" height="56" rx="9"/>
+    <rect x="272" y="313" width="120" height="38" rx="10"/><rect x="386" y="304" width="34" height="56" rx="9"/>
+    <circle cx="256" cy="256" r="38"/>
+  </g>
+  <circle cx="109" cy="180" r="9" fill="#0B0B0C"/><circle cx="403" cy="180" r="9" fill="#0B0B0C"/>
+  <circle cx="109" cy="256" r="9" fill="#0B0B0C"/><circle cx="403" cy="256" r="9" fill="#0B0B0C"/>
+  <circle cx="109" cy="332" r="9" fill="#0B0B0C"/><circle cx="403" cy="332" r="9" fill="#0B0B0C"/>
+  <circle cx="256" cy="256" r="17" fill="#0B0B0C"/><circle cx="256" cy="256" r="7" fill="#D5001C"/>
+</svg>

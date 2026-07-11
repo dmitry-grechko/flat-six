@@ -1,10 +1,15 @@
+'use client';
+
 import AppShell from '@/components/shell/AppShell';
 import ObdWorkspace from '@/components/views/ObdWorkspace';
+import { ObdFocusProvider } from '@/lib/obd/ObdFocusContext';
 
 export default function ObdPage() {
   return (
-    <AppShell>
-      <ObdWorkspace />
-    </AppShell>
+    <ObdFocusProvider>
+      <AppShell>
+        <ObdWorkspace />
+      </AppShell>
+    </ObdFocusProvider>
   );
 }

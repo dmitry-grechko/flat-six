@@ -2,13 +2,13 @@
 /**
  * FLAT·SIX local OBD bridge — thin HTTP wrapper around lib/obd ObdHost.
  *
- * Adapters:
- *   - elm327 (default) — USB / Bluetooth Classic serial
- *   - vas6154 (experimental) — J2534 PassThru / DoIP via tools/obd-bridge/adapters
+ * ELM327 over USB serial + Bluetooth Classic SPP.
+ * Serves test UI at http://127.0.0.1:8765
  *
- * Run: node --import tsx server.mjs
+ * Run: npm start  (uses tsx so lib/obd/*.ts resolves)
  */
 
+import Module from 'node:module';
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -16,6 +16,12 @@ import os from 'node:os';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// lib/obd resolves packages from the repo root; use this bridge's node_modules.
+const bridgeModules = path.join(__dirname, 'node_modules');
+process.env.NODE_PATH = [bridgeModules, process.env.NODE_PATH].filter(Boolean).join(path.delimiter);
+Module._initPaths();
+
 const PORT = Number(process.env.OBD_BRIDGE_PORT || 8765);
 const PUBLIC = path.join(__dirname, 'public');
 const PLATFORM = process.platform;
@@ -24,30 +30,11 @@ const hostMod = await import(pathToFileURL(path.join(__dirname, '../../lib/obd/n
 /** @type {import('../../lib/obd/host').ObdHost} */
 const host = new hostMod.ObdHost(PLATFORM);
 
-const vasLab = await import(pathToFileURL(path.join(__dirname, 'adapters/vas6154/adapter.mjs')).href);
-
 const MIME = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
 };
-
-const ADAPTERS = [
-  {
-    id: 'elm327',
-    label: 'ELM327 (USB / BT Classic)',
-    experimental: false,
-    available: true,
-    description: 'Production path — serial ELM327, Mode 01/03/07/09.',
-  },
-  {
-    id: 'vas6154',
-    label: 'VAS 6154 (Experimental)',
-    experimental: true,
-    available: PLATFORM === 'win32' || true,
-    description: 'Lab only — J2534 PassThru and/or DoIP raw transcript.',
-  },
-];
 
 const server = http.createServer(async (req, res) => {
   setCors(res);
@@ -68,38 +55,10 @@ const server = http.createServer(async (req, res) => {
         port: st.path,
         baud: st.baudRate,
         platform: PLATFORM,
-        transports: ['usb-serial', 'bluetooth-classic-spp', 'j2534-passthru', 'doip'],
+        transports: ['usb-serial', 'bluetooth-classic-spp'],
         adapterKind: st.adapterKind,
-        experimental: st.experimental,
-        adapters: ADAPTERS,
-        note: 'BLE-only dongles (e.g. Ancel BD200) are not supported. VAS6154 is experimental.',
+        note: 'BLE-only dongles (e.g. Ancel BD200) are not supported — need USB or Classic BT serial.',
       });
-    }
-
-    if (req.method === 'GET' && url.pathname === '/adapters') {
-      return json(res, { platform: PLATFORM, adapters: ADAPTERS });
-    }
-
-    if (req.method === 'GET' && url.pathname === '/j2534') {
-      const devices = PLATFORM === 'win32' ? vasLab.listPassThruDevices() : [];
-      return json(res, {
-        platform: PLATFORM,
-        supported: PLATFORM === 'win32',
-        devices,
-        note:
-          PLATFORM === 'win32'
-            ? 'Install I+ME Actia VAS6154 PassThru so FunctionLibrary appears in the registry.'
-            : 'J2534 registry discovery is Windows-only.',
-      });
-    }
-
-    if (req.method === 'POST' && url.pathname === '/doip/discover') {
-      const body = await readJson(req).catch(() => ({}));
-      const found = await vasLab.discoverDoipVehicles({
-        timeoutMs: Number(body.timeoutMs || 2500),
-        port: Number(body.port || 13400),
-      });
-      return json(res, { found });
     }
 
     if (req.method === 'GET' && url.pathname === '/ports') {
@@ -119,9 +78,8 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (req.method === 'GET' && url.pathname === '/live') {
-      const live = host.getLive();
       if (!host.status().connected) return json(res, { error: 'Not connected' }, 400);
-      return json(res, live);
+      return json(res, host.getLive());
     }
 
     if (req.method === 'POST' && url.pathname === '/live') {
@@ -161,21 +119,11 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === 'POST' && url.pathname === '/connect') {
       const body = await readJson(req);
-      const adapter = body.adapter === 'vas6154' ? 'vas6154' : 'elm327';
       try {
         const status = await host.connect({
-          port: String(body.port || '').trim() || undefined,
-          baudRate: body.baudRate != null ? Number(body.baudRate) : undefined,
-          adapter,
-          experimental: body.experimental === true,
-          mode: body.mode,
-          dllPath: body.dllPath,
-          host: body.host,
-          doipPort: body.doipPort != null ? Number(body.doipPort) : body.port && adapter === 'vas6154' && body.host ? Number(body.port) : undefined,
-          protocol: body.protocol,
-          sourceAddress: body.sourceAddress,
-          targetAddress: body.targetAddress,
-          readDids: body.readDids,
+          port: String(body.port || '').trim(),
+          baudRate: Number(body.baudRate || 38400),
+          adapter: 'elm327',
         });
         return json(res, { ok: true, status });
       } catch (e) {
@@ -214,8 +162,6 @@ const server = http.createServer(async (req, res) => {
       return json(res, {
         ...host.debug(),
         hostname: os.hostname(),
-        adapterKind: host.status().adapterKind,
-        experimental: host.status().experimental,
       });
     }
 
@@ -242,8 +188,7 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, '127.0.0.1', () => {
   console.log(`\n  FLAT·SIX OBD bridge running (${PLATFORM})`);
-  console.log(`  Core: lib/obd · adapters: elm327 | vas6154 (experimental)`);
-  console.log(`  Lab:  tools/obd-bridge/adapters/vas6154 (PassThru / DoIP)`);
+  console.log(`  Adapter: elm327 (USB serial + Bluetooth Classic SPP)`);
   console.log(`  Test UI:  http://127.0.0.1:${PORT}`);
   console.log(`  Health:   http://127.0.0.1:${PORT}/health\n`);
 });

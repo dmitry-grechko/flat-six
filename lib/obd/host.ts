@@ -15,7 +15,6 @@ import type {
   ObdStatus,
   PortInfo,
   Snapshot,
-  TransportKind,
   VehicleInfo,
 } from './types';
 
@@ -47,12 +46,7 @@ export class ObdHost {
   async connect(opts: ConnectOptions): Promise<ObdStatus> {
     const adapter = opts.adapter ?? 'elm327';
     const port = String(opts.port || '').trim();
-    if (adapter === 'elm327' && !port) throw new Error('Missing port');
-    if (adapter === 'vas6154' && opts.experimental !== true) {
-      throw new Error(
-        'VAS 6154 is experimental. Send { adapter: "vas6154", experimental: true, ... } to opt in.',
-      );
-    }
+    if (!port) throw new Error('Missing port');
 
     await this.disconnect();
 
@@ -60,8 +54,8 @@ export class ObdHost {
     const createOpts = connectOptionsToCreate({
       ...opts,
       adapter,
-      port: port || opts.dllPath || opts.host || 'vas6154',
-      baudRate: opts.baudRate ?? (adapter === 'vas6154' ? 500000 : 38400),
+      port,
+      baudRate: opts.baudRate ?? 38400,
     });
     this.#session = await createAdapter({
       ...createOpts,
@@ -109,31 +103,22 @@ export class ObdHost {
 
   status(): ObdStatus {
     const s = this.#session;
-    const experimental = this.#adapterKind === 'vas6154';
     return {
       connected: s?.isOpen() === true,
       path: s?.path ?? null,
       baudRate: s?.baudRate ?? null,
-      transport: s ? this.#transportFor(s) : null,
+      transport: s ? classifyPath(s.path, null, this.platform).transport : null,
       adapter: s?.adapterInfo ?? null,
       protocol: s?.protocol ?? null,
       adapterKind: this.#adapterKind,
-      experimental,
       polling: this.#pollingActive,
-      pollSupported: !experimental,
+      pollSupported: true,
       lastLive: this.#lastLive,
       lastFaults: this.#lastFaults,
       lastVehicle: this.#lastVehicle,
       capabilities: s?.isOpen() ? s.getCapabilities() : null,
       platform: this.platform,
     };
-  }
-
-  #transportFor(s: ObdAdapter): TransportKind {
-    if (this.#adapterKind === 'vas6154') {
-      return s.protocol?.startsWith('DoIP') ? 'doip' : 'j2534-passthru';
-    }
-    return classifyPath(s.path, null, this.platform).transport;
   }
 
   capabilities(): Capabilities {
@@ -183,11 +168,6 @@ export class ObdHost {
   async pollStart(intervalMsInput?: number): Promise<{ ok: true; intervalMs: number }> {
     const intervalMs = Math.max(1500, Number(intervalMsInput || 2000));
     if (!this.#session?.isOpen()) throw new Error('Not connected');
-    if (this.#adapterKind === 'vas6154') {
-      throw new Error(
-        'Live poll is ELM327-only. VAS experimental path uses Debug raw RX; refresh Vehicle/Debug instead.',
-      );
-    }
     this.stopPoll();
     this.#pollCancel = false;
     this.#pollingActive = true;

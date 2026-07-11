@@ -14,6 +14,7 @@ import { generationForBody } from '@/lib/models';
 import { useVehicle } from '@/lib/vehicle-context';
 import { useDocumentsAccess } from '@/lib/hooks/useDocumentsAccess';
 import WorkshopManual from '@/components/views/WorkshopManual';
+import { OnlineRequiredBanner } from '@/components/shell/OnlineRequiredBanner';
 
 const mono = "'JetBrains Mono',monospace";
 
@@ -114,6 +115,10 @@ export default function DocumentLibrary() {
 
   return (
     <div className="padView docsRoot" style={{ padding: 28, maxWidth: 960 }}>
+      <OnlineRequiredBanner
+        feature="Documents"
+        detail="factory PDFs stay online-only in v1 (no offline PDF cache yet)"
+      />
       <p style={{ margin: '0 0 18px', font: "400 14px/1.55 'Helvetica Neue',Arial,sans-serif", color: '#6E6E73', maxWidth: 560 }}>
         Factory docs for your garage vehicle
         {' '}

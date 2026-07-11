@@ -1,0 +1,100 @@
+# Desktop release — manual dispatch until signing + GH_TOKEN are configured.
+#
+# Prerequisites:
+#   - Repository secret GH_TOKEN (PAT with `repo` scope) or use GITHUB_TOKEN for same-repo releases
+#   - Optional: code-signing certs (Windows Authenticode, macOS Developer ID)
+#   - Bump apps/desktop/package.json version before running
+#
+# First-time setup: uncomment the publish step and test on a draft prerelease.
+
+name: Desktop release
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Upload to GitHub Releases (requires GH_TOKEN)'
+        type: boolean
+        default: false
+
+jobs:
+  build-win:
+    name: Windows pack
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Install desktop dependencies
+        run: npm --prefix apps/desktop ci
+
+      - name: Build Next standalone
+        run: npm run build
+        env:
+          NEXT_PUBLIC_DEMO_MODE: 'true'
+          NEXT_PUBLIC_SUPABASE_URL: https://demo.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: demo-anon-key
+
+      - name: Prepare Electron standalone
+        run: npm --prefix apps/desktop run prepare:standalone
+
+      - name: Pack Windows installers
+        run: npm --prefix apps/desktop run pack
+        # TODO: when publish input is true, use:
+        # run: npx electron-builder --win nsis portable --x64 --publish always
+        # env:
+        #   GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-win
+          path: apps/desktop/release/*
+
+  build-mac:
+    name: macOS pack
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Install desktop dependencies
+        run: npm --prefix apps/desktop ci
+
+      - name: Build Next standalone
+        run: npm run build
+        env:
+          NEXT_PUBLIC_DEMO_MODE: 'true'
+          NEXT_PUBLIC_SUPABASE_URL: https://demo.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: demo-anon-key
+
+      - name: Prepare Electron standalone
+        run: npm --prefix apps/desktop run prepare:standalone
+
+      - name: Pack macOS DMG + zip
+        run: npm --prefix apps/desktop run pack:mac
+        # TODO: publish — npx electron-builder --mac dmg zip --x64 --arm64 --publish always
+        # env:
+        #   GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        #   CSC_LINK: ${{ secrets.MAC_CERT_BASE64 }}
+        #   CSC_KEY_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-mac
+          path: apps/desktop/release/*

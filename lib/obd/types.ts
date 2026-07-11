@@ -1,15 +1,8 @@
-/** Shared OBD read-model types for bridge, Track UI, Electron, and PWA. */
+/** Shared OBD read-model types for bridge, Desktop Electron, and Live OBD. */
 
-export type AdapterKind = 'elm327' | 'vas6154';
+export type AdapterKind = 'elm327';
 
-export type TransportKind =
-  | 'usb'
-  | 'bluetooth-classic'
-  | 'serial'
-  | 'web-serial'
-  | 'j2534-passthru'
-  | 'doip'
-  | 'other';
+export type TransportKind = 'usb' | 'bluetooth-classic' | 'serial' | 'web-serial' | 'other';
 
 export interface DebugLogEntry {
   ts: number;
@@ -119,7 +112,6 @@ export interface ObdStatus {
   adapter: string | null;
   protocol: string | null;
   adapterKind: AdapterKind;
-  experimental: boolean;
   polling: boolean;
   pollSupported: boolean;
   lastLive: LiveData | null;
@@ -130,37 +122,11 @@ export interface ObdStatus {
 }
 
 export interface ConnectOptions {
-  /** ELM327 serial port (COMx / /dev/cu.*). Optional for VAS when dllPath/host set. */
+  /** ELM327 serial port (COMx / /dev/cu.*) or `web-serial`. */
   port?: string;
   baudRate?: number;
   adapter?: AdapterKind;
-  /** Required true when adapter is vas6154. */
-  experimental?: boolean;
-  /** VAS: passthru | doip | auto */
-  mode?: 'passthru' | 'doip' | 'auto';
-  dllPath?: string;
-  host?: string;
-  doipPort?: number;
-  protocol?: string | number;
-  sourceAddress?: number;
-  targetAddress?: number;
-  readDids?: boolean;
 }
-
-export type Vas6154Mode = NonNullable<ConnectOptions['mode']>;
-
-export type Vas6154Options = Pick<
-  ConnectOptions,
-  | 'mode'
-  | 'dllPath'
-  | 'host'
-  | 'doipPort'
-  | 'protocol'
-  | 'baudRate'
-  | 'sourceAddress'
-  | 'targetAddress'
-  | 'readDids'
-> & { path?: string };
 
 export interface Snapshot {
   at: string;
@@ -188,7 +154,7 @@ export interface ByteTransport {
   setMaxListeners?(n: number): void;
 }
 
-/** High-level adapter contract shared by ELM and VAS stubs. */
+/** High-level adapter contract (ELM327 today). */
 export interface ObdAdapter {
   readonly kind: AdapterKind;
   readonly path: string;
@@ -209,7 +175,7 @@ export interface ObdAdapter {
   snapshot(): Promise<Snapshot>;
 }
 
-/** Client API used by Track UI transports (HTTP / IPC / Web Serial). */
+/** Client API used by Live OBD transports (HTTP / IPC / Web Serial). */
 export interface ObdClient {
   health(): Promise<{
     ok: boolean;
@@ -241,16 +207,5 @@ export interface ObdClient {
     lastFaults: FaultsData | null;
     lastVehicle: VehicleInfo | null;
     capabilities: Capabilities | null;
-  }>;
-  /** Bridge-only: Windows J2534 registry. Optional on other transports. */
-  listJ2534?(): Promise<{
-    platform: string;
-    supported: boolean;
-    devices: { name: string; vendor?: string; dllPath: string }[];
-    note?: string;
-  }>;
-  /** Bridge-only: UDP DoIP discovery. Optional on other transports. */
-  discoverDoip?(opts?: { timeoutMs?: number; port?: number }): Promise<{
-    found: { address: string; [k: string]: unknown }[];
   }>;
 }

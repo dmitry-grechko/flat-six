@@ -33,23 +33,19 @@ tab bars — test at 375 px. Nav item = route (`app/*/page.tsx` + `AppShell` +
 `Sidebar` NAV + `PAGE_META`). **Live OBD** (`/obd`, beta) talks to the local helper
 `tools/obd-bridge` (`npm run obd-bridge`, default `http://127.0.0.1:8765`) via
 `lib/obd/httpClient.ts` — or **Web Serial** for USB ELM in desktop Chrome/Edge
-(no helper). Classic Bluetooth still needs the bridge or Electron Track.
-**Downloads** (`/downloads`, beta) lists Track Desktop (Win + Mac) / Track PWA /
-Bridge — catalog in `lib/downloads.ts` (set `href` / `hrefMac` when GitHub
-Releases publish). Owner path = Electron; Bridge is contributors/lab.
+(no helper). Classic Bluetooth still needs the bridge or Electron Desktop.
+**Downloads** (`/downloads`, beta) lists **FLAT·SIX Desktop** + **PWA** (full garage)
+and lab Bridge — catalog in `lib/downloads.ts` (`href` / `hrefMac` when GitHub
+Releases publish). No npm install commands on that page.
 
-## Track companion (PWA + Electron)
+## Full-app offline (Desktop + PWA)
 
-Offline / track-day shell — **same** `lib/obd` + `lib/knowledge`, not a fork of the
-garage app. UI in `apps/track`; desktop shell in `apps/track-electron`; procedure
-[`docs/procedures/track-offline.md`](./docs/procedures/track-offline.md).
+Procedure: [`docs/procedures/full-app-offline.md`](./docs/procedures/full-app-offline.md).
 
-- Scripts: `npm run track:dev` · `track:pwa` · `track:electron` ·
-  `track:electron:pack` · `track:electron:pack:mac` · `track:electron:pack:all`
-- Transports: Electron IPC (USB + Classic BT) · HTTP bridge · Web Serial (desktop Chrome USB)
-- Adapters: `elm327` default · `vas6154` experimental stub/lab
-- Offline KB = bundled TF `searchKnowledge` (no workshop-manual embeddings in v1)
-- PWA = same Track UI as Electron (not the full Next garage / 3D)
+- Offline garage sync: `lib/offline/` + `lib/db/*` (IndexedDB; queue when offline)
+- Next PWA: `@ducanh2912/next-pwa` + `/offline` fallback; Documents/AI stay online-only
+- Desktop: `apps/desktop` (Next standalone + OBD IPC); scripts `desktop:dev` / `desktop:pack`
+
 ## Backend & MCP
 
 - Backend change → additive Supabase migration + update `lib/db/*` mapping +
@@ -69,7 +65,7 @@ garage app. UI in `apps/track`; desktop shell in `apps/track-electron`; procedur
 - Add a model variant → [`docs/procedures/adding-model-variant.md`](./docs/procedures/adding-model-variant.md)
 - Add a generation → [`docs/procedures/adding-new-generation.md`](./docs/procedures/adding-new-generation.md)
 - Build a feature → [`docs/procedures/building-features.md`](./docs/procedures/building-features.md)
-- Track offline (PWA + Electron) → [`docs/procedures/track-offline.md`](./docs/procedures/track-offline.md)
+- Full-app offline (Desktop + PWA) → [`docs/procedures/full-app-offline.md`](./docs/procedures/full-app-offline.md)
 - Public SEO / marketing pages → [`docs/procedures/public-seo-pages.md`](./docs/procedures/public-seo-pages.md)
 
 **When you change a process, update its procedure doc + this file + `.cursor/rules/`.**
