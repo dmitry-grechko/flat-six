@@ -232,7 +232,7 @@ export default function ComponentExplorer() {
           )}
 
           <div style={{ marginLeft: 'auto', font: `500 10px/1 ${mono}`, letterSpacing: '.12em', color: '#9A9AA0' }}>
-            {view === '3d' ? (xray ? (assemblyId ? 'X-RAY · DRAG TO ORBIT · CLICK A PART' : (layer === 'air' || layer === 'lines' ? `${layer.toUpperCase()} LAYER · CLICK A FLOW TO INSPECT` : 'ALL SYSTEMS · DRAG TO ORBIT · CLICK A SYSTEM')) : 'DRAG TO ORBIT · CLICK A PANEL DOT') : `${viewComponents.length} COMPONENTS · CLICK A NODE`}
+            {view === '3d' ? (xray ? (assemblyId ? 'X-RAY · DRAG TO ORBIT · CLICK A PART' : (layer === 'air' || layer === 'lines' || layer === 'vacuum' ? `${layer.toUpperCase()} LAYER · CLICK A FLOW TO INSPECT` : 'ALL SYSTEMS · DRAG TO ORBIT · CLICK A SYSTEM')) : 'DRAG TO ORBIT · CLICK A PANEL DOT') : `${viewComponents.length} COMPONENTS · CLICK A NODE`}
           </div>
         </div>
 
@@ -896,7 +896,7 @@ function FlowDetailCard({ flow, assemblies, vehicle, onClose, onInspectParts, on
     <div className="fadeUp" style={{ padding: '18px 22px', borderBottom: '1px solid #EEEEF0', flexShrink: 0 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 10 }}>
         <span style={{ font: `600 10px/1 ${mono}`, letterSpacing: '.1em', color: flow.color, border: `1px solid ${flow.color}`, borderRadius: 2, padding: '5px 8px' }}>
-          {flow.layer === 'air' ? 'AIR FLOW' : flow.layer === 'wiring' ? 'WIRING' : 'LINE'}
+          {flow.layer === 'air' ? 'AIR FLOW' : flow.layer === 'wiring' ? 'WIRING' : flow.layer === 'vacuum' ? 'VACUUM' : 'LINE'}
         </span>
         <span onClick={onClose} style={{ marginLeft: 'auto', cursor: 'pointer', color: '#9A9AA0', font: `500 18px/1 ${mono}` }}>×</span>
       </div>
@@ -948,6 +948,7 @@ function XraySidebar({
   const flows = flowsForLayer(layer, generation);
   const airFlows = flows.filter((f) => f.layer === 'air');
   const lineFlows = flows.filter((f) => f.layer === 'lines');
+  const vacuumFlows = flows.filter((f) => f.layer === 'vacuum');
   const wiringFlows = flows.filter((f) => f.layer === 'wiring');
 
   const flowRow = (f: FlowSystem) => {
@@ -1022,6 +1023,14 @@ function XraySidebar({
                   FLUID &amp; BRAKE LINES · CLICK TO TRACE
                 </div>
                 {lineFlows.map(flowRow)}
+              </>
+            )}
+            {vacuumFlows.length > 0 && (
+              <>
+                <div style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.14em', color: '#B4B4B8', padding: '12px 8px 10px' }}>
+                  VACUUM · CLICK TO TRACE
+                </div>
+                {vacuumFlows.map(flowRow)}
               </>
             )}
             {wiringFlows.length > 0 && (

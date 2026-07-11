@@ -7,19 +7,21 @@ import { FLOW_SYSTEMS_987 } from './flow-systems-987';
  *  - mechanical: assemblies + dashed concept connections (the original view)
  *  - air:        ghosted assemblies + intake/exhaust flow tubes
  *  - lines:      ghosted assemblies + oil/coolant/fuel/brake line tubes
+ *  - vacuum:     ghosted assemblies + vacuum hose runs (AOS, brake booster, PSE…)
  *  - wiring:     ghosted assemblies + main harness runs, fuse box & ECU nodes
  */
-export type XrayLayer = 'all' | 'mechanical' | 'air' | 'lines' | 'wiring';
+export type XrayLayer = 'all' | 'mechanical' | 'air' | 'lines' | 'vacuum' | 'wiring';
 
 export const XRAY_LAYERS: { id: XrayLayer; label: string }[] = [
   { id: 'all',        label: 'ALL' },
   { id: 'mechanical', label: 'MECHANICAL' },
   { id: 'air',        label: 'AIR' },
   { id: 'lines',      label: 'LINES' },
+  { id: 'vacuum',     label: 'VACUUM' },
   { id: 'wiring',     label: 'WIRING' },
 ];
 
-export type FlowLayerId = 'air' | 'lines' | 'wiring';
+export type FlowLayerId = 'air' | 'lines' | 'vacuum' | 'wiring';
 
 /**
  * One routed run of tube. Points are car-space coordinates (same frame as
@@ -56,7 +58,8 @@ export interface FlowNode {
 }
 
 export interface FlowSystem {
-  id: 'intake' | 'exhaust-flow' | 'coolant' | 'oil-lines' | 'fuel' | 'ps-lines' | 'brake-lines' | 'harness';
+  id: 'intake' | 'exhaust-flow' | 'coolant' | 'oil-lines' | 'fuel' | 'ps-lines' | 'brake-lines' | 'harness'
+    | 'vacuum-aos' | 'vacuum-brake' | 'vacuum-pse' | 'vacuum-evap' | 'vacuum-flap';
   layer: FlowLayerId;
   label: string;
   /** System accent — used for the animated pulses, clamp fittings and label. */
@@ -226,6 +229,71 @@ export const FLOW_SYSTEMS: FlowSystem[] = [
     ],
     nodes: [
       { id: 'dme', label: 'DME · ECU', at: [0.55, 0.32, -1.05], size: [0.3, 0.08, 0.24], color: '#33414d' },
+    ],
+  },
+  // ── VACUUM ───────────────────────────────────────────────────────────────
+  {
+    id: 'vacuum-aos',
+    layer: 'vacuum',
+    label: 'Crankcase Breather / AOS',
+    color: '#94A3B8',
+    pipe: { color: '#1c1e21', metalness: 0.15, roughness: 0.85 }, // thin black rubber hose
+    radius: 0.013,
+    speed: 0.09,
+    desc: 'The air-oil separator (AOS) ties the crankcase to the intake under manifold vacuum — oil mist is condensed and drained back to the sump while filtered blow-by gas is pulled into the plenum. A torn AOS diaphragm is a classic MA1 failure: white smoke on start-up, a rough idle and high oil consumption. Pull the intake hose and check for pooled oil to diagnose it.',
+    relatedAssembly: 'airfilter',
+    labelAt: [-0.62, 0.46, -0.66],
+    paths: [
+      // Crankcase pickup → AOS canister
+      { points: [[-0.08, -0.12, -0.78], [-0.2, 0.0, -0.76], [-0.32, 0.16, -0.73], [-0.4, 0.27, -0.7]] },
+      // AOS → intake manifold (clean gas drawn into the plenum)
+      { points: [[-0.4, 0.27, -0.7], [-0.3, 0.32, -0.66], [-0.18, 0.34, -0.62], [-0.05, 0.35, -0.58]] },
+    ],
+    nodes: [
+      { id: 'aos', label: 'AOS', at: [-0.4, 0.27, -0.7], size: [0.1, 0.14, 0.1], color: '#2f3237' },
+    ],
+  },
+  {
+    id: 'vacuum-brake',
+    layer: 'vacuum',
+    label: 'Brake Booster Vacuum',
+    color: '#94A3B8',
+    pipe: { color: '#1c1e21', metalness: 0.15, roughness: 0.85 },
+    radius: 0.013,
+    speed: 0.09,
+    desc: 'A direct-injection flat-six makes little manifold vacuum, so a cam-driven mechanical vacuum pump evacuates the brake booster through an inline check valve. The check valve holds vacuum with the engine off for the first few pedal presses. A pedal that goes hard after the car sits, or a hissing booster, points at a failed check valve or a perished supply hose.',
+    relatedAssembly: 'fbrakes',
+    labelAt: [0.52, 0.12, 0.35],
+    paths: [
+      // Cam-driven vacuum pump → check valve → brake booster at the cowl
+      { points: [[0.2, 0.04, -0.9], [0.27, 0.0, -0.4], [0.3, 0.03, 0.2], [0.33, 0.12, 0.7], [0.35, 0.24, 0.95]] },
+    ],
+    nodes: [
+      { id: 'vac-pump', label: 'Vacuum Pump', at: [0.2, 0.04, -0.9], size: [0.1, 0.1, 0.12], color: '#4a4d52' },
+      { id: 'check-valve', label: 'Check Valve', at: [0.3, 0.03, 0.2], size: [0.06, 0.06, 0.1], color: '#2f3237' },
+      { id: 'booster', label: 'Brake Booster', at: [0.35, 0.26, 0.96], size: [0.17, 0.17, 0.13], color: '#55585d' },
+    ],
+  },
+  {
+    id: 'vacuum-pse',
+    layer: 'vacuum',
+    label: 'Sport Exhaust (PSE) Vacuum',
+    color: '#94A3B8',
+    pipe: { color: '#1c1e21', metalness: 0.15, roughness: 0.85 },
+    radius: 0.013,
+    speed: 0.09,
+    desc: 'The optional sport exhaust (PSE) opens bypass flaps in the rear silencers for a louder note. Engine vacuum stored in a small reservoir is routed by an electric changeover (solenoid) valve to the diaphragm actuators on each muffler; with no vacuum applied the flaps default open. A flap stuck open (loud all the time) usually means a cracked hose, a leaking reservoir or a tired actuator.',
+    relatedAssembly: 'exhaust',
+    labelAt: [0.0, -0.32, -1.62],
+    paths: [
+      // Reservoir → changeover valve → left silencer flap actuator
+      { points: [[-0.32, 0.14, -1.05], [-0.2, 0.04, -1.2], [-0.28, -0.2, -1.5], [-0.33, -0.44, -1.82], [-0.35, -0.52, -2.02]] },
+      // Changeover valve → right silencer flap actuator
+      { points: [[-0.12, 0.05, -1.2], [0.02, -0.06, -1.4], [0.2, -0.26, -1.66], [0.32, -0.46, -1.9], [0.35, -0.52, -2.05]] },
+    ],
+    nodes: [
+      { id: 'vac-reservoir', label: 'Vacuum Reservoir', at: [-0.34, 0.15, -1.04], size: [0.14, 0.1, 0.12], color: '#2f3237' },
+      { id: 'changeover-valve', label: 'Changeover Valve', at: [-0.12, 0.05, -1.2], size: [0.08, 0.07, 0.08], color: '#3a3d42' },
     ],
   },
 ];

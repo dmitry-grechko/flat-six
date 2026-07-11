@@ -176,4 +176,66 @@ export const FLOW_SYSTEMS_987: FlowSystem[] = [
       { id: 'dme', label: 'DME · ECU', at: [0.55, 0.32, -1.05], size: [0.3, 0.08, 0.24], color: '#33414d' },
     ],
   },
+  // ── VACUUM ───────────────────────────────────────────────────────────────
+  {
+    id: 'vacuum-brake',
+    layer: 'vacuum',
+    label: 'Brake Booster Vacuum',
+    color: '#94A3B8',
+    pipe: { color: '#1c1e21', metalness: 0.15, roughness: 0.85 }, // thin black rubber hose
+    radius: 0.013,
+    speed: 0.09,
+    desc: 'On the 987.2 (9A1 DFI) a cam-driven vacuum pump evacuates the brake booster through an inline check valve, because direct injection leaves little manifold vacuum to spare. The earlier 987.1 (M96/M97 port injection) drew booster vacuum straight off the intake and had no dedicated pump. A hard pedal on the first press after the car sits points at the check valve or a cracked supply hose.',
+    relatedAssembly: 'fbrakes',
+    labelAt: [0.52, 0.12, 0.35],
+    paths: [
+      // Cam-driven vacuum pump → check valve → brake booster at the cowl
+      { points: [[0.2, 0.04, -0.9], [0.27, 0.0, -0.4], [0.3, 0.03, 0.2], [0.33, 0.12, 0.7], [0.35, 0.24, 0.95]] },
+    ],
+    nodes: [
+      { id: 'vac-pump', label: 'Vacuum Pump', at: [0.2, 0.04, -0.9], size: [0.1, 0.1, 0.12], color: '#4a4d52' },
+      { id: 'check-valve', label: 'Check Valve', at: [0.3, 0.03, 0.2], size: [0.06, 0.06, 0.1], color: '#2f3237' },
+      { id: 'booster', label: 'Brake Booster', at: [0.35, 0.26, 0.96], size: [0.17, 0.17, 0.13], color: '#55585d' },
+    ],
+  },
+  {
+    id: 'vacuum-evap',
+    layer: 'vacuum',
+    label: 'EVAP / Tank Vent',
+    color: '#94A3B8',
+    pipe: { color: '#1c1e21', metalness: 0.15, roughness: 0.85 },
+    radius: 0.013,
+    speed: 0.09,
+    desc: 'Fuel vapor from the tank is stored in the charcoal canister ahead of the cabin; when the DME opens the tank-vent (purge) valve, manifold vacuum draws the stored vapor into the intake to be burned. A stuck or leaking purge valve, or a cracked line, is the usual cause of an evaporative-emissions (EVAP) fault code and a failed smoke test.',
+    relatedAssembly: 'fuel',
+    labelAt: [-0.4, -0.12, 0.3],
+    paths: [
+      // Charcoal canister (front) → center tunnel → purge valve → intake at engine
+      { points: [[0.08, -0.2, 0.98], [0.0, -0.34, 0.55], [-0.06, -0.34, 0.0], [-0.12, -0.2, -0.5], [-0.22, 0.16, -0.68], [-0.2, 0.28, -0.62]] },
+    ],
+    nodes: [
+      { id: 'canister', label: 'Charcoal Canister', at: [0.1, -0.2, 1.0], size: [0.16, 0.12, 0.12], color: '#2f3237' },
+      { id: 'purge-valve', label: 'Purge Valve', at: [-0.22, 0.2, -0.66], size: [0.07, 0.06, 0.08], color: '#3a3d42' },
+    ],
+  },
+  {
+    id: 'vacuum-flap',
+    layer: 'vacuum',
+    label: 'Intake Resonance Flap',
+    color: '#94A3B8',
+    pipe: { color: '#1c1e21', metalness: 0.15, roughness: 0.85 },
+    radius: 0.013,
+    speed: 0.09,
+    desc: 'The variable intake tunes runner length for both low-end torque and top-end power: a vacuum diaphragm swings the resonance/tuning flap in the intake distributor (the "resonance valve" on the 987.1, "tuning flaps" on the 987.2). A small reservoir and an electric solenoid hold and switch the vacuum. A leaking actuator or split hose leaves the flap stuck in one position and dulls throttle response at one end of the rev range.',
+    relatedAssembly: 'airfilter',
+    labelAt: [0.5, 0.5, -0.78],
+    paths: [
+      // Vacuum reservoir / solenoid → flap actuator on the intake plenum
+      { points: [[0.32, 0.16, -0.98], [0.3, 0.26, -0.84], [0.26, 0.36, -0.75], [0.2, 0.42, -0.7]] },
+    ],
+    nodes: [
+      { id: 'vac-reservoir', label: 'Vacuum Reservoir', at: [0.33, 0.15, -1.0], size: [0.12, 0.1, 0.1], color: '#2f3237' },
+      { id: 'flap-actuator', label: 'Flap Actuator', at: [0.2, 0.43, -0.7], size: [0.08, 0.06, 0.08], color: '#3a3d42' },
+    ],
+  },
 ];
