@@ -12,6 +12,7 @@ import {
 } from '@/lib/documents';
 import { generationForBody } from '@/lib/models';
 import { useVehicle } from '@/lib/vehicle-context';
+import { useDocumentsAccess } from '@/lib/hooks/useDocumentsAccess';
 import WorkshopManual from '@/components/views/WorkshopManual';
 
 const mono = "'JetBrains Mono',monospace";
@@ -26,6 +27,7 @@ export default function DocumentLibrary() {
   const { vehicle } = useVehicle();
   const vehicleGen = generationForBody(vehicle.body);
   const gen = vehicleGen === '987' || vehicleGen === '981' ? vehicleGen : '981';
+  const { allowed, loading } = useDocumentsAccess();
 
   const [q, setQ] = useState('');
 
@@ -72,6 +74,32 @@ export default function DocumentLibrary() {
   const initialPage = workshopLink
     ? workshopLink.pageInVolume
     : (Number.isFinite(pageParam) && pageParam > 0 ? pageParam : undefined);
+
+  if (loading) {
+    return (
+      <div className="padView" style={{ padding: 28, color: '#9A9AA0', font: "400 14px 'Helvetica Neue',Arial,sans-serif" }}>
+        Loading…
+      </div>
+    );
+  }
+
+  // No access: ignore deep links and hide the library.
+  if (!allowed) {
+    return (
+      <div className="padView" style={{ padding: 28, maxWidth: 560 }}>
+        <div style={{ background: '#fff', border: '1px solid #E3E3E5', borderRadius: 4, padding: 24 }}>
+          <div style={{ font: `500 11px/1 ${mono}`, letterSpacing: '.14em', color: '#9A9AA0', marginBottom: 12 }}>DOCUMENTS</div>
+          <h2 style={{ margin: 0, font: "400 20px/1.25 'Helvetica Neue',Arial,sans-serif", color: '#0B0B0C' }}>
+            Document preview is not enabled
+          </h2>
+          <p style={{ margin: '12px 0 0', font: "400 14px/1.6 'Helvetica Neue',Arial,sans-serif", color: '#6E6E73' }}>
+            Factory PDF viewing is limited to accounts with document access. Fault finding and AI search still use the
+            knowledge index — they just won&rsquo;t open the PDF viewer.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (docId && active) {
     return (

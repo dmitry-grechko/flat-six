@@ -149,6 +149,16 @@ export interface Vehicle {
   wheelSetup?: WheelSetup;
 }
 
+/** Per-user row in public.profiles (prefs + feature flags). */
+export interface Profile {
+  id: string;
+  displayName: string;
+  units: 'imperial' | 'metric';
+  /** When true, user may open /manual PDF library and document deep links. */
+  documentsAccess: boolean;
+  createdAt: string;
+}
+
 /** A saved wheel/tyre setup for a vehicle (front + rear + optional notes). */
 export interface WheelSetup {
   front: WheelSpec;

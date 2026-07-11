@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { getSpecs, type Spec } from '@/lib/knowledge';
 import { searchTorqueManual, type ManualHit } from '@/lib/manual-lookup';
 import { manualHitHref } from '@/lib/documents';
+import { useDocumentsAccess } from '@/lib/hooks/useDocumentsAccess';
 import { DEMO_MODE } from '@/lib/demo';
 import { InfoBox, ToolSection, mono, sans } from './ui';
 
@@ -196,7 +197,8 @@ export default function TorqueFinder({ gen }: { gen: string }) {
 }
 
 function ManualTorqueRow({ hit }: { hit: ManualHit }) {
-  const href = manualHitHref(hit);
+  const { allowed: docsAccess } = useDocumentsAccess();
+  const href = docsAccess ? manualHitHref(hit) : null;
   const snippet = (hit.snippet ?? '').replace(/<\/?b>/g, '');
   const values = extractTorques(snippet);
   return (

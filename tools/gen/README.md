@@ -1,6 +1,6 @@
 # Procedural 3D component pipeline
 
-Generates clean technical-illustration / CAD-style **GLB** models of the Porsche
+Generates clean technical-illustration / CAD-style **GLB** models of the
 981 Boxster S internal components, one `.glb` per component with **named nodes**
 so the app can isolate / highlight individual parts. Also emits a manifest the
 app reads.

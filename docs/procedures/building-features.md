@@ -29,6 +29,12 @@ A nav destination is a real route: add `app/<name>/page.tsx` wrapping the view i
 `components/shell/AppShell.tsx` (`PAGE_META`). Views are `'use client'`, read the
 car via `useVehicle()` and derive generation with `generationForBody()`.
 
+Public marketing pages (landing, `/features/*`, hubs, guides, codes) are SSR and
+use `MarketingShell` — see [`public-seo-pages.md`](./public-seo-pages.md).
+
+Factory PDF preview (`/manual`) is gated by `profiles.documents_access` (default
+off for new accounts; toggle in Admin). Embeddings / manual search stay available.
+
 ## 3. If it touches the backend
 
 - Per-user data → add a migration in `supabase/migrations/NNNN_*.sql` (additive;

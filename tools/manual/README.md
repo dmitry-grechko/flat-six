@@ -1,10 +1,10 @@
 # Documents & knowledge pipeline
 
-Turns factory PDFs into (a) an in-app **Documents** library and (b) searchable
+Turns reference PDFs into (a) an in-app **Documents** library and (b) searchable
 Supabase chunks for Fault Finding + MCP.
 
-**Copyright**: all of this is © Porsche. PDFs and extracted JSON are gitignored —
-they feed your own Supabase project only. DB reads require an authenticated session.
+**Rights**: source PDFs and extracted JSON are gitignored — they feed your own
+Supabase project only. DB reads require an authenticated session.
 
 ## Sources
 

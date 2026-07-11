@@ -10,6 +10,7 @@ import type { FaultCode, KnownIssue, Severity } from '@/lib/knowledge';
 import { searchParts, type CatalogPartRow } from '@/lib/parts-lookup';
 import { searchManualHybrid, getManualSection, type ManualHit } from '@/lib/manual-lookup';
 import { manualHitHref, resolveDocumentForManualHit } from '@/lib/documents';
+import { useDocumentsAccess } from '@/lib/hooks/useDocumentsAccess';
 import Link from 'next/link';
 import { useVehicle } from '@/lib/vehicle-context';
 import { generationForBody } from '@/lib/models';
@@ -262,6 +263,7 @@ function ManualResults({
 }) {
   const [openId, setOpenId] = useState<string | null>(null);
   const [content, setContent] = useState<Record<string, string>>({});
+  const { allowed: docsAccess } = useDocumentsAccess();
 
   function toggle(id: string) {
     setOpenId((cur) => (cur === id ? null : id));
@@ -282,7 +284,7 @@ function ManualResults({
       </div>
       {hits.map((h) => {
         const open = openId === h.id;
-        const href = manualHitHref(h, query);
+        const href = docsAccess ? manualHitHref(h, query) : null;
         const doc = resolveDocumentForManualHit(h);
         const codeLabel = h.wmCode
           ? (h.source === 'workshop' || /^[0-9]/.test(h.wmCode) ? `WM ${h.wmCode}` : h.wmCode)

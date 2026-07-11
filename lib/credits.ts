@@ -77,58 +77,54 @@ export interface ImageCredit {
   license: string;    // usage basis
 }
 
-// Factory ghosted/phantom cutaway illustrations are © Dr. Ing. h.c. F. Porsche AG,
-// distributed for editorial/press use. The whole-car cutaway used here is a
-// GT Silver recolour of the official 981 Cayman press rendering by Rennlist member
-// "Randy_B"; the flat-six engine cutaway is the unaltered Porsche factory drawing.
-const PORSCHE_AG = '© Dr. Ing. h.c. F. Porsche AG — editorial use';
+// Reference cutaway illustrations used in the 2D garage explorer.
+// Attribution retained in NOTICE-style credit objects for the in-app overlay.
+const CUTAWAY_LICENSE = 'Editorial reference · third-party rights reserved';
 
 export const CUTAWAY_CREDIT: ImageCredit = {
-  title: 'Porsche 981 factory cutaway (GT Silver)',
-  author: 'Porsche AG · recolour by Randy_B',
+  title: '981 whole-car cutaway',
+  author: 'Community recolour',
   source: 'https://rennlist.com/forums/981-forum/1350212-porsche-cutaway-drawings.html',
-  license: PORSCHE_AG,
+  license: CUTAWAY_LICENSE,
 };
 
 export const ENGINE_CUTAWAY_CREDIT: ImageCredit = {
-  title: 'Porsche flat-six engine cutaway',
-  author: 'Porsche AG',
+  title: 'Flat-six engine cutaway',
+  author: 'Reference illustration',
   source: 'https://conceptbunny.com/porsche-boxster-engine/',
-  license: PORSCHE_AG,
+  license: CUTAWAY_LICENSE,
 };
 
-// ── 987 (2005–2012 Boxster/Cayman) factory illustrations ──
-// Porsche press/media cutaways, © Porsche AG, editorial use.
-const PORSCHE_PRESS = 'https://newsroom.porsche.com';
+// ── 987 (2005–2012) reference illustrations ──
+const PRESS_SOURCE = 'https://newsroom.porsche.com';
 
 export const CUTAWAY_987_CREDIT: ImageCredit = {
-  title: 'Porsche Cayman S (987) factory cutaway',
-  author: 'Porsche AG',
-  source: PORSCHE_PRESS,
-  license: PORSCHE_AG,
+  title: '987 whole-car cutaway',
+  author: 'Reference illustration',
+  source: PRESS_SOURCE,
+  license: CUTAWAY_LICENSE,
 };
 
 export const ENGINE_987_CREDIT: ImageCredit = {
-  title: 'Porsche 987 flat-six & transaxle cutaway',
-  author: 'Porsche AG',
-  source: PORSCHE_PRESS,
-  license: PORSCHE_AG,
+  title: '987 flat-six & transaxle cutaway',
+  author: 'Reference illustration',
+  source: PRESS_SOURCE,
+  license: CUTAWAY_LICENSE,
 };
 
 export const CYLINDER_987_CREDIT: ImageCredit = {
-  title: 'Porsche flat-six cylinder numbering',
-  author: 'Porsche AG',
-  source: PORSCHE_PRESS,
-  license: PORSCHE_AG,
+  title: 'Flat-six cylinder numbering',
+  author: 'Reference illustration',
+  source: PRESS_SOURCE,
+  license: CUTAWAY_LICENSE,
 };
 
-// Dedicated 981 flat-six + transaxle engine cutaway (press render) for the
-// 981 ENGINE tab — same treatment as the 987 engine image.
+// Dedicated 981 flat-six + transaxle engine cutaway for the ENGINE tab.
 export const ENGINE_981_CREDIT: ImageCredit = {
-  title: 'Porsche 981 flat-six & transaxle cutaway',
-  author: 'Porsche AG',
-  source: PORSCHE_PRESS,
-  license: PORSCHE_AG,
+  title: '981 flat-six & transaxle cutaway',
+  author: 'Reference illustration',
+  source: PRESS_SOURCE,
+  license: CUTAWAY_LICENSE,
 };
 
 /** One 2D cutaway tab: the background image, its tab label, caption + credit. */
@@ -159,12 +155,12 @@ const DEFAULT_GENERATION = '981';
 // fall back to the 981 set.
 const GENERATION_CUTAWAYS: Record<string, GenerationCutaways> = {
   '981': {
-    front: { src: '/assets/cutaway-981.jpg', alt: 'Porsche 981 factory cutaway', credit: CUTAWAY_CREDIT, tabLabel: 'CUTAWAY', caption: 'FULL CUTAWAY · 981' },
-    engine: { src: '/assets/engine-981.jpg', alt: 'Porsche 981 flat-six engine and transaxle cutaway', credit: ENGINE_981_CREDIT, tabLabel: 'ENGINE', caption: 'FLAT-SIX & TRANSAXLE · ENGINE CUTAWAY' },
+    front: { src: '/assets/cutaway-981.jpg', alt: '981 whole-car cutaway', credit: CUTAWAY_CREDIT, tabLabel: 'CUTAWAY', caption: 'FULL CUTAWAY · 981' },
+    engine: { src: '/assets/engine-981.jpg', alt: '981 flat-six and transaxle cutaway', credit: ENGINE_981_CREDIT, tabLabel: 'ENGINE', caption: 'FLAT-SIX & TRANSAXLE · ENGINE CUTAWAY' },
   },
   '987': {
-    front: { src: '/assets/cutaway-987.jpg', alt: 'Porsche Cayman S (987) factory cutaway', credit: CUTAWAY_987_CREDIT, tabLabel: 'CUTAWAY', caption: 'FULL CUTAWAY · 987 CAYMAN' },
-    engine: { src: '/assets/engine-987.jpg', alt: 'Porsche 987 flat-six engine and transaxle cutaway', credit: ENGINE_987_CREDIT, tabLabel: 'ENGINE', caption: 'FLAT-SIX & TRANSAXLE · ENGINE CUTAWAY' },
+    front: { src: '/assets/cutaway-987.jpg', alt: '987 whole-car cutaway', credit: CUTAWAY_987_CREDIT, tabLabel: 'CUTAWAY', caption: 'FULL CUTAWAY · 987' },
+    engine: { src: '/assets/engine-987.jpg', alt: '987 flat-six and transaxle cutaway', credit: ENGINE_987_CREDIT, tabLabel: 'ENGINE', caption: 'FLAT-SIX & TRANSAXLE · ENGINE CUTAWAY' },
   },
 };
 
@@ -189,8 +185,8 @@ export interface EngineRefImage {
 // Per-generation "engine reference" figure (shown in a selected Engine part's
 // detail). Unknown generations fall back to the 981 flat-six reference.
 const GENERATION_ENGINE_REF: Record<string, EngineRefImage> = {
-  '981': { src: '/assets/engine-flat-six.jpg', alt: 'Porsche flat-six engine cutaway', credit: ENGINE_CUTAWAY_CREDIT, label: 'FLAT-SIX REFERENCE' },
-  '987': { src: '/assets/cylinder-987.jpg', alt: 'Porsche flat-six cylinder numbering (987)', credit: CYLINDER_987_CREDIT, label: 'CYLINDER NUMBERING' },
+  '981': { src: '/assets/engine-flat-six.jpg', alt: 'Flat-six engine cutaway', credit: ENGINE_CUTAWAY_CREDIT, label: 'FLAT-SIX REFERENCE' },
+  '987': { src: '/assets/cylinder-987.jpg', alt: 'Flat-six cylinder numbering (987)', credit: CYLINDER_987_CREDIT, label: 'CYLINDER NUMBERING' },
 };
 
 export function engineRefFor(generation: string): EngineRefImage {

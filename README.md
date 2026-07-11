@@ -1,14 +1,14 @@
 <p align="center">
-  <img src="./public/logo.svg" alt="FLAT·SIX — Porsche 981/987 Garage" width="360" />
+  <img src="./public/logo.svg" alt="FLAT·SIX" width="360" />
 </p>
 
-# FLAT·SIX — Porsche Garage
+# FLAT·SIX
 
-A DIY maintenance OS for the **Porsche Boxster / Cayman** — **987 and 981 today**, with more generations on the way: an interactive component explorer, a generation-scoped knowledge base (fault codes, torque specs, known issues), a personal service log + planner, and an **AI workshop assistant** exposed to Claude over the Model Context Protocol (MCP).
+A DIY maintenance OS for the **Boxster / Cayman** platform — **987 and 981 today**, with more generations on the way: an interactive component explorer, a generation-scoped knowledge base (fault codes, torque specs, known issues), a personal service log + planner, and an **AI workshop assistant** exposed to Claude over the Model Context Protocol (MCP).
 
 Built as a single Next.js app that deploys for free on **Vercel + Supabase**.
 
-> ⚠️ Hobby/community project. Not affiliated with Dr. Ing. h.c. F. Porsche AG.
+> ⚠️ Hobby/community project. Independent and unofficial — not affiliated with the vehicle manufacturer.
 > All maintenance data is provided for reference only — always verify against an
 > official workshop manual before working on your car.
 
@@ -17,7 +17,7 @@ Built as a single Next.js app that deploys for free on **Vercel + Supabase**.
 ## Features
 
 - **Garage / Component Explorer** — interactive 2D cutaways with clickable hotspots,
-  an exterior 3D model viewer (paint picker), and real OEM part numbers, torque specs,
+  an exterior 3D model viewer (paint picker), and real part numbers, torque specs,
   and step-by-step procedures per component.
 - **Service history** — per-vehicle maintenance log with flexible line items
   (part numbers, costs, notes).
@@ -53,7 +53,7 @@ Supabase, and the whole thing runs on free tiers.
 
 ## Architecture
 
-- **Shared reference data** (components, fault library, OEM catalog, 981 knowledge
+- **Shared reference data** (components, fault library, part catalog, 981 knowledge
   base) is static and version-controlled in `lib/` — identical for everyone.
 - **Per-user data** (vehicles, service records, plans) lives in Postgres. Every row
   carries a `user_id`; RLS policies (`auth.uid() = user_id`) enforce isolation at the
@@ -125,7 +125,7 @@ garage tools (read/write your records) require it. Full details and other client
 app/                Next.js routes (garage, history, plans, faults, settings, auth, api/mcp)
 components/         UI — shell, garage explorer, views, home landing
 lib/
-  data.ts, catalog* Static reference data + OEM part catalog
+  data.ts, catalog* Static reference data + part catalog
   knowledge/        981 knowledge base + search (RAG layer)
   mcp/              MCP tool definitions + auth
   db/               Per-user data access (vehicles, records, plans)
@@ -160,13 +160,14 @@ The same rules are encoded for AI pair-programming in [`CLAUDE.md`](./CLAUDE.md)
 ## License & attributions
 
 - **Code** — [MIT](./LICENSE).
-- **Bundled assets** — third-party 3D models and factory reference imagery are used
-  under their own licences (CC BY 4.0, CC BY-NC-SA 4.0, and © Porsche AG editorial
-  use). See [`NOTICE.md`](./NOTICE.md) for required attributions. Two bundled models
-  (the 987 Spyder and the 981 GT4) are **CC BY-NC-SA**, so any redistributed
-  derivative of the app must stay non-commercial + share-alike.
-- **Factory documentation** — workshop manuals and parts catalogues are © Porsche AG,
-  are **not** redistributed (gitignored), and are served only to authenticated users.
+- **Bundled assets** — third-party 3D models carry their own Creative Commons
+  licences (CC BY 4.0 / CC BY-NC-SA 4.0). See [`NOTICE.md`](./NOTICE.md) for
+  required attributions. Two bundled models (the 987 Spyder and the 981 GT4) are
+  **CC BY-NC-SA**, so any redistributed derivative of the app must stay
+  non-commercial + share-alike.
+- **Reference documentation** — any third-party workshop PDFs used for local
+  development are **not** redistributed (gitignored) and are served only to
+  authenticated users when configured.
 
 Contributing a model or generation? See [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 `app/api/devshot` is a dev-only render-capture route; remove it before a public

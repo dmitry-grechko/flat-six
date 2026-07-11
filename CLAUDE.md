@@ -51,6 +51,7 @@ tab bars — test at 375 px. Nav item = route (`app/*/page.tsx` + `AppShell` +
 - Add a model variant → [`docs/procedures/adding-model-variant.md`](./docs/procedures/adding-model-variant.md)
 - Add a generation → [`docs/procedures/adding-new-generation.md`](./docs/procedures/adding-new-generation.md)
 - Build a feature → [`docs/procedures/building-features.md`](./docs/procedures/building-features.md)
+- Public SEO / marketing pages → [`docs/procedures/public-seo-pages.md`](./docs/procedures/public-seo-pages.md)
 
 **When you change a process, update its procedure doc + this file + `.cursor/rules/`.**
 

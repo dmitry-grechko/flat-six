@@ -12,6 +12,7 @@ import { searchCatalog, formatPartNumber } from '@/lib/catalog';
 import { GENERATIONS, generationForBody } from '@/lib/models';
 import { resolveUser, AUTH_REQUIRED_MESSAGE, publicClient } from './auth';
 import { manualHitHref } from '@/lib/documents';
+import { userHasDocumentsAccess } from '@/lib/documents-access';
 import { embedQuery, toVectorLiteral, voyageConfigured } from '@/lib/embeddings';
 import {
   presetsForGeneration,
@@ -536,6 +537,7 @@ export function registerTools(server: McpServer): void {
             `Import with npm run db:import-manual / db:import-mtl.`,
         );
       }
+      const canViewDocs = await userHasDocumentsAccess(user.supabase, user.userId);
       return scopedJson(
         scope,
         (data as any[]).map((r) => {
@@ -557,7 +559,7 @@ export function registerTools(server: McpServer): void {
             source: r.source,
             generation: r.generation,
             docId: r.doc_id,
-            viewerUrl: manualHitHref(hit),
+            viewerUrl: canViewDocs ? manualHitHref(hit) : null,
             snippet: (r.snippet ?? '').replace(/<\/?b>/g, '**'),
           };
         }),
@@ -593,6 +595,7 @@ export function registerTools(server: McpServer): void {
         docId: data.doc_id,
         page: data.page as number,
       };
+      const canViewDocs = await userHasDocumentsAccess(user.supabase, user.userId);
       return json({
         id: data.id,
         wmCode: data.wm_code,
@@ -604,7 +607,7 @@ export function registerTools(server: McpServer): void {
         source: data.source,
         generation: data.generation,
         docId: data.doc_id,
-        viewerUrl: manualHitHref(hit),
+        viewerUrl: canViewDocs ? manualHitHref(hit) : null,
         content: data.content,
       });
     },

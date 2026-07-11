@@ -8,6 +8,7 @@ import { useVehicle } from '@/lib/vehicle-context';
 import { createClient } from '@/lib/supabase/client';
 import { isAdminEmail } from '@/lib/admin';
 import { DEMO_MODE } from '@/lib/demo';
+import { useDocumentsAccess } from '@/lib/hooks/useDocumentsAccess';
 import VehicleSwitcher from './VehicleSwitcher';
 import AddVehicleModal from './AddVehicleModal';
 
@@ -40,11 +41,13 @@ export default function Sidebar({
   // so it can be tested without a real session). The /api/admin route enforces
   // this server-side regardless — this just controls the nav item.
   const [isAdmin, setIsAdmin] = useState(DEMO_MODE);
+  const { allowed: docsAccess } = useDocumentsAccess();
   useEffect(() => {
     if (DEMO_MODE) return;
     createClient().auth.getUser().then(({ data }) => setIsAdmin(isAdminEmail(data.user?.email)));
   }, []);
-  const items = isAdmin ? [...NAV, { no: '09', label: 'Admin', href: '/admin' }] : NAV;
+  const baseNav = docsAccess ? NAV : NAV.filter((item) => item.href !== '/manual');
+  const items = isAdmin ? [...baseNav, { no: '09', label: 'Admin', href: '/admin' }] : baseNav;
 
   return (
     <aside

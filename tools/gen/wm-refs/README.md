@@ -1,7 +1,7 @@
 # Workshop-manual CAD refs (local)
 
 PNG extracts used to calibrate procedural component geometry.
-**Do not commit PNGs** (© Porsche) — gitignored via `tools/gen/wm-refs/**/*.png`.
+**Do not commit PNGs** (third-party rights reserved) — gitignored via `tools/gen/wm-refs/**/*.png`.
 
 ## AI workflow (source of truth)
 

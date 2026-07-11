@@ -53,11 +53,47 @@ a { color: inherit; text-decoration: none; }
 
 /* Landing page (home) interactions */
 .navlink:hover { color: #fff !important; }
+.navDropItem:hover { background: #1E1E22 !important; }
+.codeRow:hover { background: #161619 !important; }
+.docRow:hover { background: rgba(0,0,0,.3) !important; }
+.carCard:hover { border-color: #4A2A2E !important; }
+.darkCardHover:hover { border-color: #3A3A40 !important; transform: translateY(-3px); }
+.crumb:hover { color: #fff !important; }
 .fcard:hover { border-color: #C9C9CD !important; transform: translateY(-2px); }
 .pin:hover .pinlabel { opacity: 1 !important; }
 .cta:hover { background: #B00018 !important; }
 .ghost:hover { border-color: #0B0B0C !important; color: #0B0B0C !important; }
 .ghostDark:hover { border-color: #fff !important; color: #fff !important; }
+
+/* Marketing mobile nav */
+.marketingHamburger {
+  display: none;
+  width: 38px; height: 38px; flex-shrink: 0; padding: 0;
+  flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  background: transparent; border: 1px solid #313135; border-radius: 3px; cursor: pointer;
+}
+.marketingHamburger span { width: 16px; height: 2px; background: #fff; border-radius: 1px; }
+.marketingDrawerBackdrop {
+  display: none; position: fixed; inset: 0; z-index: 90;
+  background: rgba(11,11,12,.55); border: 0; cursor: pointer;
+}
+.marketingDrawer {
+  display: none; position: fixed; top: 68px; right: 0; bottom: 0; z-index: 95;
+  width: min(320px, 88vw); background: #0B0B0C; border-left: 1px solid #1C1C1F;
+  overflow: auto; transform: translateX(100%); transition: transform .24s ease;
+}
+.marketingDrawer.open { transform: translateX(0); }
+.marketingDrawerLink {
+  display: block; padding: 12px 0; font: 500 15px/1.3 'Helvetica Neue', Arial, sans-serif;
+  color: #C9C9CD; text-decoration: none;
+}
+.marketingDrawerLink:hover { color: #fff; }
+
+@keyframes navDrop {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: none; }
+}
+.navDrop { animation: navDrop .16s ease; }
 
 /* Landing page (home) responsive — collapse the multi-column sections */
 @media (max-width: 880px) {
@@ -129,13 +165,29 @@ model-viewer { width: 100%; height: 100%; --poster-color: transparent; }
 /* --- Landing page --- */
 @media (max-width: 760px) {
   .landingNavLinks { display: none !important; }
-  .landingNav { padding-left: 18px !important; padding-right: 18px !important; gap: 10px !important; }
+  .hideOnMobileNav { display: none !important; }
+  .marketingHamburger { display: inline-flex !important; }
+  .marketingDrawerBackdrop.open { display: block !important; opacity: 1; }
+  .marketingDrawer { display: block !important; }
+  .marketingFooterGrid { grid-template-columns: 1fr 1fr !important; gap: 28px !important; }
+  .landingNav { padding-left: 18px !important; padding-right: 18px !important; gap: 10px !important; height: 64px !important; }
   .landing section { padding-left: 18px !important; padding-right: 18px !important; }
   .landingHero { padding: 52px 18px 60px !important; }
   .landing h1 { font-size: 42px !important; }
   .landing h2 { font-size: 30px !important; }
   .landingMcpGrid { grid-template-columns: 1fr 1fr !important; }
   .heroValueStrip { grid-template-columns: 1fr !important; }
+  .featureHero { grid-template-columns: 1fr !important; padding-top: 64px !important; padding-bottom: 64px !important; }
+  .featureHighlights { grid-template-columns: 1fr !important; }
+  .featureDetail { grid-template-columns: 1fr !important; }
+  .modelFacts { grid-template-columns: 1fr 1fr !important; }
+  .modelKnows { grid-template-columns: 1fr !important; }
+  .guidesGrid { grid-template-columns: 1fr !important; }
+  .codesSystems { grid-template-columns: 1fr 1fr !important; }
+  .aboutPrinciples { grid-template-columns: 1fr 1fr !important; }
+  .multiCar { grid-template-columns: 1fr !important; }
+  .carCards { flex-direction: column !important; }
+  .toolChecks { grid-template-columns: 1fr !important; }
 }
 @media (max-width: 440px) {
   .landingMcpGrid { grid-template-columns: 1fr !important; }

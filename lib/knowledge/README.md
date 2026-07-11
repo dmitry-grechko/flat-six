@@ -1,6 +1,6 @@
 # FLAT·SIX 981 Knowledge Base
 
-A structured, sourced knowledge base on the **Porsche 981** (Boxster 981 / Cayman 981c, model years ~2012–2016: base 2.7L, S/GTS 3.4L, GT4/Spyder 3.8L). It powers two consumers:
+A structured, sourced knowledge base on the **981** (Boxster 981 / Cayman 981c, model years ~2012–2016: base 2.7L, S/GTS 3.4L, GT4/Spyder 3.8L). It powers two consumers:
 
 1. The **RAG assistant** (via `searchKnowledge`).
 2. **MCP tools** for fault-code / spec / parts / maintenance lookups (which code against the exact exports in `index.ts`).
@@ -9,7 +9,7 @@ A structured, sourced knowledge base on the **Porsche 981** (Boxster 981 / Cayma
 
 | File | Type | Approx. count | Description |
 |------|------|--------------|-------------|
-| `fault-codes.json` | `FaultCode[]` | ~47 | Generic OBD-II P-codes relevant to the DFI flat-six + Porsche-specific (P1128/P1130) + PDK pointer (P0700). |
+| `fault-codes.json` | `FaultCode[]` | ~47 | Generic OBD-II P-codes relevant to the DFI flat-six + platform-specific (P1128/P1130) + PDK pointer (P0700). |
 | `specs.json` | `Spec[]` | ~60 | Torque, fluid specs, capacities, tyre sizes/pressures, electrical, tolerances. |
 | `maintenance.json` | `MaintenanceItem[]` | ~17 | Factory interval schedule (oil, brake fluid, plugs, filters, coolant, PDK/manual service, belt, etc.). |
 | `known-issues.json` | `KnownIssue[]` | ~19 | 981-specific issues incl. the explicit **"no IMS bearing"** note and verified recalls. |
@@ -51,7 +51,7 @@ MCP `search_workshop_manual`). Torque: curated `specs*.json` (~35 DIY entries)
 
 ## Data sources
 
-Facts were researched and verified against reputable sources, with a `source` URL on each record. Primary references include: Porsche Club of America (PCA) tech Q&A, Rennlist and Planet-9 forums, FCP Euro / Pelican Parts / Design911 catalogs and blogs, Mobil (oil approvals), OBD-Codes (generic DTC library), NHTSA (recalls), and Wikipedia (model/engine facts). Several values are flagged **LOW/MEDIUM-CONFIDENCE** in their `notes` where they came from aggregators or closely-related (non-981) models — these should be confirmed against the official Porsche workshop manual / spec sheet before being treated as authoritative. Notably flagged: some torque values (coolant drain, engine mount, control arm), coolant total capacities, the 3.8L oil capacity, alternator output, base-model brake-disc dimensions, and the normal-vs-full-load tyre-pressure split (always defer to the car's door/fuel-flap placard).
+Facts were researched and verified against reputable sources, with a `source` URL on each record. Primary references include owner clubs and forums, parts catalogs and blogs, oil approvals, OBD-Codes (generic DTC library), NHTSA (recalls), and Wikipedia (model/engine facts). Several values are flagged **LOW/MEDIUM-CONFIDENCE** in their `notes` where they came from aggregators or closely-related (non-981) models — these should be confirmed against an official workshop manual / spec sheet before being treated as authoritative. Notably flagged: some torque values (coolant drain, engine mount, control arm), coolant total capacities, the 3.8L oil capacity, alternator output, base-model brake-disc dimensions, and the normal-vs-full-load tyre-pressure split (always defer to the car's door/fuel-flap placard).
 
 **Correctness highlights deliberately encoded:** the 981 uses the DFI **9A1/MA1** engine and has **NO IMS bearing** (that was the M96/M97 in the 986/987.1); the wheel-bolt torque is **160 Nm** (not the legacy 130 Nm); the 3.4 L is **MA1.23** (the 2.7 is MA1.22); and the Pentosin FFL-3 commonly sold as "PDK fluid" is the **clutch/control fluid** — the PDK gear set uses 75W-90.
 
