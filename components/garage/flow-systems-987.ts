@@ -92,7 +92,8 @@ export const FLOW_SYSTEMS_987: FlowSystem[] = [
     relatedAssembly: 'oil',
     labelAt: [0.85, 0.4, -0.9],
     paths: [
-      { closed: true, points: [[0.2, -0.18, -0.8], [0.5, -0.06, -0.98], [0.64, 0.12, -0.9], [0.5, 0.35, -0.8], [0.2, 0.3, -0.68], [0.04, 0.05, -0.72]] },
+      // Loop threads the car-space oil assembly's filter (≈0.44 0.03 -0.61).
+      { closed: true, points: [[0.2, -0.18, -0.8], [0.5, -0.06, -0.98], [0.48, 0.03, -0.62], [0.5, 0.35, -0.8], [0.2, 0.3, -0.68], [0.04, 0.05, -0.72]] },
     ],
   },
   {
@@ -107,7 +108,8 @@ export const FLOW_SYSTEMS_987: FlowSystem[] = [
     relatedAssembly: 'fuel',
     labelAt: [-0.1, -0.25, 0.4],
     paths: [
-      { points: [[0, -0.2, 0.9], [-0.1, -0.4, 0.55], [-0.15, -0.42, 0], [-0.2, -0.3, -0.5], [-0.42, 0.22, -0.85]] },
+      // Hugs the underbody: tank → floor pan → tunnel → riser to the engine.
+      { points: [[0, -0.2, 0.9], [-0.1, -0.5, 0.55], [-0.15, -0.54, 0], [-0.18, -0.54, -0.5], [-0.3, -0.3, -0.72], [-0.42, 0.22, -0.85]] },
     ],
   },
   {
@@ -125,12 +127,12 @@ export const FLOW_SYSTEMS_987: FlowSystem[] = [
     // psReservoir, steeringRack — carSpace ×0.95); these runs thread them.
     // Waypoints match susp GLB nodes × worldScale 0.95 (psPump / rack / psReservoir).
     paths: [
-      // Pressure: engine-driven pump → right sill → rack valve body
-      { points: [[0.55, 0.02, -0.95], [0.59, -0.28, -0.48], [0.59, -0.34, 0.48], [0.52, -0.27, 1.05], [0.43, -0.18, 1.29]] },
+      // Pressure: engine-driven pump → right sill AT FLOOR LEVEL → rack valve body
+      { points: [[0.55, 0.02, -0.95], [0.59, -0.42, -0.48], [0.59, -0.48, 0.48], [0.52, -0.35, 1.05], [0.43, -0.18, 1.29]] },
       // Return: rack → frunk reservoir
       { points: [[0.42, -0.19, 1.33], [0.48, 0.0, 1.29], [0.52, 0.28, 1.25]] },
-      // Suction: reservoir → right sill → pump
-      { points: [[0.52, 0.28, 1.25], [0.59, -0.19, 0.57], [0.57, -0.24, -0.38], [0.55, 0.08, -0.95]] },
+      // Suction: reservoir → right sill at floor level → pump
+      { points: [[0.52, 0.28, 1.25], [0.59, -0.35, 0.57], [0.57, -0.42, -0.38], [0.55, 0.08, -0.95]] },
     ],
   },
   {
@@ -167,9 +169,12 @@ export const FLOW_SYSTEMS_987: FlowSystem[] = [
     relatedAssembly: 'elec',
     labelAt: [0.7, 0.4, 0.9],
     paths: [
-      { points: [[-0.62, 0.22, 1.05], [-0.3, -0.1, 0.65], [-0.25, -0.25, 0.05], [-0.3, -0.05, -0.7], [-0.35, 0.05, -0.95]] },
+      // Battery → tunnel loom at floor level → riser to the DME
+      { points: [[-0.62, 0.22, 1.05], [-0.35, -0.3, 0.7], [-0.3, -0.48, 0.05], [-0.3, -0.42, -0.7], [-0.35, 0.05, -0.95]] },
+      // Cowl crossover (dash harness — legitimately runs high)
       { points: [[-0.62, 0.28, 1.05], [-0.2, 0.24, 1.0], [0.25, 0.22, 0.97], [0.62, 0.2, 0.95]] },
-      { points: [[0.62, 0.18, 0.95], [0.5, -0.1, 0.45], [0.45, -0.25, -0.35], [0.5, 0.0, -0.8], [0.55, 0.3, -1.02]] },
+      // Fuse panel → right tunnel at floor level → alternator/starter riser
+      { points: [[0.62, 0.18, 0.95], [0.5, -0.28, 0.45], [0.45, -0.46, -0.35], [0.5, -0.05, -0.8], [0.55, 0.3, -1.02]] },
       { points: [[0.55, 0.3, -1.0], [0.3, 0.35, -0.9], [0.05, 0.3, -0.85]] },
     ],
     nodes: [
@@ -187,14 +192,14 @@ export const FLOW_SYSTEMS_987: FlowSystem[] = [
     speed: 0.09,
     desc: 'On the 987.2 (9A1 DFI) a cam-driven vacuum pump evacuates the brake booster through an inline check valve, because direct injection leaves little manifold vacuum to spare. The earlier 987.1 (M96/M97 port injection) drew booster vacuum straight off the intake and had no dedicated pump. A hard pedal on the first press after the car sits points at the check valve or a cracked supply hose.',
     relatedAssembly: 'fbrakes',
-    labelAt: [0.52, 0.12, 0.35],
+    labelAt: [0.52, -0.3, 0.3],
     paths: [
-      // Cam-driven vacuum pump → check valve → brake booster at the cowl
-      { points: [[0.2, 0.04, -0.9], [0.27, 0.0, -0.4], [0.3, 0.03, 0.2], [0.33, 0.12, 0.7], [0.35, 0.24, 0.95]] },
+      // Pump → floor pan → tunnel at floor level → cowl riser via check valve
+      { points: [[0.2, 0.04, -0.9], [0.26, -0.35, -0.55], [0.3, -0.52, -0.1], [0.32, -0.52, 0.45], [0.34, -0.1, 0.82], [0.35, 0.24, 0.95]] },
     ],
     nodes: [
       { id: 'vac-pump', label: 'Vacuum Pump', at: [0.2, 0.04, -0.9], size: [0.1, 0.1, 0.12], color: '#4a4d52' },
-      { id: 'check-valve', label: 'Check Valve', at: [0.3, 0.03, 0.2], size: [0.06, 0.06, 0.1], color: '#2f3237' },
+      { id: 'check-valve', label: 'Check Valve', at: [0.33, -0.02, 0.78], size: [0.06, 0.06, 0.1], color: '#2f3237' },
       { id: 'booster', label: 'Brake Booster', at: [0.35, 0.26, 0.96], size: [0.17, 0.17, 0.13], color: '#55585d' },
     ],
   },
@@ -210,8 +215,8 @@ export const FLOW_SYSTEMS_987: FlowSystem[] = [
     relatedAssembly: 'fuel',
     labelAt: [-0.4, -0.12, 0.3],
     paths: [
-      // Charcoal canister (front) → center tunnel → purge valve → intake at engine
-      { points: [[0.08, -0.2, 0.98], [0.0, -0.34, 0.55], [-0.06, -0.34, 0.0], [-0.12, -0.2, -0.5], [-0.22, 0.16, -0.68], [-0.2, 0.28, -0.62]] },
+      // Charcoal canister → floor pan → tunnel at floor level → purge-valve riser
+      { points: [[0.08, -0.2, 0.98], [0.0, -0.45, 0.55], [-0.06, -0.5, 0.0], [-0.12, -0.42, -0.5], [-0.22, 0.16, -0.68], [-0.2, 0.28, -0.62]] },
     ],
     nodes: [
       { id: 'canister', label: 'Charcoal Canister', at: [0.1, -0.2, 1.0], size: [0.16, 0.12, 0.12], color: '#2f3237' },

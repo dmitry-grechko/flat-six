@@ -159,8 +159,9 @@ export const FLOW_SYSTEMS: FlowSystem[] = [
     relatedAssembly: 'oil',
     labelAt: [0.85, 0.4, -0.9],
     paths: [
-      // Compact closed loop: sump → pump/filter (oil assembly sits at 0.6 0.1 -0.9) → galleries → back
-      { closed: true, points: [[0.2, -0.18, -0.8], [0.5, -0.06, -0.98], [0.64, 0.12, -0.9], [0.5, 0.35, -0.8], [0.2, 0.3, -0.68], [0.04, 0.05, -0.72]] },
+      // Compact closed loop around the engine's right flank: sump → pump →
+      // filter (car-space oil assembly puts it at ≈0.44 0.03 -0.61) → galleries.
+      { closed: true, points: [[0.2, -0.18, -0.8], [0.5, -0.06, -0.98], [0.48, 0.03, -0.62], [0.5, 0.35, -0.8], [0.2, 0.3, -0.68], [0.04, 0.05, -0.72]] },
     ],
   },
   {
@@ -175,8 +176,9 @@ export const FLOW_SYSTEMS: FlowSystem[] = [
     relatedAssembly: 'fuel',
     labelAt: [-0.1, -0.25, 0.4],
     paths: [
-      // Tank outlet (underside) → center tunnel → fuel rail at the engine
-      { points: [[0, -0.2, 0.9], [-0.1, -0.4, 0.55], [-0.15, -0.42, 0], [-0.2, -0.3, -0.5], [-0.42, 0.22, -0.85]] },
+      // Tank outlet → drop to the floor pan → center tunnel at floor level →
+      // rise at the engine bulkhead to the rail (real line hugs the underbody).
+      { points: [[0, -0.2, 0.9], [-0.1, -0.5, 0.55], [-0.15, -0.54, 0], [-0.18, -0.54, -0.5], [-0.3, -0.3, -0.72], [-0.42, 0.22, -0.85]] },
     ],
     // Tank body now lives in the dedicated `fuel` assembly (WM tank overview).
   },
@@ -222,9 +224,12 @@ export const FLOW_SYSTEMS: FlowSystem[] = [
     labelAt: [0.7, 0.4, 0.9],
     // Battery + fuse box live in the elec GLB — do not re-draw them as FlowNodes.
     paths: [
-      { points: [[-0.62, 0.22, 1.05], [-0.3, -0.1, 0.65], [-0.25, -0.25, 0.05], [-0.3, -0.05, -0.7], [-0.35, 0.05, -0.95]] },
+      // Battery → tunnel loom AT FLOOR LEVEL → rise to the DME at the engine
+      { points: [[-0.62, 0.22, 1.05], [-0.35, -0.3, 0.7], [-0.3, -0.48, 0.05], [-0.3, -0.42, -0.7], [-0.35, 0.05, -0.95]] },
+      // Cowl crossover (dash harness — legitimately runs high)
       { points: [[-0.62, 0.28, 1.05], [-0.2, 0.24, 1.0], [0.25, 0.22, 0.97], [0.62, 0.2, 0.95]] },
-      { points: [[0.62, 0.18, 0.95], [0.5, -0.1, 0.45], [0.45, -0.25, -0.35], [0.5, 0.0, -0.8], [0.55, 0.3, -1.02]] },
+      // Fuse panel → right tunnel at floor level → alternator/starter riser
+      { points: [[0.62, 0.18, 0.95], [0.5, -0.28, 0.45], [0.45, -0.46, -0.35], [0.5, -0.05, -0.8], [0.55, 0.3, -1.02]] },
       { points: [[0.55, 0.3, -1.0], [0.3, 0.35, -0.9], [0.05, 0.3, -0.85]] },
     ],
     nodes: [
@@ -263,14 +268,15 @@ export const FLOW_SYSTEMS: FlowSystem[] = [
     speed: 0.09,
     desc: 'A direct-injection flat-six makes little manifold vacuum, so a cam-driven mechanical vacuum pump evacuates the brake booster through an inline check valve. The check valve holds vacuum with the engine off for the first few pedal presses. A pedal that goes hard after the car sits, or a hissing booster, points at a failed check valve or a perished supply hose.',
     relatedAssembly: 'fbrakes',
-    labelAt: [0.52, 0.12, 0.35],
+    labelAt: [0.52, -0.3, 0.3],
     paths: [
-      // Cam-driven vacuum pump → check valve → brake booster at the cowl
-      { points: [[0.2, 0.04, -0.9], [0.27, 0.0, -0.4], [0.3, 0.03, 0.2], [0.33, 0.12, 0.7], [0.35, 0.24, 0.95]] },
+      // Pump drops to the floor pan, runs the tunnel at floor level, rises at
+      // the cowl through the check valve to the booster (real hose routing).
+      { points: [[0.2, 0.04, -0.9], [0.26, -0.35, -0.55], [0.3, -0.52, -0.1], [0.32, -0.52, 0.45], [0.34, -0.1, 0.82], [0.35, 0.24, 0.95]] },
     ],
     nodes: [
       { id: 'vac-pump', label: 'Vacuum Pump', at: [0.2, 0.04, -0.9], size: [0.1, 0.1, 0.12], color: '#4a4d52' },
-      { id: 'check-valve', label: 'Check Valve', at: [0.3, 0.03, 0.2], size: [0.06, 0.06, 0.1], color: '#2f3237' },
+      { id: 'check-valve', label: 'Check Valve', at: [0.33, -0.02, 0.78], size: [0.06, 0.06, 0.1], color: '#2f3237' },
       { id: 'booster', label: 'Brake Booster', at: [0.35, 0.26, 0.96], size: [0.17, 0.17, 0.13], color: '#55585d' },
     ],
   },
@@ -284,12 +290,13 @@ export const FLOW_SYSTEMS: FlowSystem[] = [
     speed: 0.09,
     desc: 'The optional sport exhaust (PSE) opens bypass flaps in the rear silencers for a louder note. Engine vacuum stored in a small reservoir is routed by an electric changeover (solenoid) valve to the diaphragm actuators on each muffler; with no vacuum applied the flaps default open. A flap stuck open (loud all the time) usually means a cracked hose, a leaking reservoir or a tired actuator.',
     relatedAssembly: 'exhaust',
-    labelAt: [0.0, -0.32, -1.62],
+    labelAt: [0.0, -0.45, -1.7],
     paths: [
-      // Reservoir → changeover valve → left silencer flap actuator
-      { points: [[-0.32, 0.14, -1.05], [-0.2, 0.04, -1.2], [-0.28, -0.2, -1.5], [-0.33, -0.44, -1.82], [-0.35, -0.52, -2.02]] },
-      // Changeover valve → right silencer flap actuator
-      { points: [[-0.12, 0.05, -1.2], [0.02, -0.06, -1.4], [0.2, -0.26, -1.66], [0.32, -0.46, -1.9], [0.35, -0.52, -2.05]] },
+      // Reservoir drops to the rear floor pan and runs low to the left
+      // silencer flap actuator (hoses follow the underbody, not mid-air).
+      { points: [[-0.32, 0.14, -1.05], [-0.28, -0.3, -1.18], [-0.3, -0.55, -1.5], [-0.33, -0.6, -1.85], [-0.35, -0.52, -2.02]] },
+      // Changeover valve → floor → right silencer flap actuator
+      { points: [[-0.12, 0.05, -1.2], [0.0, -0.35, -1.35], [0.2, -0.58, -1.7], [0.32, -0.6, -1.9], [0.35, -0.52, -2.05]] },
     ],
     nodes: [
       { id: 'vac-reservoir', label: 'Vacuum Reservoir', at: [-0.34, 0.15, -1.04], size: [0.14, 0.1, 0.12], color: '#2f3237' },

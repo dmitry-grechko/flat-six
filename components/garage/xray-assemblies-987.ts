@@ -22,11 +22,16 @@ export const XRAY_ASSEMBLIES_987: XrayAssembly[] = [
   { id: 'rbrakes',   label: 'Rear Brakes',       glb: '/models/components/987/rbrakes.glb',   manifest: '/models/components/987/rbrakes-parts.json',   hotspot3d: '0 -0.2 -1.34', displayRadius: 0.46, bilateral: true, lateralOffset: 1.15,
     hideInUnified: ['absPsmHydraulicUnit', 'brakeFluidReservoir'] },
   { id: 'cooling',   label: 'Cooling System',    glb: '/models/components/987/cooling.glb',   manifest: '/models/components/987/cooling-parts.json',   hotspot3d: '0 -0.05 1.45', displayRadius: 0.80 },
-  { id: 'oil',       label: 'Oil & Lubrication', glb: '/models/components/987/oil.glb',       manifest: '/models/components/987/oil-parts.json',       hotspot3d: '0.6 0.1 -0.9', displayRadius: 0.22 },
+  // Car-space on the engine (matches the 981 entry — same native frame): sump
+  // under the crankcase, oil filter low on the right flank (from beneath).
+  { id: 'oil',       label: 'Oil & Lubrication', glb: '/models/components/987/oil.glb',       manifest: '/models/components/987/oil-parts.json',       hotspot3d: '0 0.18 -0.78', carSpace: true, worldScale: 0.42 },
   { id: 'airfilter', label: 'Air Intake',        glb: '/models/components/987/airfilter.glb', manifest: '/models/components/987/airfilter-parts.json', hotspot3d: '0 0 0', carSpace: true, worldScale: 1 },
-  // Ignition & fuel = full flat-six model; sit it on the engine so the coils land
-  // on the cylinder heads instead of a small offset cluster (see 981 note).
-  { id: 'plugs',     label: 'Ignition & Fuel',   glb: '/models/components/987/plugs.glb',     manifest: '/models/components/987/plugs-parts.json',     hotspot3d: '0 0.2 -0.8', displayRadius: 0.70 },
+  // Car-space on the engine (see 981 note): rod-coil banks at native x ±1.5 →
+  // ±0.44 half-embedded in the heads. The 987 module additionally parks the
+  // fuel-pressure regulator in the tank zone (SI: in-tank on the 987.2) — hide
+  // it in unified alongside the pump/relay/filler-valve tank parts.
+  { id: 'plugs',     label: 'Ignition & Fuel',   glb: '/models/components/987/plugs.glb',     manifest: '/models/components/987/plugs-parts.json',     hotspot3d: '0 0.11 -0.8', carSpace: true, worldScale: 0.29,
+    hideInUnified: ['lowPressureFuelPump', 'fuelPumpRelay', 'fuelTankFillerNeckCheckValve', 'fuelPressureRegulator'] },
   { id: 'susp',      label: 'Suspension',        glb: '/models/components/987/susp.glb',      manifest: '/models/components/987/susp-parts.json',      hotspot3d: '0 0 0', carSpace: true, worldScale: 0.95 },
   { id: 'elec',      label: 'Electrical',        glb: '/models/components/987/elec.glb',      manifest: '/models/components/987/elec-parts.json',      hotspot3d: '0 0 0', carSpace: true, worldScale: 1 },
   { id: 'driveline', label: 'Driveline',         glb: '/models/components/987/driveline.glb', manifest: '/models/components/987/driveline-parts.json', hotspot3d: '0 0.05 0', carSpace: true, worldScale: 0.95 },
