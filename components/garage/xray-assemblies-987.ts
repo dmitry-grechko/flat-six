@@ -24,7 +24,9 @@ export const XRAY_ASSEMBLIES_987: XrayAssembly[] = [
   { id: 'cooling',   label: 'Cooling System',    glb: '/models/components/987/cooling.glb',   manifest: '/models/components/987/cooling-parts.json',   hotspot3d: '0 -0.05 1.45', displayRadius: 0.80 },
   { id: 'oil',       label: 'Oil & Lubrication', glb: '/models/components/987/oil.glb',       manifest: '/models/components/987/oil-parts.json',       hotspot3d: '0.6 0.1 -0.9', displayRadius: 0.22 },
   { id: 'airfilter', label: 'Air Intake',        glb: '/models/components/987/airfilter.glb', manifest: '/models/components/987/airfilter-parts.json', hotspot3d: '0 0 0', carSpace: true, worldScale: 1 },
-  { id: 'plugs',     label: 'Ignition & Fuel',   glb: '/models/components/987/plugs.glb',     manifest: '/models/components/987/plugs-parts.json',     hotspot3d: '-0.5 0.3 -0.9', displayRadius: 0.18 },
+  // Ignition & fuel = full flat-six model; sit it on the engine so the coils land
+  // on the cylinder heads instead of a small offset cluster (see 981 note).
+  { id: 'plugs',     label: 'Ignition & Fuel',   glb: '/models/components/987/plugs.glb',     manifest: '/models/components/987/plugs-parts.json',     hotspot3d: '0 0.2 -0.8', displayRadius: 0.70 },
   { id: 'susp',      label: 'Suspension',        glb: '/models/components/987/susp.glb',      manifest: '/models/components/987/susp-parts.json',      hotspot3d: '0 0 0', carSpace: true, worldScale: 0.95 },
   { id: 'elec',      label: 'Electrical',        glb: '/models/components/987/elec.glb',      manifest: '/models/components/987/elec-parts.json',      hotspot3d: '0 0 0', carSpace: true, worldScale: 1 },
   { id: 'driveline', label: 'Driveline',         glb: '/models/components/987/driveline.glb', manifest: '/models/components/987/driveline-parts.json', hotspot3d: '0 0.05 0', carSpace: true, worldScale: 0.95 },

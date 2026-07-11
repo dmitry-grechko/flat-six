@@ -155,6 +155,14 @@ export default function ComponentExplorer() {
     setFlowId(null);
   };
 
+  // Jump straight to a specific part inside its assembly (X-ray search results).
+  const selectPartInAssembly = (aid: XrayAssembly['id'], pid: string) => {
+    setAssemblyId(aid);
+    setDrillId(null);
+    setFlowId(null);
+    setSelectedPartId(pid);
+  };
+
   // Selecting a primary that has children drills into it; any other highlights it.
   const handleSelectPart = (id: string | null) => {
     if (id && !drillId) {
@@ -441,6 +449,7 @@ export default function ComponentExplorer() {
             selectedFlow={selectedFlow}
             onSelectFlow={setFlowId}
             onSelectAssembly={switchAssembly}
+            onSearchSelect={selectPartInAssembly}
             onSelectPart={handleSelectPart}
             onExitDrill={exitDrill}
             vehicle={vehicle}
@@ -962,7 +971,7 @@ function FlowDetailCard({ flow, assemblies, vehicle, onClose, onInspectParts, on
 function XraySidebar({
   assemblies, generation, assemblyId, assembly, partsByAssembly, visibleParts, drillPart, selectedPart,
   layer, selectedFlow, onSelectFlow,
-  onSelectAssembly, onSelectPart, onExitDrill, vehicle, trimBadge, onLog, onAsk,
+  onSelectAssembly, onSearchSelect, onSelectPart, onExitDrill, vehicle, trimBadge, onLog, onAsk,
 }: {
   assemblies: XrayAssembly[];
   generation: string;
@@ -976,6 +985,7 @@ function XraySidebar({
   selectedFlow: FlowSystem | null;
   onSelectFlow: (id: FlowSystem['id'] | null) => void;
   onSelectAssembly: (id: XrayAssembly['id'] | null) => void;
+  onSearchSelect: (assemblyId: XrayAssembly['id'], partId: string) => void;
   onSelectPart: (id: string | null) => void;
   onExitDrill: () => void;
   vehicle: Vehicle;
@@ -986,6 +996,20 @@ function XraySidebar({
 }) {
   const loadedCount = assemblies.filter((a) => partsByAssembly[a.id]).length;
   const totalParts = assemblies.reduce((n, a) => n + (partsByAssembly[a.id]?.filter(isPrimary).length ?? 0), 0);
+
+  // Free-text search across every loaded assembly's primary parts (X-ray now has
+  // too many components to scan by eye). Matches label or OEM part number;
+  // clicking a result jumps straight to that part in its assembly.
+  const [search, setSearch] = useState('');
+  const q = search.trim().toLowerCase();
+  const searchResults = q
+    ? assemblies.flatMap((a) =>
+        (partsByAssembly[a.id] ?? [])
+          .filter(isPrimary)
+          .filter((p) => p.label.toLowerCase().includes(q) || (p.partNumber ?? '').toLowerCase().includes(q))
+          .map((p) => ({ a, p })),
+      ).slice(0, 80)
+    : [];
 
   const showAssemblies = layer === 'all' || layer === 'mechanical';
   const flows = flowsForLayer(layer, generation);
@@ -1038,10 +1062,26 @@ function XraySidebar({
         </button>
       </div>
 
+      {assemblyId === null && (
+        <div style={{ padding: '12px 20px', borderBottom: '1px solid #EEEEF0', flexShrink: 0 }}>
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search all components…"
+            style={{
+              width: '100%', height: 32, padding: '0 10px', border: '1px solid #DDDDE0', borderRadius: 3,
+              font: `500 12px/1 ${mono}`, letterSpacing: '.04em', color: '#2A2A2E', background: '#FAFAFA',
+              outline: 'none', boxSizing: 'border-box',
+            }}
+          />
+        </div>
+      )}
+
       {assemblyId === null ? (
         /* ── Unified overview: systems + flow layers ── */
         <>
-          {selectedFlow && (
+          {selectedFlow && !q && (
             <FlowDetailCard
               flow={selectedFlow}
               assemblies={assemblies}
@@ -1052,6 +1092,43 @@ function XraySidebar({
             />
           )}
           <div style={{ flex: 1, overflowY: 'auto', padding: '10px 12px 24px' }}>
+            {q ? (
+              searchResults.length ? (
+                <>
+                  <div style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.14em', color: '#B4B4B8', padding: '8px 8px 10px' }}>
+                    {searchResults.length} MATCH{searchResults.length === 1 ? '' : 'ES'}
+                  </div>
+                  {searchResults.map(({ a, p }) => (
+                    <button
+                      key={`${a.id}:${p.id}`}
+                      onClick={() => { setSearch(''); onSearchSelect(a.id, p.id); }}
+                      style={{
+                        width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                        padding: '9px 12px', marginBottom: 4, borderRadius: 3, cursor: 'pointer', textAlign: 'left',
+                        background: '#F6F6F7', border: '1px solid #EEEEF0',
+                      }}
+                    >
+                      <span style={{ flex: 1, font: "400 12px/1.3 'Helvetica Neue',Arial,sans-serif", color: '#2A2A2E' }}>
+                        {p.label}
+                      </span>
+                      <span style={{ font: `500 9px/1 ${mono}`, letterSpacing: '.06em', color: '#B4B4B8', whiteSpace: 'nowrap' }}>
+                        {a.label.toUpperCase()}
+                      </span>
+                      {p.partNumber && (
+                        <span style={{ font: `500 10px/1 ${mono}`, color: '#9A9AA0', whiteSpace: 'nowrap' }}>
+                          {formatPartNumber(p.partNumber)}
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </>
+              ) : (
+                <div style={{ padding: '24px 10px', textAlign: 'center', font: "400 13px/1.5 'Helvetica Neue',Arial,sans-serif", color: '#9A9AA0' }}>
+                  No components match “{search}”.
+                </div>
+              )
+            ) : (
+              <>
             {airFlows.length > 0 && (
               <>
                 <div style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.14em', color: '#B4B4B8', padding: '8px 8px 10px' }}>
@@ -1111,6 +1188,8 @@ function XraySidebar({
                     </button>
                   );
                 })}
+              </>
+            )}
               </>
             )}
           </div>

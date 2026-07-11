@@ -75,7 +75,10 @@ export const XRAY_ASSEMBLIES: XrayAssembly[] = [
   { id: 'oil',       label: 'Oil & Lubrication', glb: '/models/components/oil.glb',       manifest: '/models/components/oil-parts.json',       hotspot3d: '0.6 0.1 -0.9', displayRadius: 0.22 },
   // Dual air cleaners merge at central throttle (WM 242519 / 244601).
   { id: 'airfilter', label: 'Air Intake',        glb: '/models/components/airfilter.glb', manifest: '/models/components/airfilter-parts.json', hotspot3d: '0 0 0', carSpace: true, worldScale: 1 },
-  { id: 'plugs',     label: 'Ignition & Fuel',   glb: '/models/components/plugs.glb',     manifest: '/models/components/plugs-parts.json',     hotspot3d: '-0.5 0.3 -0.9', displayRadius: 0.18 },
+  // Ignition & fuel is a FULL flat-six model (coils on both banks at native x±1.5):
+  // sit it on the engine (same hotspot, engine-scale radius) so the coils land on
+  // the cylinder heads instead of rendering as a small cluster off to the side.
+  { id: 'plugs',     label: 'Ignition & Fuel',   glb: '/models/components/plugs.glb',     manifest: '/models/components/plugs-parts.json',     hotspot3d: '0 0.2 -0.8', displayRadius: 0.70 },
   // Engine grew denser after WM detail pass — slightly larger display so it stays
   // the visual anchor next to exhaust/cooling in the joint view.
   // (engine displayRadius kept at 0.70; tune here if layout report flags extent)
