@@ -44,6 +44,10 @@ Dependency-free, in-memory TF retrieval:
 4. **Filter & return:** filter by `opts.kinds` if given, sort by score descending, return the top `opts.limit ?? 8`.
 
 This is intentionally simple and synchronous — no embeddings, no network, no DB.
+Structured facts (faults, curated specs, maintenance) live here; **factory
+procedure depth** is in `manual_sections` (hybrid FTS + Voyage embeddings via
+MCP `search_workshop_manual`). Torque: curated `specs*.json` (~35 DIY entries)
++ Torque Finder manual FTS for the long tail — do not duplicate the whole WM in JSON.
 
 ## Data sources
 

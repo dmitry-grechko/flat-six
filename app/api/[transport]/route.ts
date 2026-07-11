@@ -1,6 +1,6 @@
 import { createMcpHandler, withMcpAuth } from 'mcp-handler';
 import type { AuthInfo } from '@modelcontextprotocol/sdk/server/auth/types.js';
-import { registerTools } from '@/lib/mcp/tools';
+import { registerTools, MCP_SERVER_INSTRUCTIONS } from '@/lib/mcp/tools';
 import { resolveUser } from '@/lib/mcp/auth';
 
 // Supabase + the MCP SDK need Node APIs, so pin this route to the Node runtime.
@@ -34,6 +34,7 @@ const handler = createMcpHandler(
   },
   {
     serverInfo,
+    instructions: MCP_SERVER_INSTRUCTIONS,
   },
   {
     // The dynamic route lives at app/api/[transport]/route.ts, so the transport

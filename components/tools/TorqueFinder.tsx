@@ -35,9 +35,10 @@ function isFactorySource(source?: string) {
   return !!source && !/^https?:\/\//i.test(source);
 }
 
-/** Pull "85 Nm (63 ft-lb)"-style torque values out of a manual snippet. */
+/** Pull Nm or lb-ft torque values out of a manual snippet. */
 function extractTorques(text: string): string[] {
-  const matches = text.match(/\d[\d.,]*\s*Nm(?:\s*\([^)]*\))?/gi) ?? [];
+  const matches =
+    text.match(/\d[\d.,]*\s*Nm(?:\s*\([^)]*\))?|\d[\d.,]*\s*(?:lb-?ft|ft-?lb)(?:\s*\([^)]*\))?/gi) ?? [];
   return [...new Set(matches.map((m) => m.replace(/\s+/g, ' ').trim()))].slice(0, 4);
 }
 

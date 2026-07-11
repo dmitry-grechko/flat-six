@@ -253,6 +253,116 @@
     "source": "Porsche WM 987 · 4001TW · p.5325"
   },
   {
+    "id": "torque-coil-pack-bolt",
+    "category": "torque",
+    "name": "Ignition coil fastening screw",
+    "value": "10 Nm (7.5 lb-ft)",
+    "notes": "Two M6×25 screws per coil. Label cylinders before removal.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "Porsche WM 987 · 282019 · p.4682"
+  },
+  {
+    "id": "torque-throttle-body",
+    "category": "torque",
+    "name": "Throttle body fastening screws",
+    "value": "10 Nm (7.5 lb-ft)",
+    "notes": "M6×50 Torx screws. Adaptation required after removal on drive-by-wire cars.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "Porsche WM 987 · 244219 · p.2642"
+  },
+  {
+    "id": "torque-track-rod-axial",
+    "category": "torque",
+    "name": "Track rod (axial joint) to steering gear",
+    "value": "90 Nm (67 lb-ft)",
+    "notes": "Hydraulic rack — alignment required after tie-rod work.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "Porsche WM 987 · 4800TW · p.5178"
+  },
+  {
+    "id": "torque-tie-rod-ball-joint",
+    "category": "torque",
+    "name": "Tie-rod ball joint to wheel carrier",
+    "value": "75 Nm (56 lb-ft)",
+    "notes": "Aluminum tie rod to axial joint = 50 Nm (37 lb-ft).",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "Porsche WM 987 · 4800TW · p.5178"
+  },
+  {
+    "id": "torque-belt-tensioner",
+    "category": "torque",
+    "name": "Serpentine-belt tensioner fastening screws",
+    "value": "28 Nm (21 lb-ft) ±3 Nm",
+    "notes": "Tensioner to coolant pump (Internal Torx M8). Tensioning-roller bolt = 23 Nm on some layouts.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "Porsche WM 987 · 137319 · p.3985"
+  },
+  {
+    "id": "torque-battery-terminal",
+    "category": "torque",
+    "name": "Battery terminal clamp",
+    "value": "5 Nm (3.5 lb-ft)",
+    "notes": "Attach manually — do not over-tighten. Terminals do not need grease. Follow WM work instructions after reconnecting.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "Porsche WM 987 · 270601 · p.4631"
+  },
+  {
+    "id": "torque-underbody-cover",
+    "category": "torque",
+    "name": "Underbody cover screws / nuts",
+    "value": "2 Nm (~1.5 lb-ft)",
+    "notes": "Centre and rear underbody panels — very low torque; use a torque screwdriver.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "Porsche WM 987 · 519319 · p.781"
+  },
+  {
+    "id": "torque-exhaust-clamp",
+    "category": "torque",
+    "name": "Rear silencer clamp nut",
+    "value": "23 Nm (17 lb-ft)",
+    "notes": "Clamp on rear silencer; always replace seals and lock nuts when removing the silencer.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "Porsche WM 987 · 263319 · p.4594"
+  },
+  {
+    "id": "torque-antiroll-rear",
+    "category": "torque",
+    "name": "Anti-roll-bar drop-link nut (rear)",
+    "value": "3-stage: 50 Nm → loosen 90° → 65 Nm",
+    "notes": "Same 3-stage procedure as the front drop link. M10; do not grease.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "Porsche WM 987 · 4001TW · p.5325"
+  },
+  {
+    "id": "torque-dme-holder",
+    "category": "torque",
+    "name": "DME control-unit holder nuts",
+    "value": "10 Nm (7.5 lb-ft)",
+    "notes": "Fastening nuts securing the control unit and holder after programming/replacement.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "Porsche WM 987 · 247019 · p.4555"
+  },
+  {
     "id": "fluid-engine-oil-approval",
     "category": "fluid",
     "name": "Engine oil approval",

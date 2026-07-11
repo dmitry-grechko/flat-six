@@ -658,8 +658,28 @@ export function resolveDocumentForManualHit(hit: {
   return candidates[0];
 }
 
-/** Build `/manual?doc=…&page=…` for a factory-doc hit, or null if unresolved. */
-export function manualHitHref(hit: {
+/**
+ * Build `/manual?doc=…&page=…` for a factory-doc hit (with an optional `&q=`
+ * highlight term the viewer pre-searches on the target page), or null if
+ * unresolved.
+ */
+export function manualHitHref(
+  hit: {
+    source?: string | null;
+    generation?: string | null;
+    title: string;
+    docId?: string | null;
+    page: number;
+  },
+  highlight?: string | null,
+): string | null {
+  const base = manualHitHrefBase(hit);
+  if (!base) return null;
+  const term = highlight?.trim();
+  return term ? `${base}&q=${encodeURIComponent(term)}` : base;
+}
+
+function manualHitHrefBase(hit: {
   source?: string | null;
   generation?: string | null;
   title: string;

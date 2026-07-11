@@ -78,6 +78,7 @@ export default function DocumentLibrary() {
       <WorkshopManual
         documentId={active.id}
         initialPage={initialPage}
+        highlight={searchParams.get('q') ?? undefined}
         onBack={closeDoc}
       />
     );

@@ -237,6 +237,30 @@ function err(message: string) {
 }
 
 /**
+ * Injected into MCP clients that support server instructions (Claude Desktop,
+ * Claude Code, etc.). Workflow rules only — tool schemas carry field detail.
+ */
+export const MCP_SERVER_INSTRUCTIONS = `FLAT·SIX is a Porsche Boxster/Cayman (981 & 987) garage assistant.
+
+Generation scoping (mandatory):
+- NEVER mix 981 and 987 facts in one answer.
+- Call get_my_vehicles when the user has multiple cars or does not name a generation.
+- Pass vehicleId (preferred) or generation on every knowledge and manual tool call.
+
+Factory procedures and in-depth torque (licensed content — requires login):
+- search_workshop_manual → get_manual_procedure on the best-matching section id.
+- Always fetch full procedure text before prescribing steps, warnings, or Nm values.
+- Treat search titles skeptically — near-miss sections exist; verify in the full text.
+
+Curated specs and quick facts:
+- get_spec / search_knowledge cover verified DIY shortcuts (~35 torque entries + faults/issues).
+- If get_spec returns nothing, fall through to search_workshop_manual — do not invent values.
+
+Torque lookups:
+- Try get_spec first for common DIY fasteners (oil drain, caliper, wheel bolts, plugs).
+- For anything else, search_workshop_manual with the fastener name + generation.`;
+
+/**
  * Register every FLAT·SIX MCP tool on the server.
  *
  * Knowledge tools (search/fault/spec/maintenance/issues/parts) are open — they
@@ -310,7 +334,9 @@ export function registerTools(server: McpServer): void {
     {
       title: 'Get a specification',
       description:
-        'Look up a torque value, capacity, fluid grade or other spec for ONE car generation. ' +
+        'Look up a curated DIY spec for ONE car generation — ~35 verified torque entries plus ' +
+        'fluids, capacities, tyre pressures, etc. Does NOT search the full workshop manual; ' +
+        'if nothing matches, call search_workshop_manual for factory torque/procedure text. ' +
         'Pass vehicleId/generation when the garage has multiple models — 981 and 987 specs differ.',
       inputSchema: {
         query: z.string().min(1).describe('What spec you need, e.g. "wheel bolt torque"'),
@@ -332,7 +358,12 @@ export function registerTools(server: McpServer): void {
         return inCat && text.includes(q);
       });
       if (specs.length === 0) {
-        return err(`No spec matching "${query}" was found for generation ${scope.generation}.`);
+        return err(
+          `No curated spec matching "${query}" was found for generation ${scope.generation}. ` +
+            `get_spec covers verified DIY shortcuts only — not the full workshop manual. ` +
+            `Call search_workshop_manual with the same query (generation: "${scope.generation}") ` +
+            `then get_manual_procedure on the best section id before quoting torque values or steps.`,
+        );
       }
       return scopedJson(scope, specs);
     },
@@ -448,9 +479,11 @@ export function registerTools(server: McpServer): void {
     {
       title: 'Search workshop manuals & tech library',
       description:
-        'Hybrid semantic + full-text search over factory reference docs: workshop manuals plus ' +
-        'Mobile Tech Library diagnostics, Service Information Technik, and training books for 981/987. ' +
-        'ALWAYS scoped to one generation — pass vehicleId/generation when the user has multiple cars. ' +
+        'Hybrid semantic + full-text search over factory reference docs for ONE generation: workshop ' +
+        'manuals plus curated Mobile Tech Library diagnostics, Service Information Technik, and training ' +
+        'books. Results are scoped to the active car (981 or 987) — never mixed across generations. ' +
+        'Pass vehicleId/generation when the user has multiple cars. Prefer natural-language procedure ' +
+        'queries ("bleed cooling system", "PDK clutch adaptation") as well as WM codes / DTCs. ' +
         'Returns ranked sections with codes/snippets — fetch full text with get_manual_procedure. ' +
         'Requires your garage login (licensed content, not public).',
       inputSchema: {

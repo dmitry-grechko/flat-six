@@ -32,7 +32,11 @@ to the per-generation JSON (`known-issues.json`, `fault-codes.json`, `specs.json
 etc. for 987. These flow into search + the MCP knowledge tools automatically.
 
 - **Fault Finding** reads `fault-codes*.json` / `known-issues*.json` — add there for a fault/known issue.
-- **Specs / torque** → `specs*.json`. **Alignment/fitment** → `lib/fitment/*`.
+- **Specs / torque** → `specs*.json` (curated DIY shortcuts, ~35 torque entries per
+  generation with WM citations). The **Torque Finder** also searches the full
+  imported workshop manual via plain FTS (`torque OR Nm` filter) — that tier is
+  the long-tail coverage; do not try to mirror the entire WM in JSON.
+- **Alignment/fitment** → `lib/fitment/*`.
 
 ## 4. 3D / visual tips (only if relevant)
 
@@ -74,14 +78,24 @@ in `.env.local` (see `.env.local.example`) and migration `0009` applied
 keyword FTS — but the new docs won't surface semantically until you run it.
 
 > The **torque finder** uses plain full-text search (not embeddings), so it needs
-> only the step-5 import, not this step.
+> only the step-5 import, not this step. Its manual tier matches sections
+> containing `torque` **or** `Nm` (OR query) so values like "Tighten to 50 Nm"
+> surface even when the word "torque" is absent.
 
 ## 7. MCP
 
-No MCP change is needed — imported docs are searchable via the existing
+No new MCP tool is needed — imported docs are searchable via the existing
 `search_workshop_manual` / `get_manual_procedure` tools (hybrid semantic + keyword
-once embedded), and knowledge JSON flows through `search_knowledge` /
-`list_known_issues` etc.
+once embedded). Knowledge JSON flows through `search_knowledge` /
+`get_spec` / `list_known_issues` etc.
+
+- **Embeddings** apply to `manual_sections` only (factory WM + curated MTL text).
+  Keep them — they help MCP and Fault Finding find procedure sections from
+  natural-language queries. The structured knowledge JSON (`lib/knowledge/`) stays
+  keyword-only by design.
+- **Server instructions** in `app/api/[transport]/route.ts` tell connected agents
+  to scope by generation, use `get_spec` for DIY shortcuts, and fall through to
+  `search_workshop_manual` → `get_manual_procedure` for factory depth.
 
 ## Checklist
 

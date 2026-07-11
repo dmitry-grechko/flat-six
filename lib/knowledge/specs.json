@@ -264,6 +264,127 @@
     "source": "Porsche WM 981 · 242519 · p.4341"
   },
   {
+    "id": "torque-coil-pack-bolt",
+    "category": "torque",
+    "name": "Ignition coil fastening screw",
+    "value": "10 Nm (7.5 lb-ft)",
+    "notes": "M6×16 cheese-head bolt securing each coil to the cylinder-head cover.",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 2X00IN · p.3337"
+  },
+  {
+    "id": "torque-throttle-body",
+    "category": "torque",
+    "name": "Throttle body to intake-air distributor",
+    "value": "10 Nm (7.5 lb-ft)",
+    "notes": "External Torx M6×50. Adaptation may be required after removal — clear DME adaptations if idle is rough.",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 2X00IN · p.3337"
+  },
+  {
+    "id": "torque-intake-distributor",
+    "category": "torque",
+    "name": "Intake-air distributor to cylinder head",
+    "value": "13 Nm (9.5 lb-ft)",
+    "notes": "External Torx M6×35.",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 2X00IN · p.3337"
+  },
+  {
+    "id": "torque-track-rod-axial",
+    "category": "torque",
+    "name": "Track rod (axial joint) to steering gear",
+    "value": "30 Nm (22 lb-ft) initial",
+    "notes": "M16×1.5 — always observe the prescribed tightening sequence in the WM procedure; alignment required after tie-rod work.",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 487919 · p.5202"
+  },
+  {
+    "id": "torque-tie-rod-ball-joint",
+    "category": "torque",
+    "name": "Tie-rod ball joint lock nut (to wheel carrier)",
+    "value": "85 Nm (63 lb-ft)",
+    "notes": "Lock nut on the ball joint. Separate lock nut on the tie rod itself = 50 Nm (37 lb-ft).",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 488119 · p.5217"
+  },
+  {
+    "id": "torque-belt-tensioner",
+    "category": "torque",
+    "name": "Serpentine-belt tensioner fastening screws",
+    "value": "28 Nm (21 lb-ft) ±3 Nm",
+    "notes": "Both tensioner-to-coolant-pump screws (Internal Torx M8). Tensioning-roller bolt on some layouts = 23 Nm — check the procedure for your engine.",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 137319 · p.3746"
+  },
+  {
+    "id": "torque-battery-terminal",
+    "category": "torque",
+    "name": "Battery terminal clamp",
+    "value": "6 Nm (4.5 lb-ft) ±0.5 Nm",
+    "notes": "Attach manually — do not over-tighten. Terminals do not need grease.",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 270601 · p.3269"
+  },
+  {
+    "id": "torque-underbody-cover",
+    "category": "torque",
+    "name": "Front underbody cover screws / nuts",
+    "value": "2.7 Nm (2 lb-ft) ±0.2 Nm",
+    "notes": "Use torque screwdriver per WM (Nr.89 Pos.5). Center and side underbody panels use the same low torque.",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 519219 · p.1389"
+  },
+  {
+    "id": "torque-exhaust-clamp",
+    "category": "torque",
+    "name": "Exhaust silencer clamp / sleeve nut",
+    "value": "23 Nm (17 lb-ft)",
+    "notes": "Clamping sleeve on rear silencer; exhaust manifold to rear silencer collar nut is also 23 Nm (replace lock nuts). Tailpipe to silencer clamp screw = 55 Nm.",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 2X00IN · p.3337"
+  },
+  {
+    "id": "torque-fuel-sender-ring",
+    "category": "torque",
+    "name": "Fuel-level sender locking ring",
+    "value": "23 Nm (17 lb-ft)",
+    "notes": "Locking ring on the in-tank sender flange (lug wrench 9731/1). Replace flange gasket; mark sender position before removal.",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 201519 · p.4263"
+  },
+  {
+    "id": "torque-dme-holder",
+    "category": "torque",
+    "name": "DME control-unit holder screws",
+    "value": "9.7 Nm (7.5 lb-ft)",
+    "notes": "Six screws/nuts securing the holder to the body when fitting a new control unit.",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 247019 · p.4425"
+  },
+  {
     "id": "fluid-engine-oil-approval",
     "category": "fluid",
     "name": "Engine oil approval",

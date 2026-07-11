@@ -107,10 +107,11 @@ export async function searchManualHybrid(
 }
 
 /**
- * Plain full-text search (NO embeddings) over the manual's torque-bearing
- * sections, for signed-in users. Powers the torque finder's "search the full
- * manual" tier. Returns authRequired=true on 401 so the UI can prompt sign-in
- * rather than showing a misleading "no results".
+ * Search the manual's torque-bearing sections for signed-in users. Plain FTS
+ * only (`ftsOnly`) — torque lookups want exact keyword matching (Nm, fastener
+ * names), not semantic paraphrase ranking. Powers the torque finder's "search
+ * the full manual" tier. Returns authRequired=true on 401 so the UI can prompt
+ * sign-in rather than showing a misleading "no results".
  */
 export async function searchTorqueManual(
   query: string,
@@ -123,7 +124,13 @@ export async function searchTorqueManual(
     const res = await fetch('/api/manual/search', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query: q, limit, generation: opts?.generation, ftsOnly: true, torque: true }),
+      body: JSON.stringify({
+        query: q,
+        limit,
+        generation: opts?.generation,
+        torque: true,
+        ftsOnly: true,
+      }),
     });
     if (res.status === 401) return { hits: [], authRequired: true };
     if (!res.ok) return { hits: [], authRequired: false };

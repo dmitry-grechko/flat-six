@@ -31,15 +31,15 @@ export async function POST(req: Request) {
   const ftsOnly = body?.ftsOnly === true;
   const torque = body?.torque === true;
 
-  // websearch_to_tsquery ANDs unquoted words, so appending "torque" restricts
-  // hits to sections that actually state a tightening torque.
-  const ftsQuery = torque ? `${query} torque` : query;
+  // Torque tier: OR-match sections that state Nm values even when the word
+  // "torque" is absent ("Tighten to 50 Nm"). Default path still ANDs terms.
+  const ftsQuery = torque ? `${query} (torque OR Nm)` : query;
 
   if (!ftsOnly && voyageConfigured()) {
     try {
-      const emb = await embedQuery(query);
+      const emb = await embedQuery(ftsQuery);
       const { data, error } = await supabase.rpc('search_manual_hybrid', {
-        q: query,
+        q: ftsQuery,
         query_embedding: toVectorLiteral(emb),
         lim,
         gen,
