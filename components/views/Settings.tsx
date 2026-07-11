@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { COLORS, enginesFor, transmissionsFor, defaultEngine, defaultTransmission } from '@/lib/data';
 import { useVehicle, MODEL_OPTIONS } from '@/lib/vehicle-context';
-import { generationForBody } from '@/lib/models';
+import { generationForBody, getVariant } from '@/lib/models';
 import { createClient } from '@/lib/supabase/client';
 import { DEMO_MODE, DEMO_EMAIL } from '@/lib/demo';
 
@@ -96,10 +96,15 @@ export default function Settings() {
             <button
               key={m.id}
               onClick={() => {
-                const g = generationForBody(m.id);
+                // A variant with a signature powertrain (e.g. GT4 = 3.8 / manual)
+                // snaps to it; otherwise keep a still-valid selection, else default.
+                const target = getVariant(m.id);
+                const g = target.generation;
                 const patch: Partial<typeof vehicle> = { body: m.id, model: m.modelName };
-                if (!enginesFor(g).includes(vehicle.engine)) patch.engine = defaultEngine(g);
-                if (!transmissionsFor(g).includes(vehicle.trans)) patch.trans = defaultTransmission(g);
+                if (target.defaultEngine) patch.engine = target.defaultEngine;
+                else if (!enginesFor(g).includes(vehicle.engine)) patch.engine = defaultEngine(g);
+                if (target.defaultTransmission) patch.trans = target.defaultTransmission;
+                else if (!transmissionsFor(g).includes(vehicle.trans)) patch.trans = defaultTransmission(g);
                 update(patch);
               }}
               style={chip(vehicle.body === m.id)}

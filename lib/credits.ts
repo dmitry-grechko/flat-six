@@ -30,6 +30,16 @@ export const MODEL_CREDITS: Record<BodyType, ModelCredit> = {
     license: CC_BY,
     licenseUrl: CC_BY_URL,
   },
+  // ⚠ CC BY-NC-SA 4.0 (NonCommercial + ShareAlike) — like the Spyder below,
+  // unlike the CC-BY models. FLAT·SIX is non-commercial so NC is fine;
+  // redistributed derivatives must stay under the same CC BY-NC-SA licence.
+  'cayman-gt4-981': {
+    title: '2015 Porsche Cayman GT4',
+    author: 'OUTPISTON',
+    source: 'https://skfb.ly/pBVJw',
+    license: CC_BY_NC_SA,
+    licenseUrl: CC_BY_NC_SA_URL,
+  },
   'cayman-987': {
     title: 'Porsche Cayman 987',
     author: 'Mona x Supercars',
