@@ -53,7 +53,11 @@ export interface XrayAssembly {
 export const AXLE = { frontZ: 1.5, rearZ: -1.5, halfTrack: 0.82, hubY: -0.35 };
 
 export const XRAY_ASSEMBLIES: XrayAssembly[] = [
-  { id: 'engine',    label: 'Engine',           glb: '/models/components/engine.glb',    manifest: '/models/components/engine-parts.json',    hotspot3d: '0 0.2 -0.8',   displayRadius: 0.70 },
+  // The plugs overlay is the single coil depiction in unified — hide the
+  // engine model's own coilPacks band there (top-mounted, wrong for a boxer;
+  // still visible + pinnable in the focused engine view).
+  { id: 'engine',    label: 'Engine',           glb: '/models/components/engine.glb',    manifest: '/models/components/engine-parts.json',    hotspot3d: '0 0.2 -0.8',   displayRadius: 0.70,
+    hideInUnified: ['coilPacks'] },
   { id: 'trans',     label: 'Transaxle',         glb: '/models/components/trans.glb',     manifest: '/models/components/trans-parts.json',     hotspot3d: '0 -0.1 -1.7',  displayRadius: 0.55 },
   // Exhaust spans engine headers (z≈-0.85) to the rear tips (z≈-2.0): sized so the
   // native span (ports z0 → tips z-4.05, sphere r≈3.33) lands at scale ≈0.28 and

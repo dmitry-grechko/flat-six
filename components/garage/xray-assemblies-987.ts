@@ -14,7 +14,10 @@ import type { XrayAssembly } from './xray-assemblies';
 export const XRAY_ASSEMBLIES_987: XrayAssembly[] = [
   // Real 9A1 flat-six model — the 987.2 (2009–2012) shares the 9A1 engine
   // family with the 981; the GLB is a copy of the same downloaded model.
-  { id: 'engine',    label: 'Engine',           glb: '/models/components/987/engine.glb',    manifest: '/models/components/987/engine-parts.json',    hotspot3d: '0 0.2 -0.8',   displayRadius: 0.70 },
+  // Hide the engine model's own coilPacks band in unified (see 981 note) —
+  // the plugs overlay's horizontal rod coils are the single depiction there.
+  { id: 'engine',    label: 'Engine',           glb: '/models/components/987/engine.glb',    manifest: '/models/components/987/engine-parts.json',    hotspot3d: '0 0.2 -0.8',   displayRadius: 0.70,
+    hideInUnified: ['coilPacks'] },
   { id: 'trans',     label: 'Transaxle',         glb: '/models/components/987/trans.glb',     manifest: '/models/components/987/trans-parts.json',     hotspot3d: '0 -0.1 -1.7',  displayRadius: 0.55 },
   { id: 'exhaust',   label: 'Exhaust',           glb: '/models/components/987/exhaust.glb',   manifest: '/models/components/987/exhaust-parts.json',   hotspot3d: '0 -0.55 -1.85', displayRadius: 0.93 },
   { id: 'fbrakes',   label: 'Front Brakes',      glb: '/models/components/987/fbrakes.glb',   manifest: '/models/components/987/fbrakes-parts.json',   hotspot3d: '0 -0.17 1.5',  displayRadius: 0.49, bilateral: true, lateralOffset: 1.15,

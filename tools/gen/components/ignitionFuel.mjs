@@ -31,20 +31,29 @@ const RAIL = { color: 0xb0b4ba, metalness: 0.9, roughness: 0.3 };
 const BANK_X = 1.5;
 const CYL_Z = [0.7, 0.0, -0.7]; // front, middle, rear
 
+// BOXER plug/coil axis: on a flat six the cylinders are HORIZONTAL, so the
+// spark-plug + coil-on-plug axis runs along ±X — coils insert from the
+// outboard flank pointing in toward the pistons (parallel to the ground),
+// NOT top-down like an inline engine. COIL_X is the coil-group origin on
+// that axis (boot reaches inward past the head face at |x|≈1.43 under the
+// app's car-space transform); STACK_Y is the head-center height.
+const COIL_X = 1.5;
+const STACK_Y = 0.3;
+
 // Build the coil-on-plug + spark-plug + injector stack for one cylinder.
 // Coils: blocky L / stepped housings (WM ~4614) — not capsules.
 // Injectors: longer nozzle, angled connector, bellows ridges, spring clamp (WM ~4450).
 function cylinderStack(bankSign, z, idx, coilGroup, plugGroup, hwGroup, injGroup, sealGroup, railY) {
   const x = bankSign * BANK_X;
   const tag = `${bankSign > 0 ? 'b1' : 'b2'}_${idx}`;
-  const yawSign = bankSign;
 
   // --- Ignition coil: L-shaped / stepped housing (WM 4614 Fig 1) ---
-  // Upper blocky body + narrower stalk into plug well; yellow connector on top;
-  // single fastening screw on base flange tab.
+  // Local geometry stacks along +Y (body/connector) → −Y (boot). Rotating the
+  // whole group −bankSign·90° about Z lays that stack HORIZONTALLY: connector
+  // end outboard, boot reaching inward into the plug recess (boxer engine).
   const coilLocal = group(`coilAsm_${tag}`);
-  at(coilLocal, x, 0.52, z);
-  rot(coilLocal, 0, 0, yawSign * 0.12);
+  at(coilLocal, bankSign * COIL_X, STACK_Y, z);
+  rot(coilLocal, 0, 0, -bankSign * (Math.PI / 2));
   coilGroup.add(coilLocal);
 
   // main rectangular body (thick upper block)
@@ -60,13 +69,15 @@ function cylinderStack(bankSign, z, idx, coilGroup, plugGroup, hwGroup, injGroup
   coilLocal.add(at(box(`coilConn_${tag}`, 0.12, 0.1, 0.14, 'yellow'), bankSign * 0.02, 0.28, 0));
   coilLocal.add(at(box(`coilConnLock_${tag}`, 0.08, 0.04, 0.08, 'yellow'), bankSign * 0.02, 0.34, 0));
 
-  // --- Coil mounting hardware: single M6 at base flange (WM 4614 label 3) ---
-  hwGroup.add(at(cyl(`coilBolt_${tag}`, 0.035, 0.035, 0.09, 'bolt', 8), x + bankSign * 0.14, 0.42, z));
+  // --- Coil mounting hardware: single M6 at base flange, screwed into the
+  // head's outboard face (axis along X, like the plug) ---
+  hwGroup.add(at(rot(cyl(`coilBolt_${tag}`, 0.035, 0.035, 0.09, 'bolt', 8), 0, 0, Math.PI / 2), bankSign * 1.62, STACK_Y - 0.14, z));
 
-  // --- Spark plug below the boot ---
-  plugGroup.add(at(cyl(`plugBody_${tag}`, 0.06, 0.06, 0.2, 'steel', 14), x, 0.0, z));
-  plugGroup.add(at(cyl(`plugHex_${tag}`, 0.08, 0.08, 0.07, 'aluDark', 6), x, 0.1, z));
-  plugGroup.add(at(cyl(`plugTip_${tag}`, 0.018, 0.018, 0.09, 'steel', 8), x, -0.14, z));
+  // --- Spark plug inboard of the boot, on the same horizontal axis (threads
+  // into the head from the side; tip innermost toward the piston) ---
+  plugGroup.add(at(rot(cyl(`plugBody_${tag}`, 0.06, 0.06, 0.2, 'steel', 14), 0, 0, Math.PI / 2), bankSign * 1.26, STACK_Y, z));
+  plugGroup.add(at(rot(cyl(`plugHex_${tag}`, 0.08, 0.08, 0.07, 'aluDark', 6), 0, 0, Math.PI / 2), bankSign * 1.36, STACK_Y, z));
+  plugGroup.add(at(rot(cyl(`plugTip_${tag}`, 0.018, 0.018, 0.09, 'steel', 8), 0, 0, Math.PI / 2), bankSign * 1.12, STACK_Y, z));
 
   // --- DFI injector (WM 4450 exploded) ---
   // Longer nozzle, angled electrical connector, 3-ridge bellows, spring clamp.

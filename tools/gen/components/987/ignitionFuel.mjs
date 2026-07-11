@@ -47,6 +47,13 @@ const RAIL = { color: 0xb0b4ba, metalness: 0.9, roughness: 0.3 };
 const BANK_X = 1.5;
 const CYL_Z = [0.7, 0.0, -0.7]; // front, middle, rear
 
+// BOXER plug/coil axis (see 981 module): horizontal cylinders → the rod
+// module + spark plug lie along ±X, inserted from the outboard flank pointing
+// in toward the pistons (parallel to the ground). COIL_X = rod-group origin
+// on that axis; STACK_Y = head-center height.
+const COIL_X = 1.48;
+const STACK_Y = 0.3;
+
 // Build the coil-on-plug + spark-plug + injector stack for one cylinder.
 // Coils: rod-type ignition modules (SI Fig 2_22_09) — connector head, ribbed
 // seal collar, long slim rod into the plug recess (no tilting needed for
@@ -57,9 +64,12 @@ function cylinderStack(bankSign, z, idx, coilGroup, plugGroup, hwGroup, injGroup
   const tag = `${bankSign > 0 ? 'b1' : 'b2'}_${idx}`;
 
   // --- Rod-type ignition coil (SI Fig 2_22_09 / 2_23_09) ---
+  // Local stack runs +Y (connector head) → −Y (rod/boot); rotating the group
+  // −bankSign·90° about Z lays the rod HORIZONTALLY, extending straight into
+  // the plug recess from the outboard flank (boxer engine).
   const coilLocal = group(`coilAsm_${tag}`);
-  at(coilLocal, x, 0.58, z);
-  rot(coilLocal, 0, 0, bankSign * 0.12);
+  at(coilLocal, bankSign * COIL_X, STACK_Y, z);
+  rot(coilLocal, 0, 0, -bankSign * (Math.PI / 2));
   coilGroup.add(coilLocal);
 
   // connector head on top (4-pin plug connection, sealed)
@@ -77,18 +87,20 @@ function cylinderStack(bankSign, z, idx, coilGroup, plugGroup, hwGroup, injGroup
   // high-voltage plug / silicone boot tip onto the spark plug
   coilLocal.add(at(cyl(`coilBoot_${tag}`, 0.045, 0.055, 0.16, 'rubber', 14), 0, -0.38, 0));
 
-  // --- Coil mounting hardware: single bolt at the eyelet ---
-  hwGroup.add(at(cyl(`coilBolt_${tag}`, 0.035, 0.035, 0.09, 'bolt', 8), x + bankSign * 0.13, 0.78, z));
+  // --- Coil mounting hardware: single bolt at the eyelet, screwed into the
+  // head's outboard face (axis along X, like the rod) ---
+  hwGroup.add(at(rot(cyl(`coilBolt_${tag}`, 0.035, 0.035, 0.09, 'bolt', 8), 0, 0, Math.PI / 2), bankSign * 1.74, STACK_Y - 0.13, z));
 
-  // --- Surface-gap spark plug below the boot (SI Fig 2_05_02) ---
-  plugGroup.add(at(cyl(`plugBody_${tag}`, 0.06, 0.06, 0.2, 'steel', 14), x, 0.0, z));
-  plugGroup.add(at(cyl(`plugHex_${tag}`, 0.08, 0.08, 0.07, 'aluDark', 6), x, 0.1, z));
-  plugGroup.add(at(cyl(`plugTip_${tag}`, 0.018, 0.018, 0.09, 'steel', 8), x, -0.14, z));
-  // four ground electrodes arranged around the insulator (surface-gap)
+  // --- Surface-gap spark plug inboard of the rod, same horizontal axis ---
+  plugGroup.add(at(rot(cyl(`plugBody_${tag}`, 0.06, 0.06, 0.2, 'steel', 14), 0, 0, Math.PI / 2), bankSign * 1.26, STACK_Y, z));
+  plugGroup.add(at(rot(cyl(`plugHex_${tag}`, 0.08, 0.08, 0.07, 'aluDark', 6), 0, 0, Math.PI / 2), bankSign * 1.36, STACK_Y, z));
+  plugGroup.add(at(rot(cyl(`plugTip_${tag}`, 0.018, 0.018, 0.09, 'steel', 8), 0, 0, Math.PI / 2), bankSign * 1.12, STACK_Y, z));
+  // four ground electrodes arranged around the insulator (surface-gap) —
+  // ringed around the horizontal plug axis at the tip end
   for (let g = 0; g < 4; g++) {
     const ga = (g / 4) * Math.PI * 2 + Math.PI / 4;
-    plugGroup.add(at(box(`plugGndEl_${tag}_${g}`, 0.014, 0.05, 0.014, 'steel'),
-      x + Math.cos(ga) * 0.035, -0.16, z + Math.sin(ga) * 0.035));
+    plugGroup.add(at(box(`plugGndEl_${tag}_${g}`, 0.05, 0.014, 0.014, 'steel'),
+      bankSign * 1.06, STACK_Y + Math.cos(ga) * 0.035, z + Math.sin(ga) * 0.035));
   }
 
   // --- DFI injector (3.4 S engines; SI Fig 2_20_09) ---
