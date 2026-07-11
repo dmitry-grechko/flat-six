@@ -22,9 +22,12 @@ export const XRAY_ASSEMBLIES_987: XrayAssembly[] = [
   { id: 'rbrakes',   label: 'Rear Brakes',       glb: '/models/components/987/rbrakes.glb',   manifest: '/models/components/987/rbrakes-parts.json',   hotspot3d: '0 -0.2 -1.34', displayRadius: 0.46, bilateral: true, lateralOffset: 1.15,
     hideInUnified: ['absPsmHydraulicUnit', 'brakeFluidReservoir'] },
   { id: 'cooling',   label: 'Cooling System',    glb: '/models/components/987/cooling.glb',   manifest: '/models/components/987/cooling-parts.json',   hotspot3d: '0 -0.05 1.45', displayRadius: 0.80 },
-  // Car-space on the engine (matches the 981 entry — same native frame): sump
-  // under the crankcase, oil filter low on the right flank (from beneath).
-  { id: 'oil',       label: 'Oil & Lubrication', glb: '/models/components/987/oil.glb',       manifest: '/models/components/987/oil-parts.json',       hotspot3d: '0 0.18 -0.78', carSpace: true, worldScale: 0.42 },
+  // Car-space on the engine, EXTERNAL service items only (see 981 note): the
+  // engine.glb already shows its own pan/pump — hide our duplicates in unified
+  // (incl. the 987 sheet-metal panel, a child of oilSump) and keep the filter
+  // console / cooler / separator / filler / sensors.
+  { id: 'oil',       label: 'Oil & Lubrication', glb: '/models/components/987/oil.glb',       manifest: '/models/components/987/oil-parts.json',       hotspot3d: '0 0.18 -0.78', carSpace: true, worldScale: 0.42,
+    hideInUnified: ['oilSump', 'engineOil', 'oilPump', 'oilPipe', 'oilLevelSensor'] },
   { id: 'airfilter', label: 'Air Intake',        glb: '/models/components/987/airfilter.glb', manifest: '/models/components/987/airfilter-parts.json', hotspot3d: '0 0 0', carSpace: true, worldScale: 1 },
   // Car-space on the engine (see 981 note): rod-coil banks at native x ±1.5 →
   // ±0.44 half-embedded in the heads. The 987 module additionally parks the

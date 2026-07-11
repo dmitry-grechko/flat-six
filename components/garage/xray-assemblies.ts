@@ -72,10 +72,13 @@ export const XRAY_ASSEMBLIES: XrayAssembly[] = [
   // so the front cores land at the bumper corners (±0.41, -0.07, ~1.89) at a
   // legible ~0.31 core height. The engine-bay bits compress toward mid-car — fine.
   { id: 'cooling',   label: 'Cooling System',    glb: '/models/components/cooling.glb',   manifest: '/models/components/cooling-parts.json',   hotspot3d: '0 -0.05 1.45', displayRadius: 0.80 },
-  // Full engine-scale lubrication model (sump, pump, filter console, cooler):
-  // car-space ON the engine so the sump hangs under the crankcase and the oil
-  // filter reads clearly low on the right flank (9A1: cartridge from beneath).
-  { id: 'oil',       label: 'Oil & Lubrication', glb: '/models/components/oil.glb',       manifest: '/models/components/oil-parts.json',       hotspot3d: '0 0.18 -0.78', carSpace: true, worldScale: 0.42 },
+  // Car-space ON the engine, EXTERNAL service items only: the real engine.glb
+  // already shows its own pan/sump, oil pump and internals — overlaying ours
+  // duplicated them (the "giant box" under the engine). Hide the internals in
+  // unified and keep the filter console, cooler, separator, filler/dipstick and
+  // sensors (the DIY anchors). Focused view still shows + pins everything.
+  { id: 'oil',       label: 'Oil & Lubrication', glb: '/models/components/oil.glb',       manifest: '/models/components/oil-parts.json',       hotspot3d: '0 0.18 -0.78', carSpace: true, worldScale: 0.42,
+    hideInUnified: ['oilSump', 'engineOil', 'oilPump', 'oilPipe', 'oilLevelSensor'] },
   // Dual air cleaners merge at central throttle (WM 242519 / 244601).
   { id: 'airfilter', label: 'Air Intake',        glb: '/models/components/airfilter.glb', manifest: '/models/components/airfilter-parts.json', hotspot3d: '0 0 0', carSpace: true, worldScale: 1 },
   // Ignition & fuel is a full flat-six model (coil banks at native x ±1.5) that
