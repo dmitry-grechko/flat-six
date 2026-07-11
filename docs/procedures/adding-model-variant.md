@@ -37,6 +37,12 @@ Engines, transmissions and paint colors come from `lib/data.ts` and are keyed by
 **generation**, not variant. If the variant needs distinct options, extend those
 lists (and any per-generation filtering). Colors are `COLORS` in `lib/data.ts`.
 
+For a variant that shipped with a single factory powertrain (e.g. the GT4 is a
+manual-only 3.8), set `defaultEngine` / `defaultTransmission` on its `CarVariant`
+in `lib/models.ts` — new vehicles seed to it and the picker snaps to it, instead
+of the generic per-generation default. The values must be members of the
+generation's `enginesFor()` / `transmissionsFor()` lists.
+
 ## 5. Fitment (if wheels differ)
 
 If the variant runs unique OEM wheels, add a `FitmentPreset` in

@@ -159,6 +159,15 @@ The same rules are encoded for AI pair-programming in [`CLAUDE.md`](./CLAUDE.md)
 
 ## License & attributions
 
-Third-party 3D models are used under CC BY 4.0 — see [`NOTICE.md`](./NOTICE.md) for
-required attributions. `app/api/devshot` is a dev-only render-capture route; remove it
-before a public production deploy.
+- **Code** — [MIT](./LICENSE).
+- **Bundled assets** — third-party 3D models and factory reference imagery are used
+  under their own licences (CC BY 4.0, CC BY-NC-SA 4.0, and © Porsche AG editorial
+  use). See [`NOTICE.md`](./NOTICE.md) for required attributions. Two bundled models
+  (the 987 Spyder and the 981 GT4) are **CC BY-NC-SA**, so any redistributed
+  derivative of the app must stay non-commercial + share-alike.
+- **Factory documentation** — workshop manuals and parts catalogues are © Porsche AG,
+  are **not** redistributed (gitignored), and are served only to authenticated users.
+
+Contributing a model or generation? See [`CONTRIBUTING.md`](./CONTRIBUTING.md).
+`app/api/devshot` is a dev-only render-capture route; remove it before a public
+production deploy.

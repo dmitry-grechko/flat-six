@@ -1,5 +1,10 @@
 # Third-party assets & attributions
 
+> **Code vs. assets.** The FLAT·SIX application code is MIT-licensed (see
+> [`LICENSE`](./LICENSE)). This NOTICE governs the **third-party assets** bundled
+> with the app — 3D models and reference imagery — which carry their own,
+> separate licences and attribution requirements.
+
 ## 3D models (exterior)
 
 The exterior vehicle models are used under the **Creative Commons Attribution 4.0**
@@ -16,6 +21,14 @@ license (CC BY 4.0 — https://creativecommons.org/licenses/by/4.0/). Required a
 - **"Porsche Cayman 987"** (https://skfb.ly/oQzBB) by **Mona x Supercars**,
   licensed under [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/).
   Served as `public/models/cayman-987.glb`.
+
+- **"2015 Porsche Cayman GT4"** (https://skfb.ly/pBVJw) by **OUTPISTON**,
+  licensed under [CC BY-NC-SA 4.0](http://creativecommons.org/licenses/by-nc-sa/4.0/).
+  Served as `public/models/cayman-gt4-981.glb`.
+
+  > ⚠ **Licence caveat:** like the Boxster Spyder below, this asset is
+  > **NonCommercial + ShareAlike** — any redistributed derivative must keep the
+  > CC BY-NC-SA licence.
 
 - **"2010 Porsche Boxster Spyder"** (https://skfb.ly/pBAu9) by **Ddiaz Design**,
   licensed under [CC BY-NC-SA 4.0](http://creativecommons.org/licenses/by-nc-sa/4.0/).

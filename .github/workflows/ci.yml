@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    name: Typecheck · knowledge base · 3D coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Knowledge-base lint
+        run: npm run kb:lint
+
+      - name: 3D pin coverage (981)
+        run: npm run gen:verify
+
+      - name: 3D pin coverage (987)
+        run: node tools/gen/verify-coverage.mjs --gen 987
+
+      # A production build (`npm run build`) is the strongest gate but needs
+      # placeholder Supabase env to build the auth-gated routes. Add it once
+      # verified in CI, e.g.:
+      #   - name: Build
+      #     run: npm run build
+      #     env:
+      #       NEXT_PUBLIC_DEMO_MODE: "true"
+      #       NEXT_PUBLIC_SUPABASE_URL: https://demo.supabase.co
+      #       NEXT_PUBLIC_SUPABASE_ANON_KEY: demo-anon-key
+      #
+      # `next lint` is intentionally omitted — ESLint is not configured in this
+      # repo yet (running it prompts interactively). Set up eslint-config-next
+      # and add a lint step when ready.

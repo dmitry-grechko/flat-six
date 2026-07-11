@@ -2,6 +2,7 @@
   "name": "flatsix-981-garage",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "engines": {
     "node": "24.x"
   },
@@ -13,6 +14,7 @@
     "gen:components": "node tools/gen/build-components.mjs",
     "gen:verify": "node tools/gen/verify-coverage.mjs",
     "gen:layout": "node tools/gen/verify-unified-layout.mjs",
+    "kb:lint": "node tools/knowledge/lint.mjs",
     "wm:figs": "python3 .cursor/skills/wm-3d-calibrate/scripts/find-figs.py",
     "wm:extract": "node tools/gen/wm-refs/extract-pages.mjs",
     "db:link": "supabase link",

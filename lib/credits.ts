@@ -142,46 +142,40 @@ export interface CutawayImage {
   caption: string;
 }
 
+/** The two cutaway tabs (front/full + engine) available for one generation. */
+interface GenerationCutaways {
+  front: CutawayImage;
+  engine: CutawayImage;
+}
+
+/** Fallback generation for unknown / legacy vehicle bodies. */
+const DEFAULT_GENERATION = '981';
+
+// Per-generation 2D cutaway registry — the single place to register a
+// generation's cutaway tabs. Mirrors GENERATION_KB in lib/knowledge and
+// GENERATION_POWERTRAIN in lib/data. The 981 reuses ONE top-down image for the
+// CUTAWAY tab and a dedicated flat-six image for the ENGINE tab; the 987 has a
+// distinct whole-car cutaway plus its own engine image. Unknown generations
+// fall back to the 981 set.
+const GENERATION_CUTAWAYS: Record<string, GenerationCutaways> = {
+  '981': {
+    front: { src: '/assets/cutaway-981.jpg', alt: 'Porsche 981 factory cutaway', credit: CUTAWAY_CREDIT, tabLabel: 'CUTAWAY', caption: 'FULL CUTAWAY · 981' },
+    engine: { src: '/assets/engine-981.jpg', alt: 'Porsche 981 flat-six engine and transaxle cutaway', credit: ENGINE_981_CREDIT, tabLabel: 'ENGINE', caption: 'FLAT-SIX & TRANSAXLE · ENGINE CUTAWAY' },
+  },
+  '987': {
+    front: { src: '/assets/cutaway-987.jpg', alt: 'Porsche Cayman S (987) factory cutaway', credit: CUTAWAY_987_CREDIT, tabLabel: 'CUTAWAY', caption: 'FULL CUTAWAY · 987 CAYMAN' },
+    engine: { src: '/assets/engine-987.jpg', alt: 'Porsche 987 flat-six engine and transaxle cutaway', credit: ENGINE_987_CREDIT, tabLabel: 'ENGINE', caption: 'FLAT-SIX & TRANSAXLE · ENGINE CUTAWAY' },
+  },
+};
+
 /**
- * Resolve the 2D cutaway image for a generation + tab. The 981 reuses ONE
- * top-down image for both tabs (front vs engine differ only by which hotspots
- * show); the 987 has a distinct whole-car cutaway and a dedicated engine image.
+ * Resolve the 2D cutaway image for a generation + tab. The `front` view is the
+ * whole-car/full cutaway; `rear` maps to the dedicated engine cutaway. Unknown
+ * generations fall back to the 981 set.
  */
 export function cutawayImageFor(generation: string, view: 'front' | 'rear'): CutawayImage {
-  if (generation === '987') {
-    return view === 'front'
-      ? {
-          src: '/assets/cutaway-987.jpg',
-          alt: 'Porsche Cayman S (987) factory cutaway',
-          credit: CUTAWAY_987_CREDIT,
-          tabLabel: 'CUTAWAY',
-          caption: 'FULL CUTAWAY · 987 CAYMAN',
-        }
-      : {
-          src: '/assets/engine-987.jpg',
-          alt: 'Porsche 987 flat-six engine and transaxle cutaway',
-          credit: ENGINE_987_CREDIT,
-          tabLabel: 'ENGINE',
-          caption: 'FLAT-SIX & TRANSAXLE · ENGINE CUTAWAY',
-        };
-  }
-  // 981 (default): whole-car top-down cutaway for the CUTAWAY tab; a dedicated
-  // flat-six + transaxle image for the ENGINE tab (same pattern as the 987).
-  return view === 'front'
-    ? {
-        src: '/assets/cutaway-981.jpg',
-        alt: 'Porsche 981 factory cutaway',
-        credit: CUTAWAY_CREDIT,
-        tabLabel: 'CUTAWAY',
-        caption: 'FULL CUTAWAY · 981',
-      }
-    : {
-        src: '/assets/engine-981.jpg',
-        alt: 'Porsche 981 flat-six engine and transaxle cutaway',
-        credit: ENGINE_981_CREDIT,
-        tabLabel: 'ENGINE',
-        caption: 'FLAT-SIX & TRANSAXLE · ENGINE CUTAWAY',
-      };
+  const tabs = GENERATION_CUTAWAYS[generation] ?? GENERATION_CUTAWAYS[DEFAULT_GENERATION];
+  return view === 'front' ? tabs.front : tabs.engine;
 }
 
 /** The "engine reference" figure shown in a selected Engine component's detail. */
@@ -192,19 +186,13 @@ export interface EngineRefImage {
   label: string;
 }
 
+// Per-generation "engine reference" figure (shown in a selected Engine part's
+// detail). Unknown generations fall back to the 981 flat-six reference.
+const GENERATION_ENGINE_REF: Record<string, EngineRefImage> = {
+  '981': { src: '/assets/engine-flat-six.jpg', alt: 'Porsche flat-six engine cutaway', credit: ENGINE_CUTAWAY_CREDIT, label: 'FLAT-SIX REFERENCE' },
+  '987': { src: '/assets/cylinder-987.jpg', alt: 'Porsche flat-six cylinder numbering (987)', credit: CYLINDER_987_CREDIT, label: 'CYLINDER NUMBERING' },
+};
+
 export function engineRefFor(generation: string): EngineRefImage {
-  if (generation === '987') {
-    return {
-      src: '/assets/cylinder-987.jpg',
-      alt: 'Porsche flat-six cylinder numbering (987)',
-      credit: CYLINDER_987_CREDIT,
-      label: 'CYLINDER NUMBERING',
-    };
-  }
-  return {
-    src: '/assets/engine-flat-six.jpg',
-    alt: 'Porsche flat-six engine cutaway',
-    credit: ENGINE_CUTAWAY_CREDIT,
-    label: 'FLAT-SIX REFERENCE',
-  };
+  return GENERATION_ENGINE_REF[generation] ?? GENERATION_ENGINE_REF[DEFAULT_GENERATION];
 }

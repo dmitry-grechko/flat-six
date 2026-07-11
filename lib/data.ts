@@ -60,19 +60,46 @@ export const TRANS_987 = ['5-Speed Manual', '6-Speed Manual', '5-Speed Tiptronic
 export const ENGINES = ENGINES_981;
 export const TRANS = TRANS_981;
 
+/** Fallback generation for unknown / legacy vehicle bodies. */
+export const DEFAULT_GENERATION = '981';
+
+/** The powertrain (option lists + seed defaults) for one generation. */
+export interface GenerationPowertrain {
+  engines: string[];
+  transmissions: string[];
+  /** Seed engine for a new vehicle of this generation (an "S" everywhere today). */
+  defaultEngine: string;
+  /** Seed transmission — 981 → PDK; 987 → manual (valid across 987.1 + 987.2). */
+  defaultTransmission: string;
+}
+
+// Per-generation powertrain registry — the single place to register a
+// generation's engine/transmission options. Mirrors GENERATION_KB in
+// lib/knowledge and the cutaway registry in lib/credits. Unknown generations
+// fall back to DEFAULT_GENERATION, so legacy vehicles and not-yet-populated
+// generations still get a valid option list. (Per-VARIANT signature powertrains
+// — e.g. the GT4's manual-only 3.8 — live on CarVariant in lib/models and are
+// applied by callers as `variant.defaultEngine ?? defaultEngine(gen)`.)
+const GENERATION_POWERTRAIN: Record<string, GenerationPowertrain> = {
+  '981': { engines: ENGINES_981, transmissions: TRANS_981, defaultEngine: '3.4 L Flat-Six (S)', defaultTransmission: '7-Speed PDK' },
+  '987': { engines: ENGINES_987, transmissions: TRANS_987, defaultEngine: '3.4 L Flat-Six (S)', defaultTransmission: '6-Speed Manual' },
+};
+
+function powertrain(generation: string): GenerationPowertrain {
+  return GENERATION_POWERTRAIN[generation] ?? GENERATION_POWERTRAIN[DEFAULT_GENERATION];
+}
+
 export function enginesFor(generation: string): string[] {
-  return generation === '987' ? ENGINES_987 : ENGINES_981;
+  return powertrain(generation).engines;
 }
 export function transmissionsFor(generation: string): string[] {
-  return generation === '987' ? TRANS_987 : TRANS_981;
+  return powertrain(generation).transmissions;
 }
-/** Sensible default engine — every variant we ship is an "S" model. */
-export function defaultEngine(_generation: string): string {
-  return '3.4 L Flat-Six (S)';
+export function defaultEngine(generation: string): string {
+  return powertrain(generation).defaultEngine;
 }
-/** Default transmission: 981 → PDK; 987 → manual (valid across 987.1 + 987.2). */
 export function defaultTransmission(generation: string): string {
-  return generation === '987' ? '6-Speed Manual' : '7-Speed PDK';
+  return powertrain(generation).defaultTransmission;
 }
 
 // view/ix/iy come from the mockup's VIEWMAP (hotspot positions on the 2D cutaways).
@@ -200,11 +227,17 @@ export const COMPONENTS: Component[] = [
 ];
 
 /**
- * Cutaway components for a generation. 981 uses COMPONENTS; 987 uses its own
- * set (lib/data-987.ts). Mirrors the generation fork in lib/knowledge.
+ * Cutaway components per generation. Mirrors the registries in lib/knowledge
+ * (GENERATION_KB) and the powertrain registry above. Unknown / null generations
+ * fall back to the 981 set.
  */
+const GENERATION_COMPONENTS: Record<string, Component[]> = {
+  '981': COMPONENTS,
+  '987': COMPONENTS_987,
+};
+
 export function componentsForGeneration(generation: string | null | undefined): Component[] {
-  return generation === '987' ? COMPONENTS_987 : COMPONENTS;
+  return GENERATION_COMPONENTS[generation ?? DEFAULT_GENERATION] ?? GENERATION_COMPONENTS[DEFAULT_GENERATION];
 }
 
 export const FAULTS: Fault[] = [
