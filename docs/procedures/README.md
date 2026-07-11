@@ -10,6 +10,8 @@ rules ([`CLAUDE.md`](../../CLAUDE.md) and [`.cursor/rules/`](../../.cursor/rules
 | [adding-model-variant.md](./adding-model-variant.md) | Add a body variant within an existing generation (e.g. a Spyder) |
 | [adding-new-generation.md](./adding-new-generation.md) | Add a whole new generation (e.g. 991, 718/982) |
 | [building-features.md](./building-features.md) | Build any feature — design system, backend/MCP rules, doc upkeep |
+| [track-offline.md](./track-offline.md) | Track companion: PWA + Electron packaging, OBD transports, offline KB |
+| [public-seo-pages.md](./public-seo-pages.md) | Public marketing / SEO pages (landing, hubs, guides) |
 
 ## The golden rule
 

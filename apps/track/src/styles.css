@@ -1,0 +1,262 @@
+:root {
+  --red: #d5001c;
+  --ink: #0b0b0c;
+  --grey: #6e6e73;
+  --muted: #9a9aa0;
+  --border: #e3e3e5;
+  --page: #ececee;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+  --sans: 'Helvetica Neue', Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--sans);
+  background: var(--page);
+  color: var(--ink);
+  line-height: 1.45;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app-header {
+  background: var(--ink);
+  color: #fff;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.app-header .mark {
+  width: 10px;
+  height: 10px;
+  background: var(--red);
+  flex-shrink: 0;
+}
+
+.app-header h1 {
+  margin: 0;
+  font: 700 13px/1 var(--mono);
+  letter-spacing: 0.28em;
+}
+
+.app-header .sub {
+  font: 500 11px/1 var(--mono);
+  color: var(--muted);
+}
+
+.app-header .shell-pill {
+  margin-left: auto;
+  font: 500 10px/1 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border: 1px solid #2a2a2e;
+  padding: 6px 8px;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding: 10px 12px 0;
+  border-bottom: 1px solid var(--border);
+  background: #fff;
+}
+
+.tabs button {
+  border: none;
+  background: transparent;
+  padding: 10px 12px;
+  font: 600 11px/1 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--grey);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+}
+
+.tabs button.active {
+  color: var(--ink);
+  border-bottom-color: var(--red);
+}
+
+.main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 16px 14px 48px;
+  display: grid;
+  gap: 12px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px;
+}
+
+.card h2 {
+  margin: 0 0 10px;
+  font: 700 11px/1 var(--mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.field {
+  display: grid;
+  gap: 4px;
+  min-width: 140px;
+  flex: 1;
+}
+
+.field label {
+  font: 600 10px/1 var(--mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.field input,
+.field select {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 8px 10px;
+  background: #fff;
+}
+
+.btn {
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: #fff;
+  border-radius: 4px;
+  padding: 9px 12px;
+  font: 600 11px/1 var(--mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.btn.secondary {
+  background: #fff;
+  color: var(--ink);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.muted {
+  color: var(--grey);
+  font-size: 13px;
+}
+
+.err {
+  color: var(--red);
+  font-size: 13px;
+}
+
+.gauge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.gauge {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 12px;
+}
+
+.gauge .label {
+  font: 600 10px/1 var(--mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.gauge .value {
+  margin-top: 8px;
+  font: 700 28px/1 var(--mono);
+}
+
+.gauge .unit {
+  font: 500 11px/1 var(--mono);
+  color: var(--grey);
+  margin-left: 4px;
+}
+
+.chip {
+  display: inline-block;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 8px;
+  font: 500 10px/1 var(--mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+
+.chip.on {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.list {
+  display: grid;
+  gap: 8px;
+}
+
+.list-item {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 10px;
+}
+
+.list-item strong {
+  font: 700 13px/1.2 var(--mono);
+}
+
+.list-item p {
+  margin: 6px 0 0;
+  color: var(--grey);
+  font-size: 13px;
+}
+
+.debug {
+  font: 12px/1.4 var(--mono);
+  white-space: pre-wrap;
+  max-height: 240px;
+  overflow: auto;
+  background: #f7f7f8;
+  border-radius: 4px;
+  padding: 10px;
+}

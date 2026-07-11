@@ -11,16 +11,19 @@ import { DEMO_MODE } from '@/lib/demo';
 import { useDocumentsAccess } from '@/lib/hooks/useDocumentsAccess';
 import VehicleSwitcher from './VehicleSwitcher';
 import AddVehicleModal from './AddVehicleModal';
+import { BetaBadge } from './BetaBadge';
 
-const NAV: { no: string; label: string; href: string }[] = [
+const NAV: { no: string; label: string; href: string; beta?: boolean }[] = [
   { no: '01', label: 'Garage', href: '/garage' },
   { no: '02', label: 'Service History', href: '/history' },
   { no: '03', label: 'Service Plans', href: '/plans' },
   { no: '04', label: 'Fault Finding', href: '/faults' },
-  { no: '05', label: 'Documents', href: '/manual' },
-  { no: '06', label: 'Tools', href: '/tools' },
-  { no: '07', label: 'AI', href: '/ai' },
-  { no: '08', label: 'Settings', href: '/settings' },
+  { no: '05', label: 'Live OBD', href: '/obd', beta: true },
+  { no: '06', label: 'Downloads', href: '/downloads', beta: true },
+  { no: '07', label: 'Documents', href: '/manual' },
+  { no: '08', label: 'Tools', href: '/tools' },
+  { no: '09', label: 'AI', href: '/ai' },
+  { no: '10', label: 'Settings', href: '/settings' },
 ];
 
 const mono = "'JetBrains Mono',monospace";
@@ -47,7 +50,7 @@ export default function Sidebar({
     createClient().auth.getUser().then(({ data }) => setIsAdmin(isAdminEmail(data.user?.email)));
   }, []);
   const baseNav = docsAccess ? NAV : NAV.filter((item) => item.href !== '/manual');
-  const items = isAdmin ? [...baseNav, { no: '09', label: 'Admin', href: '/admin' }] : baseNav;
+  const items = isAdmin ? [...baseNav, { no: '11', label: 'Admin', href: '/admin' }] : baseNav;
 
   return (
     <aside
@@ -134,8 +137,11 @@ export default function Sidebar({
               }}
             >
               <span style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.06em', opacity: .6, width: 18 }}>{it.no}</span>
-              <span style={{ font: "500 13px/1 'Helvetica Neue',Arial,sans-serif", letterSpacing: '.02em' }}>{it.label}</span>
-              <span style={{ marginLeft: 'auto', width: 6, height: 6, borderRadius: '50%', background: on ? 'var(--red)' : 'transparent' }} />
+              <span style={{ font: "500 13px/1 'Helvetica Neue',Arial,sans-serif", letterSpacing: '.02em', display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{it.label}</span>
+                {it.beta && <BetaBadge tone={on ? 'light' : 'dark'} />}
+              </span>
+              <span style={{ marginLeft: 'auto', width: 6, height: 6, borderRadius: '50%', background: on ? 'var(--red)' : 'transparent', flexShrink: 0 }} />
             </Link>
           );
         })}

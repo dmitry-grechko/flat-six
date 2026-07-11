@@ -30,7 +30,23 @@ white cards**; result boxes are white with a tone-colored border (never filled
 tints). Reuse `components/tools/ui.tsx` + `diagrams.tsx`. Responsive: `padView`,
 `stackSm`, `repeat(auto-fit,minmax())` grids, `flexWrap` chips, `overflowX:auto`
 tab bars — test at 375 px. Nav item = route (`app/*/page.tsx` + `AppShell` +
-`Sidebar` NAV + `PAGE_META`).
+`Sidebar` NAV + `PAGE_META`). **Live OBD** (`/obd`, beta) talks to the local helper
+`tools/obd-bridge` (`npm run obd-bridge`, default `http://127.0.0.1:8765`) via
+`lib/obd/httpClient.ts` — or **Web Serial** for USB ELM in desktop Chrome/Edge
+(no helper). Classic Bluetooth still needs the bridge or Electron Track.
+**Downloads** (`/downloads`, beta) lists Bridge / Track Electron / Track PWA —
+catalog in `lib/downloads.ts` (set `href` when installers are published).
+
+## Track companion (PWA + Electron)
+
+Offline / track-day shell — **same** `lib/obd` + `lib/knowledge`, not a fork of the
+garage app. UI in `apps/track`; desktop shell in `apps/track-electron`; procedure
+[`docs/procedures/track-offline.md`](./docs/procedures/track-offline.md).
+
+- Scripts: `npm run track:dev` · `track:pwa` · `track:electron` · `track:electron:pack`
+- Transports: Electron IPC (USB + Classic BT) · HTTP bridge · Web Serial (desktop Chrome USB)
+- Adapters: `elm327` default · `vas6154` experimental stub/lab
+- Offline KB = bundled TF `searchKnowledge` (no workshop-manual embeddings in v1)
 
 ## Backend & MCP
 
@@ -51,6 +67,7 @@ tab bars — test at 375 px. Nav item = route (`app/*/page.tsx` + `AppShell` +
 - Add a model variant → [`docs/procedures/adding-model-variant.md`](./docs/procedures/adding-model-variant.md)
 - Add a generation → [`docs/procedures/adding-new-generation.md`](./docs/procedures/adding-new-generation.md)
 - Build a feature → [`docs/procedures/building-features.md`](./docs/procedures/building-features.md)
+- Track offline (PWA + Electron) → [`docs/procedures/track-offline.md`](./docs/procedures/track-offline.md)
 - Public SEO / marketing pages → [`docs/procedures/public-seo-pages.md`](./docs/procedures/public-seo-pages.md)
 
 **When you change a process, update its procedure doc + this file + `.cursor/rules/`.**
@@ -58,6 +75,6 @@ tab bars — test at 375 px. Nav item = route (`app/*/page.tsx` + `AppShell` +
 ## Verify
 
 Lint isn't configured — **`npx tsc --noEmit` is the gate**. Unit-check pure logic
-(`node --experimental-strip-types`), run the app, drive the real flow. Data claims
+(`npx tsx lib/obd/decode.test.ts`), run the app, drive the real flow. Data claims
 (specs/torque/alignment) must be verified against a real source or clearly flagged
 `unconfirmed`.

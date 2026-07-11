@@ -1,37 +1,53 @@
 #!/usr/bin/env node
 /**
- * FLAT·SIX local OBD bridge — ELM327 over serial.
+ * FLAT·SIX local OBD bridge — thin HTTP wrapper around lib/obd ObdHost.
  *
- * Transports (same API):
- *   - USB ELM327  → /dev/cu.usbserial* (Mac) or COMx (Windows)
- *   - Bluetooth Classic SPP → paired dongle as serial port (NOT BLE-only like Ancel BD200)
+ * Adapters:
+ *   - elm327 (default) — USB / Bluetooth Classic serial
+ *   - vas6154 (experimental) — J2534 PassThru / DoIP via tools/obd-bridge/adapters
  *
- * Serves test UI at http://127.0.0.1:8765
+ * Run: node --import tsx server.mjs
  */
 
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { fileURLToPath } from 'node:url';
-import { Elm327 } from './elm327.mjs';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.OBD_BRIDGE_PORT || 8765);
 const PUBLIC = path.join(__dirname, 'public');
-const PLATFORM = process.platform; // darwin | win32 | linux
+const PLATFORM = process.platform;
 
-/** @type {Elm327 | null} */
-let session = null;
-let pollTimer = null;
-/** @type {object | null} */
-let lastSnapshot = null;
+const hostMod = await import(pathToFileURL(path.join(__dirname, '../../lib/obd/node.ts')).href);
+/** @type {import('../../lib/obd/host').ObdHost} */
+const host = new hostMod.ObdHost(PLATFORM);
+
+const vasLab = await import(pathToFileURL(path.join(__dirname, 'adapters/vas6154/adapter.mjs')).href);
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
 };
+
+const ADAPTERS = [
+  {
+    id: 'elm327',
+    label: 'ELM327 (USB / BT Classic)',
+    experimental: false,
+    available: true,
+    description: 'Production path — serial ELM327, Mode 01/03/07/09.',
+  },
+  {
+    id: 'vas6154',
+    label: 'VAS 6154 (Experimental)',
+    experimental: true,
+    available: PLATFORM === 'win32' || true,
+    description: 'Lab only — J2534 PassThru and/or DoIP raw transcript.',
+  },
+];
 
 const server = http.createServer(async (req, res) => {
   setCors(res);
@@ -45,96 +61,164 @@ const server = http.createServer(async (req, res) => {
 
   try {
     if (req.method === 'GET' && url.pathname === '/health') {
+      const st = host.status();
       return json(res, {
         ok: true,
-        connected: session?.isOpen() === true,
-        port: session?.path ?? null,
-        baud: session?.baudRate ?? null,
+        connected: st.connected,
+        port: st.path,
+        baud: st.baudRate,
         platform: PLATFORM,
-        transports: ['usb-serial', 'bluetooth-classic-spp'],
-        note: 'BLE-only dongles (e.g. Ancel BD200) are not supported — need USB or Classic BT serial.',
+        transports: ['usb-serial', 'bluetooth-classic-spp', 'j2534-passthru', 'doip'],
+        adapterKind: st.adapterKind,
+        experimental: st.experimental,
+        adapters: ADAPTERS,
+        note: 'BLE-only dongles (e.g. Ancel BD200) are not supported. VAS6154 is experimental.',
       });
+    }
+
+    if (req.method === 'GET' && url.pathname === '/adapters') {
+      return json(res, { platform: PLATFORM, adapters: ADAPTERS });
+    }
+
+    if (req.method === 'GET' && url.pathname === '/j2534') {
+      const devices = PLATFORM === 'win32' ? vasLab.listPassThruDevices() : [];
+      return json(res, {
+        platform: PLATFORM,
+        supported: PLATFORM === 'win32',
+        devices,
+        note:
+          PLATFORM === 'win32'
+            ? 'Install I+ME Actia VAS6154 PassThru so FunctionLibrary appears in the registry.'
+            : 'J2534 registry discovery is Windows-only.',
+      });
+    }
+
+    if (req.method === 'POST' && url.pathname === '/doip/discover') {
+      const body = await readJson(req).catch(() => ({}));
+      const found = await vasLab.discoverDoipVehicles({
+        timeoutMs: Number(body.timeoutMs || 2500),
+        port: Number(body.port || 13400),
+      });
+      return json(res, { found });
     }
 
     if (req.method === 'GET' && url.pathname === '/ports') {
-      const { SerialPort } = await import('serialport');
-      const list = await SerialPort.list();
-      const ports = list
-        .map((p) => classifyPort(p))
-        .filter((p) => !p.ignore)
-        .sort((a, b) => b.score - a.score || a.path.localeCompare(b.path));
-      return json(res, { platform: PLATFORM, ports });
+      return json(res, await host.listPorts());
     }
 
     if (req.method === 'GET' && url.pathname === '/status') {
-      return json(res, {
-        connected: session?.isOpen() === true,
-        path: session?.path ?? null,
-        baudRate: session?.baudRate ?? null,
-        transport: session ? classifyPath(session.path).transport : null,
-        adapter: session?.adapterInfo ?? null,
-        protocol: session?.protocol ?? null,
-        polling: pollTimer != null,
-        lastSnapshot,
-        platform: PLATFORM,
-      });
+      return json(res, host.status());
+    }
+
+    if (req.method === 'GET' && url.pathname === '/capabilities') {
+      try {
+        return json(res, host.capabilities());
+      } catch (e) {
+        return json(res, { error: e.message }, 400);
+      }
+    }
+
+    if (req.method === 'GET' && url.pathname === '/live') {
+      const live = host.getLive();
+      if (!host.status().connected) return json(res, { error: 'Not connected' }, 400);
+      return json(res, live);
+    }
+
+    if (req.method === 'POST' && url.pathname === '/live') {
+      const body = await readJson(req).catch(() => ({}));
+      try {
+        return json(res, await host.refreshLive({ priorityOnly: body.priorityOnly === true }));
+      } catch (e) {
+        return json(res, { error: e.message }, 400);
+      }
+    }
+
+    if (req.method === 'GET' && url.pathname === '/faults') {
+      if (!host.status().connected) return json(res, { error: 'Not connected' }, 400);
+      return json(res, host.getFaults());
+    }
+
+    if (req.method === 'POST' && url.pathname === '/faults') {
+      try {
+        return json(res, await host.refreshFaults());
+      } catch (e) {
+        return json(res, { error: e.message }, 400);
+      }
+    }
+
+    if (req.method === 'GET' && url.pathname === '/vehicle') {
+      if (!host.status().connected) return json(res, { error: 'Not connected' }, 400);
+      return json(res, host.getVehicle());
+    }
+
+    if (req.method === 'POST' && url.pathname === '/vehicle') {
+      try {
+        return json(res, await host.refreshVehicle());
+      } catch (e) {
+        return json(res, { error: e.message }, 400);
+      }
     }
 
     if (req.method === 'POST' && url.pathname === '/connect') {
       const body = await readJson(req);
-      const port = String(body.port || '').trim();
-      const baudRate = Number(body.baudRate || 38400);
-      if (!port) return json(res, { error: 'Missing port' }, 400);
-
-      await disconnect();
-
-      session = new Elm327(port, baudRate);
-      await session.open();
-      lastSnapshot = await session.snapshot();
-      return json(res, { ok: true, status: await statusPayload() });
+      const adapter = body.adapter === 'vas6154' ? 'vas6154' : 'elm327';
+      try {
+        const status = await host.connect({
+          port: String(body.port || '').trim() || undefined,
+          baudRate: body.baudRate != null ? Number(body.baudRate) : undefined,
+          adapter,
+          experimental: body.experimental === true,
+          mode: body.mode,
+          dllPath: body.dllPath,
+          host: body.host,
+          doipPort: body.doipPort != null ? Number(body.doipPort) : body.port && adapter === 'vas6154' && body.host ? Number(body.port) : undefined,
+          protocol: body.protocol,
+          sourceAddress: body.sourceAddress,
+          targetAddress: body.targetAddress,
+          readDids: body.readDids,
+        });
+        return json(res, { ok: true, status });
+      } catch (e) {
+        return json(res, { error: e.message || String(e) }, 500);
+      }
     }
 
     if (req.method === 'POST' && url.pathname === '/disconnect') {
-      await disconnect();
+      await host.disconnect();
       return json(res, { ok: true });
     }
 
     if (req.method === 'POST' && url.pathname === '/snapshot') {
-      if (!session?.isOpen()) return json(res, { error: 'Not connected' }, 400);
-      lastSnapshot = await session.snapshot();
-      return json(res, lastSnapshot);
+      try {
+        return json(res, await host.snapshot());
+      } catch (e) {
+        return json(res, { error: e.message }, 400);
+      }
     }
 
     if (req.method === 'POST' && url.pathname === '/poll/start') {
       const body = await readJson(req).catch(() => ({}));
-      const intervalMs = Math.max(500, Number(body.intervalMs || 1000));
-      if (!session?.isOpen()) return json(res, { error: 'Not connected' }, 400);
-      stopPoll();
-      pollTimer = setInterval(async () => {
-        try {
-          if (session?.isOpen()) lastSnapshot = await session.snapshot();
-        } catch (e) {
-          console.error('[poll]', e.message);
-        }
-      }, intervalMs);
-      return json(res, { ok: true, intervalMs });
+      try {
+        return json(res, await host.pollStart(body.intervalMs));
+      } catch (e) {
+        return json(res, { error: e.message }, 400);
+      }
     }
 
     if (req.method === 'POST' && url.pathname === '/poll/stop') {
-      stopPoll();
+      host.stopPoll();
       return json(res, { ok: true });
     }
 
     if (req.method === 'GET' && url.pathname === '/debug') {
       return json(res, {
-        platform: PLATFORM,
+        ...host.debug(),
         hostname: os.hostname(),
-        log: session?.getDebugLog() ?? [],
-        lastSnapshot,
+        adapterKind: host.status().adapterKind,
+        experimental: host.status().experimental,
       });
     }
 
-    // Static UI
     if (req.method === 'GET') {
       let filePath = url.pathname === '/' ? '/index.html' : url.pathname;
       filePath = path.normalize(filePath).replace(/^(\.\.[/\\])+/, '');
@@ -158,42 +242,11 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, '127.0.0.1', () => {
   console.log(`\n  FLAT·SIX OBD bridge running (${PLATFORM})`);
-  console.log(`  Transports: USB serial + Bluetooth Classic SPP`);
+  console.log(`  Core: lib/obd · adapters: elm327 | vas6154 (experimental)`);
+  console.log(`  Lab:  tools/obd-bridge/adapters/vas6154 (PassThru / DoIP)`);
   console.log(`  Test UI:  http://127.0.0.1:${PORT}`);
   console.log(`  Health:   http://127.0.0.1:${PORT}/health\n`);
 });
-
-async function disconnect() {
-  stopPoll();
-  if (session) {
-    try {
-      await session.close();
-    } catch {
-      /* ignore */
-    }
-  }
-  session = null;
-  lastSnapshot = null;
-}
-
-function stopPoll() {
-  if (pollTimer) clearInterval(pollTimer);
-  pollTimer = null;
-}
-
-async function statusPayload() {
-  return {
-    connected: session?.isOpen() === true,
-    path: session?.path ?? null,
-    baudRate: session?.baudRate ?? null,
-    transport: session ? classifyPath(session.path).transport : null,
-    adapter: session?.adapterInfo ?? null,
-    protocol: session?.protocol ?? null,
-    polling: pollTimer != null,
-    lastSnapshot,
-    platform: PLATFORM,
-  };
-}
 
 function setCors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -230,100 +283,12 @@ function readJson(req) {
   });
 }
 
-/**
- * Classify a serialport list entry for UI hints + ranking.
- * @param {{ path: string, manufacturer?: string|null, vendorId?: string|null, productId?: string|null, serialNumber?: string|null }} p
- */
-function classifyPort(p) {
-  const base = classifyPath(p.path, p.manufacturer);
-  return {
-    path: p.path,
-    manufacturer: p.manufacturer || null,
-    serialNumber: p.serialNumber || null,
-    vendorId: p.vendorId || null,
-    productId: p.productId || null,
-    ...base,
-  };
-}
-
-function classifyPath(portPath, manufacturer = null) {
-  const p = String(portPath || '').toLowerCase();
-  const mfg = String(manufacturer || '').toLowerCase();
-  const blob = `${p} ${mfg}`;
-
-  // Noise — hide from UI
-  if (
-    p.includes('bluetooth-incoming') ||
-    p.includes('debug-console') ||
-    p.includes('bluetooth-modem') ||
-    /^\/dev\/tty\./.test(p) // prefer /dev/cu.* on macOS (caller may still list tty)
-  ) {
-    // On macOS SerialPort often lists both tty.* and cu.* — keep cu only
-    if (PLATFORM === 'darwin' && p.startsWith('/dev/tty.')) {
-      return { transport: 'other', hint: 'Duplicate tty (use cu.*)', score: -100, ignore: true };
-    }
-    if (p.includes('bluetooth-incoming') || p.includes('debug-console')) {
-      return { transport: 'other', hint: 'Not your OBD dongle', score: -50, ignore: true };
-    }
-  }
-
-  // USB serial (CH340 / FTDI / CP210x / etc.)
-  if (
-    /usb|usbserial|wch|ch340|ch341|ftdi|cp210|silabs|slab|prolific|pl2303|arduino/.test(blob) ||
-    (PLATFORM === 'win32' && /usb/.test(blob))
-  ) {
-    return {
-      transport: 'usb',
-      hint: 'USB ELM327 / USB-serial',
-      score: 100,
-      ignore: false,
-    };
-  }
-
-  // Bluetooth Classic SPP (pairs as serial — NOT BLE-only Ancel BD200)
-  if (/bluetooth|bt-|rfcomm|spp|obd|elm|chx|bafang/.test(blob)) {
-    return {
-      transport: 'bluetooth-classic',
-      hint: 'Bluetooth Classic serial (SPP)',
-      score: 80,
-      ignore: false,
-    };
-  }
-
-  // Windows COM ports without metadata — still show them
-  if (PLATFORM === 'win32' && /^com\d+$/i.test(portPath)) {
-    return {
-      transport: 'serial',
-      hint: 'Windows COM port (USB or paired BT)',
-      score: 60,
-      ignore: false,
-    };
-  }
-
-  // macOS cu.* unknown
-  if (p.startsWith('/dev/cu.')) {
-    return {
-      transport: 'serial',
-      hint: 'macOS serial — may be USB or paired BT',
-      score: 40,
-      ignore: false,
-    };
-  }
-
-  return {
-    transport: 'other',
-    hint: null,
-    score: 10,
-    ignore: false,
-  };
-}
-
 process.on('SIGINT', async () => {
-  await disconnect();
+  await host.disconnect();
   process.exit(0);
 });
 
 process.on('SIGTERM', async () => {
-  await disconnect();
+  await host.disconnect();
   process.exit(0);
 });

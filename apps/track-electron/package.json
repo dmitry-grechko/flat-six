@@ -1,0 +1,46 @@
+{
+  "name": "@flatsix/track-electron",
+  "version": "0.1.0",
+  "private": true,
+  "main": "main.mjs",
+  "description": "FLAT·SIX Track desktop shell (OBD via serialport in main)",
+  "scripts": {
+    "bundle:host": "node scripts/bundle-host.mjs",
+    "prestart": "node scripts/bundle-host.mjs",
+    "start": "electron .",
+    "dev": "node ./scripts/dev.mjs",
+    "prepack": "node scripts/bundle-host.mjs && npm --prefix ../track run build",
+    "pack": "electron-builder --win portable --x64",
+    "dist": "npm run pack"
+  },
+  "dependencies": {
+    "serialport": "^13.0.0"
+  },
+  "devDependencies": {
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8",
+    "esbuild": "^0.25.0",
+    "tsx": "^4.20.0"
+  },
+  "build": {
+    "appId": "com.flatsix.track",
+    "productName": "FLAT·SIX Track",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.mjs",
+      "preload.cjs",
+      "obd-host-runner.mjs",
+      {
+        "from": "../track/dist",
+        "to": "ui",
+        "filter": ["**/*"]
+      }
+    ],
+    "win": {
+      "target": ["portable"],
+      "signAndEditExecutable": false
+    }
+  }
+}

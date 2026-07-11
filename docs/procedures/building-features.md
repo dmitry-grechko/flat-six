@@ -35,6 +35,18 @@ use `MarketingShell` — see [`public-seo-pages.md`](./public-seo-pages.md).
 Factory PDF preview (`/manual`) is gated by `profiles.documents_access` (default
 off for new accounts; toggle in Admin). Embeddings / manual search stay available.
 
+**Live OBD** (`/obd`) is a first-class nav destination (marked **BETA**). Connection
+tab lets you pick **ELM327** or **VAS 6154 (experimental)**. On desktop Chrome/Edge,
+ELM prefers **Web Serial** (USB, no helper). Classic BT and VAS need the local helper
+(`tools/obd-bridge`, `npm run obd-bridge`). VAS PassThru is Windows-only; DoIP can be
+tried on Mac if the VCI has an IP. Client: `lib/obd/httpClient.ts`, `webSerial.ts`,
+`useObdBridge`; UI: `components/views/ObdWorkspace.tsx`. Shared with Track PWA.
+No MCP tool yet (local hardware). DTC chips deep-link to `/faults?q=CODE`.
+
+**Downloads** (`/downloads`, **BETA**) lists the OBD Bridge, Track Electron, and
+Track PWA companions. Catalog: `lib/downloads.ts` — set each item’s `href` when a
+packaged release is published; until then the page shows copy-install commands.
+
 ## 3. If it touches the backend
 
 - Per-user data → add a migration in `supabase/migrations/NNNN_*.sql` (additive;

@@ -33,14 +33,25 @@ A change isn't done until the **five layers** it touches are consistent:
 - Manual search (`manual_sections`) is hybrid FTS + Voyage/pgvector embeddings.
   After importing doc text, run `npm run db:embed-manual` (needs `VOYAGE_API_KEY`)
   so semantic search sees it. Torque finder is FTS-only, no embeddings.
+- **Track companion** (`apps/track` + `apps/track-electron`): offline OBD + knowledge
+  packaged as PWA and Electron from one UI — see `docs/procedures/track-offline.md`.
+  Core lives in `lib/obd` (adapters: elm327 / vas6154 experimental). Do not fork
+  knowledge or OBD decode into the shells.
+- **Live OBD in the main app** (`/obd`, beta): left-nav diagnostic workspace. Prefers
+  **Web Serial** (desktop Chrome/Edge USB ELM, no helper). Falls back to the local
+  helper `tools/obd-bridge` (`npm run obd-bridge`) for Classic BT / when Web Serial
+  is unavailable — see `lib/obd/httpClient.ts`, `webSerial.ts`, `useObdBridge`.
+- **Downloads** (`/downloads`, beta): Bridge + Track Electron + Track PWA. Catalog
+  `lib/downloads.ts` — set `href` when packaged releases are published.
 
 ## Before non-trivial work
 
 Read the matching runbook: adding-documents / adding-model-variant /
-adding-new-generation / building-features. **When you change a process, update its
-procedure doc + `CLAUDE.md` + these rules.**
+adding-new-generation / building-features / track-offline. **When you change a
+process, update its procedure doc + `CLAUDE.md` + these rules.**
 
 ## Verify
 
-Lint isn't configured — **`npx tsc --noEmit` is the gate.** Unit-check pure logic;
-run the app and drive the real flow (mobile at 375 px too).
+Lint isn't configured — **`npx tsc --noEmit` is the gate.** Unit-check pure logic
+(`npx tsx lib/obd/decode.test.ts`); run the app and drive the real flow (mobile at
+375 px too).

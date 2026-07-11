@@ -9,7 +9,6 @@
       --bg: #0b0b0c;
       --panel: #141416;
       --border: #232327;
-      --text: #e8e8ea;
       --muted: #9a9aa0;
       --red: #d5001c;
       --green: #3cd37a;
@@ -32,11 +31,39 @@
       align-items: center;
       gap: 12px;
       border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
     }
-    header .mark { width: 12px; height: 12px; background: var(--red); }
+    header .mark { width: 12px; height: 12px; background: var(--red); flex-shrink: 0; }
     header h1 { margin: 0; font: 700 14px/1 var(--mono); letter-spacing: .28em; }
-    header span { margin-left: auto; font: 500 11px/1 var(--mono); color: var(--muted); }
-    main { max-width: 1100px; margin: 0 auto; padding: 28px 20px 60px; display: grid; gap: 20px; }
+    header .sub { font: 500 11px/1 var(--mono); color: var(--muted); }
+    header #bridgeHealth { margin-left: auto; font: 500 11px/1 var(--mono); color: var(--muted); }
+    main { max-width: 1100px; margin: 0 auto; padding: 20px 20px 60px; display: grid; gap: 16px; }
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+    .tabs button {
+      height: 36px;
+      padding: 0 14px;
+      border: 1px solid #c9c9cd;
+      border-radius: 2px;
+      background: #fff;
+      color: #0b0b0c;
+      font: 600 11px/1 var(--mono);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .tabs button.active {
+      background: var(--bg);
+      color: #fff;
+      border-color: var(--bg);
+    }
+    .panel { display: none; }
+    .panel.active { display: grid; gap: 16px; }
     .card {
       background: #fff;
       border: 1px solid #e3e3e5;
@@ -52,10 +79,16 @@
       border-bottom: 1px solid #f0f0f1;
       text-transform: uppercase;
     }
+    .card h3 {
+      margin: 0 0 12px;
+      font: 600 10px/1 var(--mono);
+      letter-spacing: .12em;
+      color: #6e6e73;
+      text-transform: uppercase;
+    }
     .card .body { padding: 18px 20px 22px; }
     ol.steps { margin: 0; padding-left: 20px; color: #3a3a3e; }
     ol.steps li { margin: 8px 0; }
-    ol.steps strong { color: #0b0b0c; }
     .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px; }
     label { font: 500 11px/1 var(--mono); letter-spacing: .08em; color: #6e6e73; }
     select, input {
@@ -66,7 +99,7 @@
       font: 500 12px/1 var(--mono);
       min-width: 220px;
     }
-    button {
+    button.action {
       height: 38px;
       padding: 0 16px;
       border: none;
@@ -79,7 +112,7 @@
     .btn-primary { background: var(--red); color: #fff; }
     .btn-ghost { background: #fff; color: #0b0b0c; border: 1px solid #c9c9cd; }
     .btn-dark { background: var(--bg); color: #fff; }
-    button:disabled { opacity: .45; cursor: not-allowed; }
+    button.action:disabled { opacity: .45; cursor: not-allowed; }
     .status {
       display: inline-flex;
       align-items: center;
@@ -92,7 +125,6 @@
     }
     .dot { width: 8px; height: 8px; border-radius: 50%; background: #b4b4b8; }
     .dot.on { background: var(--green); }
-    .dot.err { background: var(--red); }
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -110,8 +142,10 @@
       color: #76767b;
       margin-bottom: 8px;
     }
-    .metric .v { font: 300 28px/1 var(--sans); }
+    .metric .v { font: 300 26px/1 var(--sans); word-break: break-word; }
     .metric .u { font: 500 11px/1 var(--mono); color: #9a9aa0; margin-top: 6px; }
+    .group { margin-bottom: 20px; }
+    .group:last-child { margin-bottom: 0; }
     pre {
       margin: 0;
       background: #0f0f11;
@@ -120,7 +154,7 @@
       border-radius: 6px;
       padding: 14px;
       font: 500 11px/1.45 var(--mono);
-      max-height: 320px;
+      max-height: 360px;
       overflow: auto;
       white-space: pre-wrap;
       word-break: break-word;
@@ -133,6 +167,15 @@
       padding: 12px 14px;
       font-size: 14px;
       margin-top: 12px;
+    }
+    .note {
+      background: #f4f4f5;
+      border: 1px solid #e3e3e5;
+      border-radius: 4px;
+      padding: 12px 14px;
+      font-size: 14px;
+      color: #3a3a3e;
+      margin-bottom: 14px;
     }
     .toggle {
       display: inline-flex;
@@ -156,100 +199,270 @@
     }
     .switch.on::after { transform: translateX(20px); }
     code { font-family: var(--mono); font-size: 12px; background: #f4f4f5; padding: 2px 6px; border-radius: 2px; }
+    .module {
+      border: 1px solid #e3e3e5;
+      border-radius: 6px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+    }
+    .module.unavailable { opacity: .7; background: #fafafa; }
+    .module .mod-head {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .module .mod-name { font: 600 13px/1.2 var(--sans); }
+    .module .mod-badge {
+      font: 600 9px/1 var(--mono);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: 4px 8px;
+      border-radius: 2px;
+      background: #e8f8ee;
+      color: #1a7a42;
+    }
+    .module.unavailable .mod-badge {
+      background: #f0f0f1;
+      color: #6e6e73;
+    }
+    .dtc-list { margin: 0; padding-left: 18px; font: 500 13px/1.5 var(--mono); }
+    .dtc-list li { margin: 4px 0; }
+    .kv {
+      display: grid;
+      grid-template-columns: minmax(120px, 180px) 1fr;
+      gap: 8px 16px;
+      font-size: 14px;
+    }
+    .kv .k { font: 500 11px/1.4 var(--mono); letter-spacing: .06em; color: #6e6e73; }
+    .kv .v { font: 500 13px/1.4 var(--mono); word-break: break-all; }
+    .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      font: 500 11px/1 var(--mono);
+      padding: 6px 10px;
+      border-radius: 3px;
+      border: 1px solid #e3e3e5;
+      background: #fff;
+    }
+    .chip.ok { border-color: #b8e6c8; color: #1a7a42; }
+    .chip.bad { border-color: #f0b4bc; color: #8a0011; }
+    .chip.off { color: #9a9aa0; }
   </style>
 </head>
 <body>
   <header>
     <div class="mark"></div>
     <h1>FLAT·SIX</h1>
-    <div>OBD BRIDGE · TEST UI</div>
+    <div class="sub">OBD BRIDGE · ADAPTERS</div>
     <span id="bridgeHealth">checking…</span>
   </header>
 
   <main>
-    <section class="card">
-      <h2>Setup — USB or Bluetooth Classic</h2>
-      <div class="body">
-        <p style="margin:0 0 14px;color:#3a3a3e;font-size:14px">
-          Works with <strong>USB ELM327</strong> and <strong>Bluetooth Classic</strong> dongles that appear as a serial port
-          (<code>COMx</code> on Windows, <code>/dev/cu.…</code> on Mac). BLE-only sticks (e.g. Ancel BD200) are not supported.
-        </p>
-        <ol class="steps">
-          <li>Dongle in the car’s <strong>OBD port</strong>, ignition <strong>ON</strong> (engine running helps RPM).</li>
-          <li><strong>USB:</strong> plug into the PC. On Windows check Device Manager → Ports for a new <code>COMx</code>. Leave MS/HS switch on <strong>HS-CAN</strong>.</li>
-          <li><strong>Bluetooth Classic:</strong> pair in OS Bluetooth settings until a serial/COM port appears (not BLE app-only).</li>
-          <li>Start the bridge: <code>npm run obd-bridge</code> from the repo root.</li>
-          <li><strong>Refresh ports</strong> → pick the USB or BT serial entry → baud <strong>38400</strong> (try 9600 / 115200 if needed).</li>
-          <li><strong>Connect</strong> → toggle <strong>Live poll</strong>. Use Debug log if anything fails.</li>
-        </ol>
-      </div>
-    </section>
+    <nav class="tabs" id="tabs" role="tablist">
+      <button type="button" class="active" data-tab="connection">Connection</button>
+      <button type="button" data-tab="live">Live data</button>
+      <button type="button" data-tab="faults">Fault codes</button>
+      <button type="button" data-tab="vehicle">Vehicle info</button>
+      <button type="button" data-tab="debug">Debug</button>
+    </nav>
 
-    <section class="card">
-      <h2>Connection</h2>
-      <div class="body">
-        <div class="row">
-          <div class="status" id="connStatus"><span class="dot" id="connDot"></span><span id="connLabel">DISCONNECTED</span></div>
+    <!-- CONNECTION -->
+    <div class="panel active" id="panel-connection">
+      <section class="card">
+        <h2>Setup</h2>
+        <div class="body">
+          <p style="margin:0 0 14px;color:#3a3a3e;font-size:14px">
+            Pick an <strong>adapter</strong> below. <strong>ELM327</strong> is the production path (USB / Bluetooth Classic serial).
+            <strong>VAS 6154</strong> is experimental (J2534 PassThru / DoIP raw transcript on Windows) — not a full UDS product stack.
+          </p>
+          <ol class="steps" id="setupStepsElm">
+            <li>Dongle in the car’s <strong>OBD port</strong>, ignition <strong>ON</strong> (engine running helps RPM).</li>
+            <li><strong>USB:</strong> plug into the PC. Device Manager → Ports for a new <code>COMx</code>. Leave MS/HS on <strong>HS-CAN</strong>.</li>
+            <li><strong>Bluetooth Classic:</strong> pair until a serial/COM port appears (not BLE app-only).</li>
+            <li>Start the bridge: <code>npm run obd-bridge</code> (or <code>npm start</code> in <code>tools/obd-bridge</code>).</li>
+            <li><strong>Refresh ports</strong> → pick port → baud <strong>38400</strong> → <strong>Connect</strong> → Live poll.</li>
+          </ol>
+          <ol class="steps" id="setupStepsVas" style="display:none">
+            <li>Install <strong>I+ME Actia VAS6154 PassThru</strong> drivers (J2534 FunctionLibrary in the registry).</li>
+            <li>VAS in car OBD port, ignition ON. Prefer USB for lab; note Wi‑Fi / RNDIS IP if using DoIP.</li>
+            <li>Choose mode <strong>PassThru</strong> (DLL) or <strong>DoIP</strong> (host:13400), or <strong>Auto</strong>.</li>
+            <li>Check <strong>Experimental</strong> → <strong>Connect</strong> → open <strong>Debug</strong> for raw TX/RX.</li>
+            <li>See <code>tools/obd-bridge/README.md</code> for DLL / DoIP assumptions.</li>
+          </ol>
         </div>
-        <div class="row">
-          <label for="port">Serial port</label>
-          <select id="port"><option value="">— refresh ports —</option></select>
-          <button class="btn-ghost" id="btnRefresh">Refresh ports</button>
-        </div>
-        <div class="row">
-          <label for="baud">Baud</label>
-          <select id="baud">
-            <option value="38400" selected>38400</option>
-            <option value="9600">9600</option>
-            <option value="115200">115200</option>
-          </select>
-          <button class="btn-primary" id="btnConnect">Connect</button>
-          <button class="btn-ghost" id="btnDisconnect" disabled>Disconnect</button>
-          <button class="btn-ghost" id="btnSnapshot" disabled>Read once</button>
-        </div>
-        <div class="row">
-          <label class="toggle" id="pollToggle">
-            <span class="switch" id="pollSwitch"></span>
-            Live poll (1s)
-          </label>
-        </div>
-        <div id="connError" class="errbox" style="display:none"></div>
-        <div id="meta" style="margin-top:12px;font:500 11px/1.4 var(--mono);color:#6e6e73"></div>
-      </div>
-    </section>
+      </section>
 
-    <section class="card">
-      <h2>Live data</h2>
-      <div class="body">
-        <div class="grid" id="metrics">
-          <div class="metric"><div class="k">RPM</div><div class="v" id="mRpm">—</div><div class="u">rev/min</div></div>
-          <div class="metric"><div class="k">COOLANT</div><div class="v" id="mCoolant">—</div><div class="u">°C</div></div>
-          <div class="metric"><div class="k">SPEED</div><div class="v" id="mSpeed">—</div><div class="u">km/h</div></div>
-          <div class="metric"><div class="k">VOLTAGE</div><div class="v" id="mVolt">—</div><div class="u">V</div></div>
-          <div class="metric"><div class="k">LOAD</div><div class="v" id="mLoad">—</div><div class="u">%</div></div>
-        </div>
-        <div style="margin-top:16px;font:600 10px/1 var(--mono);letter-spacing:.12em;color:#9a9aa0">DTCs</div>
-        <pre id="dtcs">—</pre>
-        <div id="pidErrors" class="errbox" style="display:none"></div>
-      </div>
-    </section>
+      <section class="card">
+        <h2>Connection</h2>
+        <div class="body">
+          <div class="row">
+            <div class="status" id="connStatus"><span class="dot" id="connDot"></span><span id="connLabel">DISCONNECTED</span></div>
+          </div>
 
-    <section class="card">
-      <h2>Debug log (raw ELM327)</h2>
-      <div class="body">
-        <div class="row">
-          <button class="btn-dark" id="btnDebug">Refresh debug log</button>
-          <button class="btn-ghost" id="btnCopy">Copy JSON</button>
+          <div class="row">
+            <label for="adapter">Adapter</label>
+            <select id="adapter" style="min-width:280px">
+              <option value="elm327">ELM327 (USB / BT Classic)</option>
+              <option value="vas6154">VAS 6154 (Experimental)</option>
+            </select>
+          </div>
+
+          <div id="elmFields">
+            <div class="row">
+              <label for="port">Serial port</label>
+              <select id="port"><option value="">— refresh ports —</option></select>
+              <button class="action btn-ghost" id="btnRefresh">Refresh ports</button>
+            </div>
+            <div class="row">
+              <label for="baud">Baud</label>
+              <select id="baud">
+                <option value="38400" selected>38400</option>
+                <option value="9600">9600</option>
+                <option value="115200">115200</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="vasFields" style="display:none">
+            <div class="note" style="border-color:#f0b4bc;background:#fff8f8">
+              <strong>Experimental.</strong> Opens PassThru and/or DoIP, dumps raw traffic to Debug.
+              No multi-module UDS product features. Does not replace ELM live PIDs.
+            </div>
+            <div class="row">
+              <label for="vasMode">Mode</label>
+              <select id="vasMode" style="min-width:200px">
+                <option value="auto">Auto (PassThru → DoIP)</option>
+                <option value="passthru">PassThru (J2534)</option>
+                <option value="doip">DoIP (TCP)</option>
+              </select>
+              <button class="action btn-ghost" id="btnJ2534">Refresh J2534</button>
+              <button class="action btn-ghost" id="btnDoipDiscover">DoIP discover</button>
+            </div>
+            <div class="row" id="vasPtRow">
+              <label for="dllPath">PassThru DLL</label>
+              <select id="dllPath" style="min-width:320px;max-width:100%"><option value="">— auto / refresh J2534 —</option></select>
+            </div>
+            <div class="row" id="vasPtProtoRow">
+              <label for="vasProtocol">Protocol</label>
+              <select id="vasProtocol">
+                <option value="ISO15765" selected>ISO15765 (CAN ISO-TP)</option>
+                <option value="CAN">CAN</option>
+                <option value="ISO13400">ISO13400 / DoIP (vendor)</option>
+              </select>
+              <label for="vasBaud">CAN baud</label>
+              <select id="vasBaud">
+                <option value="500000" selected>500000</option>
+                <option value="250000">250000</option>
+              </select>
+            </div>
+            <div class="row" id="vasDoipRow">
+              <label for="doipHost">DoIP host</label>
+              <input id="doipHost" type="text" placeholder="169.254.x.x or VAS Wi‑Fi IP" style="min-width:220px" />
+              <label for="doipPort">Port</label>
+              <input id="doipPort" type="number" value="13400" style="min-width:100px" />
+            </div>
+            <div class="row">
+              <label class="toggle" id="expToggle" title="Required to connect VAS">
+                <span class="switch" id="expSwitch"></span>
+                I understand this is Experimental
+              </label>
+            </div>
+          </div>
+
+          <div class="row">
+            <button class="action btn-primary" id="btnConnect">Connect</button>
+            <button class="action btn-ghost" id="btnDisconnect" disabled>Disconnect</button>
+            <button class="action btn-ghost" id="btnSnapshot" disabled>Full read</button>
+          </div>
+          <div class="row" id="pollRow">
+            <label class="toggle" id="pollToggle">
+              <span class="switch" id="pollSwitch"></span>
+              Live poll (~2s priority · full every ~8s)
+            </label>
+          </div>
+          <div id="connError" class="errbox" style="display:none"></div>
+          <div id="meta" style="margin-top:12px;font:500 11px/1.4 var(--mono);color:#6e6e73"></div>
         </div>
-        <pre id="debug">—</pre>
-      </div>
-    </section>
+      </section>
+    </div>
+
+    <!-- LIVE -->
+    <div class="panel" id="panel-live">
+      <section class="card">
+        <h2>Live data</h2>
+        <div class="body">
+          <div class="note">
+            Mode 01 PIDs supported by this DME. Priority set (RPM, coolant, speed, voltage, load, MIL) polls every second;
+            secondary PIDs refresh about every 3 seconds while live poll is on.
+          </div>
+          <div class="row">
+            <button class="action btn-ghost" id="btnLiveRefresh" disabled>Refresh live</button>
+          </div>
+          <div id="liveGroups"></div>
+          <div id="liveErrors" class="errbox" style="display:none"></div>
+          <p id="liveEmpty" style="color:#6e6e73;font-size:14px;margin:0">Connect to see live PIDs.</p>
+        </div>
+      </section>
+    </div>
+
+    <!-- FAULTS -->
+    <div class="panel" id="panel-faults">
+      <section class="card">
+        <h2>Fault codes</h2>
+        <div class="body">
+          <div class="note">
+            Generic OBD Mode 03 / 07 / 0A reads the <strong>engine emissions ECU (DME)</strong> only.
+            Look up meanings in FLAT·SIX Fault Finding. Other modules need manufacturer UDS.
+          </div>
+          <div class="row">
+            <button class="action btn-ghost" id="btnFaultsRefresh" disabled>Refresh faults</button>
+          </div>
+          <div id="faultModules"></div>
+          <p id="faultsEmpty" style="color:#6e6e73;font-size:14px;margin:0">Connect to scan fault codes.</p>
+        </div>
+      </section>
+    </div>
+
+    <!-- VEHICLE -->
+    <div class="panel" id="panel-vehicle">
+      <section class="card">
+        <h2>Vehicle info</h2>
+        <div class="body">
+          <div class="note">
+            Mode 09 identity (VIN, calibration ID, CVN, ECU name) — read once on connect, not every poll.
+          </div>
+          <div class="row">
+            <button class="action btn-ghost" id="btnVehicleRefresh" disabled>Refresh identity</button>
+          </div>
+          <div id="vehicleBody"></div>
+          <p id="vehicleEmpty" style="color:#6e6e73;font-size:14px;margin:0">Connect to read vehicle identity.</p>
+        </div>
+      </section>
+    </div>
+
+    <!-- DEBUG -->
+    <div class="panel" id="panel-debug">
+      <section class="card">
+        <h2>Debug log (raw TX/RX)</h2>
+        <div class="body">
+          <div class="row">
+            <button class="action btn-dark" id="btnDebug">Refresh debug log</button>
+            <button class="action btn-ghost" id="btnCopy">Copy JSON</button>
+          </div>
+          <pre id="debug">—</pre>
+        </div>
+      </section>
+    </div>
   </main>
 
   <script>
-    const API = ''; // same origin as bridge
-
+    const API = '';
     const $ = (id) => document.getElementById(id);
+
+    let connected = false;
+    let experimentalOk = false;
 
     async function api(path, opts = {}) {
       const res = await fetch(API + path, {
@@ -270,40 +483,248 @@
     }
 
     function setConnected(on, label) {
+      connected = !!on;
       $('connDot').className = 'dot' + (on ? ' on' : '');
       $('connLabel').textContent = label || (on ? 'CONNECTED' : 'DISCONNECTED');
       $('btnConnect').disabled = on;
       $('btnDisconnect').disabled = !on;
       $('btnSnapshot').disabled = !on;
+      $('btnLiveRefresh').disabled = !on;
+      $('btnFaultsRefresh').disabled = !on;
+      $('btnVehicleRefresh').disabled = !on;
+      $('adapter').disabled = on;
     }
 
-    function renderSnapshot(snap) {
-      if (!snap) return;
-      const p = snap.pids || {};
-      $('mRpm').textContent = p.rpm ?? '—';
-      $('mCoolant').textContent = p.coolant_c ?? '—';
-      $('mSpeed').textContent = p.speed_kmh ?? '—';
-      $('mVolt').textContent = p.voltage_v ?? '—';
-      $('mLoad').textContent = p.engine_load_pct ?? '—';
-      const dtcs = snap.dtcs || [];
-      $('dtcs').textContent = dtcs.length ? dtcs.join('\n') : '(none)';
-      if (snap.errors?.length) {
-        showError($('pidErrors'), snap.errors.map((e) => `${e.pid}: ${e.message}`).join('\n'));
-      } else {
-        showError($('pidErrors'), '');
-      }
+    function selectedAdapter() {
+      return $('adapter').value || 'elm327';
     }
+
+    function syncAdapterUi() {
+      const vas = selectedAdapter() === 'vas6154';
+      $('elmFields').style.display = vas ? 'none' : '';
+      $('vasFields').style.display = vas ? '' : 'none';
+      $('setupStepsElm').style.display = vas ? 'none' : '';
+      $('setupStepsVas').style.display = vas ? '' : 'none';
+      $('pollRow').style.display = vas ? 'none' : '';
+      syncVasModeUi();
+    }
+
+    function syncVasModeUi() {
+      const mode = $('vasMode').value;
+      const showPt = mode === 'passthru' || mode === 'auto';
+      const showDoip = mode === 'doip' || mode === 'auto';
+      $('vasPtRow').style.display = showPt ? '' : 'none';
+      $('vasPtProtoRow').style.display = showPt ? '' : 'none';
+      $('vasDoipRow').style.display = showDoip ? '' : 'none';
+    }
+
+    // Tabs
+    document.querySelectorAll('#tabs button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#tabs button').forEach((b) => b.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach((p) => p.classList.remove('active'));
+        btn.classList.add('active');
+        $('panel-' + btn.dataset.tab).classList.add('active');
+      });
+    });
+
+    $('adapter').onchange = () => {
+      showError($('connError'), '');
+      syncAdapterUi();
+    };
+    $('vasMode').onchange = syncVasModeUi;
+
+    $('expToggle').onclick = () => {
+      experimentalOk = !experimentalOk;
+      $('expSwitch').classList.toggle('on', experimentalOk);
+    };
 
     function renderMeta(st) {
       if (!st) { $('meta').textContent = ''; return; }
       const bits = [];
+      if (st.adapterKind) bits.push('Adapter: ' + st.adapterKind + (st.experimental ? ' (exp)' : ''));
       if (st.platform) bits.push(st.platform);
       if (st.transport) bits.push('Transport: ' + st.transport);
-      if (st.adapter) bits.push('Adapter: ' + st.adapter);
+      if (st.adapter) bits.push(st.adapter);
       if (st.protocol) bits.push('Protocol: ' + st.protocol);
-      if (st.path) bits.push('Port: ' + st.path + ' @ ' + st.baudRate);
+      if (st.path) bits.push('Path: ' + st.path + (st.baudRate != null ? ' @ ' + st.baudRate : ''));
       if (st.polling) bits.push('Polling: ON');
+      if (st.capabilities?.supportedPids) {
+        bits.push('Mode01 PIDs: ' + st.capabilities.supportedPids.length);
+      }
       $('meta').textContent = bits.join(' · ');
+    }
+
+    function fmt(v) {
+      if (v == null) return '—';
+      if (typeof v === 'number') return Number.isInteger(v) ? String(v) : String(v);
+      return String(v);
+    }
+
+    function renderLive(live) {
+      const wrap = $('liveGroups');
+      const empty = $('liveEmpty');
+      if (!live || !live.groups || !Object.keys(live.groups).length) {
+        wrap.innerHTML = '';
+        empty.style.display = 'block';
+        empty.textContent = connected ? 'No supported live PIDs returned yet.' : 'Connect to see live PIDs.';
+        showError($('liveErrors'), '');
+        return;
+      }
+      empty.style.display = 'none';
+      const order = ['Engine', 'Fuel & air', 'Throttle', 'Temps', 'Status'];
+      const keys = [...order.filter((g) => live.groups[g]), ...Object.keys(live.groups).filter((g) => !order.includes(g))];
+      wrap.innerHTML = keys.map((group) => {
+        const items = live.groups[group] || [];
+        return `<div class="group"><h3>${group}</h3><div class="grid">${items.map((m) => `
+          <div class="metric">
+            <div class="k">${m.label}</div>
+            <div class="v">${fmt(m.value)}</div>
+            <div class="u">${m.unit || ('PID ' + m.pid)}</div>
+          </div>`).join('')}</div></div>`;
+      }).join('');
+
+      if (live.readiness) {
+        const r = live.readiness;
+        const chips = (r.monitors || []).map((m) => {
+          const cls = m.incomplete ? 'bad' : 'ok';
+          return `<span class="chip ${cls}">${m.label}: ${m.incomplete ? 'incomplete' : 'ready'}</span>`;
+        }).join('');
+        wrap.innerHTML += `<div class="group"><h3>Readiness</h3>
+          <div class="chip-row" style="margin-bottom:10px">
+            <span class="chip ${r.mil ? 'bad' : 'ok'}">MIL ${r.mil ? 'ON' : 'OFF'}</span>
+            <span class="chip">${r.dtcCount} stored DTC(s)</span>
+            <span class="chip">${r.ignition || ''}</span>
+          </div>
+          <div class="chip-row">${chips || '<span class="chip off">No monitors listed</span>'}</div>
+        </div>`;
+      }
+
+      if (live.note) {
+        wrap.innerHTML = `<div class="note">${live.note}</div>` + wrap.innerHTML;
+      }
+
+      if (live.errors?.length) {
+        showError($('liveErrors'), live.errors.map((e) => `${e.pid}: ${e.message}`).join('\n'));
+      } else {
+        showError($('liveErrors'), '');
+      }
+    }
+
+    function renderFaults(faults) {
+      const wrap = $('faultModules');
+      const empty = $('faultsEmpty');
+      if (!faults?.modules?.length) {
+        wrap.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+
+      wrap.innerHTML = faults.modules.map((m) => {
+        if (!m.available) {
+          return `<div class="module unavailable">
+            <div class="mod-head">
+              <span class="mod-name">${m.name}</span>
+              <span class="mod-badge">UDS required</span>
+            </div>
+            <div style="font-size:14px;color:#6e6e73">${m.note || 'Not available via generic ELM327'}</div>
+          </div>`;
+        }
+
+        const list = (label, codes) => {
+          if (!codes?.length) return `<div style="margin-bottom:8px"><strong style="font:600 10px/1 var(--mono);letter-spacing:.08em;color:#9a9aa0">${label}</strong><div style="color:#6e6e73;font-size:14px">(none)</div></div>`;
+          return `<div style="margin-bottom:8px"><strong style="font:600 10px/1 var(--mono);letter-spacing:.08em;color:#9a9aa0">${label}</strong>
+            <ul class="dtc-list">${codes.map((c) => `<li>${c}</li>`).join('')}</ul></div>`;
+        };
+
+        let readinessHtml = '';
+        if (m.readiness) {
+          const r = m.readiness;
+          readinessHtml = `<div style="margin:12px 0">
+            <strong style="font:600 10px/1 var(--mono);letter-spacing:.08em;color:#9a9aa0">READINESS</strong>
+            <div class="chip-row" style="margin-top:8px">
+              <span class="chip ${r.mil ? 'bad' : 'ok'}">MIL ${r.mil ? 'ON' : 'OFF'}</span>
+              <span class="chip">${r.dtcCount} DTC count byte</span>
+            </div>
+          </div>`;
+        }
+
+        let ff = '';
+        if (m.freezeFrame) {
+          const f = m.freezeFrame;
+          if (f.dtc) {
+            const pidBits = Object.entries(f.pids || {}).map(([k, v]) => `${k}=${v}`).join(' · ') || '(no PID data)';
+            ff = `<div style="margin-top:10px"><strong style="font:600 10px/1 var(--mono);letter-spacing:.08em;color:#9a9aa0">FREEZE FRAME</strong>
+              <div style="font:500 13px/1.4 var(--mono);margin-top:6px">${f.dtc} — ${pidBits}</div></div>`;
+          } else {
+            ff = `<div style="margin-top:10px;color:#6e6e73;font-size:14px">Freeze frame: none</div>`;
+          }
+        }
+
+        const err = m.errors?.length
+          ? `<div class="errbox">${m.errors.map((e) => `${e.service || e.pid}: ${e.message}`).join('\n')}</div>`
+          : '';
+
+        return `<div class="module">
+          <div class="mod-head">
+            <span class="mod-name">${m.name}</span>
+            <span class="mod-badge">OBD-II</span>
+          </div>
+          ${list('CONFIRMED (MODE 03)', m.confirmed)}
+          ${list('PENDING (MODE 07)', m.pending)}
+          ${list('PERMANENT (MODE 0A)', m.permanent)}
+          ${readinessHtml}
+          ${ff}
+          ${err}
+        </div>`;
+      }).join('');
+    }
+
+    function renderVehicle(v) {
+      const wrap = $('vehicleBody');
+      const empty = $('vehicleEmpty');
+      if (!v) {
+        wrap.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+      const rows = [
+        ['VIN', v.vin],
+        ['Calibration ID', v.calid],
+        ['CVN', v.cvn],
+        ['ECU name', v.ecu_name],
+        ['Adapter', v.adapter],
+        ['Protocol', v.protocol],
+        ['Mode 09 types', (v.supportedMode09 || []).join(' ') || '—'],
+        ['Mode 01 PIDs', (v.supportedPids || []).length ? (v.supportedPids.length + ' supported') : '—'],
+      ];
+      if (v.dids) {
+        for (const [k, val] of Object.entries(v.dids)) {
+          rows.push(['DID ' + k, val]);
+        }
+      }
+      wrap.innerHTML = `${v.experimental ? '<div class="note" style="border-color:#f0b4bc">Experimental identify — verify against Debug transcript.</div>' : ''}
+        <div class="kv">${rows.map(([k, val]) => `
+        <div class="k">${k}</div><div class="v">${fmt(val)}</div>`).join('')}</div>
+        ${v.supportedPids?.length ? `<div style="margin-top:16px"><h3>Supported Mode 01 PIDs</h3>
+          <div style="font:500 11px/1.5 var(--mono);color:#3a3a3e;word-break:break-all">${v.supportedPids.join(' ')}</div></div>` : ''}
+        ${v.errors?.length ? `<div class="errbox">${v.errors.map((e) => `${e.type}: ${e.message}`).join('\n')}</div>` : ''}`;
+    }
+
+    function applyStatus(st) {
+      setConnected(st.connected, st.connected ? 'CONNECTED' : 'DISCONNECTED');
+      if (st.adapterKind) $('adapter').value = st.adapterKind;
+      syncAdapterUi();
+      renderMeta(st);
+      $('pollSwitch').classList.toggle('on', !!st.polling);
+      if (st.lastLive) renderLive(st.lastLive);
+      else if (st.lastSnapshot?.live) renderLive(st.lastSnapshot.live);
+      if (st.lastFaults) renderFaults(st.lastFaults);
+      else if (st.lastSnapshot?.faults) renderFaults(st.lastSnapshot.faults);
+      if (st.lastVehicle) renderVehicle(st.lastVehicle);
+      else if (st.lastSnapshot?.vehicle) renderVehicle(st.lastSnapshot.vehicle);
     }
 
     async function checkHealth() {
@@ -335,7 +756,6 @@
         sel.appendChild(opt);
       }
       if (cur) sel.value = cur;
-      // Prefer USB, then Bluetooth Classic, then any scored port
       if (!sel.value && data.ports.length) {
         const likely = data.ports.find((p) => p.transport === 'usb')
           || data.ports.find((p) => p.transport === 'bluetooth-classic')
@@ -345,13 +765,30 @@
       }
     }
 
+    async function refreshJ2534() {
+      const data = await api('/j2534');
+      const sel = $('dllPath');
+      const cur = sel.value;
+      sel.innerHTML = '<option value="">— auto-select VAS / first device —</option>';
+      for (const d of data.devices || []) {
+        const opt = document.createElement('option');
+        opt.value = d.dllPath;
+        opt.textContent = `${d.name}${d.vendor ? ' · ' + d.vendor : ''} — ${d.dllPath}`;
+        sel.appendChild(opt);
+      }
+      if (cur) sel.value = cur;
+      if (!data.supported) {
+        showError($('connError'), 'J2534 registry discovery is Windows-only. Use DoIP mode with a host IP.');
+      } else if (!(data.devices || []).length) {
+        showError($('connError'), 'No PassThru devices in registry. Install Actia VAS6154 PassThru drivers.');
+      } else {
+        showError($('connError'), '');
+      }
+    }
+
     async function refreshStatus() {
       const st = await api('/status');
-      setConnected(st.connected, st.connected ? 'CONNECTED' : 'DISCONNECTED');
-      renderMeta(st);
-      if (st.lastSnapshot) renderSnapshot(st.lastSnapshot);
-      const sw = $('pollSwitch');
-      sw.classList.toggle('on', !!st.polling);
+      applyStatus(st);
       return st;
     }
 
@@ -360,15 +797,60 @@
       try { await refreshPorts(); } catch (e) { showError($('connError'), e.message); }
     };
 
+    $('btnJ2534').onclick = async () => {
+      try { await refreshJ2534(); } catch (e) { showError($('connError'), e.message); }
+    };
+
+    $('btnDoipDiscover').onclick = async () => {
+      showError($('connError'), '');
+      try {
+        const data = await api('/doip/discover', { method: 'POST', body: JSON.stringify({ timeoutMs: 2500 }) });
+        if (data.found?.length) {
+          $('doipHost').value = data.found[0].address;
+          showError($('connError'), '');
+          $('meta').textContent = 'DoIP found: ' + data.found.map((f) => f.address + (f.vin ? ' VIN ' + f.vin : '')).join(', ');
+        } else {
+          showError($('connError'), 'No DoIP vehicles answered UDP discovery. Enter host IP manually.');
+        }
+      } catch (e) { showError($('connError'), e.message); }
+    };
+
     $('btnConnect').onclick = async () => {
       showError($('connError'), '');
-      const port = $('port').value;
-      if (!port) return showError($('connError'), 'Select a serial port first.');
+      const adapter = selectedAdapter();
       try {
         setConnected(false, 'CONNECTING…');
+        let body;
+        if (adapter === 'vas6154') {
+          if (!experimentalOk) {
+            setConnected(false, 'FAILED');
+            return showError($('connError'), 'Enable “I understand this is Experimental” before connecting VAS.');
+          }
+          body = {
+            adapter: 'vas6154',
+            experimental: true,
+            mode: $('vasMode').value,
+            dllPath: $('dllPath').value || undefined,
+            protocol: $('vasProtocol').value,
+            baudRate: Number($('vasBaud').value),
+            host: $('doipHost').value.trim() || undefined,
+            doipPort: Number($('doipPort').value) || 13400,
+          };
+        } else {
+          const port = $('port').value;
+          if (!port) {
+            setConnected(false, 'FAILED');
+            return showError($('connError'), 'Select a serial port first.');
+          }
+          body = {
+            adapter: 'elm327',
+            port,
+            baudRate: Number($('baud').value),
+          };
+        }
         await api('/connect', {
           method: 'POST',
-          body: JSON.stringify({ port, baudRate: Number($('baud').value) }),
+          body: JSON.stringify(body),
         });
         await refreshStatus();
         await loadDebug();
@@ -385,26 +867,56 @@
       $('pollSwitch').classList.remove('on');
       setConnected(false);
       renderMeta(null);
+      renderLive(null);
+      renderFaults(null);
+      renderVehicle(null);
     };
 
     $('btnSnapshot').onclick = async () => {
       showError($('connError'), '');
       try {
         const snap = await api('/snapshot', { method: 'POST', body: '{}' });
-        renderSnapshot(snap);
+        if (snap.live) renderLive(snap.live);
+        if (snap.faults) renderFaults(snap.faults);
+        if (snap.vehicle) renderVehicle(snap.vehicle);
+        await loadDebug();
+      } catch (e) { showError($('connError'), e.message); }
+    };
+
+    $('btnLiveRefresh').onclick = async () => {
+      try {
+        const live = await api('/live', { method: 'POST', body: JSON.stringify({ priorityOnly: false }) });
+        renderLive(live);
+      } catch (e) { showError($('connError'), e.message); }
+    };
+
+    $('btnFaultsRefresh').onclick = async () => {
+      try {
+        const faults = await api('/faults', { method: 'POST', body: '{}' });
+        renderFaults(faults);
+      } catch (e) { showError($('connError'), e.message); }
+    };
+
+    $('btnVehicleRefresh').onclick = async () => {
+      try {
+        const v = await api('/vehicle', { method: 'POST', body: '{}' });
+        renderVehicle(v);
         await loadDebug();
       } catch (e) { showError($('connError'), e.message); }
     };
 
     $('pollToggle').onclick = async () => {
       showError($('connError'), '');
+      if (selectedAdapter() === 'vas6154') {
+        return showError($('connError'), 'Live poll is ELM327-only. Use Debug for VAS raw RX.');
+      }
       const on = $('pollSwitch').classList.contains('on');
       try {
         if (on) {
           await api('/poll/stop', { method: 'POST', body: '{}' });
           $('pollSwitch').classList.remove('on');
         } else {
-          await api('/poll/start', { method: 'POST', body: JSON.stringify({ intervalMs: 1000 }) });
+          await api('/poll/start', { method: 'POST', body: JSON.stringify({ intervalMs: 2000 }) });
           $('pollSwitch').classList.add('on');
         }
       } catch (e) { showError($('connError'), e.message); }
@@ -423,21 +935,25 @@
 
     (async function boot() {
       try {
+        syncAdapterUi();
         await checkHealth();
         await refreshPorts();
+        try { await refreshJ2534(); } catch { /* non-Windows ok */ }
         await refreshStatus();
         await loadDebug();
         setInterval(async () => {
           try {
             const st = await api('/status');
-            if (st.lastSnapshot) renderSnapshot(st.lastSnapshot);
-            renderMeta(st);
-            $('pollSwitch').classList.toggle('on', !!st.polling);
-            setConnected(st.connected);
+            applyStatus(st);
+            try {
+              const h = await api('/health');
+              $('bridgeHealth').textContent = h.connected ? 'BRIDGE OK · LINK UP' : 'BRIDGE OK · IDLE';
+              $('bridgeHealth').style.color = '';
+            } catch { /* ignore */ }
           } catch { /* bridge stopped */ }
         }, 1500);
       } catch (e) {
-        showError($('connError'), 'Bridge not running. In the repo root run: npm run obd-bridge');
+        showError($('connError'), 'Bridge not running. In tools/obd-bridge run: npm start');
       }
     })();
   </script>

@@ -12,6 +12,7 @@ import { searchManualHybrid, getManualSection, type ManualHit } from '@/lib/manu
 import { manualHitHref, resolveDocumentForManualHit } from '@/lib/documents';
 import { useDocumentsAccess } from '@/lib/hooks/useDocumentsAccess';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useVehicle } from '@/lib/vehicle-context';
 import { generationForBody } from '@/lib/models';
 
@@ -70,12 +71,20 @@ const EXAMPLES = ['P0301', 'P000C', 'rough idle', 'coolant leak', 'water pump', 
 export default function FaultFinding() {
   const { vehicle } = useVehicle();
   const generation = generationForBody(vehicle.body);
+  const searchParams = useSearchParams();
+  const initialQ = searchParams.get('q')?.trim() ?? '';
 
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState(initialQ);
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [parts, setParts] = useState<CatalogPartRow[]>([]);
   const [partsLoading, setPartsLoading] = useState(false);
   const [manualHits, setManualHits] = useState<ManualHit[]>([]);
+
+  // Prefill from Live OBD deep-links (/faults?q=P0301)
+  useEffect(() => {
+    const q = searchParams.get('q')?.trim();
+    if (q) setQuery(q);
+  }, [searchParams]);
 
   // Knowledge lookup maps for the active car's generation.
   const faultByCode = useMemo(

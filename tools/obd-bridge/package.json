@@ -3,15 +3,21 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Local ELM327 OBD bridge + test UI for FLAT·SIX (Mac BT dongles, USB serial)",
+  "description": "Local OBD bridge + test UI for FLAT·SIX (ELM327 + experimental VAS6154)",
   "scripts": {
-    "start": "node server.mjs",
-    "dev": "node --watch server.mjs"
+    "start": "node --import tsx server.mjs",
+    "dev": "node --import tsx --watch server.mjs"
   },
   "dependencies": {
-    "serialport": "^13.0.0"
+    "koffi": "^2.11.0",
+    "serialport": "^13.0.0",
+    "tsx": "^4.23.0"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
+  },
+  "allowScripts": {
+    "koffi@2.16.2": true,
+    "@serialport/bindings-cpp@13.0.0": true
   }
 }

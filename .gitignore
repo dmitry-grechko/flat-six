@@ -1,6 +1,12 @@
 # dependencies
 /node_modules
 tools/obd-bridge/node_modules
+apps/track/node_modules
+apps/track/dist
+apps/track-electron/node_modules
+apps/track-electron/release
+apps/track-electron/obd-host-runner.mjs
+apps/track-electron/ui
 /.pnp
 .pnp.js
 

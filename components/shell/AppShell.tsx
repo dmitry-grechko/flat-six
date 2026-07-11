@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Sidebar from './Sidebar';
+import { BetaBadge } from './BetaBadge';
 import { useVehicle } from '@/lib/vehicle-context';
 
 const mono = "'JetBrains Mono',monospace";
@@ -13,12 +14,17 @@ const PAGE_META: Record<string, [string, string]> = {
   '/history/new': ['MAINTENANCE', 'New Service Record'],
   '/plans': ['MAINTENANCE', 'Service Plans'],
   '/faults': ['DIAGNOSTICS', 'Fault Finding'],
+  '/obd': ['DIAGNOSTICS', 'Live OBD'],
+  '/downloads': ['COMPANIONS', 'Downloads'],
   '/manual': ['REFERENCE', 'Documents'],
   '/tools': ['REFERENCE', 'DIY Tools'],
   '/ai': ['INTEGRATION', 'AI Assistant'],
   '/settings': ['CONFIGURATION', 'Settings'],
   '/admin': ['ADMIN', 'Usage Overview'],
 };
+
+/** In-progress surfaces — show a BETA chip next to the page title. */
+const BETA_PATHS = new Set(['/obd', '/downloads']);
 
 export default function AppShell({
   children,
@@ -30,6 +36,7 @@ export default function AppShell({
   const pathname = usePathname();
   const { vehicle: VEHICLE } = useVehicle();
   const [kicker, title] = PAGE_META[pathname] ?? PAGE_META['/garage'];
+  const showBeta = BETA_PATHS.has(pathname);
   const [navOpen, setNavOpen] = useState(false);
 
   return (
@@ -60,9 +67,10 @@ export default function AppShell({
             <div style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.16em', color: '#9A9AA0' }}>{kicker}</div>
             <div
               className="appHeaderTitle"
-              style={{ font: "400 19px/1.1 'Helvetica Neue',Arial,sans-serif", letterSpacing: '-.01em', color: '#0B0B0C', marginTop: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+              style={{ font: "400 19px/1.1 'Helvetica Neue',Arial,sans-serif", letterSpacing: '-.01em', color: '#0B0B0C', marginTop: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'flex', alignItems: 'center', gap: 10 }}
             >
-              {title}
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{title}</span>
+              {showBeta && <BetaBadge tone="page" />}
             </div>
           </div>
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>

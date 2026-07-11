@@ -17,5 +17,13 @@
     "paths": { "@/*": ["./*"] }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "2014-porsche-cayman-s-981", "2015-porsche-boxster-gts-718", "designs", "tools/gen"]
+  "exclude": [
+    "node_modules",
+    "2014-porsche-cayman-s-981",
+    "2015-porsche-boxster-gts-718",
+    "designs",
+    "tools/gen",
+    "apps",
+    "lib/obd/decode.test.ts"
+  ]
 }
