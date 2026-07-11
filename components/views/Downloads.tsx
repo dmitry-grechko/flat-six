@@ -48,7 +48,25 @@ function CopyCommand({ command }: { command: string }) {
   );
 }
 
+function SoonButton({ label }: { label: string }) {
+  return (
+    <span
+      style={{
+        ...btnBase,
+        background: '#F4F4F5',
+        color: '#9A9AA0',
+        cursor: 'default',
+        border: '1px solid #E3E3E5',
+      }}
+      title="Packaged download not published yet — coming via GitHub Releases after testing"
+    >
+      {label} — soon
+    </span>
+  );
+}
+
 function DownloadCard({ item }: { item: DownloadItem }) {
+  const isOwner = item.audience === 'owners';
   return (
     <article style={card}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, flexWrap: 'wrap' }}>
@@ -63,6 +81,19 @@ function DownloadCard({ item }: { item: DownloadItem }) {
           {item.name}
         </h2>
         <BetaBadge tone="page" />
+        <span
+          style={{
+            font: `600 9px/1 ${mono}`,
+            letterSpacing: '.1em',
+            textTransform: 'uppercase',
+            color: isOwner ? '#D5001C' : '#9A9AA0',
+            border: `1px solid ${isOwner ? 'rgba(213,0,28,.35)' : '#E3E3E5'}`,
+            padding: '5px 8px',
+            borderRadius: 2,
+          }}
+        >
+          {isOwner ? 'For owners' : 'Contributors / lab'}
+        </span>
       </div>
       <div
         style={{
@@ -114,20 +145,22 @@ function DownloadCard({ item }: { item: DownloadItem }) {
             {item.cta}
           </a>
         ) : (
-          <span
-            style={{
-              ...btnBase,
-              background: '#F4F4F5',
-              color: '#9A9AA0',
-              cursor: 'default',
-              border: '1px solid #E3E3E5',
-            }}
-            title="Packaged download not published yet"
-          >
-            {item.cta} — soon
-          </span>
+          <SoonButton label={item.cta} />
         )}
-        {item.command && <CopyCommand command={item.command} />}
+        {item.ctaMac &&
+          (item.hrefMac ? (
+            <a
+              href={item.hrefMac}
+              style={{ ...btnBase, background: '#D5001C', color: '#fff' }}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {item.ctaMac}
+            </a>
+          ) : (
+            <SoonButton label={item.ctaMac} />
+          ))}
+        {item.command && item.audience === 'contributors' && <CopyCommand command={item.command} />}
         <a
           href={REPO_URL}
           target="_blank"
@@ -152,12 +185,14 @@ export default function Downloads() {
           <BetaBadge tone="page" />
         </div>
         <p style={{ margin: 0, font: `400 14px/1.55 ${sans}`, color: '#3A3A3E' }}>
-          OBD Bridge and Track (Electron + PWA) are early builds — expect rough edges while we harden
-          packaging and publish installers. In-browser{' '}
+          <strong style={{ fontWeight: 600 }}>Track Desktop</strong> is the owner path (Windows + Mac) —
+          live OBD without a terminal. <strong style={{ fontWeight: 600 }}>Track PWA</strong> is the same
+          Track UI installable from Chrome. The OBD Bridge is for contributors / lab only. In-browser{' '}
           <Link href="/obd" style={{ color: '#D5001C', textDecoration: 'none', fontWeight: 500 }}>
             Live OBD
           </Link>{' '}
-          already covers USB ELM327 on desktop Chrome/Edge via Web Serial (no download).
+          already covers USB ELM327 on desktop Chrome/Edge via Web Serial. Installers land on GitHub
+          Releases after testing — buttons say “soon” until then.
         </p>
       </div>
 

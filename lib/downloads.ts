@@ -1,70 +1,77 @@
 /**
  * Catalog of companion downloads (OBD bridge, Track Electron, Track PWA).
- * All are beta while packaging / release hosting is still settling —
- * swap `href` to a real artifact URL when a release is published.
+ * Set `href` / `hrefMac` to GitHub Release asset URLs when publish goes live.
  */
 
-export type DownloadId = 'obd-bridge' | 'track-electron' | 'track-pwa';
+export type DownloadId = 'track-electron' | 'track-pwa' | 'obd-bridge';
 
 export type DownloadItem = {
   id: DownloadId;
   name: string;
   tagline: string;
   platform: string;
-  /** When set, primary CTA downloads / opens this URL. */
+  /** Primary download (Windows Electron, or single-URL items). */
   href: string | null;
-  /** Button label for href (ignored when href is null). */
+  /** Optional second download (macOS Electron). */
+  hrefMac?: string | null;
   cta: string;
-  /** Shown when href is null, or as secondary “from source” help. */
+  ctaMac?: string;
   installNotes: string[];
-  /** Shell command to copy (dev / from-source path). */
+  /** Dev / contributor command — not the owner path. */
   command?: string;
+  /** Audience hint shown in the UI. */
+  audience: 'owners' | 'contributors';
 };
 
 export const DOWNLOADS: DownloadItem[] = [
   {
-    id: 'obd-bridge',
-    name: 'OBD Bridge',
-    tagline:
-      'Local serial helper for Classic Bluetooth ELM327 and browsers without Web Serial. Live OBD in the main app can use this when USB Web Serial is not available.',
-    platform: 'Windows · macOS · Linux (Node 22+)',
-    href: null,
-    cta: 'Download',
-    command: 'npm run obd-bridge',
-    installNotes: [
-      'Clone the FLAT·SIX repo, then from the repo root run the command below.',
-      'The helper listens on http://127.0.0.1:8765. Leave it running while you use Live OBD in bridge mode.',
-      'Desktop Chrome/Edge with a USB ELM usually does not need the bridge — use Web Serial on Live OBD instead.',
-    ],
-  },
-  {
     id: 'track-electron',
     name: 'Track Desktop',
     tagline:
-      'Windows Electron shell for the Track companion: live OBD over USB or Classic BT (serialport in main), offline knowledge search, and session recording.',
-    platform: 'Windows (portable .exe)',
+      'Recommended for owners. Double-click app with live OBD (USB + Classic Bluetooth), offline knowledge search, and session recording — no terminal, no separate bridge.',
+    platform: 'Windows (installer + portable) · macOS (DMG, Intel + Apple Silicon)',
     href: null,
-    cta: 'Download Windows',
+    hrefMac: null,
+    cta: 'Download for Windows',
+    ctaMac: 'Download for Mac',
+    audience: 'owners',
     command: 'npm run track:electron:pack',
     installNotes: [
-      'Packaged Windows builds are not published yet (beta).',
-      'From a clone with Node 20+: install apps/track and apps/track-electron deps, then run the pack command — output lands in apps/track-electron/release/.',
-      'For day-to-day testing use npm run track:electron (dev) instead of packing.',
+      'Packaged builds are not on GitHub Releases yet (still in testing). When published, use the buttons above.',
+      'Windows: NSIS installer (Setup) or portable .exe. macOS: .dmg — build Mac packages on a Mac (or CI); unsigned builds need Right-click → Open the first time.',
+      'Dev pack: npm run track:electron:pack (Windows host) or npm run track:electron:pack:mac (macOS host). Output: apps/track-electron/release/.',
     ],
   },
   {
     id: 'track-pwa',
     name: 'Track PWA',
     tagline:
-      'Installable Track companion for desktop Chrome: Web Serial USB ELM, offline knowledge, and sessions — same UI as the Electron shell.',
-    platform: 'Desktop Chrome / Edge (PWA)',
+      'Same Track companion UI as Desktop (OBD connect, live gauges, faults, offline knowledge, sessions) — install from Chrome/Edge. Not the full garage/3D web app.',
+    platform: 'Desktop Chrome / Edge · Android Chrome (offline KB + sessions; live OBD needs desktop USB Web Serial or Track Desktop)',
     href: null,
-    cta: 'Open Track',
+    cta: 'Open Track (install from browser)',
+    audience: 'owners',
     command: 'npm run track:pwa',
     installNotes: [
-      'Hosted install URL is not published yet (beta).',
-      'Build static assets with the command below, then npm --prefix apps/track run preview — or host apps/track/dist behind HTTPS.',
-      'In Chrome: open the preview URL → Install app. Use Web Serial for USB ELM without the bridge.',
+      'Hosted install URL is not published yet. After hosting apps/track/dist on HTTPS: open the URL → Install app in Chrome.',
+      'Packages the Track companion we already built (apps/track) — one codebase shared with Electron. It does not wrap the whole Next.js garage (auth, 3D X-RAY, etc.).',
+      'Live OBD in the PWA uses Web Serial (USB ELM on desktop Chrome). Classic Bluetooth needs Track Desktop.',
+    ],
+  },
+  {
+    id: 'obd-bridge',
+    name: 'OBD Bridge (lab helper)',
+    tagline:
+      'Local serial helper for contributors and browser Live OBD when you are not using Track Desktop. Owners should prefer Track Desktop instead.',
+    platform: 'Windows · macOS · Linux (requires Node)',
+    href: null,
+    cta: 'Download helper',
+    audience: 'contributors',
+    command: 'npm run obd-bridge',
+    installNotes: [
+      'Not packaged as a double-click app yet — still a Node process from the repo.',
+      'From a clone: run the command below; leave http://127.0.0.1:8765 running while using Live OBD in bridge mode.',
+      'Desktop Chrome USB ELM usually does not need this — use Web Serial on Live OBD or Track PWA.',
     ],
   },
 ];

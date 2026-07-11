@@ -43,9 +43,10 @@ tried on Mac if the VCI has an IP. Client: `lib/obd/httpClient.ts`, `webSerial.t
 `useObdBridge`; UI: `components/views/ObdWorkspace.tsx`. Shared with Track PWA.
 No MCP tool yet (local hardware). DTC chips deep-link to `/faults?q=CODE`.
 
-**Downloads** (`/downloads`, **BETA**) lists the OBD Bridge, Track Electron, and
-Track PWA companions. Catalog: `lib/downloads.ts` — set each item’s `href` when a
-packaged release is published; until then the page shows copy-install commands.
+**Downloads** (`/downloads`, **BETA**) lists Track Desktop (Windows + Mac), Track
+PWA, and the lab OBD Bridge. Catalog: `lib/downloads.ts` — set `href` / `hrefMac`
+when GitHub Release assets are published. Owners use Electron; Bridge is for
+contributors / lab.
 
 ## 3. If it touches the backend
 

@@ -34,9 +34,9 @@ A change isn't done until the **five layers** it touches are consistent:
   After importing doc text, run `npm run db:embed-manual` (needs `VOYAGE_API_KEY`)
   so semantic search sees it. Torque finder is FTS-only, no embeddings.
 - **Track companion** (`apps/track` + `apps/track-electron`): offline OBD + knowledge
-  packaged as PWA and Electron from one UI — see `docs/procedures/track-offline.md`.
-  Core lives in `lib/obd` (adapters: elm327 / vas6154 experimental). Do not fork
-  knowledge or OBD decode into the shells.
+  packaged as PWA and Electron (Windows NSIS/portable + macOS DMG) from one UI —
+  see `docs/procedures/track-offline.md`. Core lives in `lib/obd` (adapters: elm327 /
+  vas6154 experimental). Do not fork knowledge or OBD decode into the shells.
 - **Live OBD in the main app** (`/obd`, beta): left-nav diagnostic workspace. Prefers
   **Web Serial** (desktop Chrome/Edge USB ELM, no helper). Falls back to the local
   helper `tools/obd-bridge` (`npm run obd-bridge`) for Classic BT / when Web Serial

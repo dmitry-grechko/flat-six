@@ -34,8 +34,9 @@ tab bars — test at 375 px. Nav item = route (`app/*/page.tsx` + `AppShell` +
 `tools/obd-bridge` (`npm run obd-bridge`, default `http://127.0.0.1:8765`) via
 `lib/obd/httpClient.ts` — or **Web Serial** for USB ELM in desktop Chrome/Edge
 (no helper). Classic Bluetooth still needs the bridge or Electron Track.
-**Downloads** (`/downloads`, beta) lists Bridge / Track Electron / Track PWA —
-catalog in `lib/downloads.ts` (set `href` when installers are published).
+**Downloads** (`/downloads`, beta) lists Track Desktop (Win + Mac) / Track PWA /
+Bridge — catalog in `lib/downloads.ts` (set `href` / `hrefMac` when GitHub
+Releases publish). Owner path = Electron; Bridge is contributors/lab.
 
 ## Track companion (PWA + Electron)
 
@@ -43,11 +44,12 @@ Offline / track-day shell — **same** `lib/obd` + `lib/knowledge`, not a fork o
 garage app. UI in `apps/track`; desktop shell in `apps/track-electron`; procedure
 [`docs/procedures/track-offline.md`](./docs/procedures/track-offline.md).
 
-- Scripts: `npm run track:dev` · `track:pwa` · `track:electron` · `track:electron:pack`
+- Scripts: `npm run track:dev` · `track:pwa` · `track:electron` ·
+  `track:electron:pack` · `track:electron:pack:mac` · `track:electron:pack:all`
 - Transports: Electron IPC (USB + Classic BT) · HTTP bridge · Web Serial (desktop Chrome USB)
 - Adapters: `elm327` default · `vas6154` experimental stub/lab
 - Offline KB = bundled TF `searchKnowledge` (no workshop-manual embeddings in v1)
-
+- PWA = same Track UI as Electron (not the full Next garage / 3D)
 ## Backend & MCP
 
 - Backend change → additive Supabase migration + update `lib/db/*` mapping +

@@ -10,7 +10,9 @@
     "start": "electron .",
     "dev": "node ./scripts/dev.mjs",
     "prepack": "node scripts/bundle-host.mjs && npm --prefix ../track run build",
-    "pack": "electron-builder --win portable --x64",
+    "pack": "electron-builder --win nsis portable --x64",
+    "pack:mac": "electron-builder --mac dmg zip --x64 --arm64",
+    "pack:all": "electron-builder --win nsis portable --x64 --mac dmg zip --x64 --arm64",
     "dist": "npm run pack"
   },
   "dependencies": {
@@ -39,8 +41,34 @@
       }
     ],
     "win": {
-      "target": ["portable"],
+      "target": [
+        { "target": "nsis", "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
+      ],
       "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "FLAT·SIX Track"
+    },
+    "mac": {
+      "target": [
+        { "target": "dmg", "arch": ["x64", "arm64"] },
+        { "target": "zip", "arch": ["x64", "arm64"] }
+      ],
+      "category": "public.app-category.utilities",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "identity": null
+    },
+    "dmg": {
+      "contents": [
+        { "x": 130, "y": 220 },
+        { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
+      ]
     }
   }
 }

@@ -36,6 +36,8 @@
     "track:pwa": "npm --prefix apps/track run build:pwa",
     "track:electron": "npm --prefix apps/track-electron run dev",
     "track:electron:pack": "npm --prefix apps/track-electron run pack",
+    "track:electron:pack:mac": "npm --prefix apps/track-electron run pack:mac",
+    "track:electron:pack:all": "npm --prefix apps/track-electron run pack:all",
     "obd:test": "npx --yes tsx lib/obd/decode.test.ts",
     "parts:parse": "node tools/parts/parse-parts.mjs",
     "postinstall": "cp node_modules/pdfjs-dist/build/pdf.worker.min.mjs public/pdf.worker.min.mjs 2>/dev/null || true"

@@ -27,11 +27,13 @@ lib/obd + lib/knowledge
 
 | Runtime | Live OBD | Offline KB / sessions |
 | --- | --- | --- |
-| Electron (Windows laptop) | USB + Bluetooth Classic COM | Yes |
+| Electron (Windows / macOS laptop) | USB + Bluetooth Classic COM | Yes |
 | PWA desktop Chrome | Web Serial USB ELM | Yes |
 | PWA Android Chrome | Not in v1 (browser limits) | Yes |
 
 Adapters: `elm327` (default) · `vas6154` (experimental stub only).
+
+**PWA scope:** `apps/track` is packaged as a PWA (same UI as Electron) — OBD, faults, offline knowledge, sessions. It does **not** wrap the full Next.js garage (3D X-RAY, auth, Documents, etc.).
 
 ## Dev
 
@@ -63,13 +65,17 @@ Web Serial (desktop Chrome, no bridge): open Track with `?transport=webserial` o
 npm run track:pwa
 npm --prefix apps/track run preview
 
-# Windows portable Electron
-npm run track:electron:pack
+# Electron — run on the matching OS (or CI)
+npm run track:electron:pack        # Windows: NSIS installer + portable
+npm run track:electron:pack:mac    # macOS: DMG + zip (Intel + Apple Silicon)
+npm run track:electron:pack:all    # both (needs a Mac host or CI matrix)
 # → apps/track-electron/release/
 ```
 
+Unsigned Mac builds: first launch may need **Right-click → Open**. Code signing / notarization comes with GitHub Releases for owners.
+
 In the main app, **Downloads** (`/downloads`) surfaces these companions (beta).
-When you publish installers, set `href` on the matching entry in
+When you publish installers, set `href` / `hrefMac` on the matching entry in
 [`lib/downloads.ts`](../../lib/downloads.ts).
 ## Offline knowledge
 
