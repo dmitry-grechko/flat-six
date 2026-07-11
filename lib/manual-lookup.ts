@@ -79,6 +79,62 @@ function mapRow(r: ManualRowDB): ManualHit {
   };
 }
 
+/**
+ * Hybrid (vector + full-text) manual search via the server route, which holds
+ * the Voyage key and fuses semantic + keyword ranking. Falls back server-side
+ * to plain FTS when embeddings aren't configured/backfilled, and returns [] when
+ * signed out (licensed content) or on any error — callers degrade gracefully.
+ */
+export async function searchManualHybrid(
+  query: string,
+  limit = 8,
+  opts?: { generation?: string; source?: string },
+): Promise<ManualHit[]> {
+  const q = query.trim();
+  if (!q) return [];
+  try {
+    const res = await fetch('/api/manual/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: q, limit, generation: opts?.generation, source: opts?.source }),
+    });
+    if (!res.ok) return [];
+    const json = await res.json();
+    return Array.isArray(json?.hits) ? (json.hits as ManualRowDB[]).map(mapRow) : [];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Plain full-text search (NO embeddings) over the manual's torque-bearing
+ * sections, for signed-in users. Powers the torque finder's "search the full
+ * manual" tier. Returns authRequired=true on 401 so the UI can prompt sign-in
+ * rather than showing a misleading "no results".
+ */
+export async function searchTorqueManual(
+  query: string,
+  limit = 10,
+  opts?: { generation?: string },
+): Promise<{ hits: ManualHit[]; authRequired: boolean }> {
+  const q = query.trim();
+  if (!q) return { hits: [], authRequired: false };
+  try {
+    const res = await fetch('/api/manual/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: q, limit, generation: opts?.generation, ftsOnly: true, torque: true }),
+    });
+    if (res.status === 401) return { hits: [], authRequired: true };
+    if (!res.ok) return { hits: [], authRequired: false };
+    const json = await res.json();
+    const hits = Array.isArray(json?.hits) ? (json.hits as ManualRowDB[]).map(mapRow) : [];
+    return { hits, authRequired: false };
+  } catch {
+    return { hits: [], authRequired: false };
+  }
+}
+
 export async function getManualSection(id: string): Promise<(ManualHit & { content: string }) | null> {
   try {
     const supabase = createClient();

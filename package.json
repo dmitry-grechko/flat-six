@@ -23,6 +23,7 @@
     "db:import-parts": "node tools/parts/import-parts.mjs",
     "db:import-manual": "node tools/manual/import-manual.mjs",
     "db:import-mtl": "node tools/manual/import-manual.mjs data/mtl-981-987.json",
+    "db:embed-manual": "node tools/manual/embed-sections.mjs",
     "manual:parse-mtl": "node tools/manual/parse-mtl.mjs",
     "manual:compress": "node tools/manual/compress-workshop.mjs",
     "manual:compress-987": "node tools/manual/compress-987-workshop.mjs",

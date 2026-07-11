@@ -57,11 +57,31 @@ filename**. For a non-year file (e.g. a `SB-…` bulletin) add an explicit entry
 For searchable full text (workshop manual / MTL), also import the parsed text:
 `npm run db:import-manual` / `npm run db:import-mtl`.
 
-## 6. MCP
+## 6. Embed for semantic search — `npm run db:embed-manual`
+
+Importing text (step 5) only populates **keyword** search. To make the new
+sections reachable by **semantic** search — the MCP `search_workshop_manual`
+tool and the Fault Finding tab — generate embeddings too:
+
+```bash
+npm run db:embed-manual    # voyage-4-lite → manual_sections.embedding (pgvector)
+```
+
+Idempotent & resumable: it only embeds rows where `embedding IS NULL`, so after
+an import just run it again to backfill the new chunks. Requires `VOYAGE_API_KEY`
+in `.env.local` (see `.env.local.example`) and migration `0009` applied
+(`npm run db:push`). Skipping it isn't fatal — semantic search degrades to
+keyword FTS — but the new docs won't surface semantically until you run it.
+
+> The **torque finder** uses plain full-text search (not embeddings), so it needs
+> only the step-5 import, not this step.
+
+## 7. MCP
 
 No MCP change is needed — imported docs are searchable via the existing
-`search_workshop_manual` / `get_manual_procedure` tools, and knowledge JSON flows
-through `search_knowledge` / `list_known_issues` etc.
+`search_workshop_manual` / `get_manual_procedure` tools (hybrid semantic + keyword
+once embedded), and knowledge JSON flows through `search_knowledge` /
+`list_known_issues` etc.
 
 ## Checklist
 
@@ -69,4 +89,5 @@ through `search_knowledge` / `list_known_issues` etc.
 - [ ] `DocumentMeta` added to `lib/documents.ts`
 - [ ] Knowledge/faults JSON updated (if it carries facts)
 - [ ] Uploaded to Supabase (`docs:upload`) and/or text imported
+- [ ] Embeddings backfilled (`npm run db:embed-manual`) if text was imported
 - [ ] `npx tsc --noEmit` clean

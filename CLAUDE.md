@@ -40,6 +40,10 @@ tab bars — test at 375 px. Nav item = route (`app/*/page.tsx` + `AppShell` +
 - **If a feature adds a capability the AI should use, expose it via MCP**
   (`lib/mcp/tools.ts`): knowledge/computation tools no-auth; garage tools
   token-scoped (RLS); always scope by generation. Validate before shipping.
+- **Manual search** (`manual_sections`) is hybrid: tsvector FTS + Voyage
+  embeddings in pgvector. After importing doc text, run `npm run db:embed-manual`
+  (needs `VOYAGE_API_KEY`, server-only) so semantic search (MCP + Fault Finding)
+  sees it. The torque finder deliberately uses FTS only — no embeddings.
 
 ## Procedures (read before doing)
 
