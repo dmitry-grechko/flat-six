@@ -93,7 +93,7 @@ export function getArticles(generation: string = DEFAULT_GENERATION): KnowledgeA
 // ---- Chunk index ---------------------------------------------------------
 
 const WORD_RE = /[a-z0-9]+/gi;
-const CODE_RE = /^[pbcu]\d{4}$/i; // OBD-II style code, e.g. P0301
+const CODE_RE = /^[pbcu][0-3][0-9a-f]{3}$/i; // OBD-II DTC, e.g. P0301, P000A, U0100
 
 function joinList(label: string, items?: string[]): string {
   if (!items || items.length === 0) return '';
@@ -209,7 +209,7 @@ export function searchKnowledge(
   // Detect a fault-code-looking query (e.g. "P0301", "p0420").
   const codeTerms = query
     .toUpperCase()
-    .match(/[PBCU]\d{4}/g)
+    .match(/[PBCU][0-3][0-9A-F]{3}/g)
     ?.map((c) => c.toUpperCase()) ?? [];
 
   let chunks = buildChunks(opts?.generation ?? DEFAULT_GENERATION);

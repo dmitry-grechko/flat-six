@@ -48,9 +48,13 @@ const ZONES = {
   fbrakes:   { center: [0, -0.25, 1.45], tol: [1.4, 0.55, 0.45], maxExtent: [2.8, 1.2, 1.2] },
   rbrakes:   { center: [0, -0.25, -1.4], tol: [1.4, 0.55, 0.45], maxExtent: [2.8, 1.2, 1.2] },
   cooling:   { center: [0, 0.0, 1.2], tol: [0.9, 0.7, 1.0], maxExtent: [2.4, 1.6, 3.2] },
-  oil:       { center: [0.55, 0.1, -0.9], tol: [0.45, 0.4, 0.45], maxExtent: [0.9, 0.8, 0.9] },
+  // Oil is car-space ON the engine (full lubrication model): sump hangs below
+  // the block, filler pokes above, filter console on the right flank.
+  oil:       { center: [0, 0.1, -0.8], tol: [0.35, 0.4, 0.4], maxExtent: [1.15, 1.4, 1.35] },
   airfilter: { center: [0, 0.3, -0.9], tol: [0.7, 0.55, 0.7], maxExtent: [2.4, 1.2, 2.2] },
-  plugs:     { center: [-0.4, 0.25, -0.9], tol: [0.5, 0.45, 0.5], maxExtent: [1.0, 0.9, 1.0] },
+  // Plugs (ignition & DFI) is car-space ON the engine — coil banks on the heads.
+  // Tank-side fuel-delivery nodes are hidden in unified (visible-AABB excludes them).
+  plugs:     { center: [0, 0.2, -0.8], tol: [0.3, 0.3, 0.35], maxExtent: [1.1, 0.7, 1.1] },
   susp:      { center: [0, -0.2, 0], tol: [0.4, 0.5, 0.4], maxExtent: [2.6, 1.4, 3.6] },
   // Car-space elec: battery (+X frunk) + fuse (−X) span the front half.
   elec:      { center: [0, 0.05, 0.35], tol: [0.7, 0.55, 1.2], maxExtent: [2.0, 1.4, 3.6] },
@@ -186,15 +190,31 @@ function nativeBounds(scene) {
   return { box, sphere, size, center, radius: sphere.radius };
 }
 
+/**
+ * Bounds of what is actually SEEN in the unified scene: hideInUnified subtrees
+ * removed. The app's normalize/scale math still uses the FULL box (parity with
+ * AssemblyMesh) — only the reported AABB / zone checks use the visible box.
+ */
+function visibleBounds(scene, hide) {
+  if (!hide?.length) return nativeBounds(scene);
+  const c = scene.clone(true);
+  const doomed = [];
+  c.traverse((o) => { if (hide.includes(o.name)) doomed.push(o); });
+  doomed.forEach((o) => o.parent?.remove(o));
+  return nativeBounds(c);
+}
+
 /** Place like AssemblyMesh; return world AABB(s) and meta. */
 function placeAssembly(assembly, scene) {
   const [px, py, pz] = assembly.hotspot3d.split(' ').map(Number);
   const native = nativeBounds(scene);
+  // Reported AABBs reflect the visible envelope (hideInUnified excluded).
+  const vis = visibleBounds(scene, assembly.hideInUnified);
 
   if (assembly.carSpace) {
     const s = assembly.worldScale ?? 1;
-    const min = native.box.min.clone().multiplyScalar(s).add(new THREE.Vector3(px, py, pz));
-    const max = native.box.max.clone().multiplyScalar(s).add(new THREE.Vector3(px, py, pz));
+    const min = vis.box.min.clone().multiplyScalar(s).add(new THREE.Vector3(px, py, pz));
+    const max = vis.box.max.clone().multiplyScalar(s).add(new THREE.Vector3(px, py, pz));
     const world = new THREE.Box3(min, max);
     return {
       mode: 'carSpace',
@@ -216,17 +236,18 @@ function placeAssembly(assembly, scene) {
   const centerZ = pz - center.z;
 
   const makeWorld = (gx, mirrorX = false) => {
-    // World = groupPos + local * scale (with optional X mirror)
+    // World = groupPos + local * scale (with optional X mirror). Corners come
+    // from the VISIBLE box; scale/offsets stay app-parity (full box).
     const sx = mirrorX ? -scale : scale;
     const corners = [
-      [native.box.min.x, native.box.min.y, native.box.min.z],
-      [native.box.min.x, native.box.min.y, native.box.max.z],
-      [native.box.min.x, native.box.max.y, native.box.min.z],
-      [native.box.min.x, native.box.max.y, native.box.max.z],
-      [native.box.max.x, native.box.min.y, native.box.min.z],
-      [native.box.max.x, native.box.min.y, native.box.max.z],
-      [native.box.max.x, native.box.max.y, native.box.min.z],
-      [native.box.max.x, native.box.max.y, native.box.max.z],
+      [vis.box.min.x, vis.box.min.y, vis.box.min.z],
+      [vis.box.min.x, vis.box.min.y, vis.box.max.z],
+      [vis.box.min.x, vis.box.max.y, vis.box.min.z],
+      [vis.box.min.x, vis.box.max.y, vis.box.max.z],
+      [vis.box.max.x, vis.box.min.y, vis.box.min.z],
+      [vis.box.max.x, vis.box.min.y, vis.box.max.z],
+      [vis.box.max.x, vis.box.max.y, vis.box.min.z],
+      [vis.box.max.x, vis.box.max.y, vis.box.max.z],
     ];
     const w = new THREE.Box3();
     for (const [x, y, z] of corners) {

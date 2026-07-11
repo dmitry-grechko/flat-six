@@ -8,8 +8,9 @@ import {
 } from '@/lib/knowledge';
 import type { FaultCode, KnownIssue, Severity } from '@/lib/knowledge';
 import { searchParts, type CatalogPartRow } from '@/lib/parts-lookup';
-import { searchManual, getManualSection, type ManualHit } from '@/lib/manual-lookup';
+import { searchManualHybrid, getManualSection, type ManualHit } from '@/lib/manual-lookup';
 import { manualHitHref, resolveDocumentForManualHit } from '@/lib/documents';
+import { useDocumentsAccess } from '@/lib/hooks/useDocumentsAccess';
 import Link from 'next/link';
 import { useVehicle } from '@/lib/vehicle-context';
 import { generationForBody } from '@/lib/models';
@@ -124,7 +125,7 @@ export default function FaultFinding() {
     }
     let active = true;
     const t = setTimeout(() => {
-      searchManual(trimmed, 6, { generation }).then((rows) => {
+      searchManualHybrid(trimmed, 6, { generation }).then((rows) => {
         if (active) setManualHits(rows);
       });
     }, 260);
@@ -223,17 +224,46 @@ export default function FaultFinding() {
             ),
           )}
           {trimmed && (parts.length > 0 || partsLoading) && <PartsResults parts={parts} loading={partsLoading} />}
-          {trimmed && manualHits.length > 0 && <ManualResults hits={manualHits} />}
+          {trimmed && manualHits.length > 0 && (
+            <ManualResults hits={manualHits} query={trimmed} generation={generation} />
+          )}
         </>
       )}
     </div>
   );
 }
 
+/** Human label for manual_sections.source — workshop vs curated MTL categories. */
+function manualSourceLabel(source?: string | null): string {
+  switch (source) {
+    case 'workshop':
+      return 'Workshop';
+    case 'mtl-diagnostic':
+      return 'Diagnostic';
+    case 'mtl-sit':
+      return 'SIT';
+    case 'mtl-training':
+      return 'Training';
+    case 'mtl-service':
+      return 'Maintenance';
+    default:
+      return 'Manual';
+  }
+}
+
 /** Factory docs (workshop + MTL) — expand for text, deep-link into the PDF viewer. */
-function ManualResults({ hits }: { hits: ManualHit[] }) {
+function ManualResults({
+  hits,
+  query,
+  generation,
+}: {
+  hits: ManualHit[];
+  query: string;
+  generation: string;
+}) {
   const [openId, setOpenId] = useState<string | null>(null);
   const [content, setContent] = useState<Record<string, string>>({});
+  const { allowed: docsAccess } = useDocumentsAccess();
 
   function toggle(id: string) {
     setOpenId((cur) => (cur === id ? null : id));
@@ -249,16 +279,18 @@ function ManualResults({ hits }: { hits: ManualHit[] }) {
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 10 }}>
         <SectionLabel>FACTORY DOCS</SectionLabel>
         <span style={{ font: "400 12px/1 'Helvetica Neue',Arial,sans-serif", color: '#B4B4B8' }}>
-          981 / 987 workshop & tech library
+          {generation} workshop + diagnostic / training
         </span>
       </div>
       {hits.map((h) => {
         const open = openId === h.id;
-        const href = manualHitHref(h);
+        const href = docsAccess ? manualHitHref(h, query) : null;
         const doc = resolveDocumentForManualHit(h);
         const codeLabel = h.wmCode
           ? (h.source === 'workshop' || /^[0-9]/.test(h.wmCode) ? `WM ${h.wmCode}` : h.wmCode)
           : null;
+        const srcLabel = manualSourceLabel(h.source);
+        const genTag = h.generation && h.generation !== generation ? h.generation.toUpperCase() : null;
         return (
           <div key={h.id} style={{ background: '#fff', border: '1px solid #E3E3E5', borderRadius: 4, marginBottom: 10, overflow: 'hidden' }}>
             <div onClick={() => toggle(h.id)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', cursor: 'pointer' }}>
@@ -279,8 +311,11 @@ function ManualResults({ hits }: { hits: ManualHit[] }) {
                   />
                 )}
               </div>
-              <span style={{ flexShrink: 0, font: `600 8px/1 ${mono}`, letterSpacing: '.12em', color: '#B4B4B8' }}>
-                {h.groupLabel?.toUpperCase() ?? 'MANUAL'} · P.{h.page}
+              <span style={{ flexShrink: 0, font: `600 8px/1 ${mono}`, letterSpacing: '.12em', color: '#B4B4B8', textAlign: 'right' }}>
+                {srcLabel.toUpperCase()}
+                {genTag ? ` · ${genTag}` : ''}
+                {h.groupLabel ? ` · ${h.groupLabel.toUpperCase()}` : ''}
+                {' · '}P.{h.page}
               </span>
               <span style={{ flexShrink: 0, font: `500 18px/1 ${mono}`, color: '#B4B4B8', width: 16, textAlign: 'center' }}>{open ? '–' : '+'}</span>
             </div>

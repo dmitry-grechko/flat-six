@@ -1,5 +1,7 @@
 // ---- Core domain types (the contract all UI + agents build against) ----
 
+import type { WheelSpec } from './fitment/oem';
+
 export type SystemName =
   | 'Engine' | 'Brakes' | 'Cooling' | 'Transmission' | 'HVAC'
   | 'Electrical' | 'Fuel' | 'Steering' | 'Exhaust' | 'Wheels' | 'Body' | 'Suspension';
@@ -128,7 +130,7 @@ export interface ServicePlan {
 
 // Selectable car-variant ids (also stored as vehicle.body). Legacy 981 values
 // stay 'boxster'/'cayman'; newer generations are suffixed. See lib/models.ts.
-export type BodyType = 'boxster' | 'cayman' | 'cayman-987' | 'boxster-987' | 'spyder-987';
+export type BodyType = 'boxster' | 'cayman' | 'cayman-gt4-981' | 'cayman-987' | 'boxster-987' | 'spyder-987';
 
 export interface Vehicle {
   /** which 3D model to render */
@@ -143,6 +145,25 @@ export interface Vehicle {
   colorHex: string;
   interiorHex: string;
   plate: string;
+  /** The owner's current wheel/tyre setup, saved from Tools → fitment. */
+  wheelSetup?: WheelSetup;
+}
+
+/** Per-user row in public.profiles (prefs + feature flags). */
+export interface Profile {
+  id: string;
+  displayName: string;
+  units: 'imperial' | 'metric';
+  /** When true, user may open /manual PDF library and document deep links. */
+  documentsAccess: boolean;
+  createdAt: string;
+}
+
+/** A saved wheel/tyre setup for a vehicle (front + rear + optional notes). */
+export interface WheelSetup {
+  front: WheelSpec;
+  rear: WheelSpec;
+  notes?: string;
 }
 
 export interface PaintColor { name: string; hex: string; }

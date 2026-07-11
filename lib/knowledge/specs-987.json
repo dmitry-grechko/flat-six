@@ -3,136 +3,364 @@
     "id": "torque-wheel-bolt",
     "category": "torque",
     "name": "Wheel bolt (lug)",
-    "value": "130 Nm (96 lb-ft)",
-    "notes": "987.1 and 987.2 up to MY2011 use 130 Nm. IMPORTANT: as of MY2012 (e.g. Cayman R, Boxster Spyder, Black Edition) Porsche raised silver bolts to 160 Nm (118 lb-ft) — the same figure the 981 uses. Apply a thin film of aluminium paste to the threads and spherical seat, NOT to the wheel-contact face. Tighten diagonally.",
+    "value": "130 Nm (96 lb-ft) — 160 Nm from MY2012 / black bolts",
+    "notes": "M14×1.5. Silver bolts up to MY2011: 130 Nm (160 Nm also permitted retroactively). Silver bolts from MY2012 and ALL black bolts: 160 Nm (118 lb-ft). Thinly grease thread/shank/under-head (Optimoly TA); do NOT grease the spherical seat. Tighten diagonally.",
     "appliesTo": [
-      "987.1",
-      "987.2 up to MY2011"
+      "all 987"
     ],
-    "source": "https://www.planet-9.com/threads/wheel-bolt-torque-987-1-vs-987-2.63498/"
+    "source": "Porsche WM 987 · 4001TW · p.5325"
   },
   {
     "id": "torque-oil-drain-plug",
     "category": "torque",
     "name": "Engine oil drain plug",
     "value": "50 Nm (37 lb-ft)",
-    "notes": "Fit a new aluminium sealing/crush ring each time. Same figure across the M96/M97 (987.1) and 9A1/DFI (987.2) engines.",
+    "notes": "M18×1.5; always fit a new aluminium sealing ring. Same for M96/M97 (987.1) and 9A1 DFI (987.2).",
     "appliesTo": [
       "all 987"
     ],
-    "source": "https://rennlist.com/forums/boxster-and-boxster-s-986-forum/343643-torque-spec-oil-drain-plug.html"
+    "source": "Porsche WM 987 · 170155 · p.4218"
   },
   {
     "id": "torque-oil-filter-cap",
     "category": "torque",
     "name": "Oil filter cap / housing cover",
-    "value": "25 Nm (18 lb-ft)",
-    "notes": "Cartridge filter. Replace the cap O-ring at each service.",
+    "value": "25 Nm (19 lb-ft)",
+    "notes": "Cartridge filter cover; replace and grease the O-ring.",
     "appliesTo": [
       "all 987"
     ],
-    "source": "https://www.planet-9.com/threads/porsche-cayman-987-2-major-maintenance-torque-specs.93778/"
+    "source": "Porsche WM 987 · 170155 · p.4218"
   },
   {
     "id": "torque-spark-plug-987-1",
     "category": "torque",
-    "name": "Spark plug (M96/M97)",
-    "value": "30 Nm (22 lb-ft)",
-    "notes": "MEDIUM-CONFIDENCE: M96/M97 sources cluster 20-30 Nm; 30 Nm is the widely used target. No anti-seize.",
+    "name": "Spark plug (987.1 M96/M97)",
+    "value": "New ~30 Nm (22 lb-ft); reused ~26 Nm (19 lb-ft)",
+    "notes": "The 987.1 manual gives ft-lb only: new 22 lb-ft, reused 19 lb-ft. No anti-seize.",
     "appliesTo": [
-      "987.1 2.7",
-      "987.1 3.4 S"
+      "987.1"
     ],
-    "source": "https://www.pca.org/tech/spark-plug-torque--1583459634"
+    "source": "Porsche WM 987 · 287020 · p.2772"
   },
   {
     "id": "torque-spark-plug-987-2",
     "category": "torque",
-    "name": "Spark plug (9A1 DFI)",
-    "value": "New 33 Nm (24 lb-ft); reused 30 Nm (22 lb-ft)",
-    "notes": "DFI 9A1 spec distinguishes a new plug (24 lb-ft) from a reinstalled plug (22 lb-ft). Do not overtighten in the aluminium head.",
+    "name": "Spark plug (987.2 9A1 DFI)",
+    "value": "New 32 Nm (24 lb-ft) ±2 Nm; reused 25 Nm (19 lb-ft)",
+    "notes": "DFI plug — clearly higher than the 987.1 value; do not carry the old figure over.",
     "appliesTo": [
-      "987.2 2.9",
-      "987.2 3.4 S"
+      "987.2"
     ],
-    "source": "https://rennlist.com/forums/987-forum/795973-987-2-diy-spark-plug-change.html"
+    "source": "Porsche WM 987 · 287020 · p.4688"
   },
   {
     "id": "torque-caliper-bolt-front",
     "category": "torque",
     "name": "Brake caliper mounting bolt (front)",
     "value": "85 Nm (63 lb-ft)",
-    "notes": "MEDIUM-CONFIDENCE: M12 caliper-to-upright bolts, shared 986/987/996/997 value. Some workshop docs call these single-use — inspect/replace on removal. Front and rear identical.",
+    "notes": "M12×1.5 to the wheel carrier. Always replace the screws after removal. Do not grease (Dacromet finish).",
     "appliesTo": [
       "all 987"
     ],
-    "source": "https://www.lindseyracing.com/LR/Parts/TORQUESPEC.html"
+    "source": "Porsche WM 987 · 4700TW · p.300"
   },
   {
     "id": "torque-caliper-bolt-rear",
     "category": "torque",
     "name": "Brake caliper mounting bolt (rear)",
     "value": "85 Nm (63 lb-ft)",
-    "notes": "MEDIUM-CONFIDENCE: same M12 value as the front.",
+    "notes": "M12×1.5, same as front. Single-use screws.",
     "appliesTo": [
       "all 987"
     ],
-    "source": "https://www.lindseyracing.com/LR/Parts/TORQUESPEC.html"
+    "source": "Porsche WM 987 · 4600TW · p.190"
   },
   {
-    "id": "torque-axle-nut",
+    "id": "torque-brake-line-caliper",
     "category": "torque",
-    "name": "Drive-shaft / rear axle (hub) nut",
+    "name": "Brake line union to caliper",
+    "value": "16 Nm (12 lb-ft)",
+    "notes": "M10×1 pressure line to caliper. (Connecting-line union = 12 Nm.)",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "Porsche WM 987 · 4700TW · p.300"
+  },
+  {
+    "id": "torque-bleeder-valve",
+    "category": "torque",
+    "name": "Brake caliper bleeder screw",
+    "value": "8–12 Nm (6–9 lb-ft)",
+    "notes": "M10×1 bleeder screw.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "Porsche WM 987 · 4700TW · p.300"
+  },
+  {
+    "id": "torque-brake-disc-screw",
+    "category": "torque",
+    "name": "Brake disc retaining screw",
+    "value": "10 Nm (7.5 lb-ft)",
+    "notes": "M6, disc to hub; front and rear.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "Porsche WM 987 · 4600TW · p.190"
+  },
+  {
+    "id": "torque-axle-hub-nut",
+    "category": "torque",
+    "name": "Drive-shaft / rear axle hub nut",
     "value": "460 Nm (340 lb-ft)",
-    "notes": "M22x1.5 self-locking collar nut — very high; loosen/tighten with the car on the ground, in gear, handbrake on. Use a new nut. Shared 986/987 figure.",
+    "notes": "M22×1.5 tension bolt / hub nut — always fit a new lock nut; do not grease.",
     "appliesTo": [
       "all 987"
     ],
-    "source": "http://www.rockfordcv.com/Porsche_torque.htm"
+    "source": "Porsche WM 987 · 4001TW · p.5325"
   },
   {
-    "id": "torque-disc-retaining-screw",
+    "id": "torque-driveshaft-flange",
     "category": "torque",
-    "name": "Brake disc retaining (countersunk) screw",
-    "value": "~10 Nm (7 lb-ft)",
-    "notes": "LOW-CONFIDENCE: M6/M8 countersunk screw, value from a shared older-Porsche chart, not 987-verified.",
+    "name": "Drive shaft to transmission flange bolt",
+    "value": "81 Nm (60 lb-ft)",
+    "notes": "M10 (manual & Tiptronic). Do not grease.",
     "appliesTo": [
       "all 987"
     ],
-    "source": "https://www.lindseyracing.com/LR/Parts/TORQUESPEC.html"
+    "source": "Porsche WM 987 · 4201TW · p.5368"
+  },
+  {
+    "id": "torque-manual-trans-drain",
+    "category": "torque",
+    "name": "Manual transmission drain plug",
+    "value": "25 Nm (19 lb-ft) — 987.2 6-speed",
+    "notes": "987.2 (G87/10): 25 Nm. 987.1 varies: base Boxster 19 lb-ft; S / 2.8 L unit 30 lb-ft (~41 Nm). Fit a new sealing ring.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "Porsche WM 987 · 340155 · p.5620"
+  },
+  {
+    "id": "torque-manual-trans-fill",
+    "category": "torque",
+    "name": "Manual transmission filler plug",
+    "value": "25 Nm (19 lb-ft) — 987.2 6-speed",
+    "notes": "Same as its drain plug; the 987.1 S unit is 30 lb-ft. New seal.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "Porsche WM 987 · 340155 · p.5620"
+  },
+  {
+    "id": "torque-tiptronic-atf-drain",
+    "category": "torque",
+    "name": "Tiptronic ATF drain plug (987.1)",
+    "value": "40 Nm (30 lb-ft)",
+    "notes": "A87/01 5-speed Tiptronic. Replace the sealing ring. Filler plug = 80 Nm; ATF-pan bolts ≈ 11 Nm (8 lb-ft) in sequence.",
+    "appliesTo": [
+      "987.1 Tiptronic"
+    ],
+    "source": "Porsche WM 987 · 370255 · p.5783"
+  },
+  {
+    "id": "torque-pdk-atf-drain",
+    "category": "torque",
+    "name": "PDK ATF oil drain plug (987.2)",
+    "value": "15 Nm (11 lb-ft) +3 Nm",
+    "notes": "CG100 7-speed PDK uses a single ATF for gears and wet clutches. Fit a NEW drain plug.",
+    "appliesTo": [
+      "987.2 PDK"
+    ],
+    "source": "Porsche WM 987 · 370255 · p.5787"
+  },
+  {
+    "id": "torque-pdk-atf-fill",
+    "category": "torque",
+    "name": "PDK ATF filler plug (987.2)",
+    "value": "22 Nm (16 lb-ft)",
+    "notes": "Fill via metering pump until oil emerges, then tighten. ATF-pan bolts = 2.4 Nm in the prescribed sequence.",
+    "appliesTo": [
+      "987.2 PDK"
+    ],
+    "source": "Porsche WM 987 · 375519 · p.5972"
   },
   {
     "id": "torque-coolant-drain",
     "category": "torque",
     "name": "Coolant drain plug",
-    "value": "~10 Nm (7 lb-ft)",
-    "notes": "LOW-CONFIDENCE: value from a shared 986/996/997 chart, not 987-verified.",
+    "value": "No factory torque specified",
+    "notes": "M14×1.5, internal Torx (a/f 8) at the coolant regulator housing. The workshop manual states only \"replace the sealing ring\" — no tightening torque is given. Snug by hand with a new seal.",
     "appliesTo": [
       "all 987"
     ],
-    "source": "https://www.lindseyracing.com/LR/Parts/TORQUESPEC.html"
+    "source": "Porsche WM 987 · 193817 · p.4305"
   },
   {
-    "id": "torque-pdk-gear-plug",
+    "id": "torque-engine-mount",
     "category": "torque",
-    "name": "PDK gear-oil drain & fill plug",
-    "value": "27 Nm (20 lb-ft)",
-    "notes": "MEDIUM-CONFIDENCE: 8mm hex. The 987.2 uses the same 7-speed PDK (7DT) family as the 981, so 981 plug torques transfer; confirm against the workshop manual.",
+    "name": "Engine mount / carrier bolts",
+    "value": "65 Nm (48 lb-ft)",
+    "notes": "Engine carrier to body M10×1.5 = 65 Nm; stud to body M8 = 20 Nm. Do not grease.",
     "appliesTo": [
-      "987.2 PDK"
+      "all 987"
     ],
-    "source": "https://rennlist.com/forums/987-forum/1078012-pdk-gear-oil-change-not-clutch-fluid.html"
+    "source": "Porsche WM 987 · 4201TW · p.5368"
   },
   {
-    "id": "torque-pdk-clutch-plug",
+    "id": "torque-trans-mount",
     "category": "torque",
-    "name": "PDK clutch-oil pan drain plug",
-    "value": "~15 Nm (11 lb-ft)",
-    "notes": "LOW-CONFIDENCE: mirrors the identical-family 981 PDK (Porsche docs cite 15-18 Nm). Clutch fill requires PIWIS temperature-controlled fill mode.",
+    "name": "Transmission mount bolts",
+    "value": "85 Nm (63 lb-ft) — hydraulic mount",
+    "notes": "Hydraulic mount to trans bracket M12×1.5 = 85 Nm; bracket to gearbox M10×1.5 = 65 Nm; mount to side member M8 = 33 Nm.",
     "appliesTo": [
-      "987.2 PDK"
+      "all 987"
     ],
-    "source": "https://rennlist.com/forums/987-forum/1078012-pdk-gear-oil-change-not-clutch-fluid.html"
+    "source": "Porsche WM 987 · 4201TW · p.5368"
+  },
+  {
+    "id": "torque-antiroll-front",
+    "category": "torque",
+    "name": "Anti-roll-bar drop-link nut (front)",
+    "value": "3-stage: 50 Nm → loosen 90° → 65 Nm",
+    "notes": "M10 suspension to anti-roll bar; follow the 3-stage procedure. Do not grease. The rear drop link uses the same 3-stage ending at 65 Nm.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "Porsche WM 987 · 4001TW · p.5325"
+  },
+  {
+    "id": "torque-strut-top-mount",
+    "category": "torque",
+    "name": "Front strut top mount",
+    "value": "33 Nm (24 lb-ft) to body",
+    "notes": "Mount to body M8 = 33 Nm; mount to piston rod M14×1.5 = 80 Nm; strut to wheel carrier M12×1.5 = 85 Nm.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "Porsche WM 987 · 4001TW · p.5325"
+  },
+  {
+    "id": "torque-control-arm-front",
+    "category": "torque",
+    "name": "Front control-arm bolts",
+    "value": "120 Nm (89 lb-ft) to cross/side member",
+    "notes": "To cross/side member M12×1.5 = 120 Nm; to diagonal arm M14×1.5 = 160 Nm; ball-joint to wheel carrier M12×1.5 = 75 Nm. Do not grease.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "Porsche WM 987 · 4001TW · p.5325"
+  },
+  {
+    "id": "torque-coil-pack-bolt",
+    "category": "torque",
+    "name": "Ignition coil fastening screw",
+    "value": "10 Nm (7.5 lb-ft)",
+    "notes": "Two M6×25 screws per coil. Label cylinders before removal.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "Porsche WM 987 · 282019 · p.4682"
+  },
+  {
+    "id": "torque-throttle-body",
+    "category": "torque",
+    "name": "Throttle body fastening screws",
+    "value": "10 Nm (7.5 lb-ft)",
+    "notes": "M6×50 Torx screws. Adaptation required after removal on drive-by-wire cars.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "Porsche WM 987 · 244219 · p.2642"
+  },
+  {
+    "id": "torque-track-rod-axial",
+    "category": "torque",
+    "name": "Track rod (axial joint) to steering gear",
+    "value": "90 Nm (67 lb-ft)",
+    "notes": "Hydraulic rack — alignment required after tie-rod work.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "Porsche WM 987 · 4800TW · p.5178"
+  },
+  {
+    "id": "torque-tie-rod-ball-joint",
+    "category": "torque",
+    "name": "Tie-rod ball joint to wheel carrier",
+    "value": "75 Nm (56 lb-ft)",
+    "notes": "Aluminum tie rod to axial joint = 50 Nm (37 lb-ft).",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "Porsche WM 987 · 4800TW · p.5178"
+  },
+  {
+    "id": "torque-belt-tensioner",
+    "category": "torque",
+    "name": "Serpentine-belt tensioner fastening screws",
+    "value": "28 Nm (21 lb-ft) ±3 Nm",
+    "notes": "Tensioner to coolant pump (Internal Torx M8). Tensioning-roller bolt = 23 Nm on some layouts.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "Porsche WM 987 · 137319 · p.3985"
+  },
+  {
+    "id": "torque-battery-terminal",
+    "category": "torque",
+    "name": "Battery terminal clamp",
+    "value": "5 Nm (3.5 lb-ft)",
+    "notes": "Attach manually — do not over-tighten. Terminals do not need grease. Follow WM work instructions after reconnecting.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "Porsche WM 987 · 270601 · p.4631"
+  },
+  {
+    "id": "torque-underbody-cover",
+    "category": "torque",
+    "name": "Underbody cover screws / nuts",
+    "value": "2 Nm (~1.5 lb-ft)",
+    "notes": "Centre and rear underbody panels — very low torque; use a torque screwdriver.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "Porsche WM 987 · 519319 · p.781"
+  },
+  {
+    "id": "torque-exhaust-clamp",
+    "category": "torque",
+    "name": "Rear silencer clamp nut",
+    "value": "23 Nm (17 lb-ft)",
+    "notes": "Clamp on rear silencer; always replace seals and lock nuts when removing the silencer.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "Porsche WM 987 · 263319 · p.4594"
+  },
+  {
+    "id": "torque-antiroll-rear",
+    "category": "torque",
+    "name": "Anti-roll-bar drop-link nut (rear)",
+    "value": "3-stage: 50 Nm → loosen 90° → 65 Nm",
+    "notes": "Same 3-stage procedure as the front drop link. M10; do not grease.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "Porsche WM 987 · 4001TW · p.5325"
+  },
+  {
+    "id": "torque-dme-holder",
+    "category": "torque",
+    "name": "DME control-unit holder nuts",
+    "value": "10 Nm (7.5 lb-ft)",
+    "notes": "Fastening nuts securing the control unit and holder after programming/replacement.",
+    "appliesTo": [
+      "all 987"
+    ],
+    "source": "Porsche WM 987 · 247019 · p.4555"
   },
   {
     "id": "fluid-engine-oil-approval",

@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 import { LOGO_DATA_URI } from './logo';
 
-export const alt = 'FLAT·SIX — a free, open-source garage for the Porsche Boxster & Cayman (987, 981, and more)';
+export const alt = 'FLAT·SIX — a free, open-source garage for the Boxster & Cayman (987, 981, and more)';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -50,7 +50,7 @@ export default function OpengraphImage() {
             FREE &amp; OPEN SOURCE · 987 · 981 · MORE
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', fontSize: 68, fontWeight: 300, color: '#fff', lineHeight: 1.08, maxWidth: 980 }}>
-            <span>Every component of your mid-engine Porsche.</span>
+            <span>Every component of your mid-engine car.</span>
             <span style={{ fontWeight: 600 }}>One garage.</span>
           </div>
         </div>

@@ -1,16 +1,15 @@
-# Mobile Tech Library (local only)
+# Tech library (local only)
 
-Place the unzipped Porsche Mobile Technical Library here. The folder is
-**gitignored** (~3 GB, © Porsche).
+Place the unzipped Mobile Technical Library (or equivalent reference set) here.
+The folder is **gitignored** (large; third-party rights reserved).
 
-Expected layout (from the MTL zip):
+Expected layout:
 
 ```
 Diagnostic Information/
 Service Information Technik/
 Training Books/
 Other Documents/
-Porsche Classic/
 ```
 
 The app catalogs **981 + 987** docs in `lib/documents.ts` and serves them from

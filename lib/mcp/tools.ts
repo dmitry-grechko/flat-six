@@ -12,6 +12,17 @@ import { searchCatalog, formatPartNumber } from '@/lib/catalog';
 import { GENERATIONS, generationForBody } from '@/lib/models';
 import { resolveUser, AUTH_REQUIRED_MESSAGE, publicClient } from './auth';
 import { manualHitHref } from '@/lib/documents';
+import { userHasDocumentsAccess } from '@/lib/documents-access';
+import { embedQuery, toVectorLiteral, voyageConfigured } from '@/lib/embeddings';
+import {
+  presetsForGeneration,
+  getPreset,
+  PCD,
+  CENTER_BORE_MM,
+  WHEEL_BOLT_TORQUE,
+} from '@/lib/fitment/oem';
+import { willItFit } from '@/lib/fitment/tirefit';
+import { alignmentForGeneration } from '@/lib/fitment/alignment';
 
 /** Optional generation arg shared by the knowledge tools. */
 const GENERATION_ARG = z
@@ -227,6 +238,30 @@ function err(message: string) {
 }
 
 /**
+ * Injected into MCP clients that support server instructions (Claude Desktop,
+ * Claude Code, etc.). Workflow rules only — tool schemas carry field detail.
+ */
+export const MCP_SERVER_INSTRUCTIONS = `FLAT·SIX is a Porsche Boxster/Cayman (981 & 987) garage assistant.
+
+Generation scoping (mandatory):
+- NEVER mix 981 and 987 facts in one answer.
+- Call get_my_vehicles when the user has multiple cars or does not name a generation.
+- Pass vehicleId (preferred) or generation on every knowledge and manual tool call.
+
+Factory procedures and in-depth torque (licensed content — requires login):
+- search_workshop_manual → get_manual_procedure on the best-matching section id.
+- Always fetch full procedure text before prescribing steps, warnings, or Nm values.
+- Treat search titles skeptically — near-miss sections exist; verify in the full text.
+
+Curated specs and quick facts:
+- get_spec / search_knowledge cover verified DIY shortcuts (~35 torque entries + faults/issues).
+- If get_spec returns nothing, fall through to search_workshop_manual — do not invent values.
+
+Torque lookups:
+- Try get_spec first for common DIY fasteners (oil drain, caliper, wheel bolts, plugs).
+- For anything else, search_workshop_manual with the fastener name + generation.`;
+
+/**
  * Register every FLAT·SIX MCP tool on the server.
  *
  * Knowledge tools (search/fault/spec/maintenance/issues/parts) are open — they
@@ -300,7 +335,9 @@ export function registerTools(server: McpServer): void {
     {
       title: 'Get a specification',
       description:
-        'Look up a torque value, capacity, fluid grade or other spec for ONE car generation. ' +
+        'Look up a curated DIY spec for ONE car generation — ~35 verified torque entries plus ' +
+        'fluids, capacities, tyre pressures, etc. Does NOT search the full workshop manual; ' +
+        'if nothing matches, call search_workshop_manual for factory torque/procedure text. ' +
         'Pass vehicleId/generation when the garage has multiple models — 981 and 987 specs differ.',
       inputSchema: {
         query: z.string().min(1).describe('What spec you need, e.g. "wheel bolt torque"'),
@@ -322,7 +359,12 @@ export function registerTools(server: McpServer): void {
         return inCat && text.includes(q);
       });
       if (specs.length === 0) {
-        return err(`No spec matching "${query}" was found for generation ${scope.generation}.`);
+        return err(
+          `No curated spec matching "${query}" was found for generation ${scope.generation}. ` +
+            `get_spec covers verified DIY shortcuts only — not the full workshop manual. ` +
+            `Call search_workshop_manual with the same query (generation: "${scope.generation}") ` +
+            `then get_manual_procedure on the best section id before quoting torque values or steps.`,
+        );
       }
       return scopedJson(scope, specs);
     },
@@ -438,9 +480,11 @@ export function registerTools(server: McpServer): void {
     {
       title: 'Search workshop manuals & tech library',
       description:
-        'Full-text search over factory reference docs: workshop manuals plus Mobile Tech Library ' +
-        'diagnostics, Service Information Technik, and training books for 981/987. ' +
-        'ALWAYS scoped to one generation — pass vehicleId/generation when the user has multiple cars. ' +
+        'Hybrid semantic + full-text search over factory reference docs for ONE generation: workshop ' +
+        'manuals plus curated Mobile Tech Library diagnostics, Service Information Technik, and training ' +
+        'books. Results are scoped to the active car (981 or 987) — never mixed across generations. ' +
+        'Pass vehicleId/generation when the user has multiple cars. Prefer natural-language procedure ' +
+        'queries ("bleed cooling system", "PDK clutch adaptation") as well as WM codes / DTCs. ' +
         'Returns ranked sections with codes/snippets — fetch full text with get_manual_procedure. ' +
         'Requires your garage login (licensed content, not public).',
       inputSchema: {
@@ -454,12 +498,38 @@ export function registerTools(server: McpServer): void {
       const user = await resolveUser(extra.authInfo?.token);
       if (!user) return err(AUTH_REQUIRED_MESSAGE);
       const scope = await resolveKnowledgeScope(generation, vehicleId, extra.authInfo?.token);
-      const { data, error } = await user.supabase.rpc('search_manual', {
-        q: query,
-        lim: limit ?? 8,
-        gen: scope.generation,
-        src: null,
-      });
+      const lim = limit ?? 8;
+
+      // Prefer hybrid (semantic + keyword, RRF-fused) when Voyage is configured
+      // and the embeddings have been backfilled; fall back to plain full-text on
+      // any error (missing key, migration not applied, transient failure).
+      let data: unknown = null;
+      let error: { message: string } | null = null;
+      if (voyageConfigured()) {
+        try {
+          const emb = await embedQuery(query);
+          const r = await user.supabase.rpc('search_manual_hybrid', {
+            q: query,
+            query_embedding: toVectorLiteral(emb),
+            lim,
+            gen: scope.generation,
+            src: null,
+          });
+          if (!r.error && Array.isArray(r.data)) data = r.data;
+        } catch {
+          // fall through to full-text
+        }
+      }
+      if (data === null) {
+        const r = await user.supabase.rpc('search_manual', {
+          q: query,
+          lim,
+          gen: scope.generation,
+          src: null,
+        });
+        data = r.data;
+        error = r.error;
+      }
       if (error) return err(`Manual search failed: ${error.message}`);
       if (!Array.isArray(data) || data.length === 0) {
         return err(
@@ -467,6 +537,7 @@ export function registerTools(server: McpServer): void {
             `Import with npm run db:import-manual / db:import-mtl.`,
         );
       }
+      const canViewDocs = await userHasDocumentsAccess(user.supabase, user.userId);
       return scopedJson(
         scope,
         (data as any[]).map((r) => {
@@ -488,7 +559,7 @@ export function registerTools(server: McpServer): void {
             source: r.source,
             generation: r.generation,
             docId: r.doc_id,
-            viewerUrl: manualHitHref(hit),
+            viewerUrl: canViewDocs ? manualHitHref(hit) : null,
             snippet: (r.snippet ?? '').replace(/<\/?b>/g, '**'),
           };
         }),
@@ -524,6 +595,7 @@ export function registerTools(server: McpServer): void {
         docId: data.doc_id,
         page: data.page as number,
       };
+      const canViewDocs = await userHasDocumentsAccess(user.supabase, user.userId);
       return json({
         id: data.id,
         wmCode: data.wm_code,
@@ -535,9 +607,94 @@ export function registerTools(server: McpServer): void {
         source: data.source,
         generation: data.generation,
         docId: data.doc_id,
-        viewerUrl: manualHitHref(hit),
+        viewerUrl: canViewDocs ? manualHitHref(hit) : null,
         content: data.content,
       });
+    },
+  );
+
+  // ---------------------------------------------------------------------------
+  // Fitment tools — no auth required (static presets + pure computation).
+  // Mirror the in-app Tools tab (lib/fitment/*).
+  // ---------------------------------------------------------------------------
+
+  server.registerTool(
+    'get_wheel_fitment',
+    {
+      title: 'Get OEM wheel & tyre fitment',
+      description:
+        'OEM wheel/tyre fitment presets (rim width J, diameter, offset ET, tyre size) for ONE car ' +
+        'generation, plus bolt pattern (PCD), centre bore and wheel-bolt torque. Pass vehicleId/' +
+        'generation when the garage has multiple models.',
+      inputSchema: { generation: GENERATION_ARG, vehicleId: VEHICLE_ID_ARG },
+    },
+    async ({ generation, vehicleId }, extra) => {
+      const scope = await resolveKnowledgeScope(generation, vehicleId, extra.authInfo?.token);
+      const gen = scope.generation === '987' ? '987' : '981';
+      return scopedJson(scope, {
+        pcd: PCD,
+        centerBoreMm: CENTER_BORE_MM,
+        wheelBoltTorque: WHEEL_BOLT_TORQUE[gen],
+        presets: presetsForGeneration(gen),
+      });
+    },
+  );
+
+  server.registerTool(
+    'check_tyre_fit',
+    {
+      title: 'Check if a wheel/tyre will fit',
+      description:
+        'Native "will it fit" check: given a rim (width J, diameter, offset ET) and tyre ' +
+        '(section width, aspect), returns whether the tyre suits the rim, plus rolling-diameter ' +
+        'change, speedo error and poke/clearance vs the OEM fitment for the chosen axle. ' +
+        'Pass vehicleId/generation when the garage has multiple models.',
+      inputSchema: {
+        rimWidth: z.number().describe('Rim width, J (inches), e.g. 9.5'),
+        rimDiameter: z.number().describe('Rim diameter, inches, e.g. 19'),
+        offsetEt: z.number().describe('Offset ET, mm, e.g. 45'),
+        tyreWidth: z.number().int().describe('Tyre section width, mm, e.g. 265'),
+        tyreAspect: z.number().int().describe('Tyre aspect ratio, %, e.g. 40'),
+        axle: z.enum(['front', 'rear']).optional().describe('OEM axle fitment to compare against (default rear)'),
+        presetId: z.string().optional().describe('OEM preset id from get_wheel_fitment (defaults to the generation default)'),
+        generation: GENERATION_ARG,
+        vehicleId: VEHICLE_ID_ARG,
+      },
+    },
+    async ({ rimWidth, rimDiameter, offsetEt, tyreWidth, tyreAspect, axle, presetId, generation, vehicleId }, extra) => {
+      const scope = await resolveKnowledgeScope(generation, vehicleId, extra.authInfo?.token);
+      const gen = scope.generation === '987' ? '987' : '981';
+      const presets = presetsForGeneration(gen);
+      const preset = (presetId ? getPreset(presetId) : undefined) ?? presets[0] ?? null;
+      const which = axle ?? 'rear';
+      const oem = preset ? (which === 'front' ? preset.front : preset.rear) : null;
+      const report = willItFit(
+        { rimWidth, rimDiameter, offsetEt, tire: { width: tyreWidth, aspect: tyreAspect } },
+        oem,
+      );
+      return scopedJson(scope, {
+        comparedTo: preset ? { id: preset.id, label: preset.label, axle: which } : null,
+        report,
+      });
+    },
+  );
+
+  server.registerTool(
+    'get_alignment_specs',
+    {
+      title: 'Get wheel-alignment specs',
+      description:
+        'Factory/reference wheel-alignment values (camber, toe, caster ranges in decimal degrees) ' +
+        'for ONE car generation, with a `verified` flag: 987 = workshop-manual verified; 981 = ' +
+        'unconfirmed placeholder (see repo issue #7). For DIY spec-checking against a Hunter/string ' +
+        'alignment. Pass vehicleId/generation when the garage has multiple models.',
+      inputSchema: { generation: GENERATION_ARG, vehicleId: VEHICLE_ID_ARG },
+    },
+    async ({ generation, vehicleId }, extra) => {
+      const scope = await resolveKnowledgeScope(generation, vehicleId, extra.authInfo?.token);
+      const data = alignmentForGeneration(scope.generation);
+      if (!data) return err(`No alignment data for generation ${scope.generation}.`);
+      return scopedJson(scope, data);
     },
   );
 

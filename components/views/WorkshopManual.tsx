@@ -105,10 +105,12 @@ function PdfPageSlot({
 export default function WorkshopManual({
   documentId = '981-workshop-manual-v1',
   initialPage,
+  highlight,
   onBack,
 }: {
   documentId?: string;
   initialPage?: number;
+  highlight?: string;
   onBack?: () => void;
 } = {}) {
   const stageRef = useRef<HTMLDivElement>(null);
@@ -282,8 +284,8 @@ export default function WorkshopManual({
     setZoomLevel((z) => Math.min(2.5, Math.max(0.6, +(z + delta).toFixed(2))));
   };
 
-  const runSearch = async () => {
-    const q = query.trim().toLowerCase();
+  const runSearch = async (autoScroll = true, term?: string) => {
+    const q = (term ?? query).trim().toLowerCase();
     if (!pdf || !q) { setHits([]); setShowHits(false); return; }
 
     setSearching(true);
@@ -315,13 +317,27 @@ export default function WorkshopManual({
     setHits(found);
     setSearchProgress(found.length ? `${found.length} match${found.length === 1 ? '' : 'es'}` : 'No matches');
     setSearching(false);
-    if (found.length) scrollToPage(found[0].page);
+    if (autoScroll && found.length) scrollToPage(found[0].page);
   };
 
   const pickHit = (p: number) => {
     scrollToPage(p);
     if (isMobile) setShowHits(false);
   };
+
+  // Deep-link highlight (?q=): pre-fill the search and surface the matches, but
+  // keep the reader on the linked page — don't let the search steal the scroll.
+  useEffect(() => {
+    if (!pdf || !totalPages || !highlight) return;
+    const term = highlight.trim();
+    if (!term) return;
+    setQuery(term);
+    const id = requestAnimationFrame(() => {
+      void runSearch(false, term);
+    });
+    return () => cancelAnimationFrame(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pdf, totalPages, highlight]);
 
   const sourceBadge = urlSource === 'storage'
     ? <span style={{ color: '#1E8E4E' }}> · CLOUD</span>
@@ -383,7 +399,7 @@ export default function WorkshopManual({
               enterKeyHint="search"
               className="manualSearchInput"
             />
-            <button type="button" className="manualBtn manualSearchBtn" onClick={runSearch} disabled={searching || !pdf}>
+            <button type="button" className="manualBtn manualSearchBtn" onClick={() => runSearch()} disabled={searching || !pdf}>
               {searching ? '…' : 'Search'}
             </button>
           </div>

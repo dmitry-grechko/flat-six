@@ -6,6 +6,7 @@ import {
   MANUAL_SIGNED_URL_TTL,
   getDocument,
 } from '@/lib/documents';
+import { userHasDocumentsAccess } from '@/lib/documents-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,6 +14,7 @@ export const dynamic = 'force-dynamic';
  * Resolve a signed (or local) URL for a catalog document.
  *   GET /api/manual/url?doc=981-workshop-manual-v1
  *   GET /api/manual/url          → defaults to workshop Vol 1
+ * Requires profiles.documents_access (or demo mode).
  */
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -36,13 +38,19 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  const allowed = await userHasDocumentsAccess(supabase, user.id);
+  if (!allowed) {
+    return NextResponse.json(
+      { error: 'Document preview is not enabled for this account.' },
+      { status: 403 },
+    );
+  }
+
   const { data, error } = await supabase.storage
     .from(MANUAL_BUCKET)
     .createSignedUrl(doc.storagePath, MANUAL_SIGNED_URL_TTL);
 
   if (error || !data?.signedUrl) {
-    // Local public/ fallback is for `next dev` only — on Vercel those PDFs are
-    // gitignored and a localUrl 404s after pdf.js tries to load it.
     const host = req.headers.get('host') ?? '';
     const isLocalHost =
       host.startsWith('localhost') ||

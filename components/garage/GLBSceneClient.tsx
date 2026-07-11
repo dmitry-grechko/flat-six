@@ -8,7 +8,16 @@ import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import type { GLBSceneProps } from './GLBViewer';
 import type { EnginePart } from '@/lib/types';
 
-const BODY_MAT = /paint|car/i;
+// Body-paint materials, matched by name so the paint picker can re-tint them.
+// Naming differs per source model:
+//   • Ddiaz boxster → "…Car_Paint…"          • 987 models → "car_paint" / "…CARSKIN…"
+//   • GT4 (OUTPISTON) → "Vehicle_Exterior_mm_ext"
+//   • Ddiaz cayman (981) → "Cphong3SG1" (its M_Paint_Metal + M_Paint_Plastic shell)
+const BODY_MAT = /paint|car|Vehicle_Exterior_mm_ext$|^Cphong3SG1$/i;
+// A material can read as "paint-ish" by substring yet not be the painted shell —
+// e.g. the Spyder's underbody is "…CARBOTTOM…" which the /car/ term catches.
+// Exclude underbody/undertray/floor panels so they keep their own dark finish.
+const NOT_BODY_MAT = /bottom|under|floor/i;
 const TYRE_MAT = /^1529b39_dds$|^c4bb8b1e_dds1$|^c5ebe6d_dds$|MAT_Tire/i;
 const DISC_RIM_MAT = /MAT_Disk|MAT_Hub|MAT_Brake/i;
 const YELLOW_MAP_MAT = /_dds/i;
@@ -68,8 +77,15 @@ function Model({ src, paintHex, parts, selectedPartId, onSelectPart }: {
       if (!mesh.isMesh) return;
       const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
       mats.forEach((mat) => {
-        if (mat && isStandardMat(mat) && BODY_MAT.test(mat.name || '')) {
-          mat.color = new THREE.Color(paintHex); mat.needsUpdate = true;
+        const nm = mat?.name || '';
+        if (mat && isStandardMat(mat) && BODY_MAT.test(nm) && !NOT_BODY_MAT.test(nm)) {
+          // Drop any baked albedo (baseColor) texture so the chosen paint
+          // renders true instead of multiplying/overriding it — some models
+          // (e.g. the GT4) bake the body colour into a map. Normal/AO/roughness
+          // maps are untouched, so panel surface detail is preserved.
+          mat.map = null;
+          mat.color = new THREE.Color(paintHex);
+          mat.needsUpdate = true;
         }
       });
     });

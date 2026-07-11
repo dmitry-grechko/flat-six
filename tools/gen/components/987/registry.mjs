@@ -11,6 +11,7 @@
 // 981) and must never be overwritten by a procedural build.
 
 import * as transaxle from './transaxle.mjs';
+import * as transaxleManual from './transaxleManual.mjs';
 import * as exhaust from './exhaust.mjs';
 import * as frontBrake from './frontBrake.mjs';
 import * as rearBrake from './rearBrake.mjs';
@@ -25,6 +26,7 @@ import * as fuelSystem from './fuelSystem.mjs';
 
 export const COMPONENTS = [
   transaxle,
+  transaxleManual,
   exhaust,
   frontBrake,
   rearBrake,

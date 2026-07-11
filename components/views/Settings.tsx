@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { COLORS, enginesFor, transmissionsFor, defaultEngine, defaultTransmission } from '@/lib/data';
 import { useVehicle, MODEL_OPTIONS } from '@/lib/vehicle-context';
-import { generationForBody } from '@/lib/models';
+import { generationForBody, getVariant } from '@/lib/models';
 import { createClient } from '@/lib/supabase/client';
 import { DEMO_MODE, DEMO_EMAIL } from '@/lib/demo';
 
@@ -91,15 +91,20 @@ export default function Settings() {
         </div>
 
         <label style={fieldLabel}>Model (rendered in 3D)</label>
-        <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
           {MODEL_OPTIONS.map((m) => (
             <button
               key={m.id}
               onClick={() => {
-                const g = generationForBody(m.id);
+                // A variant with a signature powertrain (e.g. GT4 = 3.8 / manual)
+                // snaps to it; otherwise keep a still-valid selection, else default.
+                const target = getVariant(m.id);
+                const g = target.generation;
                 const patch: Partial<typeof vehicle> = { body: m.id, model: m.modelName };
-                if (!enginesFor(g).includes(vehicle.engine)) patch.engine = defaultEngine(g);
-                if (!transmissionsFor(g).includes(vehicle.trans)) patch.trans = defaultTransmission(g);
+                if (target.defaultEngine) patch.engine = target.defaultEngine;
+                else if (!enginesFor(g).includes(vehicle.engine)) patch.engine = defaultEngine(g);
+                if (target.defaultTransmission) patch.trans = target.defaultTransmission;
+                else if (!transmissionsFor(g).includes(vehicle.trans)) patch.trans = defaultTransmission(g);
                 update(patch);
               }}
               style={chip(vehicle.body === m.id)}
@@ -149,16 +154,18 @@ export default function Settings() {
         <label style={fieldLabel}>Paint — {vehicle.colorName}</label>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 4 }}>
           {COLORS.map((c) => (
-            <button
-              key={c.hex}
-              title={c.name}
-              onClick={() => update({ colorName: c.name, colorHex: c.hex })}
-              style={{
-                width: 30, height: 30, borderRadius: 4, cursor: 'pointer', padding: 0, background: c.hex,
-                border: vehicle.colorHex === c.hex ? '2px solid var(--red, #D5001C)' : '1px solid #D2D2D6',
-                boxShadow: vehicle.colorHex === c.hex ? '0 0 0 3px rgba(213,0,28,.15)' : 'none',
-              }}
-            />
+            <span key={c.hex} className="colorSwatch">
+              <button
+                aria-label={c.name}
+                onClick={() => update({ colorName: c.name, colorHex: c.hex })}
+                style={{
+                  width: 30, height: 30, borderRadius: 4, cursor: 'pointer', padding: 0, background: c.hex,
+                  border: vehicle.colorHex === c.hex ? '2px solid var(--red, #D5001C)' : '1px solid #D2D2D6',
+                  boxShadow: vehicle.colorHex === c.hex ? '0 0 0 3px rgba(213,0,28,.15)' : 'none',
+                }}
+              />
+              <span className="colorSwatchTip">{c.name}</span>
+            </span>
           ))}
         </div>
       </div>

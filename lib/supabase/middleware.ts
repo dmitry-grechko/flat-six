@@ -15,9 +15,14 @@ import { DEMO_MODE } from '@/lib/demo';
  */
 const PUBLIC_PREFIXES = ['/auth', '/api/mcp', '/api/sse', '/.well-known', '/api/oauth', '/oauth'];
 
+const PUBLIC_MARKETING_PREFIXES = ['/features', '/guides', '/codes'];
+
 function isPublic(pathname: string): boolean {
-  // The marketing landing page and the privacy/terms page are public.
-  if (pathname === '/' || pathname === '/legal') return true;
+  // Marketing landing, legal, generation hubs, and SEO content pages are public.
+  if (pathname === '/' || pathname === '/legal' || pathname === '/about') return true;
+  if (pathname === '/987' || pathname === '/981') return true;
+  if (pathname === '/codes') return true;
+  if (PUBLIC_MARKETING_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + '/'))) return true;
   return PUBLIC_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + '/'));
 }
 

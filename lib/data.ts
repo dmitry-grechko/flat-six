@@ -23,11 +23,30 @@ export const VEHICLE: Vehicle = {
   plate: 'YT14 BXS',
 };
 
+// Factory paint offered on the 981 & 987 Boxster/Cayman (2005–2016). Swatch hexes
+// are display approximations, not paint-match values. Shared across models — the
+// picker is not generation-filtered today.
 export const COLORS: PaintColor[] = [
-  { name: 'GT SILVER', hex: '#C6C8CA' }, { name: 'CARRARA WHITE', hex: '#E8E8EA' },
-  { name: 'JET BLACK', hex: '#131316' }, { name: 'GUARDS RED', hex: '#D5001C' },
-  { name: 'SAPPHIRE BLUE', hex: '#27364E' }, { name: 'RACING YELLOW', hex: '#EFC03B' },
-  { name: 'AGATE GREY', hex: '#5B5F63' }, { name: 'AMARANTH', hex: '#7A2230' },
+  // Whites / silvers / greys
+  { name: 'CARRARA WHITE', hex: '#E8E8EA' }, { name: 'CLASSIC SILVER', hex: '#BFC3C6' },
+  { name: 'ARCTIC SILVER', hex: '#C6C9CC' }, { name: 'GT SILVER', hex: '#C6C8CA' },
+  { name: 'PLATINUM SILVER', hex: '#B4B7BA' }, { name: 'RHODIUM SILVER', hex: '#97999C' },
+  { name: 'METEOR GREY', hex: '#45484B' }, { name: 'AGATE GREY', hex: '#5B5F63' },
+  // Blacks
+  { name: 'JET BLACK', hex: '#131316' }, { name: 'BASALT BLACK', hex: '#1B1C1E' },
+  // Blues
+  { name: 'AQUA BLUE', hex: '#5E97A8' }, { name: 'SAPPHIRE BLUE', hex: '#27364E' },
+  { name: 'COBALT BLUE', hex: '#22417C' }, { name: 'MIDNIGHT BLUE', hex: '#1E2A44' },
+  // Reds
+  { name: 'GUARDS RED', hex: '#D5001C' }, { name: 'CARMINE RED', hex: '#97011F' },
+  // Carmona Red Metallic (M3W / E4) — wine metallic; display approx, not paint-match
+  { name: 'CARMONA RED METALLIC', hex: '#6B1A28' },
+  { name: 'AMARANTH', hex: '#7A2230' },
+  // Yellows / greens / earth
+  { name: 'RACING YELLOW', hex: '#EFC03B' }, { name: 'SPEED YELLOW', hex: '#F5C400' },
+  { name: 'MALACHITE GREEN', hex: '#2E4A3B' }, { name: 'LIME GOLD', hex: '#7F8447' },
+  { name: 'MACADAMIA', hex: '#B7A98B' }, { name: 'NORDIC GOLD', hex: '#96865F' },
+  { name: 'MAHOGANY', hex: '#3C2B25' },
 ];
 
 // Engine + transmission options are GENERATION-SPECIFIC:
@@ -43,19 +62,46 @@ export const TRANS_987 = ['5-Speed Manual', '6-Speed Manual', '5-Speed Tiptronic
 export const ENGINES = ENGINES_981;
 export const TRANS = TRANS_981;
 
+/** Fallback generation for unknown / legacy vehicle bodies. */
+export const DEFAULT_GENERATION = '981';
+
+/** The powertrain (option lists + seed defaults) for one generation. */
+export interface GenerationPowertrain {
+  engines: string[];
+  transmissions: string[];
+  /** Seed engine for a new vehicle of this generation (an "S" everywhere today). */
+  defaultEngine: string;
+  /** Seed transmission — 981 → PDK; 987 → manual (valid across 987.1 + 987.2). */
+  defaultTransmission: string;
+}
+
+// Per-generation powertrain registry — the single place to register a
+// generation's engine/transmission options. Mirrors GENERATION_KB in
+// lib/knowledge and the cutaway registry in lib/credits. Unknown generations
+// fall back to DEFAULT_GENERATION, so legacy vehicles and not-yet-populated
+// generations still get a valid option list. (Per-VARIANT signature powertrains
+// — e.g. the GT4's manual-only 3.8 — live on CarVariant in lib/models and are
+// applied by callers as `variant.defaultEngine ?? defaultEngine(gen)`.)
+const GENERATION_POWERTRAIN: Record<string, GenerationPowertrain> = {
+  '981': { engines: ENGINES_981, transmissions: TRANS_981, defaultEngine: '3.4 L Flat-Six (S)', defaultTransmission: '7-Speed PDK' },
+  '987': { engines: ENGINES_987, transmissions: TRANS_987, defaultEngine: '3.4 L Flat-Six (S)', defaultTransmission: '6-Speed Manual' },
+};
+
+function powertrain(generation: string): GenerationPowertrain {
+  return GENERATION_POWERTRAIN[generation] ?? GENERATION_POWERTRAIN[DEFAULT_GENERATION];
+}
+
 export function enginesFor(generation: string): string[] {
-  return generation === '987' ? ENGINES_987 : ENGINES_981;
+  return powertrain(generation).engines;
 }
 export function transmissionsFor(generation: string): string[] {
-  return generation === '987' ? TRANS_987 : TRANS_981;
+  return powertrain(generation).transmissions;
 }
-/** Sensible default engine — every variant we ship is an "S" model. */
-export function defaultEngine(_generation: string): string {
-  return '3.4 L Flat-Six (S)';
+export function defaultEngine(generation: string): string {
+  return powertrain(generation).defaultEngine;
 }
-/** Default transmission: 981 → PDK; 987 → manual (valid across 987.1 + 987.2). */
 export function defaultTransmission(generation: string): string {
-  return generation === '987' ? '6-Speed Manual' : '7-Speed PDK';
+  return powertrain(generation).defaultTransmission;
 }
 
 // view/ix/iy come from the mockup's VIEWMAP (hotspot positions on the 2D cutaways).
@@ -71,9 +117,9 @@ export const COMPONENTS: Component[] = [
     steps: ['Open frunk, lift floor panel', 'Connect memory saver to OBD', 'Disconnect negative then positive', 'Swap battery, refit clamps to 6 Nm', 'Re-register battery if AGM type'],
     view: 'front', ix: 19, iy: 41 },
   { id: 'fbrakes', label: 'Front Brakes', sub: 'Pads · discs · fluid', system: 'Brakes', diff: 3, time: '~90 min',
-    part: 'Pads 981.351.939.01 · Discs 981.351.045 (S)', spec: '315 mm discs (S) · 4-pot fixed caliper', interval: 'Inspect yearly · fluid 2 yr', torque: 'Wheel bolts 130 Nm · caliper 85 Nm',
+    part: 'Pads 981.351.939.01 · Discs 981.351.045 (S)', spec: '315 mm discs (S) · 4-pot fixed caliper', interval: 'Inspect yearly · fluid 2 yr', torque: 'Wheel bolts 160 Nm · caliper 85 Nm',
     notes: 'Wear sensor on the front left. Keep the dust boot clean and lube guide pins. Bed pads in over 200 miles.',
-    steps: ['Loosen wheel bolts, lift & support', 'Remove wheel, retaining clip & pins', 'Lever pistons back, fit new pads', 'Reset wear sensor if triggered', 'Torque wheel bolts to 130 Nm in star'],
+    steps: ['Loosen wheel bolts, lift & support', 'Remove wheel, retaining clip & pins', 'Lever pistons back, fit new pads', 'Reset wear sensor if triggered', 'Torque wheel bolts to 160 Nm in star'],
     view: 'front', ix: 21, iy: 66 },
   { id: 'steering', label: 'Electromechanical Steering', sub: 'EPS rack & track rods', system: 'Steering', diff: 4, time: 'shop',
     part: 'Track rod end 981.347.082', spec: 'Electric assist — no hydraulic fluid', interval: 'Inspect boots & ends yearly', torque: 'Track rod end 100 Nm',
@@ -126,9 +172,9 @@ export const COMPONENTS: Component[] = [
     steps: ['Lift & level, warm to temp', 'Drain transaxle, measure quantity', 'Replace PDK filter / clean magnet', 'Refill exact amount via fill port', 'Fill plug to 45 Nm, road-test shifts'],
     view: 'rear', ix: 60, iy: 52 },
   { id: 'rbrakes', label: 'Rear Brakes', sub: 'Pads · discs', system: 'Brakes', diff: 3, time: '~80 min',
-    part: 'Pads 981.352.939.01 · Discs 981.352.045', spec: '299 mm discs · integrated park brake', interval: 'Inspect yearly', torque: 'Wheel bolts 130 Nm · caliper 85 Nm',
+    part: 'Pads 981.352.939.01 · Discs 981.352.045', spec: '299 mm discs · integrated park brake', interval: 'Inspect yearly', torque: 'Wheel bolts 160 Nm · caliper 85 Nm',
     notes: 'Drum-in-hat parking brake. Retract pistons squarely; release park brake fully before service.',
-    steps: ['Loosen bolts, lift & support rear', 'Release park brake, remove caliper', 'Fit new pads, lube pins', 'Seat caliper, torque 85 Nm', 'Wheel bolts 130 Nm in star'],
+    steps: ['Loosen bolts, lift & support rear', 'Release park brake, remove caliper', 'Fit new pads, lube pins', 'Seat caliper, torque 85 Nm', 'Wheel bolts 160 Nm in star'],
     view: 'front', ix: 83, iy: 67 },
   { id: 'exhaust', label: 'Exhaust & Sport System', sub: 'Cats · muffler · PSE', system: 'Exhaust', diff: 3, time: '~90 min',
     part: 'Rear muffler 981.111.025 · PSE valve', spec: 'Vacuum-actuated valve (PSE)', interval: 'Inspect yearly', torque: 'Clamp nut 23 Nm · hanger 23 Nm',
@@ -136,9 +182,9 @@ export const COMPONENTS: Component[] = [
     steps: ['Inspect from cats rearward for leaks', 'Check hangers & heat shields', 'Test PSE valve open/close vacuum', 'Replace gaskets at flanges', 'Clamp nuts to 23 Nm'],
     view: 'rear', ix: 80, iy: 56 },
   { id: 'wheels', label: 'Wheels & Tyres', sub: 'Rims · tyres · TPMS', system: 'Wheels', diff: 1, time: '~30 min',
-    part: '235/40ZR19 fr · 265/40ZR19 rr (S, N-rated)', spec: 'Pressures 2.4 / 2.9 bar (cold)', interval: 'Rotate & inspect / check pressures', torque: 'Wheel bolts 130 Nm',
+    part: '235/40ZR19 fr · 265/40ZR19 rr (S, N-rated)', spec: 'Pressures 2.4 / 2.9 bar (cold)', interval: 'Rotate & inspect / check pressures', torque: 'Wheel bolts 160 Nm',
     notes: 'Run N-spec tyres for correct handling. Square setup means no cross rotation; check inner-edge wear from camber.',
-    steps: ['Check cold pressures 2.4/2.9 bar', 'Inspect tread depth & inner edge', 'Reset TPMS after changes', 'Torque bolts to 130 Nm in star', 'Re-torque after 50 miles'],
+    steps: ['Check cold pressures 2.4/2.9 bar', 'Inspect tread depth & inner edge', 'Reset TPMS after changes', 'Torque bolts to 160 Nm in star', 'Re-torque after 50 miles'],
     view: 'front', ix: 15, iy: 73 },
   { id: 'fusebox', label: 'Front Fuse & Relay Carrier', sub: 'E-box · frunk', system: 'Electrical', diff: 1, time: '~10 min',
     part: 'Carrier 981.610.105 · mini fuses', spec: 'Main + comfort carriers under frunk trim', interval: 'Inspect when diagnosing electrics', torque: 'n/a',
@@ -183,11 +229,17 @@ export const COMPONENTS: Component[] = [
 ];
 
 /**
- * Cutaway components for a generation. 981 uses COMPONENTS; 987 uses its own
- * set (lib/data-987.ts). Mirrors the generation fork in lib/knowledge.
+ * Cutaway components per generation. Mirrors the registries in lib/knowledge
+ * (GENERATION_KB) and the powertrain registry above. Unknown / null generations
+ * fall back to the 981 set.
  */
+const GENERATION_COMPONENTS: Record<string, Component[]> = {
+  '981': COMPONENTS,
+  '987': COMPONENTS_987,
+};
+
 export function componentsForGeneration(generation: string | null | undefined): Component[] {
-  return generation === '987' ? COMPONENTS_987 : COMPONENTS;
+  return GENERATION_COMPONENTS[generation ?? DEFAULT_GENERATION] ?? GENERATION_COMPONENTS[DEFAULT_GENERATION];
 }
 
 export const FAULTS: Fault[] = [
@@ -210,7 +262,7 @@ export const REC_TEMPLATES: Record<string, string[]> = {
   'Oil & Filter': ['Drain engine oil (warm)', 'Replace Mahle OX 366D filter', 'New drain-plug crush washer', 'Refill 7.5 L Mobil 1 0W-40', 'Verify level on iPM', 'Reset oil-service interval'],
   'Brake Fluid': ['Top reservoir with fresh fluid', 'Bleed RR caliper', 'Bleed LR caliper', 'Bleed RF caliper', 'Bleed LF caliper', 'Confirm firm pedal'],
   'Spark Plugs': ['Remove rear lid & covers', 'Unbolt 6 coil packs', 'Remove & gap-check plugs', 'Fit 6 new plugs @ 30 Nm', 'Refit coils @ 9 Nm', 'Clear adaptation'],
-  'Tyre Rotation': ['Check cold pressures', 'Inspect tread & inner edge', 'Reset TPMS', 'Torque bolts 130 Nm', 'Re-torque after 50 mi'],
+  'Tyre Rotation': ['Check cold pressures', 'Inspect tread & inner edge', 'Reset TPMS', 'Torque bolts 160 Nm', 'Re-torque after 50 mi'],
   'Custom': ['Add your first step…'],
 };
 

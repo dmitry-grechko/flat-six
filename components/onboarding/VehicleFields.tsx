@@ -2,7 +2,7 @@
 
 import { COLORS, enginesFor, transmissionsFor, defaultEngine, defaultTransmission } from '@/lib/data';
 import { MODEL_OPTIONS } from '@/lib/vehicle-context';
-import { generationForBody } from '@/lib/models';
+import { generationForBody, getVariant } from '@/lib/models';
 import type { BodyType } from '@/lib/types';
 
 const mono = "'JetBrains Mono',monospace";
@@ -22,15 +22,16 @@ export interface VehicleFormState {
 
 /** Sensible starting point shared by both entry points. */
 export function defaultVehicleForm(body: BodyType = 'boxster'): VehicleFormState {
-  const gen = generationForBody(body);
+  const variant = getVariant(body);
+  const gen = variant.generation;
   return {
     body,
     year: '',
     mileage: '',
     vin: '',
     plate: '',
-    engine: defaultEngine(gen),
-    trans: defaultTransmission(gen),
+    engine: variant.defaultEngine ?? defaultEngine(gen),
+    trans: variant.defaultTransmission ?? defaultTransmission(gen),
     colorName: 'GT SILVER',
     colorHex: '#C6C8CA',
   };
@@ -92,12 +93,17 @@ export default function VehicleFields({
             key={m.id}
             type="button"
             onClick={() => {
-              // Switching model may change the valid engine/transmission sets —
-              // reset any selection that isn't offered by the new generation.
-              const g = generationForBody(m.id);
+              // Switching model may change the valid engine/transmission sets.
+              // A variant with a signature powertrain (e.g. GT4 = 3.8 / manual)
+              // snaps to it; otherwise keep the current selection when it's still
+              // valid for the new generation, else fall back to its default.
+              const target = getVariant(m.id);
+              const g = target.generation;
               const patch: Partial<VehicleFormState> = { body: m.id };
-              if (!enginesFor(g).includes(value.engine)) patch.engine = defaultEngine(g);
-              if (!transmissionsFor(g).includes(value.trans)) patch.trans = defaultTransmission(g);
+              if (target.defaultEngine) patch.engine = target.defaultEngine;
+              else if (!enginesFor(g).includes(value.engine)) patch.engine = defaultEngine(g);
+              if (target.defaultTransmission) patch.trans = target.defaultTransmission;
+              else if (!transmissionsFor(g).includes(value.trans)) patch.trans = defaultTransmission(g);
               onChange(patch);
             }}
             style={chip(value.body === m.id)}
@@ -164,22 +170,24 @@ export default function VehicleFields({
       <label style={fieldLabel}>Paint — {value.colorName}</label>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
         {COLORS.map((c) => (
-          <button
-            key={c.hex}
-            type="button"
-            title={c.name}
-            onClick={() => onChange({ colorName: c.name, colorHex: c.hex })}
-            style={{
-              width: 30,
-              height: 30,
-              borderRadius: 4,
-              cursor: 'pointer',
-              padding: 0,
-              background: c.hex,
-              border: value.colorHex === c.hex ? '2px solid var(--red, #D5001C)' : '1px solid #D2D2D6',
-              boxShadow: value.colorHex === c.hex ? '0 0 0 3px rgba(213,0,28,.15)' : 'none',
-            }}
-          />
+          <span key={c.hex} className="colorSwatch">
+            <button
+              type="button"
+              aria-label={c.name}
+              onClick={() => onChange({ colorName: c.name, colorHex: c.hex })}
+              style={{
+                width: 30,
+                height: 30,
+                borderRadius: 4,
+                cursor: 'pointer',
+                padding: 0,
+                background: c.hex,
+                border: value.colorHex === c.hex ? '2px solid var(--red, #D5001C)' : '1px solid #D2D2D6',
+                boxShadow: value.colorHex === c.hex ? '0 0 0 3px rgba(213,0,28,.15)' : 'none',
+              }}
+            />
+            <span className="colorSwatchTip">{c.name}</span>
+          </span>
         ))}
       </div>
     </>

@@ -7,6 +7,7 @@ export function isAdminEmail(email?: string | null): boolean {
 
 // ---- Admin overview shape (returned by /api/admin/overview, rendered by AdminPanel) ----
 export interface AdminUser {
+  id: string;
   email: string;
   joined: string;        // ISO date
   vehicleCount: number;
@@ -15,6 +16,8 @@ export interface AdminUser {
   planCount: number;
   /** true if the user has completed OAuth at least once (MCP connector). */
   mcpConnected: boolean;
+  /** Factory PDF library / deep-link access. */
+  documentsAccess: boolean;
 }
 
 export interface AdminOverview {
@@ -24,6 +27,8 @@ export interface AdminOverview {
   totalRecords: number;
   totalPlans: number;
   mcpConnectedUsers: number;
+  /** Vehicle counts keyed by generation (e.g. { '981': 12, '987': 5 }). */
+  vehiclesByGeneration: Record<string, number>;
   users: AdminUser[];
   /** true when served from demo placeholder data rather than the real DB. */
   demo?: boolean;

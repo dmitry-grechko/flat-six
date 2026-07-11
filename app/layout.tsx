@@ -5,22 +5,22 @@ import Providers from './providers';
 const SITE_URL = 'https://www.flat-six.org';
 const SITE_NAME = 'FLAT·SIX';
 const DESCRIPTION =
-  'A free, open-source garage for the Porsche Boxster & Cayman — 987, 981, and more. Explore your car in 3D, look up generation-specific fault codes and torque specs, keep a full service history, plan maintenance, and let an AI assistant help — all in one place.';
+  'A free, open-source garage for the Boxster & Cayman platform — 987, 981, and more. Explore your car in 3D, look up generation-specific fault codes and torque specs, keep a full service history, plan maintenance, and let an AI assistant help — all in one place.';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'FLAT·SIX — Free Porsche Boxster & Cayman garage',
+    default: 'FLAT·SIX — Free Boxster & Cayman garage',
     template: '%s · FLAT·SIX',
   },
   description: DESCRIPTION,
   applicationName: SITE_NAME,
-  authors: [{ name: 'Dmitry Grechko', url: 'https://github.com/dmitry-grechko' }],
-  creator: 'Dmitry Grechko',
+  authors: [{ name: 'Themis Grove LLC', url: SITE_URL }],
+  creator: 'Themis Grove LLC',
   publisher: SITE_NAME,
   keywords: [
-    'Porsche 987',
-    'Porsche 981',
+    '987',
+    '981',
     'Boxster',
     'Cayman',
     '987 maintenance',
@@ -31,25 +31,22 @@ export const metadata: Metadata = {
     'part numbers',
     'oil change',
     'flat-six',
-    'IMS bearing',
-    'PDK',
     'fault finding',
     'open source',
     'free',
   ],
   category: 'automotive',
-  alternates: { canonical: '/' },
   openGraph: {
     type: 'website',
     siteName: SITE_NAME,
     url: SITE_URL,
-    title: 'FLAT·SIX — Free Porsche Boxster & Cayman garage',
+    title: 'FLAT·SIX — Free Boxster & Cayman garage',
     description: DESCRIPTION,
     locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'FLAT·SIX — Free Porsche Boxster & Cayman garage',
+    title: 'FLAT·SIX — Free Boxster & Cayman garage',
     description: DESCRIPTION,
   },
   robots: {

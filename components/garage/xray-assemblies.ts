@@ -53,7 +53,11 @@ export interface XrayAssembly {
 export const AXLE = { frontZ: 1.5, rearZ: -1.5, halfTrack: 0.82, hubY: -0.35 };
 
 export const XRAY_ASSEMBLIES: XrayAssembly[] = [
-  { id: 'engine',    label: 'Engine',           glb: '/models/components/engine.glb',    manifest: '/models/components/engine-parts.json',    hotspot3d: '0 0.2 -0.8',   displayRadius: 0.70 },
+  // The plugs overlay is the single coil depiction in unified — hide the
+  // engine model's own coilPacks band there (top-mounted, wrong for a boxer;
+  // still visible + pinnable in the focused engine view).
+  { id: 'engine',    label: 'Engine',           glb: '/models/components/engine.glb',    manifest: '/models/components/engine-parts.json',    hotspot3d: '0 0.2 -0.8',   displayRadius: 0.70,
+    hideInUnified: ['coilPacks'] },
   { id: 'trans',     label: 'Transaxle',         glb: '/models/components/trans.glb',     manifest: '/models/components/trans-parts.json',     hotspot3d: '0 -0.1 -1.7',  displayRadius: 0.55 },
   // Exhaust spans engine headers (z≈-0.85) to the rear tips (z≈-2.0): sized so the
   // native span (ports z0 → tips z-4.05, sphere r≈3.33) lands at scale ≈0.28 and
@@ -72,10 +76,23 @@ export const XRAY_ASSEMBLIES: XrayAssembly[] = [
   // so the front cores land at the bumper corners (±0.41, -0.07, ~1.89) at a
   // legible ~0.31 core height. The engine-bay bits compress toward mid-car — fine.
   { id: 'cooling',   label: 'Cooling System',    glb: '/models/components/cooling.glb',   manifest: '/models/components/cooling-parts.json',   hotspot3d: '0 -0.05 1.45', displayRadius: 0.80 },
-  { id: 'oil',       label: 'Oil & Lubrication', glb: '/models/components/oil.glb',       manifest: '/models/components/oil-parts.json',       hotspot3d: '0.6 0.1 -0.9', displayRadius: 0.22 },
+  // Car-space ON the engine, EXTERNAL service items only: the real engine.glb
+  // already shows its own pan/sump, oil pump and internals — overlaying ours
+  // duplicated them (the "giant box" under the engine). Hide the internals in
+  // unified and keep the filter console, cooler, separator, filler/dipstick and
+  // sensors (the DIY anchors). Focused view still shows + pins everything.
+  { id: 'oil',       label: 'Oil & Lubrication', glb: '/models/components/oil.glb',       manifest: '/models/components/oil-parts.json',       hotspot3d: '0 0.18 -0.78', carSpace: true, worldScale: 0.42,
+    hideInUnified: ['oilSump', 'engineOil', 'oilPump', 'oilPipe', 'oilLevelSensor'] },
   // Dual air cleaners merge at central throttle (WM 242519 / 244601).
   { id: 'airfilter', label: 'Air Intake',        glb: '/models/components/airfilter.glb', manifest: '/models/components/airfilter-parts.json', hotspot3d: '0 0 0', carSpace: true, worldScale: 1 },
-  { id: 'plugs',     label: 'Ignition & Fuel',   glb: '/models/components/plugs.glb',     manifest: '/models/components/plugs-parts.json',     hotspot3d: '-0.5 0.3 -0.9', displayRadius: 0.18 },
+  // Ignition & fuel is a full flat-six model (coil banks at native x ±1.5) that
+  // ALSO carries tank-side fuel-delivery parts at native z 3.4–3.9 — bbox
+  // normalization can never seat it on the engine. Car-space instead: the
+  // rendered engine is ±0.415 half-width (gen:layout), so ±1.5·0.29 ≈ ±0.44
+  // half-embeds the coil banks in the heads; tank-side bits are hidden in
+  // unified (the Fuel Tank assembly owns that zone; still pinnable focused).
+  { id: 'plugs',     label: 'Ignition & Fuel',   glb: '/models/components/plugs.glb',     manifest: '/models/components/plugs-parts.json',     hotspot3d: '0 0.11 -0.8', carSpace: true, worldScale: 0.29,
+    hideInUnified: ['lowPressureFuelPump', 'fuelPumpRelay', 'fuelTankFillerNeckCheckValve'] },
   // Engine grew denser after WM detail pass — slightly larger display so it stays
   // the visual anchor next to exhaust/cooling in the joint view.
   // (engine displayRadius kept at 0.70; tune here if layout report flags extent)

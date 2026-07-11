@@ -8,7 +8,9 @@ import { OrbitControls, Environment, useGLTF, ContactShadows, Html, Line } from 
 import * as THREE from 'three';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { XRAY_ASSEMBLIES, xrayAssembliesFor } from './xray-assemblies';
+import { xrayAssembliesForVehicle } from './trim';
 import { flowsForLayer, type FlowNode, type FlowPathDef, type FlowSystem, type XrayLayer } from './flow-systems';
+import type { Vehicle } from '@/lib/types';
 
 type ConnectionType = 'mechanical' | 'exhaust' | 'fluid' | 'air' | 'electrical';
 
@@ -24,9 +26,9 @@ const CONNECTIONS: { from: string; to: string; label: string; type: ConnectionTy
   { from: 'engine', to: 'trans',     label: 'Crankshaft',   type: 'mechanical' },
   { from: 'engine', to: 'exhaust',   label: 'Headers',      type: 'exhaust'    },
   { from: 'engine', to: 'cooling',   label: 'Coolant Loop', type: 'fluid'      },
-  { from: 'engine', to: 'oil',       label: 'Oil Circuit',  type: 'fluid'      },
+  // (engine→oil / engine→plugs connections removed: those assemblies are now
+  // rendered car-space ON the engine, so the dashed lines degenerated to dots.)
   { from: 'engine', to: 'airfilter', label: 'Induction',    type: 'air'        },
-  { from: 'engine', to: 'plugs',     label: 'Fuel & Spark', type: 'electrical' },
   { from: 'trans',  to: 'rbrakes',   label: 'Driveshafts',  type: 'mechanical' },
 ];
 
@@ -38,6 +40,8 @@ export type UnifiedSceneProps = {
   onSelectFlow: (id: string | null) => void;
   /** Garage vehicle generation — picks the assembly + flow set ('981' default). */
   generation?: string;
+  /** Full garage vehicle — trim-resolves the assembly set (falls back to generation). */
+  vehicle?: Vehicle;
   handleRef?: { current: { reset: () => void } | null };
 };
 
@@ -374,8 +378,17 @@ function AssemblyMesh({ assembly, isSelected, anySelected, ghosted, onSelect }: 
 
   // ── Car-space: the model's own coordinates ARE scene coordinates. Render at a
   // fixed scale + hotspot offset, no recentering/normalization, so full-width
-  // chassis models keep their 4 corners aligned with the brakes.
-  const carClone = useMemo(() => (carSpace ? cloneWithMaterials(scene) : null), [scene, carSpace]);
+  // chassis models keep their 4 corners aligned with the brakes. hideInUnified
+  // applies here too (e.g. the ignition/fuel model's tank-side pump/relay —
+  // represented by the Fuel Tank assembly in this scene; still pinnable focused).
+  const carClone = useMemo(() => {
+    if (!carSpace) return null;
+    const c = cloneWithMaterials(scene);
+    const hide = assembly.hideInUnified;
+    if (hide?.length) c.traverse((o) => { if (hide.includes(o.name)) o.visible = false; });
+    return c;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scene, carSpace]);
   const carLabelY = useMemo(() => {
     if (!carClone) return 0;
     const box = new THREE.Box3().setFromObject(carClone);
@@ -442,7 +455,7 @@ function AssemblyMesh({ assembly, isSelected, anySelected, ghosted, onSelect }: 
         <group position={[px, py, pz]} scale={worldScale} {...interactiveProps}>
           <primitive object={carClone} />
         </group>
-        <Html position={[0, carLabelY, 0]} center style={{ pointerEvents: 'none', userSelect: 'none' }}>
+        <Html position={[px, carLabelY, pz]} center style={{ pointerEvents: 'none', userSelect: 'none' }}>
           <div style={{
             opacity: ghosted ? 0.3 : 1,
             color: isSelected ? '#D5001C' : '#9A9AA0',
@@ -492,11 +505,11 @@ function AssemblyMesh({ assembly, isSelected, anySelected, ghosted, onSelect }: 
   );
 }
 
-export default function UnifiedSceneClient({ selectedAssemblyId, onSelectAssembly, layer, selectedFlowId, onSelectFlow, generation = '981', handleRef }: UnifiedSceneProps) {
+export default function UnifiedSceneClient({ selectedAssemblyId, onSelectAssembly, layer, selectedFlowId, onSelectFlow, generation = '981', vehicle, handleRef }: UnifiedSceneProps) {
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
   useImperativeHandle(handleRef, () => ({ reset: () => controlsRef.current?.reset() }));
 
-  const assemblies = useMemo(() => xrayAssembliesFor(generation), [generation]);
+  const assemblies = useMemo(() => (vehicle ? xrayAssembliesForVehicle(vehicle) : xrayAssembliesFor(generation)), [vehicle, generation]);
   // Warm the generation's GLBs (981 set is already preloaded at module load).
   useMemo(() => assemblies.forEach((a) => useGLTF.preload(a.glb)), [assemblies]);
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, type FC } from 'react';
+import { useEffect, useMemo, useRef, useState, type FC } from 'react';
 import { useRouter } from 'next/navigation';
 import { COMPONENTS, SYSTEMS, COLORS, diffDots, DIFF_LABELS, componentsForGeneration } from '@/lib/data';
 import { catalogForSystem, formatPartNumber } from '@/lib/catalog';
@@ -14,8 +14,9 @@ import type { Component, SystemName, Vehicle, EnginePart } from '@/lib/types';
 // (ssr:false) internally so we can keep a working ref through it.
 import GLBViewer, { type GLBViewerHandle } from './GLBViewer';
 import UnifiedViewer, { type UnifiedViewerHandle } from './UnifiedViewer';
-import { XRAY_ASSEMBLIES, xrayAssembliesFor, type XrayAssembly, loadAssemblyParts, isPrimary, childrenOf } from './xray-assemblies';
+import { XRAY_ASSEMBLIES, type XrayAssembly, loadAssemblyParts, isPrimary, childrenOf } from './xray-assemblies';
 import { FLOW_SYSTEMS, XRAY_LAYERS, flowsForLayer, flowSystemsFor, type FlowSystem, type XrayLayer } from './flow-systems';
+import { transmissionKind, trimBadges, xrayAssembliesForVehicle, partVisibleForTrim } from './trim';
 
 const mono = "'JetBrains Mono',monospace";
 const RED = 'var(--red)';
@@ -31,6 +32,7 @@ export default function ComponentExplorer() {
   const [activeSystem, setActiveSystem] = useState<SystemName | 'All' | 'None'>('All');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [paint, setPaint] = useState<string | null>(null);
+  const [paintOpen, setPaintOpen] = useState(false);
   const [xray, setXray] = useState(false);
   const [autoSpin, setAutoSpin] = useState(false);
   const [aiPrompt, setAiPrompt] = useState<string | null>(null);
@@ -45,8 +47,12 @@ export default function ComponentExplorer() {
   const hasCutaway2D = variant.hasCutaway2D;
   const hasXray3D = variant.hasXray3D;
   const activeComponents = componentsForGeneration(generation);
-  // X-ray assembly + flow sets are generation-scoped (981 vs 987 GLB sets).
-  const assemblies = xrayAssembliesFor(generation);
+  // X-ray assembly + flow sets are generation-scoped (981 vs 987 GLB sets); the
+  // assembly set is further trim-resolved (trim.ts) so a non-PDK trim renders the
+  // PDK transaxle GLB with a fallback badge + PDK-only parts filtered out.
+  const assemblies = xrayAssembliesForVehicle(vehicle);
+  const transKind = transmissionKind(vehicle.trans);
+  const trimBadgeMap = trimBadges(vehicle);
 
   // null = all systems unified view; non-null = focused single assembly.
   const [assemblyId, setAssemblyId] = useState<XrayAssembly['id'] | null>(null);
@@ -60,7 +66,16 @@ export default function ComponentExplorer() {
 
   // Parts manifest for the active assembly (lazy, cached per assembly).
   const [partsByAssembly, setPartsByAssembly] = useState<Record<string, EnginePart[]>>({});
-  const parts = assembly ? (partsByAssembly[assembly.id] ?? []) : [];
+  // Trim-filtered view of the manifests: the transaxle GLB is PDK-modelled, so a
+  // manual/Tiptronic vehicle hides the PDK-only parts (mechatronic, clutch pack,
+  // PDK oil pan…) and keeps the shared driveline hardware. All DISPLAY consumers
+  // (focused pins, counts, search, drill-down) read this; the loader below still
+  // populates the raw map so switching trim re-filters without a refetch.
+  const displayParts = useMemo(() => {
+    if (transKind === 'pdk' || !partsByAssembly.trans) return partsByAssembly;
+    return { ...partsByAssembly, trans: partsByAssembly.trans.filter((p) => partVisibleForTrim(p, transKind)) };
+  }, [partsByAssembly, transKind]);
+  const parts = assembly ? (displayParts[assembly.id] ?? []) : [];
   const [selectedPartId, setSelectedPartId] = useState<string | null>(null);
   // Which primary part is expanded into its sub-parts (drill-down tier).
   const [drillId, setDrillId] = useState<string | null>(null);
@@ -84,14 +99,16 @@ export default function ComponentExplorer() {
 
   // Assembly ids repeat across generations — drop cached parts + selections
   // when the garage vehicle switches generation so 981 manifests don't leak
-  // into the 987 view (and vice versa).
+  // into the 987 view (and vice versa). Also reset on transmission-kind change:
+  // the trim resolver can swap the `trans` GLB+manifest (PDK ↔ manual), and the
+  // cache is keyed by assembly id, so a stale manifest would otherwise stick.
   useEffect(() => {
     setPartsByAssembly({});
     setAssemblyId(null);
     setSelectedPartId(null);
     setDrillId(null);
     setFlowId(null);
-  }, [generation]);
+  }, [generation, transKind]);
 
   // Keep view state consistent with the active variant's capabilities: if it
   // has no 3D X-ray, force X-ray off; if it has no 2D cutaway, leave the image
@@ -138,6 +155,14 @@ export default function ComponentExplorer() {
     setSelectedPartId(null);
     setDrillId(null);
     setFlowId(null);
+  };
+
+  // Jump straight to a specific part inside its assembly (X-ray search results).
+  const selectPartInAssembly = (aid: XrayAssembly['id'], pid: string) => {
+    setAssemblyId(aid);
+    setDrillId(null);
+    setFlowId(null);
+    setSelectedPartId(pid);
   };
 
   // Selecting a primary that has children drills into it; any other highlights it.
@@ -231,7 +256,7 @@ export default function ComponentExplorer() {
           )}
 
           <div style={{ marginLeft: 'auto', font: `500 10px/1 ${mono}`, letterSpacing: '.12em', color: '#9A9AA0' }}>
-            {view === '3d' ? (xray ? (assemblyId ? 'X-RAY · DRAG TO ORBIT · CLICK A PART' : (layer === 'air' || layer === 'lines' ? `${layer.toUpperCase()} LAYER · CLICK A FLOW TO INSPECT` : 'ALL SYSTEMS · DRAG TO ORBIT · CLICK A SYSTEM')) : 'DRAG TO ORBIT · CLICK A PANEL DOT') : `${viewComponents.length} COMPONENTS · CLICK A NODE`}
+            {view === '3d' ? (xray ? (assemblyId ? 'X-RAY · DRAG TO ORBIT · CLICK A PART' : (layer === 'air' || layer === 'lines' || layer === 'vacuum' ? `${layer.toUpperCase()} LAYER · CLICK A FLOW TO INSPECT` : 'ALL SYSTEMS · DRAG TO ORBIT · CLICK A SYSTEM')) : 'DRAG TO ORBIT · CLICK A PANEL DOT') : `${viewComponents.length} COMPONENTS · CLICK A NODE`}
           </div>
         </div>
 
@@ -252,6 +277,20 @@ export default function ComponentExplorer() {
             </div>
           </div>
 
+          {/* Trim fallback: the transaxle GLB is PDK-modelled, so warn when the
+              garage vehicle is a manual/Tiptronic (shown in unified + focused trans). */}
+          {view === '3d' && xray && trimBadgeMap.trans && (assemblyId === null || assemblyId === 'trans') && (
+            <div style={{
+              position: 'absolute', top: 14, left: '50%', transform: 'translateX(-50%)', zIndex: 4,
+              display: 'flex', alignItems: 'center', gap: 7, maxWidth: '68%',
+              background: 'rgba(11,11,12,.82)', border: '1px solid #C9A227', borderRadius: 20,
+              padding: '7px 14px', font: `600 9px/1.35 ${mono}`, letterSpacing: '.05em', color: '#F3CE6E', textAlign: 'center',
+            }}>
+              <span style={{ fontSize: 11, lineHeight: 1 }}>⚠</span>
+              {trimBadgeMap.trans.toUpperCase()}
+            </div>
+          )}
+
           {view === '3d' && (
             <div style={{ position: 'absolute', inset: 0 }}>
               {xray && assemblyId === null ? (
@@ -264,6 +303,7 @@ export default function ComponentExplorer() {
                   selectedFlowId={flowId}
                   onSelectFlow={(id) => setFlowId(id as FlowSystem['id'] | null)}
                   generation={generation}
+                  vehicle={vehicle}
                 />
               ) : (
                 /* ── Exterior (xray=false) or focused single assembly (xray=true + assemblyId set) ── */
@@ -278,31 +318,60 @@ export default function ComponentExplorer() {
                 />
               )}
 
-              {!xray && (
-                <div style={{ position: 'absolute', left: 18, bottom: 16, display: 'flex', alignItems: 'center', gap: 11, zIndex: 3 }}>
-                  <span style={{ font: `500 9px/1 ${mono}`, letterSpacing: '.14em', color: '#9A9AA0' }}>PAINT</span>
-                  <div style={{ display: 'flex', gap: 7 }}>
-                    {COLORS.map((c) => (
+              {/* Bottom overlay: controls row (paint popover + reset) with the model credit below.
+                  pointer-events:none on the container keeps the canvas draggable between the controls. */}
+              <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 3, padding: '0 14px 12px', display: 'flex', flexDirection: 'column', gap: 8, pointerEvents: 'none' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 10 }}>
+                  {!xray ? (
+                    <div style={{ position: 'relative', pointerEvents: 'auto' }}>
+                      {paintOpen && (
+                        <div style={{ position: 'absolute', left: 0, bottom: 'calc(100% + 8px)', width: 'min(236px, 72vw)', background: 'rgba(255,255,255,.98)', border: '1px solid #E3E3E5', borderRadius: 8, boxShadow: '0 12px 30px rgba(0,0,0,.18)', padding: 12 }}>
+                          <div style={{ font: `600 9px/1 ${mono}`, letterSpacing: '.14em', color: '#9A9AA0', marginBottom: 10 }}>PAINT</div>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                            {COLORS.map((c) => (
+                              <span key={c.hex} className="colorSwatch">
+                                <button
+                                  onClick={() => { setPaint(c.hex); setPaintOpen(false); }}
+                                  aria-label={c.name}
+                                  style={{ width: 22, height: 22, borderRadius: '50%', cursor: 'pointer', padding: 0, background: c.hex, border: activePaint === c.hex ? `2px solid ${RED}` : '1px solid #D2D2D6' }}
+                                />
+                                <span className="colorSwatchTip">{c.name}</span>
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                       <button
-                        key={c.hex}
-                        onClick={() => setPaint(c.hex)}
-                        title={c.name}
-                        style={{
-                          width: 20, height: 20, borderRadius: '50%', cursor: 'pointer', padding: 0, background: c.hex,
-                          border: activePaint === c.hex ? `2px solid ${RED}` : '1px solid rgba(0,0,0,.18)', boxShadow: '0 1px 3px rgba(0,0,0,.2)',
-                        }}
-                      />
-                    ))}
-                  </div>
+                        onClick={() => setPaintOpen((o) => !o)}
+                        aria-expanded={paintOpen}
+                        style={{ display: 'flex', alignItems: 'center', gap: 8, height: 30, padding: '0 12px 0 8px', background: 'rgba(255,255,255,.92)', border: '1px solid #DDDDE0', borderRadius: 20, cursor: 'pointer' }}
+                      >
+                        <span style={{ width: 16, height: 16, borderRadius: '50%', background: activePaint, border: '1px solid rgba(0,0,0,.2)' }} />
+                        <span style={{ font: `600 10px/1 ${mono}`, letterSpacing: '.1em', color: '#46464A' }}>PAINT</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <span />
+                  )}
+                  <button
+                    onClick={resetView}
+                    style={{ pointerEvents: 'auto', height: 30, padding: '0 13px', background: 'rgba(255,255,255,.92)', border: '1px solid #DDDDE0', borderRadius: 3, font: `600 10px/1 ${mono}`, letterSpacing: '.08em', color: '#46464A', cursor: 'pointer', whiteSpace: 'nowrap' }}
+                  >
+                    RESET VIEW
+                  </button>
                 </div>
-              )}
-
-              <button
-                onClick={resetView}
-                style={{ position: 'absolute', right: 18, bottom: 14, zIndex: 3, height: 30, padding: '0 13px', background: 'rgba(255,255,255,.92)', border: '1px solid #DDDDE0', borderRadius: 3, font: `600 10px/1 ${mono}`, letterSpacing: '.08em', color: '#46464A', cursor: 'pointer' }}
-              >
-                RESET VIEW
-              </button>
+                {!xray && (
+                  <div style={{ pointerEvents: 'auto', font: `500 9px/1.5 ${mono}`, letterSpacing: '.04em', color: '#A6A6AB', textAlign: 'center' }}>
+                    {MODEL_CREDITS[vehicle.body].title} ·{' '}
+                    <a href={MODEL_CREDITS[vehicle.body].source} target="_blank" rel="noreferrer" style={{ color: '#6E6E73' }}>
+                      {MODEL_CREDITS[vehicle.body].author}
+                    </a>{' '}·{' '}
+                    <a href={MODEL_CREDITS[vehicle.body].licenseUrl} target="_blank" rel="noreferrer" style={{ color: '#6E6E73' }}>
+                      {MODEL_CREDITS[vehicle.body].license}
+                    </a>
+                  </div>
+                )}
+              </div>
               <div style={{ position: 'absolute', right: 14, top: 14, zIndex: 3, display: 'flex', alignItems: 'center', gap: 7, background: 'rgba(11,11,12,.8)', padding: '6px 11px', borderRadius: 20, font: `500 9px/1 ${mono}`, letterSpacing: '.08em', color: '#fff', whiteSpace: 'nowrap' }}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: RED }} />
                 {xray
@@ -314,17 +383,6 @@ export default function ComponentExplorer() {
                   : `${vehicle.model.toUpperCase()} · REAL MODEL`}
               </div>
 
-              {!xray && (
-                <div style={{ position: 'absolute', left: '50%', bottom: 14, transform: 'translateX(-50%)', zIndex: 3, font: `500 9px/1.5 ${mono}`, letterSpacing: '.04em', color: '#A6A6AB', textAlign: 'center', whiteSpace: 'nowrap' }}>
-                  {MODEL_CREDITS[vehicle.body].title} ·{' '}
-                  <a href={MODEL_CREDITS[vehicle.body].source} target="_blank" rel="noreferrer" style={{ color: '#6E6E73' }}>
-                    {MODEL_CREDITS[vehicle.body].author}
-                  </a>{' '}·{' '}
-                  <a href={MODEL_CREDITS[vehicle.body].licenseUrl} target="_blank" rel="noreferrer" style={{ color: '#6E6E73' }}>
-                    {MODEL_CREDITS[vehicle.body].license}
-                  </a>
-                </div>
-              )}
             </div>
           )}
 
@@ -385,7 +443,7 @@ export default function ComponentExplorer() {
             generation={generation}
             assemblyId={assemblyId}
             assembly={assembly}
-            partsByAssembly={partsByAssembly}
+            partsByAssembly={displayParts}
             visibleParts={visibleParts}
             drillPart={drillPart}
             selectedPart={selectedPart}
@@ -393,9 +451,11 @@ export default function ComponentExplorer() {
             selectedFlow={selectedFlow}
             onSelectFlow={setFlowId}
             onSelectAssembly={switchAssembly}
+            onSearchSelect={selectPartInAssembly}
             onSelectPart={handleSelectPart}
             onExitDrill={exitDrill}
             vehicle={vehicle}
+            trimBadge={assembly ? trimBadgeMap[assembly.id] : undefined}
             onLog={() => router.push('/history/new')}
             onAsk={(p) => setAiPrompt(p)}
           />
@@ -571,9 +631,10 @@ function DetailPanel({ comp, vehicle, generation, n, onClose, onLog, onAsk }: {
 }
 
 function EnginePartsRail({
-  assemblyLabel, allParts, visibleParts, drillPart, selected, onSelect, onExitDrill, vehicle, onLog, onAsk,
+  assemblyLabel, allParts, visibleParts, drillPart, selected, onSelect, onExitDrill, vehicle, trimBadge, onLog, onAsk,
 }: {
   assemblyLabel: string;
+  trimBadge?: string;
   allParts: EnginePart[];
   visibleParts: EnginePart[];
   drillPart: EnginePart | null;
@@ -598,6 +659,16 @@ function EnginePartsRail({
         <div style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.16em', color: '#9A9AA0', marginBottom: 6 }}>
           {assemblyLabel.toUpperCase()} PARTS <span style={{ color: '#C4C4C8' }}>· {visibleParts.length}</span>
         </div>
+        {trimBadge && (
+          <div style={{
+            display: 'flex', alignItems: 'flex-start', gap: 8, margin: '0 0 12px', padding: '9px 11px',
+            background: '#fff', border: '1px solid #E4C878', borderRadius: 3,
+            font: "400 12px/1.5 'Helvetica Neue',Arial,sans-serif", color: '#8A6D1A',
+          }}>
+            <span style={{ flexShrink: 0, fontSize: 12, lineHeight: '18px' }}>⚠</span>
+            <span>{trimBadge} Showing the shared driveline parts only.</span>
+          </div>
+        )}
         {drillPart ? (
           <button
             onClick={onExitDrill}
@@ -877,7 +948,7 @@ function FlowDetailCard({ flow, assemblies, vehicle, onClose, onInspectParts, on
     <div className="fadeUp" style={{ padding: '18px 22px', borderBottom: '1px solid #EEEEF0', flexShrink: 0 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 10 }}>
         <span style={{ font: `600 10px/1 ${mono}`, letterSpacing: '.1em', color: flow.color, border: `1px solid ${flow.color}`, borderRadius: 2, padding: '5px 8px' }}>
-          {flow.layer === 'air' ? 'AIR FLOW' : flow.layer === 'wiring' ? 'WIRING' : 'LINE'}
+          {flow.layer === 'air' ? 'AIR FLOW' : flow.layer === 'wiring' ? 'WIRING' : flow.layer === 'vacuum' ? 'VACUUM' : 'LINE'}
         </span>
         <span onClick={onClose} style={{ marginLeft: 'auto', cursor: 'pointer', color: '#9A9AA0', font: `500 18px/1 ${mono}` }}>×</span>
       </div>
@@ -902,7 +973,7 @@ function FlowDetailCard({ flow, assemblies, vehicle, onClose, onInspectParts, on
 function XraySidebar({
   assemblies, generation, assemblyId, assembly, partsByAssembly, visibleParts, drillPart, selectedPart,
   layer, selectedFlow, onSelectFlow,
-  onSelectAssembly, onSelectPart, onExitDrill, vehicle, onLog, onAsk,
+  onSelectAssembly, onSearchSelect, onSelectPart, onExitDrill, vehicle, trimBadge, onLog, onAsk,
 }: {
   assemblies: XrayAssembly[];
   generation: string;
@@ -916,19 +987,37 @@ function XraySidebar({
   selectedFlow: FlowSystem | null;
   onSelectFlow: (id: FlowSystem['id'] | null) => void;
   onSelectAssembly: (id: XrayAssembly['id'] | null) => void;
+  onSearchSelect: (assemblyId: XrayAssembly['id'], partId: string) => void;
   onSelectPart: (id: string | null) => void;
   onExitDrill: () => void;
   vehicle: Vehicle;
+  /** Fallback banner shown in the focused parts rail (e.g. non-PDK transaxle). */
+  trimBadge?: string;
   onLog: () => void;
   onAsk: (p: string) => void;
 }) {
   const loadedCount = assemblies.filter((a) => partsByAssembly[a.id]).length;
   const totalParts = assemblies.reduce((n, a) => n + (partsByAssembly[a.id]?.filter(isPrimary).length ?? 0), 0);
 
+  // Free-text search across every loaded assembly's primary parts (X-ray now has
+  // too many components to scan by eye). Matches label or OEM part number;
+  // clicking a result jumps straight to that part in its assembly.
+  const [search, setSearch] = useState('');
+  const q = search.trim().toLowerCase();
+  const searchResults = q
+    ? assemblies.flatMap((a) =>
+        (partsByAssembly[a.id] ?? [])
+          .filter(isPrimary)
+          .filter((p) => p.label.toLowerCase().includes(q) || (p.partNumber ?? '').toLowerCase().includes(q))
+          .map((p) => ({ a, p })),
+      ).slice(0, 80)
+    : [];
+
   const showAssemblies = layer === 'all' || layer === 'mechanical';
   const flows = flowsForLayer(layer, generation);
   const airFlows = flows.filter((f) => f.layer === 'air');
   const lineFlows = flows.filter((f) => f.layer === 'lines');
+  const vacuumFlows = flows.filter((f) => f.layer === 'vacuum');
   const wiringFlows = flows.filter((f) => f.layer === 'wiring');
 
   const flowRow = (f: FlowSystem) => {
@@ -975,10 +1064,26 @@ function XraySidebar({
         </button>
       </div>
 
+      {assemblyId === null && (
+        <div style={{ padding: '12px 20px', borderBottom: '1px solid #EEEEF0', flexShrink: 0 }}>
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search all components…"
+            style={{
+              width: '100%', height: 32, padding: '0 10px', border: '1px solid #DDDDE0', borderRadius: 3,
+              font: `500 12px/1 ${mono}`, letterSpacing: '.04em', color: '#2A2A2E', background: '#FAFAFA',
+              outline: 'none', boxSizing: 'border-box',
+            }}
+          />
+        </div>
+      )}
+
       {assemblyId === null ? (
         /* ── Unified overview: systems + flow layers ── */
         <>
-          {selectedFlow && (
+          {selectedFlow && !q && (
             <FlowDetailCard
               flow={selectedFlow}
               assemblies={assemblies}
@@ -989,6 +1094,43 @@ function XraySidebar({
             />
           )}
           <div style={{ flex: 1, overflowY: 'auto', padding: '10px 12px 24px' }}>
+            {q ? (
+              searchResults.length ? (
+                <>
+                  <div style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.14em', color: '#B4B4B8', padding: '8px 8px 10px' }}>
+                    {searchResults.length} MATCH{searchResults.length === 1 ? '' : 'ES'}
+                  </div>
+                  {searchResults.map(({ a, p }) => (
+                    <button
+                      key={`${a.id}:${p.id}`}
+                      onClick={() => { setSearch(''); onSearchSelect(a.id, p.id); }}
+                      style={{
+                        width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                        padding: '9px 12px', marginBottom: 4, borderRadius: 3, cursor: 'pointer', textAlign: 'left',
+                        background: '#F6F6F7', border: '1px solid #EEEEF0',
+                      }}
+                    >
+                      <span style={{ flex: 1, font: "400 12px/1.3 'Helvetica Neue',Arial,sans-serif", color: '#2A2A2E' }}>
+                        {p.label}
+                      </span>
+                      <span style={{ font: `500 9px/1 ${mono}`, letterSpacing: '.06em', color: '#B4B4B8', whiteSpace: 'nowrap' }}>
+                        {a.label.toUpperCase()}
+                      </span>
+                      {p.partNumber && (
+                        <span style={{ font: `500 10px/1 ${mono}`, color: '#9A9AA0', whiteSpace: 'nowrap' }}>
+                          {formatPartNumber(p.partNumber)}
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </>
+              ) : (
+                <div style={{ padding: '24px 10px', textAlign: 'center', font: "400 13px/1.5 'Helvetica Neue',Arial,sans-serif", color: '#9A9AA0' }}>
+                  No components match “{search}”.
+                </div>
+              )
+            ) : (
+              <>
             {airFlows.length > 0 && (
               <>
                 <div style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.14em', color: '#B4B4B8', padding: '8px 8px 10px' }}>
@@ -1003,6 +1145,14 @@ function XraySidebar({
                   FLUID &amp; BRAKE LINES · CLICK TO TRACE
                 </div>
                 {lineFlows.map(flowRow)}
+              </>
+            )}
+            {vacuumFlows.length > 0 && (
+              <>
+                <div style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.14em', color: '#B4B4B8', padding: '12px 8px 10px' }}>
+                  VACUUM · CLICK TO TRACE
+                </div>
+                {vacuumFlows.map(flowRow)}
               </>
             )}
             {wiringFlows.length > 0 && (
@@ -1042,6 +1192,8 @@ function XraySidebar({
                 })}
               </>
             )}
+              </>
+            )}
           </div>
         </>
       ) : (
@@ -1056,6 +1208,7 @@ function XraySidebar({
             onSelect={onSelectPart}
             onExitDrill={onExitDrill}
             vehicle={vehicle}
+            trimBadge={trimBadge}
             onLog={onLog}
             onAsk={onAsk}
           />

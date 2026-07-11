@@ -18,6 +18,7 @@ import { writeGLB } from './lib/glb-writer.mjs';
 
 import * as engine from './components/engine.mjs';
 import * as transaxle from './components/transaxle.mjs';
+import * as transaxleManual from './components/transaxleManual.mjs';
 import * as exhaust from './components/exhaust.mjs';
 import * as frontBrake from './components/frontBrake.mjs';
 import * as rearBrake from './components/rearBrake.mjs';
@@ -50,6 +51,7 @@ const PUBLIC_PREFIX = `/models/components${GEN_SUFFIX}`;
 const COMPONENTS_981 = [
   engine,
   transaxle,
+  transaxleManual,
   exhaust,
   frontBrake,
   rearBrake,

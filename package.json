@@ -2,6 +2,7 @@
   "name": "flatsix-981-garage",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "engines": {
     "node": "24.x"
   },
@@ -13,6 +14,7 @@
     "gen:components": "node tools/gen/build-components.mjs",
     "gen:verify": "node tools/gen/verify-coverage.mjs",
     "gen:layout": "node tools/gen/verify-unified-layout.mjs",
+    "kb:lint": "node tools/knowledge/lint.mjs",
     "wm:figs": "python3 .cursor/skills/wm-3d-calibrate/scripts/find-figs.py",
     "wm:extract": "node tools/gen/wm-refs/extract-pages.mjs",
     "db:link": "supabase link",
@@ -21,6 +23,7 @@
     "db:import-parts": "node tools/parts/import-parts.mjs",
     "db:import-manual": "node tools/manual/import-manual.mjs",
     "db:import-mtl": "node tools/manual/import-manual.mjs data/mtl-981-987.json",
+    "db:embed-manual": "node tools/manual/embed-sections.mjs",
     "manual:parse-mtl": "node tools/manual/parse-mtl.mjs",
     "manual:compress": "node tools/manual/compress-workshop.mjs",
     "manual:compress-987": "node tools/manual/compress-987-workshop.mjs",

@@ -1,10 +1,14 @@
-# FLAT·SIX — Porsche Garage
+<p align="center">
+  <img src="./public/logo.svg" alt="FLAT·SIX" width="360" />
+</p>
 
-A DIY maintenance OS for the **Porsche Boxster / Cayman** — **987 and 981 today**, with more generations on the way: an interactive component explorer, a generation-scoped knowledge base (fault codes, torque specs, known issues), a personal service log + planner, and an **AI workshop assistant** exposed to Claude over the Model Context Protocol (MCP).
+# FLAT·SIX
+
+A DIY maintenance OS for the **Boxster / Cayman** platform — **987 and 981 today**, with more generations on the way: an interactive component explorer, a generation-scoped knowledge base (fault codes, torque specs, known issues), a personal service log + planner, and an **AI workshop assistant** exposed to Claude over the Model Context Protocol (MCP).
 
 Built as a single Next.js app that deploys for free on **Vercel + Supabase**.
 
-> ⚠️ Hobby/community project. Not affiliated with Dr. Ing. h.c. F. Porsche AG.
+> ⚠️ Hobby/community project. Independent and unofficial — not affiliated with the vehicle manufacturer.
 > All maintenance data is provided for reference only — always verify against an
 > official workshop manual before working on your car.
 
@@ -13,19 +17,25 @@ Built as a single Next.js app that deploys for free on **Vercel + Supabase**.
 ## Features
 
 - **Garage / Component Explorer** — interactive 2D cutaways with clickable hotspots,
-  an exterior 3D model viewer (paint picker), and real OEM part numbers, torque specs,
+  an exterior 3D model viewer (paint picker), and real part numbers, torque specs,
   and step-by-step procedures per component.
 - **Service history** — per-vehicle maintenance log with flexible line items
   (part numbers, costs, notes).
 - **Service planner** — plan upcoming work with parts and how-to links, then
   "start service" to pre-fill a record.
 - **Fault finding** — symptom/cause/check reference.
-- **981 knowledge base** — ~52 fault codes, ~58 specs, full maintenance schedule,
-  ~19 model-specific known issues, and reference articles, with a dependency-free
-  search used for RAG (`lib/knowledge/`).
-- **MCP server** — connect the garage to Claude. Knowledge tools (fault/spec/part
-  lookup, search) need no auth; per-user garage tools are scoped by Supabase Row
-  Level Security. See [`MCP_SETUP.md`](./MCP_SETUP.md).
+- **DIY Tools** — native wheel & tyre fitment tools: a "will it fit?" checker
+  (save your disks, test any tyre → tyre↔rim, rolling-diameter, speedo, poke/
+  clearance), plus tyre-size, offset, staggered-diameter and alignment
+  calculators — with visual diagrams. Our own math, no third-party API
+  (`lib/fitment/`, `components/tools/`).
+- **981 & 987 knowledge base** — per-generation fault codes, specs, maintenance
+  schedules, known issues, and reference articles, with a dependency-free search
+  used for RAG (`lib/knowledge/`).
+- **MCP server** — connect the garage to Claude. Knowledge + fitment tools
+  (fault/spec/part lookup, search, wheel-fitment, "will it fit", alignment specs)
+  need no auth; per-user garage tools are scoped by Supabase Row Level Security.
+  See [`MCP_SETUP.md`](./MCP_SETUP.md).
 - **Multi-user** — magic-link auth, each user owns their own vehicles and records.
 
 ## Tech stack
@@ -43,7 +53,7 @@ Supabase, and the whole thing runs on free tiers.
 
 ## Architecture
 
-- **Shared reference data** (components, fault library, OEM catalog, 981 knowledge
+- **Shared reference data** (components, fault library, part catalog, 981 knowledge
   base) is static and version-controlled in `lib/` — identical for everyone.
 - **Per-user data** (vehicles, service records, plans) lives in Postgres. Every row
   carries a `user_id`; RLS policies (`auth.uid() = user_id`) enforce isolation at the
@@ -115,7 +125,7 @@ garage tools (read/write your records) require it. Full details and other client
 app/                Next.js routes (garage, history, plans, faults, settings, auth, api/mcp)
 components/         UI — shell, garage explorer, views, home landing
 lib/
-  data.ts, catalog* Static reference data + OEM part catalog
+  data.ts, catalog* Static reference data + part catalog
   knowledge/        981 knowledge base + search (RAG layer)
   mcp/              MCP tool definitions + auth
   db/               Per-user data access (vehicles, records, plans)
@@ -132,8 +142,33 @@ Deploy on **Vercel**: import the repo, set `NEXT_PUBLIC_SUPABASE_URL` and
 `NEXT_PUBLIC_SUPABASE_ANON_KEY` env vars, and add your production `/auth/callback` URL
 to the Supabase dashboard. Node 24 is selected automatically via the `engines` field.
 
+## Contributing & procedures
+
+Common, repeatable work has step-by-step runbooks under
+**[`docs/procedures/`](./docs/procedures)** — keep them current when the process changes:
+
+| Procedure | What it covers |
+| --- | --- |
+| [Adding documents](./docs/procedures/adding-documents.md) | Add a manual/TSB/tech doc → knowledge base, faults, Documents registry, Supabase upload |
+| [Adding a model variant](./docs/procedures/adding-model-variant.md) | New `BodyType` (e.g. a Spyder) — registry, GLB, credits, colors |
+| [Adding a new generation](./docs/procedures/adding-new-generation.md) | A whole new generation (e.g. 991/718) — knowledge, docs, 3D, fitment |
+| [Building features](./docs/procedures/building-features.md) | Design-system rules, backend/MCP changes, when to update these docs |
+
+The same rules are encoded for AI pair-programming in [`CLAUDE.md`](./CLAUDE.md) and
+[`.cursor/rules/`](./.cursor/rules) so Claude Code and Cursor follow them automatically.
+
 ## License & attributions
 
-Third-party 3D models are used under CC BY 4.0 — see [`NOTICE.md`](./NOTICE.md) for
-required attributions. `app/api/devshot` is a dev-only render-capture route; remove it
-before a public production deploy.
+- **Code** — [MIT](./LICENSE).
+- **Bundled assets** — third-party 3D models carry their own Creative Commons
+  licences (CC BY 4.0 / CC BY-NC-SA 4.0). See [`NOTICE.md`](./NOTICE.md) for
+  required attributions. Two bundled models (the 987 Spyder and the 981 GT4) are
+  **CC BY-NC-SA**, so any redistributed derivative of the app must stay
+  non-commercial + share-alike.
+- **Reference documentation** — any third-party workshop PDFs used for local
+  development are **not** redistributed (gitignored) and are served only to
+  authenticated users when configured.
+
+Contributing a model or generation? See [`CONTRIBUTING.md`](./CONTRIBUTING.md).
+`app/api/devshot` is a dev-only render-capture route; remove it before a public
+production deploy.

@@ -85,6 +85,17 @@ function collectLocalFiles() {
     }
   }
 
+  // Technical Information bulletins — filenames aren't year-prefixed, so the SIT
+  // year→gen heuristic in storageKeyFor doesn't apply; map them explicitly.
+  // Keep in sync with the bulletin entries in lib/documents.ts.
+  const bulletinFiles = [
+    {
+      storagePath: '981/service-info/SB-10052000-1049.pdf',
+      local: path.join(PUBLIC, 'mobile_tech_library/Service Information Technik/Boxster-Cayman/SB-10052000-1049.pdf'),
+    },
+  ];
+  files.push(...bulletinFiles.filter((f) => fs.existsSync(f.local)));
+
   const sitAllow = new Set([
     '2005 Boxster.pdf', '2006 Cayman.pdf', '2007 987 Boxster-Cayman.pdf',
     '2009 Boxster, Cayman.pdf', '2011 Boxster Spyder.pdf',

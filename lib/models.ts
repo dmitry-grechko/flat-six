@@ -29,11 +29,24 @@ export interface CarVariant {
    * 987 set lives under /models/components/987/ (xray-assemblies-987).
    */
   hasXray3D: boolean;
+  /**
+   * Optional signature powertrain for variants that shipped in only one config
+   * (e.g. the 981 GT4 is a 3.8 L, manual-only car). When set, new vehicles of
+   * this variant seed to it and the model picker snaps to it, instead of the
+   * generic per-generation default. Must exactly match a string returned by
+   * enginesFor()/transmissionsFor() for this variant's generation.
+   */
+  defaultEngine?: string;
+  defaultTransmission?: string;
 }
 
 export const CAR_VARIANTS: CarVariant[] = [
   { id: 'boxster', generation: '981', bodyStyle: 'boxster', label: 'Boxster (981)', modelName: 'Boxster S (981)', glb: '/models/boxster-real.glb', hasCutaway2D: true, hasXray3D: true },
   { id: 'cayman', generation: '981', bodyStyle: 'cayman', label: 'Cayman (981)', modelName: 'Cayman S (981)', glb: '/models/cayman.glb', hasCutaway2D: true, hasXray3D: true },
+  // Cayman GT4 (981) — dedicated exterior GLB; shares the 981 cutaway + X-ray.
+  // Only ever a 3.8 L flat-six with a 6-speed manual (no PDK), so it carries a
+  // signature powertrain instead of the generic 981 S/PDK default.
+  { id: 'cayman-gt4-981', generation: '981', bodyStyle: 'cayman', label: 'Cayman GT4 (981)', modelName: 'Cayman GT4 (981)', glb: '/models/cayman-gt4-981.glb', hasCutaway2D: true, hasXray3D: true, defaultEngine: '3.8 L Flat-Six (Spyder/GT4)', defaultTransmission: '6-Speed Manual' },
   { id: 'cayman-987', generation: '987', bodyStyle: 'cayman', label: 'Cayman (987)', modelName: 'Cayman S (987)', glb: '/models/cayman-987.glb', hasCutaway2D: true, hasXray3D: true },
   // No Boxster 987 GLB yet — reuse the Cayman 987 model for the 3D exterior.
   // Same generation, so it shares the 987 cutaway + knowledge + documents.
