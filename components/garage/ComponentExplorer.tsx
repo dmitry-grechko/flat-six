@@ -99,14 +99,16 @@ export default function ComponentExplorer() {
 
   // Assembly ids repeat across generations — drop cached parts + selections
   // when the garage vehicle switches generation so 981 manifests don't leak
-  // into the 987 view (and vice versa).
+  // into the 987 view (and vice versa). Also reset on transmission-kind change:
+  // the trim resolver can swap the `trans` GLB+manifest (PDK ↔ manual), and the
+  // cache is keyed by assembly id, so a stale manifest would otherwise stick.
   useEffect(() => {
     setPartsByAssembly({});
     setAssemblyId(null);
     setSelectedPartId(null);
     setDrillId(null);
     setFlowId(null);
-  }, [generation]);
+  }, [generation, transKind]);
 
   // Keep view state consistent with the active variant's capabilities: if it
   // has no 3D X-ray, force X-ray off; if it has no 2D cutaway, leave the image

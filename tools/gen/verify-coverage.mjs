@@ -24,7 +24,7 @@ function glbNodeNames(path) {
   return names;
 }
 
-const FILES = ['engine', 'trans', 'exhaust', 'cooling', 'oil', 'airfilter', 'plugs', 'fbrakes', 'rbrakes', 'susp', 'elec', 'driveline', 'fuel'];
+const FILES = ['engine', 'trans', 'trans-manual', 'exhaust', 'cooling', 'oil', 'airfilter', 'plugs', 'fbrakes', 'rbrakes', 'susp', 'elec', 'driveline', 'fuel'];
 
 let allGood = true;
 const pad = (s, n) => String(s).padEnd(n);

@@ -8,12 +8,12 @@ import { xrayAssembliesFor, type XrayAssembly } from './xray-assemblies';
  * ignoring `vehicle.trans` — so a Manual owner saw the PDK transaxle. This maps
  * a Vehicle → the assembly set + any fallback badges + a per-part trim filter.
  *
- * REALITY: there is exactly ONE transaxle GLB per generation and it is
- * PDK-modelled (`trans.glb` / `trans-parts.json`, ids like `pdk-*`, PDK part
- * numbers, Pentosin PDK fluid). There are no manual/Tiptronic transaxle GLBs.
- * So for a non-PDK trim we still render the PDK GLB but (a) show a clear
- * fallback badge and (b) hide the PDK-only parts so a manual owner isn't shown a
- * mechatronic unit / dual-clutch pack / PDK oil pan with wrong part numbers.
+ * ASSETS: each generation ships a PDK transaxle (`trans.glb`) and a MANUAL
+ * transaxle (`trans-manual.glb`, G81.20 6-speed / G87 5-6-speed — built by
+ * tools/gen/components/transaxleManual.mjs). Manual vehicles swap in the manual
+ * GLB + manifest, so no badge. Tiptronic S (987.1) still has no model: it keeps
+ * the PDK GLB with (a) a clear fallback badge and (b) the PDK-only parts hidden
+ * so the owner isn't shown a mechatronic / dual-clutch pack with wrong PNs.
  */
 
 export type TransmissionKind = 'manual' | 'pdk' | 'tiptronic';
@@ -65,17 +65,23 @@ export interface TrimAssemblyOverride {
 
 /**
  * Overrides keyed by assembly id for the given vehicle. Only the transaxle is
- * trim-sensitive today, and — since no non-PDK transaxle GLB exists — a non-PDK
- * trim gets ONLY a `fallbackBadge` (glb/manifest stay at the base PDK values).
+ * trim-sensitive today: manual swaps in the real manual GLB + manifest (badge
+ * self-clears); Tiptronic has no model yet so it badges the PDK fallback.
  */
 export function trimAssemblyOverrides(
   v: Vehicle,
 ): Partial<Record<XrayAssembly['id'], TrimAssemblyOverride>> {
   const kind = transmissionKind(v.trans);
   if (kind === 'pdk') return {};
-  const label = (v.trans ?? '').trim() || (kind === 'tiptronic' ? 'Tiptronic S' : 'Manual');
+  if (kind === 'manual') {
+    const base = generationForBody(v.body) === '987' ? '/models/components/987' : '/models/components';
+    return {
+      trans: { glb: `${base}/trans-manual.glb`, manifest: `${base}/trans-manual-parts.json` },
+    };
+  }
+  const label = (v.trans ?? '').trim() || 'Tiptronic S';
   return {
-    // No manual/Tiptronic transaxle GLB yet — keep the PDK asset, badge the fallback.
+    // No Tiptronic transaxle GLB yet — keep the PDK asset, badge the fallback.
     trans: { fallbackBadge: `Showing PDK layout — ${label} transaxle model not loaded yet.` },
   };
 }
