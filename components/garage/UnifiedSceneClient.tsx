@@ -8,7 +8,9 @@ import { OrbitControls, Environment, useGLTF, ContactShadows, Html, Line } from 
 import * as THREE from 'three';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { XRAY_ASSEMBLIES, xrayAssembliesFor } from './xray-assemblies';
+import { xrayAssembliesForVehicle } from './trim';
 import { flowsForLayer, type FlowNode, type FlowPathDef, type FlowSystem, type XrayLayer } from './flow-systems';
+import type { Vehicle } from '@/lib/types';
 
 type ConnectionType = 'mechanical' | 'exhaust' | 'fluid' | 'air' | 'electrical';
 
@@ -38,6 +40,8 @@ export type UnifiedSceneProps = {
   onSelectFlow: (id: string | null) => void;
   /** Garage vehicle generation — picks the assembly + flow set ('981' default). */
   generation?: string;
+  /** Full garage vehicle — trim-resolves the assembly set (falls back to generation). */
+  vehicle?: Vehicle;
   handleRef?: { current: { reset: () => void } | null };
 };
 
@@ -492,11 +496,11 @@ function AssemblyMesh({ assembly, isSelected, anySelected, ghosted, onSelect }: 
   );
 }
 
-export default function UnifiedSceneClient({ selectedAssemblyId, onSelectAssembly, layer, selectedFlowId, onSelectFlow, generation = '981', handleRef }: UnifiedSceneProps) {
+export default function UnifiedSceneClient({ selectedAssemblyId, onSelectAssembly, layer, selectedFlowId, onSelectFlow, generation = '981', vehicle, handleRef }: UnifiedSceneProps) {
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
   useImperativeHandle(handleRef, () => ({ reset: () => controlsRef.current?.reset() }));
 
-  const assemblies = useMemo(() => xrayAssembliesFor(generation), [generation]);
+  const assemblies = useMemo(() => (vehicle ? xrayAssembliesForVehicle(vehicle) : xrayAssembliesFor(generation)), [vehicle, generation]);
   // Warm the generation's GLBs (981 set is already preloaded at module load).
   useMemo(() => assemblies.forEach((a) => useGLTF.preload(a.glb)), [assemblies]);
 

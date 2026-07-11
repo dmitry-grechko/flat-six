@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, type FC } from 'react';
+import { useEffect, useMemo, useRef, useState, type FC } from 'react';
 import { useRouter } from 'next/navigation';
 import { COMPONENTS, SYSTEMS, COLORS, diffDots, DIFF_LABELS, componentsForGeneration } from '@/lib/data';
 import { catalogForSystem, formatPartNumber } from '@/lib/catalog';
@@ -14,8 +14,9 @@ import type { Component, SystemName, Vehicle, EnginePart } from '@/lib/types';
 // (ssr:false) internally so we can keep a working ref through it.
 import GLBViewer, { type GLBViewerHandle } from './GLBViewer';
 import UnifiedViewer, { type UnifiedViewerHandle } from './UnifiedViewer';
-import { XRAY_ASSEMBLIES, xrayAssembliesFor, type XrayAssembly, loadAssemblyParts, isPrimary, childrenOf } from './xray-assemblies';
+import { XRAY_ASSEMBLIES, type XrayAssembly, loadAssemblyParts, isPrimary, childrenOf } from './xray-assemblies';
 import { FLOW_SYSTEMS, XRAY_LAYERS, flowsForLayer, flowSystemsFor, type FlowSystem, type XrayLayer } from './flow-systems';
+import { transmissionKind, trimBadges, xrayAssembliesForVehicle, partVisibleForTrim } from './trim';
 
 const mono = "'JetBrains Mono',monospace";
 const RED = 'var(--red)';
@@ -46,8 +47,12 @@ export default function ComponentExplorer() {
   const hasCutaway2D = variant.hasCutaway2D;
   const hasXray3D = variant.hasXray3D;
   const activeComponents = componentsForGeneration(generation);
-  // X-ray assembly + flow sets are generation-scoped (981 vs 987 GLB sets).
-  const assemblies = xrayAssembliesFor(generation);
+  // X-ray assembly + flow sets are generation-scoped (981 vs 987 GLB sets); the
+  // assembly set is further trim-resolved (trim.ts) so a non-PDK trim renders the
+  // PDK transaxle GLB with a fallback badge + PDK-only parts filtered out.
+  const assemblies = xrayAssembliesForVehicle(vehicle);
+  const transKind = transmissionKind(vehicle.trans);
+  const trimBadgeMap = trimBadges(vehicle);
 
   // null = all systems unified view; non-null = focused single assembly.
   const [assemblyId, setAssemblyId] = useState<XrayAssembly['id'] | null>(null);
@@ -61,7 +66,16 @@ export default function ComponentExplorer() {
 
   // Parts manifest for the active assembly (lazy, cached per assembly).
   const [partsByAssembly, setPartsByAssembly] = useState<Record<string, EnginePart[]>>({});
-  const parts = assembly ? (partsByAssembly[assembly.id] ?? []) : [];
+  // Trim-filtered view of the manifests: the transaxle GLB is PDK-modelled, so a
+  // manual/Tiptronic vehicle hides the PDK-only parts (mechatronic, clutch pack,
+  // PDK oil pan…) and keeps the shared driveline hardware. All DISPLAY consumers
+  // (focused pins, counts, search, drill-down) read this; the loader below still
+  // populates the raw map so switching trim re-filters without a refetch.
+  const displayParts = useMemo(() => {
+    if (transKind === 'pdk' || !partsByAssembly.trans) return partsByAssembly;
+    return { ...partsByAssembly, trans: partsByAssembly.trans.filter((p) => partVisibleForTrim(p, transKind)) };
+  }, [partsByAssembly, transKind]);
+  const parts = assembly ? (displayParts[assembly.id] ?? []) : [];
   const [selectedPartId, setSelectedPartId] = useState<string | null>(null);
   // Which primary part is expanded into its sub-parts (drill-down tier).
   const [drillId, setDrillId] = useState<string | null>(null);
@@ -253,6 +267,20 @@ export default function ComponentExplorer() {
             </div>
           </div>
 
+          {/* Trim fallback: the transaxle GLB is PDK-modelled, so warn when the
+              garage vehicle is a manual/Tiptronic (shown in unified + focused trans). */}
+          {view === '3d' && xray && trimBadgeMap.trans && (assemblyId === null || assemblyId === 'trans') && (
+            <div style={{
+              position: 'absolute', top: 14, left: '50%', transform: 'translateX(-50%)', zIndex: 4,
+              display: 'flex', alignItems: 'center', gap: 7, maxWidth: '68%',
+              background: 'rgba(11,11,12,.82)', border: '1px solid #C9A227', borderRadius: 20,
+              padding: '7px 14px', font: `600 9px/1.35 ${mono}`, letterSpacing: '.05em', color: '#F3CE6E', textAlign: 'center',
+            }}>
+              <span style={{ fontSize: 11, lineHeight: 1 }}>⚠</span>
+              {trimBadgeMap.trans.toUpperCase()}
+            </div>
+          )}
+
           {view === '3d' && (
             <div style={{ position: 'absolute', inset: 0 }}>
               {xray && assemblyId === null ? (
@@ -265,6 +293,7 @@ export default function ComponentExplorer() {
                   selectedFlowId={flowId}
                   onSelectFlow={(id) => setFlowId(id as FlowSystem['id'] | null)}
                   generation={generation}
+                  vehicle={vehicle}
                 />
               ) : (
                 /* ── Exterior (xray=false) or focused single assembly (xray=true + assemblyId set) ── */
@@ -404,7 +433,7 @@ export default function ComponentExplorer() {
             generation={generation}
             assemblyId={assemblyId}
             assembly={assembly}
-            partsByAssembly={partsByAssembly}
+            partsByAssembly={displayParts}
             visibleParts={visibleParts}
             drillPart={drillPart}
             selectedPart={selectedPart}
@@ -415,6 +444,7 @@ export default function ComponentExplorer() {
             onSelectPart={handleSelectPart}
             onExitDrill={exitDrill}
             vehicle={vehicle}
+            trimBadge={assembly ? trimBadgeMap[assembly.id] : undefined}
             onLog={() => router.push('/history/new')}
             onAsk={(p) => setAiPrompt(p)}
           />
@@ -590,9 +620,10 @@ function DetailPanel({ comp, vehicle, generation, n, onClose, onLog, onAsk }: {
 }
 
 function EnginePartsRail({
-  assemblyLabel, allParts, visibleParts, drillPart, selected, onSelect, onExitDrill, vehicle, onLog, onAsk,
+  assemblyLabel, allParts, visibleParts, drillPart, selected, onSelect, onExitDrill, vehicle, trimBadge, onLog, onAsk,
 }: {
   assemblyLabel: string;
+  trimBadge?: string;
   allParts: EnginePart[];
   visibleParts: EnginePart[];
   drillPart: EnginePart | null;
@@ -617,6 +648,16 @@ function EnginePartsRail({
         <div style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.16em', color: '#9A9AA0', marginBottom: 6 }}>
           {assemblyLabel.toUpperCase()} PARTS <span style={{ color: '#C4C4C8' }}>· {visibleParts.length}</span>
         </div>
+        {trimBadge && (
+          <div style={{
+            display: 'flex', alignItems: 'flex-start', gap: 8, margin: '0 0 12px', padding: '9px 11px',
+            background: '#fff', border: '1px solid #E4C878', borderRadius: 3,
+            font: "400 12px/1.5 'Helvetica Neue',Arial,sans-serif", color: '#8A6D1A',
+          }}>
+            <span style={{ flexShrink: 0, fontSize: 12, lineHeight: '18px' }}>⚠</span>
+            <span>{trimBadge} Showing the shared driveline parts only.</span>
+          </div>
+        )}
         {drillPart ? (
           <button
             onClick={onExitDrill}
@@ -921,7 +962,7 @@ function FlowDetailCard({ flow, assemblies, vehicle, onClose, onInspectParts, on
 function XraySidebar({
   assemblies, generation, assemblyId, assembly, partsByAssembly, visibleParts, drillPart, selectedPart,
   layer, selectedFlow, onSelectFlow,
-  onSelectAssembly, onSelectPart, onExitDrill, vehicle, onLog, onAsk,
+  onSelectAssembly, onSelectPart, onExitDrill, vehicle, trimBadge, onLog, onAsk,
 }: {
   assemblies: XrayAssembly[];
   generation: string;
@@ -938,6 +979,8 @@ function XraySidebar({
   onSelectPart: (id: string | null) => void;
   onExitDrill: () => void;
   vehicle: Vehicle;
+  /** Fallback banner shown in the focused parts rail (e.g. non-PDK transaxle). */
+  trimBadge?: string;
   onLog: () => void;
   onAsk: (p: string) => void;
 }) {
@@ -1084,6 +1127,7 @@ function XraySidebar({
             onSelect={onSelectPart}
             onExitDrill={onExitDrill}
             vehicle={vehicle}
+            trimBadge={trimBadge}
             onLog={onLog}
             onAsk={onAsk}
           />
