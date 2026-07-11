@@ -12,6 +12,7 @@ import { searchCatalog, formatPartNumber } from '@/lib/catalog';
 import { GENERATIONS, generationForBody } from '@/lib/models';
 import { resolveUser, AUTH_REQUIRED_MESSAGE, publicClient } from './auth';
 import { manualHitHref } from '@/lib/documents';
+import { embedQuery, toVectorLiteral, voyageConfigured } from '@/lib/embeddings';
 import {
   presetsForGeneration,
   getPreset,
@@ -447,8 +448,8 @@ export function registerTools(server: McpServer): void {
     {
       title: 'Search workshop manuals & tech library',
       description:
-        'Full-text search over factory reference docs: workshop manuals plus Mobile Tech Library ' +
-        'diagnostics, Service Information Technik, and training books for 981/987. ' +
+        'Hybrid semantic + full-text search over factory reference docs: workshop manuals plus ' +
+        'Mobile Tech Library diagnostics, Service Information Technik, and training books for 981/987. ' +
         'ALWAYS scoped to one generation — pass vehicleId/generation when the user has multiple cars. ' +
         'Returns ranked sections with codes/snippets — fetch full text with get_manual_procedure. ' +
         'Requires your garage login (licensed content, not public).',
@@ -463,12 +464,38 @@ export function registerTools(server: McpServer): void {
       const user = await resolveUser(extra.authInfo?.token);
       if (!user) return err(AUTH_REQUIRED_MESSAGE);
       const scope = await resolveKnowledgeScope(generation, vehicleId, extra.authInfo?.token);
-      const { data, error } = await user.supabase.rpc('search_manual', {
-        q: query,
-        lim: limit ?? 8,
-        gen: scope.generation,
-        src: null,
-      });
+      const lim = limit ?? 8;
+
+      // Prefer hybrid (semantic + keyword, RRF-fused) when Voyage is configured
+      // and the embeddings have been backfilled; fall back to plain full-text on
+      // any error (missing key, migration not applied, transient failure).
+      let data: unknown = null;
+      let error: { message: string } | null = null;
+      if (voyageConfigured()) {
+        try {
+          const emb = await embedQuery(query);
+          const r = await user.supabase.rpc('search_manual_hybrid', {
+            q: query,
+            query_embedding: toVectorLiteral(emb),
+            lim,
+            gen: scope.generation,
+            src: null,
+          });
+          if (!r.error && Array.isArray(r.data)) data = r.data;
+        } catch {
+          // fall through to full-text
+        }
+      }
+      if (data === null) {
+        const r = await user.supabase.rpc('search_manual', {
+          q: query,
+          lim,
+          gen: scope.generation,
+          src: null,
+        });
+        data = r.data;
+        error = r.error;
+      }
       if (error) return err(`Manual search failed: ${error.message}`);
       if (!Array.isArray(data) || data.length === 0) {
         return err(

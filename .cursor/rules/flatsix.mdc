@@ -30,6 +30,9 @@ A change isn't done until the **five layers** it touches are consistent:
   (`lib/mcp/tools.ts`); knowledge/computation tools no-auth, garage tools
   token-scoped, always generation-scoped. Validate before shipping.
 - Data claims (specs/torque/alignment) must be sourced or flagged `unconfirmed`.
+- Manual search (`manual_sections`) is hybrid FTS + Voyage/pgvector embeddings.
+  After importing doc text, run `npm run db:embed-manual` (needs `VOYAGE_API_KEY`)
+  so semantic search sees it. Torque finder is FTS-only, no embeddings.
 
 ## Before non-trivial work
 

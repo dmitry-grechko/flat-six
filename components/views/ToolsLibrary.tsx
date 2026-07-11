@@ -10,8 +10,10 @@ import TireSizeCalc from '@/components/tools/TireSizeCalc';
 import OffsetCalc from '@/components/tools/OffsetCalc';
 import StaggerCalc from '@/components/tools/StaggerCalc';
 import AlignmentReference from '@/components/tools/AlignmentReference';
+import TorqueFinder from '@/components/tools/TorqueFinder';
 
 const TABS = [
+  { id: 'torque', label: 'Torque Specs' },
   { id: 'fit', label: 'Will It Fit' },
   { id: 'tyre', label: 'Tyre Size' },
   { id: 'offset', label: 'Offset' },
@@ -30,10 +32,12 @@ export default function ToolsLibrary() {
   const [presetId, setPresetId] = useState<string>('');
   const preset = presets.find((p) => p.id === presetId) ?? presets[0];
 
-  const [tab, setTab] = useState<TabId>('fit');
+  const [tab, setTab] = useState<TabId>('torque');
 
   const panel = () => {
     switch (tab) {
+      case 'torque':
+        return <TorqueFinder gen={gen} />;
       case 'fit':
         // no key: keep disk edits while on the tab; OEM baseline updates live via prop.
         return <WillItFit preset={preset} />;
@@ -50,14 +54,15 @@ export default function ToolsLibrary() {
     }
   };
 
-  const showPreset = presets.length > 0 && tab !== 'align';
+  const showPreset = presets.length > 0 && tab !== 'align' && tab !== 'torque';
 
   return (
     <div className="padView" style={{ padding: 28, maxWidth: 960 }}>
       <p style={{ margin: '0 0 16px', font: `400 14px/1.55 ${sans}`, color: '#6E6E73', maxWidth: 620 }}>
-        Native wheel &amp; tyre tools for your{' '}
-        <span style={{ font: `500 12px/1 ${mono}`, color: '#0B0B0C' }}>{vehicle.model || gen}</span> ({gen}). Our
-        own calculators — no third-party service. Change the car in Settings to switch presets.
+        DIY reference tools for your{' '}
+        <span style={{ font: `500 12px/1 ${mono}`, color: '#0B0B0C' }}>{vehicle.model || gen}</span> ({gen}) — factory
+        torque specs, wheel &amp; tyre calculators and alignment data. Our own data, no third-party service. Change the
+        car in Settings to switch presets.
       </p>
 
       {/* Quick reference chips */}

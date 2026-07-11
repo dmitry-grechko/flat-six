@@ -4,149 +4,264 @@
     "category": "torque",
     "name": "Wheel bolt (lug)",
     "value": "160 Nm (118 lb-ft)",
-    "notes": "All MY2012+ 981; tighten diagonally, dry/no anti-seize. The legacy 130 Nm figure is the pre-2011 987.1 value and does NOT apply to the 981.",
-    "appliesTo": ["all 981"],
-    "source": "https://www.planet-9.com/threads/new-oem-lug-bolts-different-torque-spec-than-in-the-manual.247410/"
+    "notes": "M14×1.5, 19 mm hex. Tighten diagonally (star pattern). Do NOT grease the threads or the spherical seat. Re-torque after ~50 miles.",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 440519 · p.5448"
   },
   {
     "id": "torque-oil-drain-plug",
     "category": "torque",
     "name": "Engine oil drain plug",
     "value": "50 Nm (37 lb-ft)",
-    "notes": "T50 Torx; fit a new aluminium crush ring each time. Aftermarket magnetic plugs may spec lower (~25 Nm).",
-    "appliesTo": ["all 981"],
-    "source": "https://www.pedrosgarage.com/site-3/change-oil-and-oil-filter.html"
+    "notes": "M18×1.5 hex-socket plug in the oil pan; fit a new sealing ring each time.",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 170117 · p.3896"
   },
   {
     "id": "torque-oil-filter-cap",
     "category": "torque",
     "name": "Oil filter cap / housing cover",
-    "value": "25 Nm (18 lb-ft)",
-    "appliesTo": ["all 981"],
-    "source": "https://www.pedrosgarage.com/site-3/change-oil-and-oil-filter.html"
+    "value": "25 Nm (19 lb-ft)",
+    "notes": "Replace the cap O-ring at each service.",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 170117 · p.3897"
+  },
+  {
+    "id": "torque-spark-plug-new",
+    "category": "torque",
+    "name": "Spark plug (new)",
+    "value": "32 Nm (24 lb-ft) ±2 Nm",
+    "notes": "Initial torque for new plugs. No anti-seize on the threads.",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 287020 · p.4516"
+  },
+  {
+    "id": "torque-spark-plug-reused",
+    "category": "torque",
+    "name": "Spark plug (reused)",
+    "value": "25 Nm (19 lb-ft) +3 Nm",
+    "notes": "Lower torque when refitting a used plug.",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 287020 · p.4516"
   },
   {
     "id": "torque-caliper-bolt-front",
     "category": "torque",
     "name": "Brake caliper mounting bolt (front)",
     "value": "85 Nm (63 lb-ft)",
-    "notes": "Single-use stretch bolts — replace on every removal. Front and rear identical.",
-    "appliesTo": ["all 981"],
-    "source": "https://rennlist.com/forums/981-forum/1200944-torque-values-bolts-and-nuts-981-cs.html"
+    "notes": "M12×1.5 to wheel-bearing housing. Single-use — fit new screws each time; note the different screw lengths (per PET).",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 473919 · p.3157"
   },
   {
     "id": "torque-caliper-bolt-rear",
     "category": "torque",
     "name": "Brake caliper mounting bolt (rear)",
     "value": "85 Nm (63 lb-ft)",
-    "notes": "Single-use stretch bolts — replace on every removal. Same as front.",
-    "appliesTo": ["all 981"],
-    "source": "https://www.pca.org/tech/what-is-the-torque-on-the-brake-caliper-bolts-1594611638"
+    "notes": "M12×1.5, same as front. Single-use screws.",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 474119 · p.3163"
   },
   {
     "id": "torque-brake-line-caliper",
     "category": "torque",
-    "name": "Brake line to caliper (banjo/union)",
+    "name": "Brake line union to caliper",
     "value": "16 Nm (12 lb-ft)",
-    "appliesTo": ["all 981"],
-    "source": "https://rennlist.com/forums/981-forum/1200944-torque-values-bolts-and-nuts-981-cs.html"
+    "notes": "Same front and rear.",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 474119 · p.3163"
   },
   {
-    "id": "torque-spark-plug",
+    "id": "torque-bleeder-valve",
     "category": "torque",
-    "name": "Spark plug",
-    "value": "30 Nm (22 lb-ft)",
-    "notes": "Sources cluster 25-30 Nm; 30 Nm is the target. No anti-seize on the threads.",
-    "appliesTo": ["all 981"],
-    "source": "https://www.pca.org/tech/spark-plug-torque--1583459634"
+    "name": "Brake caliper bleeder valve",
+    "value": "14 Nm (10.5 lb-ft)",
+    "notes": "Tighten after bleeding the system.",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 470107 · p.3138"
   },
   {
-    "id": "torque-pdk-gear-drain",
+    "id": "torque-brake-disc-screw",
     "category": "torque",
-    "name": "PDK gear-oil drain plug",
+    "name": "Brake disc retaining screw",
+    "value": "10 Nm (7.5 lb-ft)",
+    "notes": "Countersunk screw securing the disc to the hub; front and rear identical.",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 465019 · p.3070"
+  },
+  {
+    "id": "torque-axle-hub-nut",
+    "category": "torque",
+    "name": "Drive-shaft / rear axle hub nut",
+    "value": "460 Nm (340 lb-ft)",
+    "notes": "M22×1.5 lock nut — always fit a new nut. Very high torque; loosen/tighten with the car on the ground, in gear, handbrake on.",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 422119 · p.5335"
+  },
+  {
+    "id": "torque-driveshaft-flange",
+    "category": "torque",
+    "name": "Drive shaft to transmission flange bolt",
+    "value": "80 Nm (59 lb-ft)",
+    "notes": "Cheese-head bolt M10.",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 422119 · p.5335"
+  },
+  {
+    "id": "torque-manual-trans-drain",
+    "category": "torque",
+    "name": "Manual transmission drain plug",
+    "value": "40 Nm (30 lb-ft) ±2 Nm",
+    "notes": "Fit a new sealing ring.",
+    "appliesTo": [
+      "981 manual"
+    ],
+    "source": "Porsche WM 981 · 340155 · p.5581"
+  },
+  {
+    "id": "torque-manual-trans-fill",
+    "category": "torque",
+    "name": "Manual transmission filler plug",
+    "value": "40 Nm (30 lb-ft) ±2 Nm",
+    "notes": "Fit a new sealing ring.",
+    "appliesTo": [
+      "981 manual"
+    ],
+    "source": "Porsche WM 981 · 340155 · p.5581"
+  },
+  {
+    "id": "torque-final-drive-plug",
+    "category": "torque",
+    "name": "Final-drive (PDK diff) oil plug",
     "value": "27 Nm (20 lb-ft)",
-    "notes": "8mm hex.",
-    "appliesTo": ["981 PDK"],
-    "source": "https://rennlist.com/forums/981-forum/1179646-981-pdk-service-do-it-yourself.html"
+    "notes": "Both the differential and gearwheel-set plugs; fit a new plug each time. Separate circuit from the PDK clutch fluid.",
+    "appliesTo": [
+      "981 PDK"
+    ],
+    "source": "Porsche WM 981 · 399055 · p.5820"
   },
   {
-    "id": "torque-pdk-gear-fill",
+    "id": "torque-pdk-atf-drain",
     "category": "torque",
-    "name": "PDK gear-oil fill plug",
+    "name": "PDK ATF (clutch fluid) drain plug",
     "value": "27 Nm (20 lb-ft)",
-    "notes": "8mm hex.",
-    "appliesTo": ["981 PDK"],
-    "source": "https://rennlist.com/forums/981-forum/1179646-981-pdk-service-do-it-yourself.html"
+    "notes": "Fit a new plug. The filler screw is the same 27 Nm.",
+    "appliesTo": [
+      "981 PDK"
+    ],
+    "source": "Porsche WM 981 · 370255 · p.5652"
   },
   {
-    "id": "torque-pdk-clutch-drain",
+    "id": "torque-pdk-atf-pan-drain",
     "category": "torque",
-    "name": "PDK clutch-oil pan drain plug",
-    "value": "15 Nm (11 lb-ft)",
-    "notes": "Some Porsche docs cite 15-18 Nm.",
-    "appliesTo": ["981 PDK"],
-    "source": "https://rennlist.com/forums/981-forum/1179646-981-pdk-service-do-it-yourself.html"
-  },
-  {
-    "id": "torque-pdk-clutch-fill",
-    "category": "torque",
-    "name": "PDK clutch-oil fill plug",
-    "value": "27 Nm (20 lb-ft)",
-    "appliesTo": ["981 PDK"],
-    "source": "https://rennlist.com/forums/981-forum/1179646-981-pdk-service-do-it-yourself.html"
-  },
-  {
-    "id": "torque-pdk-diff-drain",
-    "category": "torque",
-    "name": "PDK differential gear-oil drain plug",
-    "value": "10 Nm (7 lb-ft)",
-    "appliesTo": ["981 PDK"],
-    "source": "https://rennlist.com/forums/981-forum/1179646-981-pdk-service-do-it-yourself.html"
-  },
-  {
-    "id": "torque-manual-trans-plug",
-    "category": "torque",
-    "name": "Manual transmission drain & fill plug",
-    "value": "~25 Nm (18 lb-ft)",
-    "notes": "LOW-CONFIDENCE: source is a closely-related 987.2 6-speed, not 981-verified. Confirm against the workshop manual.",
-    "appliesTo": ["981 manual"],
-    "source": "https://www.pca.org/tech/manual-transmission-fill-drain-plugs-torque-setting"
+    "name": "PDK ATF-pan drain plug",
+    "value": "15 Nm (11 lb-ft) +3 Nm",
+    "notes": "Drain plug on the ATF pan itself (distinct from the 27 Nm main drain). Replace the plug.",
+    "appliesTo": [
+      "981 PDK"
+    ],
+    "source": "Porsche WM 981 · 375519 · p.5718"
   },
   {
     "id": "torque-coolant-drain",
     "category": "torque",
     "name": "Coolant drain plug",
-    "value": "~10 Nm (7 lb-ft)",
-    "notes": "LOW-CONFIDENCE: value is from a 997 document, not 981-verified.",
-    "appliesTo": ["all 981"],
-    "source": "https://www.6speedonline.com/forums/997/354895-torque-setting-engine-coolant-drain-plug.html"
-  },
-  {
-    "id": "torque-disc-retaining-screw",
-    "category": "torque",
-    "name": "Brake disc retaining (countersunk) screw",
-    "value": "~5 Nm (4 lb-ft)",
-    "notes": "LOW-CONFIDENCE: M6 value from an older-model chart; no 981-specific source found. Plausible.",
-    "appliesTo": ["all 981"],
-    "source": "https://www.lindseyracing.com/LR/Parts/TORQUESPEC.html"
+    "value": "25 Nm (19 lb-ft)",
+    "notes": "M14×1.5 in the coolant regulator housing; replace the sealing ring.",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 193817 · p.4017"
   },
   {
     "id": "torque-engine-mount",
     "category": "torque",
-    "name": "Engine mount bolts",
-    "value": "~48 Nm (35 lb-ft)",
-    "notes": "LOW-CONFIDENCE: M10 value from an older-model chart, NOT 981-verified.",
-    "appliesTo": ["all 981"],
-    "source": "https://www.lindseyracing.com/LR/Parts/TORQUESPEC.html"
+    "name": "Engine mount to bracket bolt",
+    "value": "120 Nm (89 lb-ft)",
+    "notes": "M12 hex-head bolt with collar nut. Engine bracket to crankcase = 65 Nm (M10×40).",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 103219 · p.3609"
   },
   {
-    "id": "torque-control-arm",
+    "id": "torque-antiroll-front",
     "category": "torque",
-    "name": "Control arm fastener",
-    "value": "~65 Nm + angle (verify)",
-    "notes": "LOW-CONFIDENCE: from an older-model chart only. The 981 likely uses angle-torque (Nm + degrees). Not verified — use the workshop manual.",
-    "appliesTo": ["all 981"],
-    "source": "https://www.lindseyracing.com/LR/Parts/TORQUESPEC.html"
+    "name": "Anti-roll-bar drop-link nut (front)",
+    "value": "40 Nm (30 lb-ft) + 30°",
+    "notes": "New nut; initial 40 Nm then final +30° torque-angle. Anti-roll-bar clamp bolts = 65 Nm.",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 407719 · p.3234"
+  },
+  {
+    "id": "torque-antiroll-rear",
+    "category": "torque",
+    "name": "Anti-roll-bar drop-link nut (rear)",
+    "value": "40 Nm (30 lb-ft) + 30°",
+    "notes": "Nut securing the anti-roll bar to the drop link; initial 40 Nm then +30°.",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 429019 · p.5432"
+  },
+  {
+    "id": "torque-strut-top-mount",
+    "category": "torque",
+    "name": "Front strut top-mount nuts",
+    "value": "33 Nm (24 lb-ft)",
+    "notes": "Mount collar nuts to the body. Strut-to-wheel-carrier clamp = 23 Nm; lower trailing-arm mount = 120 Nm.",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 408519 · p.3248"
+  },
+  {
+    "id": "torque-control-arm-balljoint",
+    "category": "torque",
+    "name": "Control arm to wheel-carrier lock nut",
+    "value": "85 Nm (63 lb-ft)",
+    "notes": "M12×1.5 cone-joint lock nut (toe arm and lower wishbone). Replace the lock nut.",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 422119 · p.5335"
+  },
+  {
+    "id": "torque-air-cleaner-nut",
+    "category": "torque",
+    "name": "Air-cleaner housing nut",
+    "value": "4 Nm (3 lb-ft)",
+    "notes": "Housing to body in the luggage compartment. Intake rubber-sleeve clamp = 3 Nm.",
+    "appliesTo": [
+      "all 981"
+    ],
+    "source": "Porsche WM 981 · 242519 · p.4341"
   },
   {
     "id": "fluid-engine-oil-approval",
@@ -154,7 +269,9 @@
     "name": "Engine oil approval",
     "value": "Porsche A40",
     "notes": "HTHS >= 3.5, high TBN. Later A40 oils may also carry the C40 spec.",
-    "appliesTo": ["all 981"],
+    "appliesTo": [
+      "all 981"
+    ],
     "source": "https://www.mobil.com/en/lubricants/for-personal-vehicles/our-products/porsche"
   },
   {
@@ -163,7 +280,9 @@
     "name": "Engine oil viscosity",
     "value": "0W-40 (factory fill)",
     "notes": "Factory fill is Mobil 1 0W-40. 5W-40 and 5W-50 are also A40-approved alternatives.",
-    "appliesTo": ["all 981"],
+    "appliesTo": [
+      "all 981"
+    ],
     "source": "https://www.mobil.com/en/lubricants/for-personal-vehicles/our-products/porsche"
   },
   {
@@ -172,7 +291,9 @@
     "name": "Coolant type",
     "value": "Porsche G40 (pink/violet Si-OAT)",
     "notes": "Equivalent to VW G12++ / TL774-J; the 'pink/002' family. Zerex G40 is an OEM-equivalent. Porsche concentrate P/N 00004330149.",
-    "appliesTo": ["all 981"],
+    "appliesTo": [
+      "all 981"
+    ],
     "source": "https://rennlist.com/forums/981-forum/1327909-coolant-type.html"
   },
   {
@@ -181,7 +302,9 @@
     "name": "Coolant mixing ratio",
     "value": "50/50 concentrate with distilled water",
     "notes": "A prediluted version also exists. Small top-ups with distilled water are acceptable.",
-    "appliesTo": ["all 981"],
+    "appliesTo": [
+      "all 981"
+    ],
     "source": "https://www.pelicanparts.com/More_Info/00004330575.htm"
   },
   {
@@ -190,7 +313,9 @@
     "name": "Brake fluid",
     "value": "DOT 4 Low Viscosity (Super DOT 4)",
     "notes": "Dry boiling point min 265C, wet 175C. Change every 2 years. Porsche P/N 00004321082.",
-    "appliesTo": ["all 981"],
+    "appliesTo": [
+      "all 981"
+    ],
     "source": "https://www.pelicanparts.com/More_Info/00004321082.htm"
   },
   {
@@ -199,7 +324,9 @@
     "name": "PDK gear oil",
     "value": "SAE 75W-90",
     "notes": "Separate circuit from the PDK clutch/control fluid. Retailers often mislabel the clutch fluid as 'PDK transmission fluid' — the gears use 75W-90.",
-    "appliesTo": ["981 PDK"],
+    "appliesTo": [
+      "981 PDK"
+    ],
     "source": "https://www.fcpeuro.com/products/porsche-pdk-transmission-fluid-service-kit-fuchs-9g132102500kt"
   },
   {
@@ -208,7 +335,9 @@
     "name": "PDK clutch / control fluid",
     "value": "Pentosin FFL-3",
     "notes": "Porsche P/N 00004330513 (supersedes 00004320729 / 00004330512). This is the fluid often mislabeled as 'PDK transmission fluid'.",
-    "appliesTo": ["981 PDK"],
+    "appliesTo": [
+      "981 PDK"
+    ],
     "source": "https://www.pelicanparts.com/More_Info/00004330513.htm"
   },
   {
@@ -217,7 +346,9 @@
     "name": "Manual transmission gear oil",
     "value": "SAE 75W-90, API GL-5",
     "notes": "Factory fill is Shell Spirax S5 ATE 75W-90. Porsche P/N 00004330549.",
-    "appliesTo": ["981 manual"],
+    "appliesTo": [
+      "981 manual"
+    ],
     "source": "https://rennlist.com/forums/981-forum/1467028-manual-transmission-fluid.html"
   },
   {
@@ -226,7 +357,9 @@
     "name": "Power steering fluid",
     "value": "NONE (electromechanical EPAS)",
     "notes": "The 981 uses electric power steering — no pump, no fluid, nothing to service.",
-    "appliesTo": ["all 981"],
+    "appliesTo": [
+      "all 981"
+    ],
     "source": "https://www.planet-9.com/threads/electric-power-steering-for-981-and-991.63357/"
   },
   {
@@ -235,7 +368,9 @@
     "name": "A/C refrigerant type",
     "value": "R134a",
     "notes": "No R1234yf cutover found for the 981; the transition lands on the later 982/718. Verify against the engine-bay refrigerant label.",
-    "appliesTo": ["all 981"],
+    "appliesTo": [
+      "all 981"
+    ],
     "source": "https://database26.com/porsche-refrigerant-capacity-chart/"
   },
   {
@@ -243,7 +378,9 @@
     "category": "fluid",
     "name": "A/C compressor oil",
     "value": "PAG ND8 / ISO 46 (~150 ml)",
-    "appliesTo": ["all 981"],
+    "appliesTo": [
+      "all 981"
+    ],
     "source": "https://database26.com/porsche-refrigerant-capacity-chart/"
   },
   {
@@ -252,7 +389,9 @@
     "name": "Engine oil capacity (2.7L)",
     "value": "7.5 L (~7.9 US qt)",
     "notes": "With filter change. ~7.25 L without filter; ~10.1 L dry.",
-    "appliesTo": ["base 2.7"],
+    "appliesTo": [
+      "base 2.7"
+    ],
     "source": "https://oil-change.info/porsche/cayman/981/"
   },
   {
@@ -261,7 +400,10 @@
     "name": "Engine oil capacity (3.4L)",
     "value": "7.5 L (~7.9 US qt)",
     "notes": "With filter change. Same as the 2.7L per all sources.",
-    "appliesTo": ["S 3.4", "GTS 3.4"],
+    "appliesTo": [
+      "S 3.4",
+      "GTS 3.4"
+    ],
     "source": "https://oil-change.info/porsche/cayman/981/"
   },
   {
@@ -270,7 +412,10 @@
     "name": "Engine oil capacity (3.8L)",
     "value": "7.5 L (~7.9 US qt)",
     "notes": "MEDIUM-CONFIDENCE: listed under the shared family figure, not independently confirmed for the GT4/Spyder 3.8L.",
-    "appliesTo": ["GT4 3.8", "Spyder 3.8"],
+    "appliesTo": [
+      "GT4 3.8",
+      "Spyder 3.8"
+    ],
     "source": "https://automoli.com/"
   },
   {
@@ -279,7 +424,11 @@
     "name": "Coolant total system capacity (2.7/3.4)",
     "value": "~23 L",
     "notes": "MEDIUM-CONFIDENCE: total system (not drain-and-fill), from an aggregator. Verify against the manual.",
-    "appliesTo": ["base 2.7", "S 3.4", "GTS 3.4"],
+    "appliesTo": [
+      "base 2.7",
+      "S 3.4",
+      "GTS 3.4"
+    ],
     "source": "https://automoli.com/"
   },
   {
@@ -288,7 +437,10 @@
     "name": "Coolant total system capacity (3.8)",
     "value": "~25 L",
     "notes": "LOW-CONFIDENCE: aggregator figure, larger cooling demand assumed for GT4/Spyder.",
-    "appliesTo": ["GT4 3.8", "Spyder 3.8"],
+    "appliesTo": [
+      "GT4 3.8",
+      "Spyder 3.8"
+    ],
     "source": "https://automoli.com/"
   },
   {
@@ -297,7 +449,9 @@
     "name": "PDK gear oil capacity (drain & fill)",
     "value": "~2.95 L",
     "notes": "Service volume, not total.",
-    "appliesTo": ["981 PDK"],
+    "appliesTo": [
+      "981 PDK"
+    ],
     "source": "https://ecarguides.com/"
   },
   {
@@ -306,7 +460,9 @@
     "name": "PDK clutch fluid exchanged (service)",
     "value": "~2-2.5 L",
     "notes": "LOW-CONFIDENCE: service pack is ~6 L but only ~2-2.5 L is exchanged. Requires PIWIS fill mode at a set fluid temperature.",
-    "appliesTo": ["981 PDK"],
+    "appliesTo": [
+      "981 PDK"
+    ],
     "source": "https://rennlist.com/forums/981-forum/1179646-981-pdk-service-do-it-yourself.html"
   },
   {
@@ -315,7 +471,9 @@
     "name": "Manual gearbox oil capacity (refill)",
     "value": "~2.8 L",
     "notes": "MEDIUM-CONFIDENCE: forum consensus; confirm against the manual.",
-    "appliesTo": ["981 manual"],
+    "appliesTo": [
+      "981 manual"
+    ],
     "source": "https://www.planet-9.com/forums/"
   },
   {
@@ -324,7 +482,9 @@
     "name": "Fuel tank capacity (standard)",
     "value": "54 L (~14.3 US gal)",
     "notes": "MEDIUM-CONFIDENCE: aggregator figure for the standard tank.",
-    "appliesTo": ["all 981"],
+    "appliesTo": [
+      "all 981"
+    ],
     "source": "https://www.auto-data.net/en/porsche-cayman-981c-2.7-275hp-pdk-21384"
   },
   {
@@ -333,7 +493,9 @@
     "name": "Fuel tank capacity (optional extended range)",
     "value": "64 L (~16.9 US gal)",
     "notes": "No-cost option; very common, so many spec sites list 64 L as default.",
-    "appliesTo": ["all 981 with Extended Range option"],
+    "appliesTo": [
+      "all 981 with Extended Range option"
+    ],
     "source": "https://www.auto-data.net/en/porsche-cayman-981c-2.7-275hp-pdk-21384"
   },
   {
@@ -341,7 +503,9 @@
     "category": "capacity",
     "name": "A/C refrigerant charge",
     "value": "850 g (R134a)",
-    "appliesTo": ["all 981"],
+    "appliesTo": [
+      "all 981"
+    ],
     "source": "https://database26.com/porsche-refrigerant-capacity-chart/"
   },
   {
@@ -350,7 +514,10 @@
     "name": "Tyre size (18 inch, base/S)",
     "value": "F 235/45 ZR18, R 265/45 ZR18",
     "notes": "Rims 8Jx18 ET57 front / 9Jx18 ET47 rear. Base normally on 18 inch.",
-    "appliesTo": ["base 2.7", "S 3.4"],
+    "appliesTo": [
+      "base 2.7",
+      "S 3.4"
+    ],
     "source": "https://www.wheel-size.com/size/porsche/cayman/981-2013-2016/"
   },
   {
@@ -359,7 +526,11 @@
     "name": "Tyre size (19 inch, base/S/GTS)",
     "value": "F 235/40 ZR19, R 265/40 ZR19",
     "notes": "Rims 8Jx19 ET57 front / 9.5Jx19 ET45 rear. S normally on 19 inch.",
-    "appliesTo": ["base", "S", "GTS"],
+    "appliesTo": [
+      "base",
+      "S",
+      "GTS"
+    ],
     "source": "https://www.wheel-size.com/size/porsche/boxster/981-2012-2017/"
   },
   {
@@ -368,7 +539,11 @@
     "name": "Tyre size (20 inch, GTS/Spyder)",
     "value": "F 235/35 ZR20, R 265/35 ZR20",
     "notes": "Rims 8Jx20 ET57 front / 9.5Jx20 ET45 rear. GTS standard on 20 inch; Spyder same sizes.",
-    "appliesTo": ["GTS", "Spyder", "S/base 20-inch option"],
+    "appliesTo": [
+      "GTS",
+      "Spyder",
+      "S/base 20-inch option"
+    ],
     "source": "https://tiresize.com/tires/Porsche/Cayman/"
   },
   {
@@ -377,7 +552,9 @@
     "name": "Tyre size (GT4)",
     "value": "F 245/35 ZR20, R 295/30 ZR20",
     "notes": "Wider than base/S/GTS. OEM Michelin Pilot Sport Cup 2 N1. Rims 8.5Jx20 front / 10Jx20 rear.",
-    "appliesTo": ["GT4 3.8"],
+    "appliesTo": [
+      "GT4 3.8"
+    ],
     "source": "https://www.wheel-size.com/size/porsche/cayman/981-2013-2016/"
   },
   {
@@ -386,7 +563,9 @@
     "name": "Cold tyre pressure (18 inch)",
     "value": "F 2.0 bar (29 psi) / R 2.1 bar (30 psi)",
     "notes": "LOW-CONFIDENCE: database baseline; the normal-vs-full-load split could not be separated. Always read the door-jamb/fuel-flap placard.",
-    "appliesTo": ["18-inch base/S"],
+    "appliesTo": [
+      "18-inch base/S"
+    ],
     "source": "https://tirepressure.com/porsche-cayman-tire-pressure"
   },
   {
@@ -395,7 +574,9 @@
     "name": "Cold tyre pressure (19 inch)",
     "value": "F 2.0 bar (29 psi) / R 2.1 bar (30 psi)",
     "notes": "LOW-CONFIDENCE: same as 18 inch in databases; read the placard for definitive normal/full-load figures.",
-    "appliesTo": ["19-inch base/S/GTS"],
+    "appliesTo": [
+      "19-inch base/S/GTS"
+    ],
     "source": "https://tirepressure.com/porsche-cayman-tire-pressure"
   },
   {
@@ -404,7 +585,9 @@
     "name": "Cold tyre pressure (20 inch)",
     "value": "F 2.2 bar (32 psi) / R 2.3 bar (33 psi)",
     "notes": "LOW-CONFIDENCE: comfort ~2.1 bar vs normal/full ~2.3 bar split suggested; axle full-load values unconfirmed. Read the placard.",
-    "appliesTo": ["20-inch"],
+    "appliesTo": [
+      "20-inch"
+    ],
     "source": "https://www.wheel-size.com/size/porsche/cayman/981-2013-2016/"
   },
   {
@@ -413,7 +596,9 @@
     "name": "Cold tyre pressure (GT4, street)",
     "value": "F 2.0 bar (29 psi) / R 2.3 bar (33 psi)",
     "notes": "MEDIUM-CONFIDENCE: door-placard street reading. One database showed 36 psi (likely track/loaded).",
-    "appliesTo": ["GT4"],
+    "appliesTo": [
+      "GT4"
+    ],
     "source": "https://rennlist.com/forums/gt4-spyder/992833-what-tire-pressure-street.html"
   },
   {
@@ -422,7 +607,9 @@
     "name": "Battery type",
     "value": "AGM, Group 48/H6, ~70 Ah, ~760 CCA",
     "notes": "OEM Banner, Porsche P/N 99961107012. AGM required (start-stop). Replacement must be coded in with PIWIS.",
-    "appliesTo": ["all 981"],
+    "appliesTo": [
+      "all 981"
+    ],
     "source": "https://www.pca.org/tech/what-is-the-correct-battery-replacement-for-a-2015-cayman-boxster"
   },
   {
@@ -430,7 +617,9 @@
     "category": "electrical",
     "name": "Battery location",
     "value": "Front trunk (frunk), under a black cover",
-    "appliesTo": ["all 981"],
+    "appliesTo": [
+      "all 981"
+    ],
     "source": "https://www.pca.org/tech/what-is-the-correct-battery-replacement-for-a-2015-cayman-boxster"
   },
   {
@@ -438,7 +627,9 @@
     "category": "electrical",
     "name": "System voltage",
     "value": "12 V",
-    "appliesTo": ["all 981"],
+    "appliesTo": [
+      "all 981"
+    ],
     "source": "https://www.design911.co.uk/porsche/boxster-986-987-981/alternator/"
   },
   {
@@ -447,7 +638,9 @@
     "name": "Alternator output",
     "value": "~150 A",
     "notes": "LOW-CONFIDENCE: from a parts listing; some base units listed at 120 A. Verify by part number.",
-    "appliesTo": ["all 981"],
+    "appliesTo": [
+      "all 981"
+    ],
     "source": "https://www.design911.co.uk/porsche/boxster-986-987-981/alternator/"
   },
   {
@@ -456,7 +649,9 @@
     "name": "Key fob battery",
     "value": "CR2032 (3V lithium)",
     "notes": "Porsche P/N 99961110800.",
-    "appliesTo": ["all 981"],
+    "appliesTo": [
+      "all 981"
+    ],
     "source": "https://www.pelicanparts.com/More_Info/99961110800.htm"
   },
   {
@@ -465,7 +660,9 @@
     "name": "Brake pad minimum thickness",
     "value": "2 mm friction material",
     "notes": "MEDIUM-CONFIDENCE: recommended replacement around 2.5 mm. From a forum, not a factory table.",
-    "appliesTo": ["all 981 front & rear"],
+    "appliesTo": [
+      "all 981 front & rear"
+    ],
     "source": "https://rennlist.com/forums/981-forum/1354131-981-brake-pad-thickness.html"
   },
   {
@@ -474,7 +671,10 @@
     "name": "Front disc minimum thickness (S/GTS)",
     "value": "26 mm (new 28 mm, 330 mm dia)",
     "notes": "MEDIUM-CONFIDENCE: minimum is stamped on the disc hub; cross-verified across two threads.",
-    "appliesTo": ["S 3.4", "GTS 3.4"],
+    "appliesTo": [
+      "S 3.4",
+      "GTS 3.4"
+    ],
     "source": "https://rennlist.com/forums/981-forum/1337788-min-rotor-thickness-replacement.html"
   },
   {
@@ -483,7 +683,10 @@
     "name": "Rear disc minimum thickness (S/GTS)",
     "value": "18 mm (new 20 mm, 299 mm dia)",
     "notes": "MEDIUM-CONFIDENCE: one poster mis-stated 22 mm; the corrected value is 18 mm.",
-    "appliesTo": ["S 3.4", "GTS 3.4"],
+    "appliesTo": [
+      "S 3.4",
+      "GTS 3.4"
+    ],
     "source": "https://rennlist.com/forums/981-forum/973779-981-cayman-rotor-thinkess.html"
   },
   {
@@ -492,7 +695,9 @@
     "name": "Front disc minimum thickness (base)",
     "value": "26 mm (new 28 mm, 315 mm dia)",
     "notes": "LOW-CONFIDENCE: base front diameter 315 mm; thickness believed same as S. Verify the value stamped on the disc.",
-    "appliesTo": ["base 2.7"],
+    "appliesTo": [
+      "base 2.7"
+    ],
     "source": "https://www.planet-9.com/threads/981-base-vs-981s-front-brakes.143105/"
   },
   {
@@ -501,7 +706,9 @@
     "name": "Rear disc minimum thickness (base)",
     "value": "18 mm (new 20 mm, 299 mm dia)",
     "notes": "LOW-CONFIDENCE: same thickness as S assumed; verify the stamped value on the disc.",
-    "appliesTo": ["base 2.7"],
+    "appliesTo": [
+      "base 2.7"
+    ],
     "source": "https://www.planet-9.com/threads/981-base-vs-981s-front-brakes.143105/"
   },
   {
@@ -510,7 +717,9 @@
     "name": "Engine oil service interval",
     "value": "1 year / 10,000 mi (16,000 km)",
     "notes": "Some early booklets cite 2 yr / 20k mi; 1yr/10k is the conservative widely-used figure. Many owners shorten to 5,000-7,500 mi.",
-    "appliesTo": ["all 981"],
+    "appliesTo": [
+      "all 981"
+    ],
     "source": "https://www.pcarwise.com/local-help/porsche-maintenance-schedules/boxster-maintenance/981-boxster-maintenance-schedule/"
   }
 ]
