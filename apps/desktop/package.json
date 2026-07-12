@@ -121,6 +121,10 @@
       "owner": "dmitry-grechko",
       "repo": "flat-six",
       "releaseType": "release"
+    },
+    "protocols": {
+      "name": "FLAT·SIX",
+      "schemes": ["flatsix"]
     }
   }
 }

@@ -26,7 +26,11 @@ port = 54323
 enabled = true
 # For local dev. In the hosted dashboard set Site URL to your Vercel domain.
 site_url = "http://localhost:3000"
-additional_redirect_urls = ["http://localhost:3000/auth/callback"]
+additional_redirect_urls = [
+  "http://localhost:3000/auth/callback",
+  "http://127.0.0.1:3911/auth/callback",
+  "flatsix://auth/callback",
+]
 jwt_expiry = 3600
 enable_signup = true
 

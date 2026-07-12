@@ -54,6 +54,8 @@ Dashboard → **Authentication → URL Configuration**:
 - **Redirect URLs**: add
   - `http://localhost:3000/auth/callback`
   - `https://<your-vercel-domain>/auth/callback`
+  - `http://127.0.0.1:3911/auth/callback` (FLAT·SIX Desktop local server)
+  - `flatsix://auth/callback` (Desktop deep link when the mail app opens the link externally)
 
 Email / magic link is enabled by default on the free tier. No SMTP setup needed for
 low volume (Supabase sends from its own domain, rate-limited). For higher volume,

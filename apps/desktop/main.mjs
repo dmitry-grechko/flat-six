@@ -14,6 +14,59 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const host = createObdHost(process.platform);
 const APP_PORT = Number(process.env.FLATSIX_DESKTOP_PORT || 3911);
 
+/** @type {import('electron').BrowserWindow | null} */
+let mainWindow = null;
+/** @type {string | null} */
+let pendingAuthUrl = null;
+
+function flatsixAuthToLocal(url) {
+  const u = new URL(url);
+  return `http://127.0.0.1:${APP_PORT}/auth/callback${u.search}`;
+}
+
+function navigateAuthDeepLink(url) {
+  const local = url.startsWith('flatsix://') ? flatsixAuthToLocal(url) : url;
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    void mainWindow.loadURL(local);
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.focus();
+  } else {
+    pendingAuthUrl = local;
+  }
+}
+
+function registerAuthProtocol() {
+  if (process.defaultApp) {
+    if (process.argv.length >= 2) {
+      app.setAsDefaultProtocolClient('flatsix', process.execPath, [path.resolve(process.argv[1])]);
+    }
+  } else {
+    app.setAsDefaultProtocolClient('flatsix');
+  }
+}
+
+const gotSingleInstanceLock = app.requestSingleInstanceLock();
+if (!gotSingleInstanceLock) {
+  app.quit();
+}
+
+app.on('second-instance', (_event, argv) => {
+  const deep = argv.find((arg) => typeof arg === 'string' && arg.startsWith('flatsix://'));
+  if (deep) navigateAuthDeepLink(deep);
+  if (mainWindow) {
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.focus();
+  }
+});
+
+app.on('open-url', (event, url) => {
+  event.preventDefault();
+  if (url.startsWith('flatsix://')) navigateAuthDeepLink(url);
+});
+
+const startupDeepLink = process.argv.find((arg) => typeof arg === 'string' && arg.startsWith('flatsix://'));
+if (startupDeepLink) pendingAuthUrl = flatsixAuthToLocal(startupDeepLink);
+
 /** @type {import('node:child_process').ChildProcess | null} */
 let nextProc = null;
 
@@ -105,7 +158,26 @@ function createWindow(url) {
       sandbox: false,
     },
   });
-  void win.loadURL(url);
+  mainWindow = win;
+  win.on('closed', () => {
+    if (mainWindow === win) mainWindow = null;
+  });
+  win.webContents.on('will-navigate', (event, target) => {
+    if (target.startsWith('flatsix://')) {
+      event.preventDefault();
+      navigateAuthDeepLink(target);
+    }
+  });
+  win.webContents.on('will-redirect', (event, target) => {
+    if (target.startsWith('flatsix://')) {
+      event.preventDefault();
+      navigateAuthDeepLink(target);
+    }
+  });
+  const startUrl = pendingAuthUrl || url;
+  pendingAuthUrl = null;
+  void win.loadURL(startUrl);
+  return win;
 }
 
 /** @param {Record<string, unknown>} status */
@@ -218,6 +290,7 @@ function wireIpc() {
 }
 
 app.whenReady().then(async () => {
+  registerAuthProtocol();
   wireIpc();
   if (app.isPackaged) setupAutoUpdater();
   const icon = resolveAppIcon();
