@@ -136,11 +136,25 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # `hdiutil detach … Resource busy (exit 16)` while building the DMG is a
+          # known CI flake: Spotlight (mds/mdworker) grabs the freshly-mounted DMG
+          # volume before electron-builder can detach it, so the (second) arm64 DMG
+          # build fails and takes the whole release down. Disable Spotlight indexing
+          # to fix the root cause, then retry to ride out any residual flakiness
+          # (`--publish always` is idempotent — a re-run overwrites uploaded assets).
+          sudo mdutil -a -i off || true
           if [ "${{ github.event_name }}" = "push" ] || [ "${{ inputs.publish }}" = "true" ]; then
-            npx electron-builder --mac dmg zip --x64 --arm64 --publish always
+            build() { npx electron-builder --mac dmg zip --x64 --arm64 --publish always; }
           else
-            npm run pack:mac
+            build() { npm run pack:mac; }
           fi
+          for attempt in 1 2 3; do
+            if build; then exit 0; fi
+            echo "macOS pack attempt ${attempt}/3 failed; retrying in 20s…"
+            sleep 20
+          done
+          echo "macOS pack failed after 3 attempts" >&2
+          exit 1
 
       - name: Upload artifacts
         if: github.event_name == 'workflow_dispatch' && !inputs.publish
