@@ -46,8 +46,9 @@ all four transports (`webSerial.ts`, `host.ts` + bridge `server.mjs`,
 `types.ts`, then `useObdBridge.ts`. Pure decoders get a case in `decode.test.ts`
 (`npx tsx lib/obd/decode.test.ts`).
 **Downloads** (`/downloads`, beta) lists **FLAT·SIX Desktop** + **PWA** (full garage)
-and lab Bridge — catalog in `lib/downloads.ts` (`href` / `hrefMac` when GitHub
-Releases publish). No npm install commands on that page.
+and lab Bridge — links resolve from the latest GitHub Release at request time
+(`lib/github-release.ts`, ~5 min cache). No hardcoded version tag; no npm install
+commands on that page.
 
 ## Full-app offline (Desktop + PWA)
 

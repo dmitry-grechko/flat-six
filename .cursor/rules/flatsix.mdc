@@ -42,8 +42,9 @@ A change isn't done until the **five layers** it touches are consistent:
   is unavailable — see `lib/obd/httpClient.ts`, `webSerial.ts`, `useObdBridge`.
   Desktop Electron embeds OBD via IPC (`lib/obd/electronClient.ts`).
 - **Downloads** (`/downloads`, beta): Desktop + PWA for owners; lab Bridge for
-  contributors. Catalog `lib/downloads.ts` — set `href` when releases publish.
-  Owner-facing copy has no npm commands.
+  contributors. Links resolve from the latest GitHub Release at request time
+  (`lib/github-release.ts`) — no hardcoded version tag. Owner-facing copy has no
+  npm commands.
 
 ## Before non-trivial work
 

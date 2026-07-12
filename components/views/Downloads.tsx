@@ -2,7 +2,7 @@
 
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
-import { DOWNLOADS, REPO_URL, RELEASE_TAG, type DownloadItem } from '@/lib/downloads';
+import { REPO_URL, type DownloadItem } from '@/lib/downloads';
 import { BetaBadge } from '@/components/shell/BetaBadge';
 import { track } from '@/lib/analytics';
 
@@ -69,6 +69,21 @@ function DownloadCard({ item }: { item: DownloadItem }) {
           {item.name}
         </h2>
         <BetaBadge tone="page" />
+        {item.versionLabel && (
+          <span
+            style={{
+              font: `600 9px/1 ${mono}`,
+              letterSpacing: '.1em',
+              textTransform: 'uppercase',
+              color: '#0B0B0C',
+              border: '1px solid #E3E3E5',
+              padding: '5px 8px',
+              borderRadius: 2,
+            }}
+          >
+            {item.versionLabel}
+          </span>
+        )}
         <span
           style={{
             font: `600 9px/1 ${mono}`,
@@ -151,7 +166,13 @@ function DownloadCard({ item }: { item: DownloadItem }) {
       )}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
         {item.href ? (
-          <a href={item.href} onClick={() => track('download_clicked', { target: item.id, os: 'win' })} style={{ ...btnBase, background: '#D5001C', color: '#fff' }} target="_blank" rel="noreferrer">
+          <a
+            href={item.href}
+            onClick={() => track('download_clicked', { target: item.id, os: 'win' })}
+            style={{ ...btnBase, background: '#D5001C', color: '#fff' }}
+            target="_blank"
+            rel="noreferrer"
+          >
             {item.cta}
           </a>
         ) : (
@@ -172,19 +193,19 @@ function DownloadCard({ item }: { item: DownloadItem }) {
             <SoonButton label={item.ctaMac} />
           ))}
         <a
-          href={REPO_URL}
+          href={`${REPO_URL}/releases`}
           target="_blank"
           rel="noreferrer"
           style={{ ...btnBase, background: '#fff', color: '#0B0B0C', border: '1px solid #C9C9CD' }}
         >
-          Source on GitHub
+          All releases
         </a>
       </div>
     </article>
   );
 }
 
-export default function Downloads() {
+export default function Downloads({ items }: { items: DownloadItem[] }) {
   return (
     <div className="padView" style={{ padding: 28, maxWidth: 880, display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ ...card, borderColor: 'rgba(213,0,28,.28)' }}>
@@ -201,15 +222,12 @@ export default function Downloads() {
           <Link href="/obd" style={{ color: '#D5001C', textDecoration: 'none', fontWeight: 500 }}>
             Live OBD
           </Link>{' '}
-          already supports USB Web Serial on desktop Chrome. Installers are on{' '}
-          <a href={`${REPO_URL}/releases/tag/${RELEASE_TAG}`} style={{ color: '#D5001C', textDecoration: 'none', fontWeight: 500 }}>
-            GitHub Releases
-          </a>
-          .
+          already supports USB Web Serial on desktop Chrome. Download buttons always track the latest
+          GitHub Release — no manual version bump on the site.
         </p>
       </div>
 
-      {DOWNLOADS.map((item) => (
+      {items.map((item) => (
         <DownloadCard key={item.id} item={item} />
       ))}
     </div>

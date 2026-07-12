@@ -33,7 +33,6 @@
     "npmRebuild": false,
     "nodeGypRebuild": false,
     "icon": "build/icon",
-    "artifactName": "FLAT-SIX-${version}-${arch}.${ext}",
     "directories": {
       "output": "release"
     },
@@ -50,9 +49,7 @@
       {
         "from": "standalone",
         "to": "standalone",
-        "filter": [
-          "**/*"
-        ]
+        "filter": ["**/*"]
       },
       {
         "from": "build/icon.png",
@@ -66,18 +63,8 @@
     "afterPack": "./scripts/after-pack-sign.mjs",
     "win": {
       "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        },
-        {
-          "target": "portable",
-          "arch": [
-            "x64"
-          ]
-        }
+        { "target": "nsis", "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
       ],
       "signAndEditExecutable": false
     },
@@ -86,23 +73,21 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "FLAT·SIX"
+      "shortcutName": "FLAT·SIX",
+      "artifactName": "FLAT-SIX-Setup-${version}-${arch}.${ext}"
+    },
+    "portable": {
+      "artifactName": "FLAT-SIX-${version}-${arch}-portable.${ext}"
     },
     "mac": {
       "target": [
         {
           "target": "dmg",
-          "arch": [
-            "x64",
-            "arm64"
-          ]
+          "arch": ["x64", "arm64"]
         },
         {
           "target": "zip",
-          "arch": [
-            "x64",
-            "arm64"
-          ]
+          "arch": ["x64", "arm64"]
         }
       ],
       "category": "public.app-category.utilities",
@@ -112,16 +97,8 @@
     },
     "dmg": {
       "contents": [
-        {
-          "x": 130,
-          "y": 220
-        },
-        {
-          "x": 410,
-          "y": 220,
-          "type": "link",
-          "path": "/Applications"
-        }
+        { "x": 130, "y": 220 },
+        { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
       ]
     },
     "publish": {

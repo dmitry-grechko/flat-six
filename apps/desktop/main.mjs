@@ -14,9 +14,9 @@ import { createMacUpdater } from './mac-updater.mjs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const host = createObdHost(process.platform);
 const APP_PORT = Number(process.env.FLATSIX_DESKTOP_PORT || 3911);
+const IS_PORTABLE = Boolean(process.env.PORTABLE_EXECUTABLE_DIR);
 
-// Isolate Chromium profile per app version so a leftover service-worker cache
-// from an older Desktop build can never keep serving a stale login UI.
+// Isolate Chromium profile per version so stale SW caches can't pin an old UI.
 app.setPath('userData', path.join(app.getPath('appData'), '@flatsix', `desktop-${app.getVersion()}`));
 
 /** @type {import('electron').BrowserWindow | null} */
@@ -94,6 +94,27 @@ function waitForServer(url, attempts = 80) {
 
 /** Kill any leftover next-server still holding the Desktop port (PPID=1 orphans). */
 function freeDesktopPort(port) {
+  if (process.platform === 'win32') {
+    try {
+      const out = execFileSync('cmd.exe', ['/c', `netstat -ano | findstr :${port}`], {
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+      });
+      const pids = new Set();
+      for (const line of out.split(/\r?\n/)) {
+        if (!/LISTENING/i.test(line)) continue;
+        const m = line.trim().match(/(\d+)\s*$/);
+        if (m) pids.add(Number(m[1]));
+      }
+      for (const pid of pids) {
+        if (!Number.isFinite(pid) || pid === process.pid) continue;
+        try {
+          execFileSync('taskkill', ['/PID', String(pid), '/T', '/F'], { stdio: 'ignore' });
+        } catch { /* already gone */ }
+      }
+    } catch { /* nothing listening */ }
+    return;
+  }
   try {
     const out = execFileSync('lsof', ['-tiTCP:' + port, '-sTCP:LISTEN'], {
       encoding: 'utf8',
@@ -248,6 +269,16 @@ function setupAutoUpdater() {
   };
   // Late subscribers (e.g. login page) miss events that fired before mount.
   ipcMain.handle('update:lastStatus', () => lastStatus);
+
+  // Portable builds share no install dir — electron-updater checksums break when
+  // NSIS + portable collide on the same artifact name (fixed in package.json).
+  if (IS_PORTABLE) {
+    push({
+      phase: 'error',
+      message: 'Portable builds do not auto-update. Install the NSIS Setup build from Downloads.',
+    });
+    return;
+  }
 
   // macOS: the ad-hoc-signed build can't apply updates via Squirrel.Mac (needs
   // Developer ID + notarization). Use our own download → verify → swap → relaunch
