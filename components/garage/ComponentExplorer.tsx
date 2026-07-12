@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, type FC } from 'react';
 import { useRouter } from 'next/navigation';
 import { COMPONENTS, SYSTEMS, COLORS, diffDots, DIFF_LABELS, componentsForGeneration, formatInterval } from '@/lib/data';
 import { useUnits } from '@/lib/units';
+import { track } from '@/lib/analytics';
 import { catalogForSystem, formatPartNumber } from '@/lib/catalog';
 import { lookupPart, type CatalogPartRow } from '@/lib/parts-lookup';
 import { exteriorPartsFor } from '@/lib/exterior-parts';
@@ -545,6 +546,9 @@ function DetailPanel({ comp, vehicle, generation, n, onClose, onLog, onAsk }: {
   comp: Component; vehicle: Vehicle; generation: string; n: number; onClose: () => void; onLog: () => void; onAsk: (p: string) => void;
 }) {
   const { units } = useUnits();
+  useEffect(() => {
+    track('component_explored', { system: comp.system, component: comp.id });
+  }, [comp.id, comp.system]);
   const engineRef = engineRefFor(generation);
   const dots = diffDots(comp.diff);
   const diffLabel = DIFF_LABELS[comp.diff - 1];

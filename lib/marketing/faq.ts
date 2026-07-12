@@ -17,6 +17,6 @@ export const LANDING_FAQ = [
   },
   {
     q: 'Is my data private?',
-    a: 'Your garage data is yours — stored in your account with row-level security. We do not sell data or run ads.',
+    a: 'Your garage data is yours — stored in your account with row-level security. We do not sell data or run ads. Optional analytics only load if you accept the cookie banner, and the desktop app sends none.',
   },
 ];

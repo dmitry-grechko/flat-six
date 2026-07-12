@@ -8,6 +8,7 @@ import { generationForBody, getVariant } from '@/lib/models';
 import { createClient } from '@/lib/supabase/client';
 import { DEMO_MODE, DEMO_EMAIL } from '@/lib/demo';
 import { useUnits, milesToDisplay, displayToMiles } from '@/lib/units';
+import { track } from '@/lib/analytics';
 
 export default function Settings() {
   const router = useRouter();
@@ -194,7 +195,7 @@ export default function Settings() {
         <label style={fieldLabel}>Distance units</label>
         <div style={{ display: 'flex', gap: 8 }}>
           {(['mi', 'km'] as const).map((u) => (
-            <button key={u} onClick={() => setUnits(u)} style={chip(units === u)}>
+            <button key={u} onClick={() => { setUnits(u); track('units_changed', { unit: u }); }} style={chip(units === u)}>
               {u === 'mi' ? 'Miles (mi)' : 'Kilometres (km)'}
             </button>
           ))}

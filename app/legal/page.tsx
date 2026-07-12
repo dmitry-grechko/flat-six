@@ -56,8 +56,9 @@ export default function LegalPage() {
           <Section id="privacy" kicker="01 · PRIVACY" title="Privacy">
             <P>
               FLAT·SIX is operated by {OPERATOR}. The service is provided free of charge as open-source software. Your personal
-              data is never sold, rented, shared for advertising, or used to train models. There are no ad networks and no
-              third-party analytics or tracking pixels.
+              data is never sold, rented, shared for advertising, or used to train models. There are no ad networks. We use
+              Google Analytics to understand which features help owners — but only if you accept in the consent banner; if you
+              decline, no analytics scripts or cookies load. The desktop app sends no analytics at all.
             </P>
             <H3>What is stored</H3>
             <P>
@@ -81,8 +82,8 @@ export default function LegalPage() {
             </P>
             <H3>Cookies</H3>
             <P>
-              The only cookies set are the session cookies required to keep you signed in. There are no marketing or
-              tracking cookies.
+              We set the session cookies required to keep you signed in. If you accept analytics in the consent banner, Google
+              Analytics also sets measurement cookies; if you decline, none are set. There are no advertising cookies.
             </P>
             <H3>Your control</H3>
             <P>

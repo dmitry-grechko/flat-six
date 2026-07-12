@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { MODEL_OPTIONS, useVehicle } from '@/lib/vehicle-context';
 import { displayToMiles } from '@/lib/units';
+import { track } from '@/lib/analytics';
 import VehicleFields, { defaultVehicleForm, type VehicleFormState } from '@/components/onboarding/VehicleFields';
 
 const mono = "'JetBrains Mono',monospace";
@@ -52,6 +53,7 @@ export default function AddVehicleModal({
         colorName: form.colorName,
         colorHex: form.colorHex,
       });
+      track('vehicle_added', { body: form.body });
       // Reset for next time and close (addVehicle already makes the new car active).
       setForm(defaultVehicleForm('cayman-987'));
       setSaving(false);

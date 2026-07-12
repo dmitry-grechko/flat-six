@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { MODEL_OPTIONS, useVehicle } from '@/lib/vehicle-context';
 import { displayToMiles } from '@/lib/units';
+import { track } from '@/lib/analytics';
 import VehicleFields, { defaultVehicleForm, type VehicleFormState } from './VehicleFields';
 
 const mono = "'JetBrains Mono',monospace";
@@ -42,6 +43,7 @@ export default function OnboardingForm() {
         colorName: form.colorName,
         colorHex: form.colorHex,
       });
+      track('onboarding_completed', { body: form.body });
       router.replace('/garage');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not save your car. Try again.');

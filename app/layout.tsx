@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import Providers from './providers';
 import ServiceWorkerRegister from '@/components/pwa/ServiceWorkerRegister';
+import Analytics from '@/components/analytics/Analytics';
 
 const SITE_URL = 'https://www.flat-six.org';
 const SITE_NAME = 'FLAT·SIX';
@@ -80,7 +81,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           src="https://unpkg.com/@google/model-viewer@4.0.0/dist/model-viewer.min.js"
         />
       </head>
-      <body><Providers>{children}</Providers><ServiceWorkerRegister /></body>
+      <body><Providers>{children}</Providers><ServiceWorkerRegister /><Analytics /></body>
     </html>
   );
 }

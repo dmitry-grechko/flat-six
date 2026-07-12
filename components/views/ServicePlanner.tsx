@@ -6,6 +6,7 @@ import { useServicePlans } from '@/lib/plans-context';
 import { useVehicle } from '@/lib/vehicle-context';
 import { fmtMiles } from '@/lib/data';
 import { useUnits, milesToDisplay, displayToMiles } from '@/lib/units';
+import { track } from '@/lib/analytics';
 import { uid } from '@/lib/uid';
 import type {
   ServicePlan,
@@ -508,6 +509,7 @@ function PlanEditor({
         },
         plan?.id,
       );
+      if (!plan?.id) track('plan_created', { status });
     } catch (e) {
       console.error('Failed to save plan', e);
       setSaving(false);

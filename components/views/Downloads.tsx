@@ -4,6 +4,7 @@ import type { CSSProperties } from 'react';
 import Link from 'next/link';
 import { DOWNLOADS, REPO_URL, RELEASE_TAG, type DownloadItem } from '@/lib/downloads';
 import { BetaBadge } from '@/components/shell/BetaBadge';
+import { track } from '@/lib/analytics';
 
 const mono = "'JetBrains Mono',monospace";
 const sans = "'Helvetica Neue',Arial,sans-serif";
@@ -150,7 +151,7 @@ function DownloadCard({ item }: { item: DownloadItem }) {
       )}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
         {item.href ? (
-          <a href={item.href} style={{ ...btnBase, background: '#D5001C', color: '#fff' }} target="_blank" rel="noreferrer">
+          <a href={item.href} onClick={() => track('download_clicked', { target: item.id, os: 'win' })} style={{ ...btnBase, background: '#D5001C', color: '#fff' }} target="_blank" rel="noreferrer">
             {item.cta}
           </a>
         ) : (
@@ -160,6 +161,7 @@ function DownloadCard({ item }: { item: DownloadItem }) {
           (item.hrefMac ? (
             <a
               href={item.hrefMac}
+              onClick={() => track('download_clicked', { target: item.id, os: 'mac' })}
               style={{ ...btnBase, background: '#D5001C', color: '#fff' }}
               target="_blank"
               rel="noreferrer"

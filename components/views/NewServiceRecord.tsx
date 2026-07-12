@@ -7,6 +7,7 @@ import { useVehicle } from '@/lib/vehicle-context';
 import { useServiceRecords } from '@/lib/records-context';
 import { useServicePlans } from '@/lib/plans-context';
 import { useUnits, milesToDisplay, displayToMiles } from '@/lib/units';
+import { track } from '@/lib/analytics';
 import { uid } from '@/lib/uid';
 import type { ServiceItem } from '@/lib/types';
 
@@ -200,6 +201,7 @@ function RecordForm({
         await update(editId, payload);
       } else {
         await add(payload);
+        track('service_logged', { diy, type });
       }
       router.push('/history');
     } catch (e) {
