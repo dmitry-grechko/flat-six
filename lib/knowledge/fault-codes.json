@@ -1,5 +1,30 @@
 [
   {
+    "code": "89020E",
+    "title": "Front luggage/engine-compartment light — defective",
+    "system": "Body",
+    "severity": "LOW",
+    "description": "Porsche body-module fault stored in the front Body Control Module (BCM), not the engine ECU. The front luggage-compartment (frunk) / engine-compartment courtesy light circuit is reported defective. PIWIS text: \"Koffer-/Motorraumleuchte vorne defekt\". Shown as the raw manufacturer code 89 02 0E and read over UDS service 19 from the BCM (diagnostic request 0x70E), so it is invisible to generic OBD-II scanners.",
+    "symptoms": [
+      "Frunk / front-compartment light stays off or flickers",
+      "No dashboard warning (body fault, not emissions)"
+    ],
+    "causes": [
+      "Failed bulb / LED unit",
+      "Open or short in the light circuit wiring or connector",
+      "Faulty BCM output stage, or a stuck lid/latch switch"
+    ],
+    "diagnosis": [
+      "Check the front-compartment bulb and its connector first",
+      "Confirm the lid/latch switch reports open when the frunk is raised",
+      "Read the BCM fault memory (UDS 19 02 at request 0x70E) to confirm 89 02 0E, then clear and re-check"
+    ],
+    "relatedParts": [
+      "Front compartment light unit / bulb",
+      "Frunk lid switch"
+    ]
+  },
+  {
     "code": "P000A",
     "title": "\"A\" Camshaft Position Slow Response (Bank 1)",
     "system": "Engine",

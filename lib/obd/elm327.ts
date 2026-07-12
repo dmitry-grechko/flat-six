@@ -4,9 +4,14 @@
  */
 
 import {
+  classifyObdResponse,
   cleanElmResponse,
+  negativeResponseInfo,
   parseDtcs,
   parseFreezeFrameDtc,
+  parseMode06,
+  parseMode06Bitmap,
+  parseUdsDtcs,
   parseMode09Bitmap,
   parseMode09Hex,
   parseMode09Text,
@@ -16,13 +21,18 @@ import {
   PROMPT,
 } from './decode';
 import { ALL_LIVE_PIDS, PID_BITMAP_QUERY, PRIORITY_PIDS, UDS_PLACEHOLDER_MODULES } from './pids';
+import { obdProfile } from './profiles';
 import type {
   AdapterKind,
   ByteTransport,
   Capabilities,
+  ClearResult,
   DebugLogEntry,
   FaultsData,
   LiveData,
+  Mode06Data,
+  ModuleScanData,
+  ModuleScanResult,
   MonitorStatus,
   ObdAdapter,
   Snapshot,
@@ -49,6 +59,8 @@ export class Elm327 implements ObdAdapter {
   lastLive: LiveData | null = null;
   lastFaults: FaultsData | null = null;
   lastVehicle: VehicleInfo | null = null;
+  lastMode06: Mode06Data | null = null;
+  lastModuleScan: ModuleScanData | null = null;
 
   adapterInfo = '';
   protocol = '';
@@ -93,6 +105,8 @@ export class Elm327 implements ObdAdapter {
     this.lastLive = null;
     this.lastFaults = null;
     this.lastVehicle = null;
+    this.lastMode06 = null;
+    this.lastModuleScan = null;
     this.#chain = Promise.resolve();
     await this.#transport.close();
   }
@@ -284,8 +298,14 @@ export class Elm327 implements ObdAdapter {
 
     const freshGroups: Record<string, LiveData['groups'][string]> = {};
 
+    // Trust the support bitmap only if discovery looks complete; a partial
+    // discovery (a handful of PIDs) would otherwise starve the read. Priority
+    // PIDs (rpm, speed, coolant, …) are near-universal — always attempt them.
+    const trustSupported = this.supportedPids.size >= 8;
+
     for (const [pid, key, group, label, unit] of list) {
-      if (this.supportedPids.size > 0 && !this.supportedPids.has(pid) && pid !== '01') {
+      const isPriority = PRIORITY_PIDS.some((p) => p[0] === pid);
+      if (trustSupported && !this.supportedPids.has(pid) && pid !== '01' && !isPriority) {
         continue;
       }
       try {
@@ -478,6 +498,184 @@ export class Elm327 implements ObdAdapter {
     }
 
     this.lastVehicle = out;
+    return out;
+  }
+
+  /**
+   * Mode 06 — on-board monitoring test results. Discovers supported OBDMIDs via
+   * the 06 00/20/… bitmaps, then reads each monitor's test value + limits.
+   */
+  async readMode06(): Promise<Mode06Data> {
+    const out: Mode06Data = { at: new Date().toISOString(), supportedMids: [], tests: [], errors: [] };
+    const nextOf: Record<string, string> = { '00': '20', '20': '40', '40': '60', '60': '80', '80': 'A0' };
+    const mids = new Set<string>();
+    for (const base of ['00', '20', '40', '60', '80', 'A0']) {
+      try {
+        const raw = await this.command(`06${base}`, 3000);
+        for (const m of parseMode06Bitmap(raw, base)) mids.add(m);
+        const next = nextOf[base];
+        if (next && !mids.has(next)) break;
+      } catch {
+        break;
+      }
+    }
+    // Range markers (00/20/…) advertise the next block, not a real test.
+    const markers = new Set(['00', '20', '40', '60', '80', 'A0']);
+    out.supportedMids = [...mids].filter((m) => !markers.has(m)).sort();
+    for (const mid of out.supportedMids) {
+      try {
+        const raw = await this.command(`06${mid}`, 3000);
+        out.tests.push(...parseMode06(raw, mid));
+      } catch (e) {
+        out.errors.push({ mid, message: e instanceof Error ? e.message : String(e) });
+      }
+    }
+    this.lastMode06 = out;
+    return out;
+  }
+
+  /**
+   * Read-only UDS/KWP fault scan of non-DME modules. Reconfigures the ELM for
+   * raw module addressing (per-module request id + receive filter), reads DTCs,
+   * then restores generic-OBD addressing so live/faults reads keep working.
+   * Non-DME addresses are candidates (see uds-modules.ts) — a `refused` result
+   * still proves the address is right; `silent` means the id/routing is wrong.
+   */
+  async scanModules(generation: string): Promise<ModuleScanData> {
+    const profile = obdProfile(generation);
+    const modules = profile.modules;
+    const results: ModuleScanResult[] = [];
+
+    await this.command('ATSP6'); // ISO 15765-4 CAN, 500k
+    await this.command('ATCAF1'); // ISO-TP auto-framing (assemble multi-frame)
+    await this.command('ATH0'); // headers off — filter with receive address instead
+
+    try {
+      for (const m of modules) {
+        const res: ModuleScanResult = {
+          id: m.id,
+          name: m.name,
+          reqId: m.reqId,
+          protocol: m.protocol,
+          addressConfirmed: m.addressConfirmed,
+          reachable: 'silent',
+          sessionOk: false,
+          confirmedDtcs: [],
+          pendingDtcs: [],
+          note: m.note,
+        };
+        try {
+          await this.command(`ATSH${m.reqId}`);
+          await this.command(`ATCRA${m.respId}`);
+
+          if (m.protocol === 'obd') {
+            // DME / generic OBD ECU: DTCs via Mode 03 (confirmed) + 07 (pending).
+            const raw3 = await this.command('03', 4000).catch(() => '');
+            res.reachable = classifyObdResponse(raw3, '03');
+            if (res.reachable === 'positive') {
+              res.confirmedDtcs = parseDtcs(raw3, '03');
+              const raw7 = await this.command('07', 4000).catch(() => '');
+              res.pendingDtcs = parseDtcs(raw7, '07');
+            }
+            // Manufacturer fault memory — where non-MIL faults (e.g. P000C) live,
+            // which generic Mode 03 never reports. The read command is per-model
+            // (profiles.ts): 981 = KWP `18 00 FF 00` (verified); newer = UDS
+            // `19 02 FF`. Try the profile's protocol, then the other as a fallback.
+            let extra = 0;
+            const tryRead = async (cmd: string, sid: string, proto: 'uds' | 'kwp') => {
+              const raw = await this.command(cmd, 4000).catch(() => '');
+              if (classifyObdResponse(raw, sid) !== 'positive') return false;
+              res.reachable = 'positive';
+              for (const d of parseUdsDtcs(raw, proto)) {
+                if (!res.confirmedDtcs.includes(d.code)) {
+                  res.confirmedDtcs.push(d.code);
+                  extra += 1;
+                }
+              }
+              return true;
+            };
+            const dme = profile.dme;
+            let ok = await tryRead(dme.readCmd, dme.readSid, dme.protocol);
+            if (!ok && dme.protocol === 'kwp') {
+              await this.command('1003', 2500).catch(() => ''); // some DMEs gate 19 behind a session
+              ok = await tryRead('1902FF', '19', 'uds');
+            } else if (!ok) {
+              ok = await tryRead('1800FF00', '18', 'kwp');
+            }
+            if (extra) res.detail = `+${extra} from manufacturer fault memory`;
+          } else {
+            const proto = m.protocol === 'uds' ? 'uds' : 'kwp';
+            const sess = await this.command('1003', 2500).catch(() => '');
+            res.sessionOk = classifyObdResponse(sess, '10') === 'positive';
+
+            // KWP2000 read-all-by-status (18 00 FF 00) — the sub-function the 981
+            // ECUs accept (18 02 / 18 01 are rejected). UDS uses 19 02 FF.
+            const dtcCmd = proto === 'uds' ? '1902FF' : '1800FF00';
+            const dtcSid = proto === 'uds' ? '19' : '18';
+            const raw = await this.command(dtcCmd, 4000).catch(() => '');
+            res.reachable = classifyObdResponse(raw, dtcSid);
+            if (res.reachable === 'positive') {
+              for (const d of parseUdsDtcs(raw, proto)) {
+                // UDS status bit 3 (0x08) = confirmedDTC; otherwise treat as pending.
+                if (d.status & 0x08) res.confirmedDtcs.push(d.code);
+                else res.pendingDtcs.push(d.code);
+              }
+            } else if (res.reachable === 'refused') {
+              const nr = negativeResponseInfo(raw);
+              if (nr) res.detail = nr.nrcName;
+            }
+          }
+        } catch (e) {
+          res.error = e instanceof Error ? e.message : String(e);
+        }
+        results.push(res);
+      }
+    } finally {
+      // Restore generic-OBD state (functional header, auto receive, headers off).
+      await this.command('ATAR').catch(() => {});
+      await this.command('ATSH7DF').catch(() => {});
+      await this.command('ATH0').catch(() => {});
+    }
+
+    const scan: ModuleScanData = {
+      at: new Date().toISOString(),
+      generation,
+      results,
+      note: 'Read-only UDS/KWP scan. Non-DME addresses are candidates until confirmed on a real vehicle.',
+    };
+    this.lastModuleScan = scan;
+    return scan;
+  }
+
+  /**
+   * Clear stored fault codes (a WRITE — resets DTCs, freeze frames and emissions
+   * readiness). Sends generic Mode 04 AND the per-model manufacturer clear
+   * (service 14; 981 = KWP `14 FF 00`). Restores generic-OBD addressing after.
+   * Callers should confirm with the user first — this is not reversible and an
+   * active fault will simply return on the next drive cycle.
+   */
+  async clearFaults(generation: string): Promise<ClearResult> {
+    const dme = obdProfile(generation).dme;
+    const out: ClearResult = { at: new Date().toISOString(), cleared: [], errors: [] };
+
+    await this.command('ATSP6');
+    await this.command('ATCAF1');
+    await this.command('ATH0');
+    await this.command('ATSH7E0');
+    await this.command('ATCRA7E8');
+    try {
+      const r04 = await this.command('04', 4000).catch((e) => String(e));
+      if (classifyObdResponse(r04, '04') === 'positive') out.cleared.push('Emissions memory (Mode 04)');
+      else out.errors.push({ cmd: '04', message: (r04 || 'no response').replace(/\n/g, ' ').trim() });
+
+      const rMf = await this.command(dme.clearCmd, 4000).catch((e) => String(e));
+      if (classifyObdResponse(rMf, dme.clearSid) === 'positive') out.cleared.push('Manufacturer fault memory');
+      else out.errors.push({ cmd: dme.clearCmd, message: (rMf || 'no response').replace(/\n/g, ' ').trim() });
+    } finally {
+      await this.command('ATAR').catch(() => {});
+      await this.command('ATSH7DF').catch(() => {});
+      await this.command('ATH0').catch(() => {});
+    }
     return out;
   }
 

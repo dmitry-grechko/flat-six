@@ -188,6 +188,31 @@ model-viewer { width: 100%; height: 100%; --poster-color: transparent; }
   padding: 8px 0 6px;
 }
 
+/* --- Live OBD: connection status + fault-map animations --- */
+@keyframes obdRing {
+  0%   { transform: scale(1);   opacity: .5; }
+  70%  { transform: scale(2.6); opacity: 0; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+@keyframes obdBlink { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+@keyframes obdSpin  { to { transform: rotate(360deg); } }
+.obdRing { animation: obdRing 1.8s ease-out infinite; }
+.obdRingFast { animation: obdRing 1s ease-out infinite; }
+.obdBlink { animation: obdBlink 1s ease-in-out infinite; }
+.obdSpin { animation: obdSpin .8s linear infinite; }
+/* Respect reduced-motion: freeze the pulses, keep the colours. */
+@media (prefers-reduced-motion: reduce) {
+  .obdRing, .obdRingFast, .obdBlink, .obdSpin { animation: none !important; }
+  .obdRing, .obdRingFast { opacity: 0 !important; }
+}
+.obdMapPin {
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+.obdMapPin:hover { transform: translate(-50%, -50%) scale(1.14) !important; }
+.obdMapPin:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+.obdCardFlash { animation: hsPulse 1.1s ease-out 2; }
+
 /* --- Component Explorer: viewer + parts rail stack vertically --- */
 @media (max-width: 860px) {
   .xplrRoot { flex-direction: column !important; height: auto !important; overflow: visible !important; }

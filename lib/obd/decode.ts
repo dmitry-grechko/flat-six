@@ -2,7 +2,7 @@
  * Pure ELM327 / OBD-II response parsers (no I/O).
  */
 
-import type { MonitorStatus } from './types';
+import type { Mode06Test, MonitorStatus } from './types';
 
 const PROMPT = '>';
 
@@ -21,6 +21,31 @@ export function allHexFrames(raw: string): string[] {
     .split('\n')
     .map((line) => line.replace(/\s+/g, '').toUpperCase())
     .filter(Boolean);
+}
+
+/**
+ * Concatenate the DATA bytes of a (possibly multi-frame) response, stripping the
+ * ELM's ISO-TP frame-number prefixes and any leading length line. Frame counters
+ * are HEX (`0:`…`9:`, then `A:`…`F:` for responses over 10 frames), so both must
+ * be recognised — otherwise the letter counters corrupt the byte stream. Use for
+ * multi-frame services (06, 09, UDS 19) where allHexFrames would misalign records.
+ */
+export function isoTpDataHex(raw: string): string {
+  const parts: string[] = [];
+  for (const line of String(raw).split(/\n/)) {
+    const t = line.trim();
+    if (!t) continue;
+    const m = t.match(/^([0-9A-Fa-f]+):(.*)$/); // "N:" frame line (N is one hex digit)
+    if (m) {
+      const hex = m[2].replace(/[^0-9A-Fa-f]/g, '').toUpperCase();
+      if (hex) parts.push(hex);
+      continue;
+    }
+    const hex = t.replace(/[^0-9A-Fa-f]/g, '').toUpperCase();
+    // A bare line of >=4 hex is real data; shorter lines are ISO-TP length headers.
+    if (hex.length >= 4) parts.push(hex);
+  }
+  return parts.join('');
 }
 
 /** Parse Mode 01 PID support bitmap (e.g. 0100 → 41 00 A5 …). */
@@ -144,7 +169,35 @@ export function decodePidBytes(
     case '4A':
     case '4C':
     case '2F':
+    case '5A':
       return Math.round((bytes[0] * 100) / 255);
+    // Fuel trims (short/long term, bank 1/2): signed percent, centered on 128.
+    case '06':
+    case '07':
+    case '08':
+    case '09':
+      return Math.round(((bytes[0] - 128) * 100) / 128 * 10) / 10;
+    // Fuel pressure (gauge, kPa) and barometric pressure (kPa).
+    case '0A':
+      return bytes[0] * 3;
+    case '33':
+      return bytes[0];
+    // Narrowband O2 sensors: byte A = voltage (A/200 V), byte B = short-term
+    // fuel trim used with that sensor (0xFF = sensor not used for trim).
+    case '14':
+    case '15':
+    case '16':
+    case '17':
+    case '18':
+    case '19':
+    case '1A':
+    case '1B': {
+      const volts = bytes[0] / 200;
+      const b = bytes[1];
+      if (b == null || b === 0xff) return `${volts.toFixed(3)} V`;
+      const trim = Math.round(((b - 128) * 100) / 128 * 10) / 10;
+      return `${volts.toFixed(3)} V / ${trim > 0 ? '+' : ''}${trim}%`;
+    }
     case '1F':
       return bytes[0] * 256 + (bytes[1] ?? 0);
     case '21':
@@ -297,6 +350,213 @@ export function decodeDtc(a: number, b: number): string {
   const d3 = (b >> 4) & 0x0f;
   const d4 = b & 0x0f;
   return `${ch}${d1}${d2.toString(16).toUpperCase()}${d3.toString(16).toUpperCase()}${d4.toString(16).toUpperCase()}`;
+}
+
+// ---- Mode 06: on-board monitoring test results ---------------------------
+
+/**
+ * Human labels for the SAE J1979-standardised OBDMID ranges only — the O2-sensor
+ * monitors (0x01–0x08) and the misfire monitors (0xA0–0xAB). MIDs outside these
+ * ranges are manufacturer-assigned and NOT guessed here (shown as "Monitor 0xNN")
+ * to avoid mislabelling.
+ */
+const MODE06_MID_LABELS: Record<string, string> = {
+  '01': 'O2 Sensor · Bank 1 Sensor 1',
+  '02': 'O2 Sensor · Bank 1 Sensor 2',
+  '03': 'O2 Sensor · Bank 1 Sensor 3',
+  '04': 'O2 Sensor · Bank 1 Sensor 4',
+  '05': 'O2 Sensor · Bank 2 Sensor 1',
+  '06': 'O2 Sensor · Bank 2 Sensor 2',
+  '07': 'O2 Sensor · Bank 2 Sensor 3',
+  '08': 'O2 Sensor · Bank 2 Sensor 4',
+  A0: 'Misfire · general',
+  A1: 'Misfire · Cylinder 1',
+  A2: 'Misfire · Cylinder 2',
+  A3: 'Misfire · Cylinder 3',
+  A4: 'Misfire · Cylinder 4',
+  A5: 'Misfire · Cylinder 5',
+  A6: 'Misfire · Cylinder 6',
+  A7: 'Misfire · Cylinder 7',
+  A8: 'Misfire · Cylinder 8',
+  A9: 'Misfire · Cylinder 9',
+  AA: 'Misfire · Cylinder 10',
+  AB: 'Misfire · Cylinder 11',
+};
+
+export function mode06Label(mid: string): string {
+  const key = mid.toUpperCase().padStart(2, '0');
+  return MODE06_MID_LABELS[key] ?? `Monitor 0x${key}`;
+}
+
+/** Parse a Mode 06 supported-MID bitmap for one base range (00/20/40/…). */
+export function parseMode06Bitmap(raw: string, base: string): string[] {
+  const baseHex = base.toUpperCase().padStart(2, '0');
+  const marker = `46${baseHex}`;
+  const baseNum = parseInt(baseHex, 16);
+  for (const hex of allHexFrames(raw)) {
+    const idx = hex.indexOf(marker);
+    if (idx < 0) continue;
+    const data = hex.slice(idx + marker.length);
+    const bytes = data.match(/.{1,2}/g)?.map((b) => parseInt(b, 16)) ?? [];
+    if (bytes.length < 4) continue;
+    const supported: string[] = [];
+    for (let i = 0; i < 32; i++) {
+      const byte = bytes[Math.floor(i / 8)];
+      if (byte == null) break;
+      const bit = 7 - (i % 8);
+      if (byte & (1 << bit)) {
+        supported.push((baseNum + 1 + i).toString(16).toUpperCase().padStart(2, '0'));
+      }
+    }
+    return supported;
+  }
+  return [];
+}
+
+/**
+ * Parse Mode 06 test results for a single MID. CAN record layout (SAE J1979):
+ * OBDMID(1) SDTID/TID(1) UASID(1) TestValue(2) MinLimit(2) MaxLimit(2) — 9 bytes
+ * each, repeated per test (AA padding ends the list).
+ *
+ * Some UASIDs are signed and some unsigned, and the standard table is not
+ * reproduced here. Rather than invent units, we pick whichever interpretation
+ * yields well-formed limits (min <= max): unsigned first, else signed 16-bit;
+ * if neither is well-formed the result is 'unknown' (never a false FAIL).
+ */
+export function parseMode06(raw: string, mid: string): Mode06Test[] {
+  const midHex = mid.toUpperCase().padStart(2, '0');
+  const combined = isoTpDataHex(raw);
+  const idx = combined.indexOf(`46${midHex}`);
+  if (idx < 0) return [];
+  const body = combined.slice(idx + 2); // keep MID as first byte of each record
+  const s16 = (n: number): number => (n >= 0x8000 ? n - 0x10000 : n);
+  const tests: Mode06Test[] = [];
+  for (let p = 0; p + 18 <= body.length; p += 18) {
+    const recMid = body.slice(p, p + 2).toUpperCase();
+    if (recMid !== midHex) break; // left this MID's records (e.g. AA padding)
+    const tid = body.slice(p + 2, p + 4).toUpperCase();
+    const uasid = body.slice(p + 4, p + 6).toUpperCase();
+    const vRaw = parseInt(body.slice(p + 6, p + 10), 16);
+    const nRaw = parseInt(body.slice(p + 10, p + 14), 16);
+    const xRaw = parseInt(body.slice(p + 14, p + 18), 16);
+    if ([vRaw, nRaw, xRaw].some(Number.isNaN)) break;
+
+    let value = vRaw;
+    let min = nRaw;
+    let max = xRaw;
+    let signed = false;
+    let result: Mode06Test['result'];
+    if (nRaw <= xRaw) {
+      result = vRaw >= nRaw && vRaw <= xRaw ? 'pass' : 'fail';
+    } else if (s16(nRaw) <= s16(xRaw)) {
+      value = s16(vRaw);
+      min = s16(nRaw);
+      max = s16(xRaw);
+      signed = true;
+      result = value >= min && value <= max ? 'pass' : 'fail';
+    } else {
+      result = 'unknown';
+    }
+
+    tests.push({ mid: midHex, tid, uasid, monitor: mode06Label(midHex), value, min, max, signed, result });
+  }
+  return tests;
+}
+
+// ---- UDS / KWP2000 DTC parsing (per-module fault scan) --------------------
+
+/**
+ * Parse DTCs from a module fault-read response.
+ *  UDS (service 19 02): `59 02 <mask> [DTC(3) status(1)]…`, 3-byte DTC → code + FTB.
+ *  KWP (service 18):    `58 <count> [DTC(2) status(1)]…`, 2-byte DTC.
+ * Assumes clean payload bytes (headers off / receive-address filtered).
+ */
+export function parseUdsDtcs(
+  raw: string,
+  protocol: 'uds' | 'kwp',
+): { code: string; status: number }[] {
+  const combined = isoTpDataHex(raw);
+  const out: { code: string; status: number }[] = [];
+
+  if (protocol === 'uds') {
+    const idx = combined.indexOf('5902');
+    if (idx < 0) return out;
+    const body = combined.slice(idx + 4).slice(2); // skip 59 02 + availability mask
+    for (let p = 0; p + 8 <= body.length; p += 8) {
+      // UDS DTCs are a 3-byte code. Porsche modules use manufacturer-specific
+      // numbers (e.g. 89 02 0E) that PIWIS shows as raw hex, so surface the raw
+      // 3-byte hex (89020E) rather than a lossy SAE reinterpretation.
+      const code = body.slice(p, p + 6).toUpperCase();
+      const status = parseInt(body.slice(p + 6, p + 8), 16);
+      if (code.length < 6 || Number.isNaN(status)) break;
+      if (/^0{6}$/.test(code)) continue;
+      out.push({ code, status });
+    }
+    return out;
+  }
+
+  const idx = combined.indexOf('58');
+  if (idx < 0) return out;
+  const body = combined.slice(idx + 2).slice(2); // skip 58 + count
+  for (let p = 0; p + 6 <= body.length; p += 6) {
+    const b0 = parseInt(body.slice(p, p + 2), 16);
+    const b1 = parseInt(body.slice(p + 2, p + 4), 16);
+    const status = parseInt(body.slice(p + 4, p + 6), 16);
+    if ([b0, b1, status].some(Number.isNaN)) break;
+    if (b0 === 0 && b1 === 0) continue;
+    out.push({ code: decodeDtc(b0, b1), status });
+  }
+  return out;
+}
+
+/** Common UDS/KWP negative-response codes → human labels. */
+const NRC_NAMES: Record<string, string> = {
+  '10': 'general reject',
+  '11': 'service not supported',
+  '12': 'sub-function not supported',
+  '13': 'incorrect message length',
+  '22': 'conditions not correct',
+  '31': 'request out of range',
+  '33': 'security access denied',
+  '35': 'invalid key',
+  '78': 'response pending',
+  '7E': 'sub-function not supported in session',
+  '7F': 'service not supported in session',
+};
+
+/** Extract the negative-response reason from a `7F <sid> <nrc>` reply, if any. */
+export function negativeResponseInfo(
+  raw: string,
+): { sid: string; nrc: string; nrcName: string } | null {
+  const bytes: string[] = isoTpDataHex(raw).match(/.{2}/g) ?? [];
+  const i = bytes.indexOf('7F');
+  if (i < 0 || !bytes[i + 1]) return null;
+  const sid = bytes[i + 1];
+  const nrc = bytes[i + 2] ?? '';
+  return { sid, nrc, nrcName: NRC_NAMES[nrc] ?? `NRC 0x${nrc}` };
+}
+
+/**
+ * Classify a raw diagnostic response for a request service id.
+ *  positive = answered with SID+0x40; refused = 7F <sid> <nrc> (module present);
+ *  silent = NO DATA / error / nothing. Assumes clean payload (headers off).
+ */
+export function classifyObdResponse(
+  raw: string,
+  reqSid: string,
+): 'positive' | 'refused' | 'silent' {
+  if (!raw) return 'silent';
+  const r = raw.toUpperCase();
+  if (/NO DATA|UNABLE TO CONNECT|CAN ERROR|BUS INIT|STOPPED|SEARCHING|^ERROR|\?/m.test(r)) {
+    return 'silent';
+  }
+  const bytes: string[] = r.replace(/[^0-9A-F]/g, '').match(/.{2}/g) ?? [];
+  const sid = reqSid.toUpperCase();
+  const i7f = bytes.indexOf('7F');
+  if (i7f >= 0 && bytes[i7f + 1] === sid) return 'refused';
+  const pos = (parseInt(sid, 16) + 0x40).toString(16).toUpperCase().padStart(2, '0');
+  if (bytes.includes(pos)) return 'positive';
+  return 'silent';
 }
 
 export function parseMode09Text(raw: string, type: string): string | null {

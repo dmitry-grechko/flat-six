@@ -8,9 +8,12 @@ import { classifyPath, classifyPort } from './ports';
 import type {
   AdapterKind,
   Capabilities,
+  ClearResult,
   ConnectOptions,
   FaultsData,
   LiveData,
+  Mode06Data,
+  ModuleScanData,
   ObdAdapter,
   ObdStatus,
   PortInfo,
@@ -154,6 +157,29 @@ export class ObdHost {
     if (!this.#session?.isOpen()) throw new Error('Not connected');
     this.#lastVehicle = await this.#session.readVehicleInfo();
     return this.#lastVehicle;
+  }
+
+  getMode06(): Mode06Data | null {
+    return this.#session?.lastMode06 ?? null;
+  }
+
+  async refreshMode06(): Promise<Mode06Data> {
+    if (!this.#session?.isOpen()) throw new Error('Not connected');
+    return this.#session.readMode06();
+  }
+
+  getModuleScan(): ModuleScanData | null {
+    return this.#session?.lastModuleScan ?? null;
+  }
+
+  async scanModules(generation: string): Promise<ModuleScanData> {
+    if (!this.#session?.isOpen()) throw new Error('Not connected');
+    return this.#session.scanModules(generation);
+  }
+
+  async clearFaults(generation: string): Promise<ClearResult> {
+    if (!this.#session?.isOpen()) throw new Error('Not connected');
+    return this.#session.clearFaults(generation);
   }
 
   async snapshot(): Promise<Snapshot> {

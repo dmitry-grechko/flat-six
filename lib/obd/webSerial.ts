@@ -246,6 +246,29 @@ export function createWebSerialClient(): ObdClient {
       return session.readVehicleInfo();
     },
 
+    async getMode06() {
+      return session?.lastMode06 ?? null;
+    },
+
+    async refreshMode06() {
+      if (!session?.isOpen()) throw new Error('Not connected');
+      return session.readMode06();
+    },
+
+    async getModuleScan() {
+      return session?.lastModuleScan ?? null;
+    },
+
+    async scanModules(generation: string) {
+      if (!session?.isOpen()) throw new Error('Not connected');
+      return session.scanModules(generation);
+    },
+
+    async clearFaults(generation: string) {
+      if (!session?.isOpen()) throw new Error('Not connected');
+      return session.clearFaults(generation);
+    },
+
     async pollStart(intervalMs = 2000) {
       if (!session?.isOpen()) throw new Error('Not connected');
       const ms = Math.max(1500, intervalMs);

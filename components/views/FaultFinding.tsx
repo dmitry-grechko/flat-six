@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   searchKnowledge,
   getFaultCodes,
@@ -86,6 +86,8 @@ export default function FaultFinding() {
     if (q) setQuery(q);
   }, [searchParams]);
 
+  const autoOpenedFor = useRef<string | null>(null);
+
   // Knowledge lookup maps for the active car's generation.
   const faultByCode = useMemo(
     () => new Map(getFaultCodes(generation).map((f) => [f.code.toUpperCase(), f])),
@@ -102,6 +104,18 @@ export default function FaultFinding() {
     if (looksLikePartNumber(trimmed)) return []; // part-number query → parts only
     return runSearch(trimmed, faultByCode, issueById, generation);
   }, [trimmed, faultByCode, issueById, generation]);
+
+  // Deep-linking an exact fault code (e.g. from Live OBD) opens that card
+  // directly — once per code, so it doesn't fight the user's later toggles.
+  useEffect(() => {
+    const q = searchParams.get('q')?.trim().toUpperCase();
+    if (!q || autoOpenedFor.current === q) return;
+    const hit = results.find((r) => r.kind === 'fault' && r.data.code.toUpperCase() === q);
+    if (hit) {
+      setOpenKey(hit.key);
+      autoOpenedFor.current = q;
+    }
+  }, [searchParams, results]);
 
   // Parts come from the central Supabase catalog (debounced). Empty query → no parts.
   useEffect(() => {

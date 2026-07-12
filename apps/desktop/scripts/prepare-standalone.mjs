@@ -27,7 +27,25 @@ const staticDest = path.join(outDir, '.next', 'static');
 fs.mkdirSync(path.dirname(staticDest), { recursive: true });
 if (fs.existsSync(staticSrc)) fs.cpSync(staticSrc, staticDest, { recursive: true });
 
-const publicDest = path.join(outDir, 'public');
-if (fs.existsSync(publicSrc)) fs.cpSync(publicSrc, publicDest, { recursive: true });
+// Online-only / dev-only public assets that must NOT be bundled into the
+// desktop app: the workshop PDFs (`manual`) and the Mobile Tech Library
+// (`mobile_tech_library`) are multi-GB, gitignored, and served from Supabase
+// Storage in production (see lib/documents.ts + /api/manual/url). Bundling them
+// bloats the installer past GitHub's 2 GB release-asset limit. Per
+// docs/procedures/full-app-offline.md these stay online-only in v1.
+const EXCLUDE_PUBLIC = new Set(['mobile_tech_library', 'manual']);
 
-console.log('Prepared apps/desktop/standalone from Next standalone build');
+const publicDest = path.join(outDir, 'public');
+if (fs.existsSync(publicSrc)) {
+  fs.cpSync(publicSrc, publicDest, {
+    recursive: true,
+    filter: (src) => {
+      const rel = path.relative(publicSrc, src);
+      if (!rel) return true;
+      const top = rel.split(path.sep)[0];
+      return !EXCLUDE_PUBLIC.has(top);
+    },
+  });
+}
+
+console.log(`Prepared apps/desktop/standalone from Next standalone build (excluded: ${[...EXCLUDE_PUBLIC].join(', ')})`);

@@ -9,6 +9,8 @@ import type {
   DebugLogEntry,
   FaultsData,
   LiveData,
+  Mode06Data,
+  ModuleScanData,
   ObdClient,
   ObdStatus,
   PortInfo,
@@ -59,6 +61,8 @@ export function useObdBridge(initialMode?: ObdTransportMode) {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [debugLog, setDebugLog] = useState<DebugLogEntry[]>([]);
+  const [mode06, setMode06] = useState<Mode06Data | null>(null);
+  const [moduleScan, setModuleScan] = useState<ModuleScanData | null>(null);
 
   const setMode = useCallback(async (next: ObdTransportMode) => {
     if (next === mode) return;
@@ -222,6 +226,49 @@ export function useObdBridge(initialMode?: ObdTransportMode) {
     }
   }, []);
 
+  const refreshMode06 = useCallback(async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      const data = await clientRef.current.refreshMode06();
+      setMode06(data);
+      return data;
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+      return null;
+    } finally {
+      setBusy(false);
+    }
+  }, []);
+
+  const scanModules = useCallback(async (generation: string) => {
+    setBusy(true);
+    setError(null);
+    try {
+      const data = await clientRef.current.scanModules(generation);
+      setModuleScan(data);
+      return data;
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+      return null;
+    } finally {
+      setBusy(false);
+    }
+  }, []);
+
+  const clearFaults = useCallback(async (generation: string) => {
+    setBusy(true);
+    setError(null);
+    try {
+      return await clientRef.current.clearFaults(generation);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+      return null;
+    } finally {
+      setBusy(false);
+    }
+  }, []);
+
   const loadDebug = useCallback(async () => {
     try {
       const d = await clientRef.current.debug();
@@ -325,6 +372,11 @@ export function useObdBridge(initialMode?: ObdTransportMode) {
     refreshLive,
     refreshFaults,
     refreshVehicle,
+    refreshMode06,
+    scanModules,
+    clearFaults,
+    mode06,
+    moduleScan,
     loadDebug,
   };
 }

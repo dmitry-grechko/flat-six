@@ -117,6 +117,42 @@ const server = http.createServer(async (req, res) => {
       }
     }
 
+    if (req.method === 'GET' && url.pathname === '/mode06') {
+      if (!host.status().connected) return json(res, { error: 'Not connected' }, 400);
+      return json(res, host.getMode06());
+    }
+
+    if (req.method === 'POST' && url.pathname === '/mode06') {
+      try {
+        return json(res, await host.refreshMode06());
+      } catch (e) {
+        return json(res, { error: e.message }, 400);
+      }
+    }
+
+    if (req.method === 'GET' && url.pathname === '/modules') {
+      if (!host.status().connected) return json(res, { error: 'Not connected' }, 400);
+      return json(res, host.getModuleScan());
+    }
+
+    if (req.method === 'POST' && url.pathname === '/modules') {
+      const body = await readJson(req).catch(() => ({}));
+      try {
+        return json(res, await host.scanModules(String(body.generation || '981')));
+      } catch (e) {
+        return json(res, { error: e.message }, 400);
+      }
+    }
+
+    if (req.method === 'POST' && url.pathname === '/clear') {
+      const body = await readJson(req).catch(() => ({}));
+      try {
+        return json(res, await host.clearFaults(String(body.generation || '981')));
+      } catch (e) {
+        return json(res, { error: e.message }, 400);
+      }
+    }
+
     if (req.method === 'POST' && url.pathname === '/connect') {
       const body = await readJson(req);
       try {

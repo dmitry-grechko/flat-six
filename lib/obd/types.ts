@@ -60,6 +60,61 @@ export interface FaultsData {
   modules: FaultModule[];
 }
 
+/** One on-board monitor test result (Mode 06 / Service $06). */
+export interface Mode06Test {
+  mid: string; // OBDMID, e.g. "01"
+  tid: string; // standardized test id, e.g. "85"
+  uasid: string; // unit-and-scaling id
+  monitor: string; // human label for the MID (best-effort; raw when unknown)
+  value: number;
+  min: number;
+  max: number;
+  signed: boolean; // whether a signed interpretation was used
+  /** pass = value in [min,max]; fail = out of range; unknown = limits malformed. */
+  result: 'pass' | 'fail' | 'unknown';
+}
+
+export interface Mode06Data {
+  at: string;
+  supportedMids: string[];
+  tests: Mode06Test[];
+  errors: { mid: string; message: string }[];
+}
+
+/** Result of probing one non-DME module over UDS/KWP (read-only). */
+export interface ModuleScanResult {
+  id: string;
+  name: string;
+  reqId: string; // diagnostic request CAN ID used
+  protocol: 'uds' | 'kwp' | 'obd';
+  /** Whether the module address was pre-verified vs a candidate to confirm. */
+  addressConfirmed: boolean;
+  /** positive = answered data, refused = 7F negative (present), silent = nothing. */
+  reachable: 'positive' | 'refused' | 'silent';
+  sessionOk: boolean; // extended diagnostic session (10 03) accepted
+  confirmedDtcs: string[];
+  pendingDtcs: string[];
+  /** For a refusal: the negative-response reason (NRC name). */
+  detail?: string;
+  note?: string;
+  error?: string;
+}
+
+export interface ModuleScanData {
+  at: string;
+  generation: string;
+  results: ModuleScanResult[];
+  note: string;
+}
+
+/** Result of a clear-DTCs request (Mode 04 + manufacturer service 14). */
+export interface ClearResult {
+  at: string;
+  /** Human labels of the memories that acknowledged the clear. */
+  cleared: string[];
+  errors: { cmd: string; message: string }[];
+}
+
 export interface VehicleInfo {
   at: string;
   vin: string | null;
@@ -164,6 +219,8 @@ export interface ObdAdapter {
   lastLive: LiveData | null;
   lastFaults: FaultsData | null;
   lastVehicle: VehicleInfo | null;
+  lastMode06: Mode06Data | null;
+  lastModuleScan: ModuleScanData | null;
   isOpen(): boolean;
   open(): Promise<void>;
   close(): Promise<void>;
@@ -172,6 +229,9 @@ export interface ObdAdapter {
   readLive(opts?: { priorityOnly?: boolean }): Promise<LiveData>;
   readFaults(): Promise<FaultsData>;
   readVehicleInfo(): Promise<VehicleInfo>;
+  readMode06(): Promise<Mode06Data>;
+  scanModules(generation: string): Promise<ModuleScanData>;
+  clearFaults(generation: string): Promise<ClearResult>;
   snapshot(): Promise<Snapshot>;
 }
 
@@ -198,6 +258,11 @@ export interface ObdClient {
   refreshFaults(): Promise<FaultsData>;
   getVehicle(): Promise<VehicleInfo | null>;
   refreshVehicle(): Promise<VehicleInfo>;
+  getMode06(): Promise<Mode06Data | null>;
+  refreshMode06(): Promise<Mode06Data>;
+  getModuleScan(): Promise<ModuleScanData | null>;
+  scanModules(generation: string): Promise<ModuleScanData>;
+  clearFaults(generation: string): Promise<ClearResult>;
   pollStart(intervalMs?: number): Promise<{ ok: boolean; intervalMs: number }>;
   pollStop(): Promise<{ ok: boolean }>;
   debug(): Promise<{

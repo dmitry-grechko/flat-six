@@ -7,6 +7,8 @@ import type {
   ConnectOptions,
   FaultsData,
   LiveData,
+  Mode06Data,
+  ModuleScanData,
   ObdClient,
   ObdStatus,
   PortInfo,
@@ -143,6 +145,40 @@ export function createHttpObdClient(baseUrl: string = bridgeBaseUrl()): ObdClien
 
     async refreshVehicle() {
       return request(base, '/vehicle', { method: 'POST', body: '{}' });
+    },
+
+    async getMode06() {
+      try {
+        return await request<Mode06Data>(base, '/mode06');
+      } catch {
+        return null;
+      }
+    },
+
+    async refreshMode06() {
+      return request(base, '/mode06', { method: 'POST', body: '{}' });
+    },
+
+    async getModuleScan() {
+      try {
+        return await request<ModuleScanData>(base, '/modules');
+      } catch {
+        return null;
+      }
+    },
+
+    async scanModules(generation: string) {
+      return request(base, '/modules', {
+        method: 'POST',
+        body: JSON.stringify({ generation }),
+      });
+    },
+
+    async clearFaults(generation: string) {
+      return request(base, '/clear', {
+        method: 'POST',
+        body: JSON.stringify({ generation }),
+      });
     },
 
     async pollStart(intervalMs = 2000) {

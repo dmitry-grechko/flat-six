@@ -34,6 +34,17 @@ tab bars — test at 375 px. Nav item = route (`app/*/page.tsx` + `AppShell` +
 `tools/obd-bridge` (`npm run obd-bridge`, default `http://127.0.0.1:8765`) via
 `lib/obd/httpClient.ts` — or **Web Serial** for USB ELM in desktop Chrome/Edge
 (no helper). Classic Bluetooth still needs the bridge or Electron Desktop.
+Read model + parsers are the shared `Elm327` (`lib/obd/elm327.ts` + `decode.ts`):
+generic Mode 01 live PIDs, Mode 03/07/0A DTCs (with knowledge-base descriptions),
+**Mode 06** on-board monitor results (`readMode06`), and a read-only **UDS/KWP
+module scan** (`scanModules(generation)`) for non-DME modules. Module addresses
+live in `lib/obd/uds-modules.ts` — only the DME is confirmed; the rest are
+candidates (`addressConfirmed: false`) to verify on a real car with
+`tools/obd-bridge/uds-probe.mjs`. Any new adapter capability must thread through
+all four transports (`webSerial.ts`, `host.ts` + bridge `server.mjs`,
+`electronClient.ts` + `apps/desktop/main.mjs`) via the `ObdClient` contract in
+`types.ts`, then `useObdBridge.ts`. Pure decoders get a case in `decode.test.ts`
+(`npx tsx lib/obd/decode.test.ts`).
 **Downloads** (`/downloads`, beta) lists **FLAT·SIX Desktop** + **PWA** (full garage)
 and lab Bridge — catalog in `lib/downloads.ts` (`href` / `hrefMac` when GitHub
 Releases publish). No npm install commands on that page.

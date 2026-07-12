@@ -31,13 +31,16 @@
     "appId": "com.flatsix.desktop",
     "productName": "FLAT·SIX",
     "icon": "build/icon",
+    "artifactName": "FLAT-SIX-${version}-${arch}.${ext}",
     "directories": {
       "output": "release"
     },
     "files": [
       "main.mjs",
       "preload.cjs",
-      "obd-host-runner.mjs",
+      "obd-host-runner.mjs"
+    ],
+    "extraResources": [
       {
         "from": "standalone",
         "to": "standalone",
@@ -47,10 +50,10 @@
       }
     ],
     "asarUnpack": [
-      "standalone/**/*",
       "node_modules/serialport/**/*",
       "node_modules/@serialport/**/*"
     ],
+    "afterPack": "./scripts/after-pack-sign.mjs",
     "win": {
       "target": [
         {

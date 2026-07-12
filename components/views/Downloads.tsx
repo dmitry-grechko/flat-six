@@ -110,6 +110,44 @@ function DownloadCard({ item }: { item: DownloadItem }) {
           </li>
         ))}
       </ul>
+      {item.macNotes && item.macNotes.length > 0 && (
+        <div
+          style={{
+            margin: '0 0 18px',
+            padding: '12px 14px',
+            background: '#FAFAFA',
+            border: '1px solid #E3E3E5',
+            borderLeft: '3px solid #D5001C',
+            borderRadius: 4,
+          }}
+        >
+          <div
+            style={{
+              font: `600 9px/1 ${mono}`,
+              letterSpacing: '.12em',
+              textTransform: 'uppercase',
+              color: '#D5001C',
+              marginBottom: 8,
+            }}
+          >
+            First launch on macOS
+          </div>
+          <ol
+            style={{
+              margin: 0,
+              padding: '0 0 0 16px',
+              font: `400 12.5px/1.6 ${sans}`,
+              color: '#3A3A3E',
+            }}
+          >
+            {item.macNotes.map((note) => (
+              <li key={note} style={{ marginBottom: 4 }}>
+                {note}
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
         {item.href ? (
           <a href={item.href} style={{ ...btnBase, background: '#D5001C', color: '#fff' }} target="_blank" rel="noreferrer">

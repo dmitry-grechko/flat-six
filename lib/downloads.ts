@@ -15,6 +15,8 @@ export type DownloadItem = {
   cta: string;
   ctaMac?: string;
   installNotes: string[];
+  /** macOS-specific first-launch steps (Gatekeeper), rendered as a callout. */
+  macNotes?: string[];
   audience: 'owners' | 'contributors';
 };
 
@@ -34,7 +36,12 @@ export const DOWNLOADS: DownloadItem[] = [
       'Packaged builds publish via GitHub Releases after testing — buttons say “soon” until then.',
       'Installed Desktop checks GitHub for updates on launch and downloads them in the background.',
       'Live OBD uses the adapter inside the app. Documents and AI still need network.',
-      'Unsigned Mac builds may need Right-click → Open the first time.',
+    ],
+    macNotes: [
+      'The Mac build is not notarized yet, so on first launch macOS blocks it with “Apple could not verify FLAT·SIX is free of malware.”',
+      'Open System Settings → Privacy & Security, scroll to Security, and click “Open Anyway” next to FLAT·SIX — then launch it again and confirm. You only do this once.',
+      'On older macOS you can instead Control-click (right-click) FLAT·SIX in Applications → Open → Open.',
+      'If it says the app “is damaged”, clear the download flag in Terminal: xattr -dr com.apple.quarantine "/Applications/FLAT·SIX.app"',
     ],
   },
   {

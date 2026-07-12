@@ -40,6 +40,10 @@ function resolveServerJs() {
     return path.join(__dirname, 'standalone', 'server.js');
   }
   const candidates = [
+    // Standalone ships as an extraResource (see build.extraResources) so its
+    // bundled node_modules survives packaging — electron-builder strips nested
+    // node_modules from files/asar entries, which breaks `require('next')`.
+    path.join(process.resourcesPath, 'standalone', 'server.js'),
     path.join(process.resourcesPath, 'app.asar.unpacked', 'standalone', 'server.js'),
     path.join(__dirname, 'standalone', 'server.js'),
   ];
@@ -197,6 +201,11 @@ function wireIpc() {
   ipcMain.handle('obd:refreshFaults', wrap(() => host.refreshFaults()));
   ipcMain.handle('obd:getVehicle', wrap(() => host.getVehicle()));
   ipcMain.handle('obd:refreshVehicle', wrap(() => host.refreshVehicle()));
+  ipcMain.handle('obd:getMode06', wrap(() => host.getMode06()));
+  ipcMain.handle('obd:refreshMode06', wrap(() => host.refreshMode06()));
+  ipcMain.handle('obd:getModuleScan', wrap(() => host.getModuleScan()));
+  ipcMain.handle('obd:scanModules', wrap((generation) => host.scanModules(generation)));
+  ipcMain.handle('obd:clearFaults', wrap((generation) => host.clearFaults(generation)));
   ipcMain.handle('obd:pollStart', wrap((intervalMs) => host.pollStart(intervalMs)));
   ipcMain.handle(
     'obd:pollStop',

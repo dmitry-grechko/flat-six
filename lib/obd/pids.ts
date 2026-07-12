@@ -15,7 +15,18 @@ export const PRIORITY_PIDS: PidDef[] = [
 /** Secondary PIDs polled less often when supported. */
 export const SECONDARY_PIDS: PidDef[] = [
   ['03', 'fuel_status', 'Fuel & air', 'Fuel status', ''],
+  ['06', 'stft_b1_pct', 'Fuel trim', 'STFT B1', '%'],
+  ['07', 'ltft_b1_pct', 'Fuel trim', 'LTFT B1', '%'],
+  ['08', 'stft_b2_pct', 'Fuel trim', 'STFT B2', '%'],
+  ['09', 'ltft_b2_pct', 'Fuel trim', 'LTFT B2', '%'],
+  ['0A', 'fuel_press_kpa', 'Fuel & air', 'Fuel pressure', 'kPa'],
   ['0B', 'map_kpa', 'Fuel & air', 'MAP', 'kPa'],
+  ['14', 'o2_b1s1', 'O2 sensors', 'O2 B1S1', 'V / %'],
+  ['15', 'o2_b1s2', 'O2 sensors', 'O2 B1S2', 'V / %'],
+  ['18', 'o2_b2s1', 'O2 sensors', 'O2 B2S1', 'V / %'],
+  ['19', 'o2_b2s2', 'O2 sensors', 'O2 B2S2', 'V / %'],
+  ['33', 'baro_kpa', 'Fuel & air', 'Barometric', 'kPa'],
+  ['5A', 'rel_pedal_pct', 'Throttle', 'Rel. accel pedal', '%'],
   ['0E', 'timing_deg', 'Engine', 'Timing advance', '°'],
   ['0F', 'iat_c', 'Fuel & air', 'IAT', '°C'],
   ['10', 'maf_gs', 'Fuel & air', 'MAF', 'g/s'],

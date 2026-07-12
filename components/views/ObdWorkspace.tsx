@@ -4,15 +4,34 @@ import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from
 import Link from 'next/link';
 import { useObdBridge } from '@/lib/obd/useObdBridge';
 import { useVehicle } from '@/lib/vehicle-context';
+import { generationForBody } from '@/lib/models';
+import { getFaultCodes, type FaultCode } from '@/lib/knowledge';
+import { ALL_LIVE_PIDS } from '@/lib/obd/pids';
 import { mono, sans } from '@/components/tools/ui';
-import type { FaultModule, LiveData, PortInfo, VehicleInfo } from '@/lib/obd/types';
+import { FuelTrimInsight, ReadinessInsight, MisfireInsight } from '@/components/views/ObdInsights';
+import type {
+  ClearResult,
+  FaultModule,
+  LiveData,
+  Mode06Data,
+  Mode06Test,
+  ModuleScanData,
+  PortInfo,
+  VehicleInfo,
+} from '@/lib/obd/types';
+import { udsModulesFor } from '@/lib/obd/uds-modules';
 import { BetaBadge } from '@/components/shell/BetaBadge';
 import { useObdFocus } from '@/lib/obd/ObdFocusContext';
+import { createClient } from '@/lib/supabase/client';
+import { isAdminEmail } from '@/lib/admin';
+import { DEMO_MODE } from '@/lib/demo';
 
 const TABS = [
   { id: 'connection', label: 'Connection' },
   { id: 'live', label: 'Live data' },
   { id: 'faults', label: 'Fault codes' },
+  { id: 'monitors', label: 'Monitors' },
+  { id: 'insights', label: 'Insights' },
   { id: 'vehicle', label: 'Vehicle info' },
   { id: 'debug', label: 'Debug' },
 ] as const;
@@ -87,16 +106,48 @@ export default function ObdWorkspace() {
   const [baud, setBaud] = useState('38400');
   const [onMac, setOnMac] = useState(false);
   const [onWindows, setOnWindows] = useState(false);
+  // Debug log is owner-only (same gate as the Admin nav item). Server-side data
+  // isn't sensitive, but the raw ELM trace is noise for everyone else.
+  const [isAdmin, setIsAdmin] = useState(DEMO_MODE);
 
   const selectedPort = port || obd.ports[0]?.path || '';
   const isWebSerial = obd.mode === 'web-serial';
   const pollOk = obd.status?.pollSupported !== false;
 
+  const visibleTabs = useMemo(() => TABS.filter((t) => t.id !== 'debug' || isAdmin), [isAdmin]);
+
+  // Single source of truth for the connection lifecycle → drives the animated
+  // indicator and the one stateful Connect/Disconnect button.
+  const connState: ConnState = obd.connected
+    ? 'connected'
+    : obd.busy && !obd.status?.connected
+      ? 'connecting'
+      : 'idle';
+
+  // Resolve DTCs to knowledge-base descriptions, scoped to the active car's
+  // generation (981 vs 987 codes differ — never cross them).
+  const generation = generationForBody(garageVehicle.body);
+  const describeDtc = useMemo(() => {
+    const byCode = new Map<string, FaultCode>();
+    for (const f of getFaultCodes(generation)) byCode.set(f.code.toUpperCase(), f);
+    return (code: string): FaultCode | undefined => byCode.get(code.toUpperCase());
+  }, [generation]);
+
   // Platform UA only after mount — keeps SSR HTML identical to the first client paint.
   useEffect(() => {
     setOnMac(isLikelyMac());
     setOnWindows(isLikelyWindows());
+    if (DEMO_MODE) return;
+    createClient()
+      .auth.getUser()
+      .then(({ data }) => setIsAdmin(isAdminEmail(data.user?.email)))
+      .catch(() => {});
   }, []);
+
+  // Never leave a hidden tab selected (e.g. Debug after an admin signs out).
+  useEffect(() => {
+    if (tab === 'debug' && !isAdmin) setTab('connection');
+  }, [tab, isAdmin]);
 
   const vinMatch = useMemo(() => {
     const obdVin = obd.vehicleInfo?.vin?.toUpperCase();
@@ -145,7 +196,7 @@ export default function ObdWorkspace() {
 
         <div className="obdTabBar">
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, overflowX: 'auto', paddingBottom: 2 }}>
-            {TABS.map((t) => (
+            {visibleTabs.map((t) => (
               <button
                 key={t.id}
                 type="button"
@@ -239,7 +290,10 @@ export default function ObdWorkspace() {
           padding: '14px 18px',
         }}
       >
-        <StatusDot on={obd.connected} label={obd.connected ? 'CONNECTED' : 'DISCONNECTED'} />
+        <ConnectionIndicator
+          state={connState}
+          label={connState === 'connected' ? 'CONNECTED' : connState === 'connecting' ? 'CONNECTING…' : 'DISCONNECTED'}
+        />
         <span style={{ font: `500 12px/1.3 ${mono}`, color: '#6E6E73' }}>
           ELM327
           {' · '}
@@ -323,16 +377,39 @@ export default function ObdWorkspace() {
           baud={baud}
           setBaud={setBaud}
           onConnect={handleConnect}
+          connState={connState}
         />
       )}
-      {tab === 'live' && <LivePanel live={obd.live} onRefresh={obd.refreshLive} busy={obd.busy} connected={obd.connected} />}
+      {tab === 'live' && (
+        <LivePanel live={obd.live} onRefresh={obd.refreshLive} busy={obd.busy} connected={obd.connected} />
+      )}
       {tab === 'faults' && (
         <FaultsPanel
           modules={obd.faults?.modules ?? []}
           onRefresh={obd.refreshFaults}
           busy={obd.busy}
           connected={obd.connected}
+          describeDtc={describeDtc}
+          moduleScan={obd.moduleScan}
+          onScanModules={() => obd.scanModules(generation)}
+          onClearFaults={() => obd.clearFaults(generation)}
+          generation={generation}
         />
+      )}
+      {tab === 'monitors' && (
+        <Mode06Panel
+          data={obd.mode06}
+          onRefresh={obd.refreshMode06}
+          busy={obd.busy}
+          connected={obd.connected}
+        />
+      )}
+      {tab === 'insights' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <FuelTrimInsight live={obd.live} />
+          <ReadinessInsight live={obd.live} />
+          <MisfireInsight mode06={obd.mode06} />
+        </div>
       )}
       {tab === 'vehicle' && (
         <VehiclePanel
@@ -344,8 +421,54 @@ export default function ObdWorkspace() {
           connected={obd.connected}
         />
       )}
-      {tab === 'debug' && <DebugPanel obd={obd} />}
+      {tab === 'debug' && isAdmin && <DebugPanel obd={obd} />}
     </div>
+  );
+}
+
+type ConnState = 'idle' | 'connecting' | 'connected';
+
+/** Live connection state with pulsing rings (green live / amber connecting). */
+function ConnectionIndicator({ state, label }: { state: ConnState; label: string }) {
+  const color = state === 'connected' ? '#3CD37A' : state === 'connecting' ? '#E0A100' : '#B4B4B8';
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 12,
+        font: `600 12px/1 ${mono}`,
+        letterSpacing: '.1em',
+        padding: '10px 14px',
+        borderRadius: 4,
+        background: '#F4F4F5',
+        minHeight: 44,
+      }}
+    >
+      <span
+        style={{
+          position: 'relative',
+          width: 12,
+          height: 12,
+          flexShrink: 0,
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        {state !== 'idle' && (
+          <span
+            className={state === 'connecting' ? 'obdRingFast' : 'obdRing'}
+            style={{ position: 'absolute', width: 12, height: 12, borderRadius: '50%', background: color }}
+          />
+        )}
+        <span
+          className={state === 'connecting' ? 'obdBlink' : undefined}
+          style={{ width: 10, height: 10, borderRadius: '50%', background: color, position: 'relative' }}
+        />
+      </span>
+      {label}
+    </span>
   );
 }
 
@@ -496,32 +619,64 @@ function PlatformCompatNote({ onMac, onWindows }: { onMac: boolean; onWindows: b
   );
 }
 
-function StatusDot({ on, label }: { on: boolean; label: string }) {
+/** One button, three states — replaces the confusing Connect + Disconnect pair. */
+function ConnectButton({
+  connState,
+  canConnect,
+  isWebSerial,
+  onConnect,
+  onDisconnect,
+}: {
+  connState: ConnState;
+  canConnect: boolean;
+  isWebSerial: boolean;
+  onConnect: () => void;
+  onDisconnect: () => void;
+}) {
+  if (connState === 'connecting') {
+    return (
+      <button
+        type="button"
+        disabled
+        style={{ ...btnBase, background: '#E0A100', color: '#fff', display: 'inline-flex', alignItems: 'center', gap: 10, opacity: 0.9 }}
+      >
+        <span
+          className="obdSpin"
+          aria-hidden
+          style={{
+            width: 14,
+            height: 14,
+            borderRadius: '50%',
+            border: '2px solid rgba(255,255,255,.4)',
+            borderTopColor: '#fff',
+            display: 'inline-block',
+          }}
+        />
+        Connecting…
+      </button>
+    );
+  }
+  if (connState === 'connected') {
+    return (
+      <button
+        type="button"
+        onClick={onDisconnect}
+        style={{ ...btnBase, background: '#0B0B0C', color: '#fff', display: 'inline-flex', alignItems: 'center', gap: 10 }}
+      >
+        <span aria-hidden style={{ width: 8, height: 8, borderRadius: '50%', background: '#3CD37A' }} />
+        Disconnect
+      </button>
+    );
+  }
   return (
-    <span
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 10,
-        font: `600 12px/1 ${mono}`,
-        letterSpacing: '.1em',
-        padding: '10px 14px',
-        borderRadius: 4,
-        background: '#F4F4F5',
-        minHeight: 44,
-      }}
+    <button
+      type="button"
+      style={{ ...btnBase, background: canConnect ? '#D5001C' : '#E7A6AE', color: '#fff', cursor: canConnect ? 'pointer' : 'not-allowed' }}
+      disabled={!canConnect}
+      onClick={onConnect}
     >
-      <span
-        style={{
-          width: 10,
-          height: 10,
-          borderRadius: '50%',
-          background: on ? '#3CD37A' : '#B4B4B8',
-          flexShrink: 0,
-        }}
-      />
-      {label}
-    </span>
+      {isWebSerial ? 'Connect USB ELM' : 'Connect'}
+    </button>
   );
 }
 
@@ -532,6 +687,7 @@ function ConnectionPanel({
   baud,
   setBaud,
   onConnect,
+  connState,
 }: {
   obd: ReturnType<typeof useObdBridge>;
   port: string;
@@ -539,6 +695,7 @@ function ConnectionPanel({
   baud: string;
   setBaud: (v: string) => void;
   onConnect: () => void;
+  connState: ConnState;
 }) {
   const isWebSerial = obd.mode === 'web-serial';
   const canConnect = isWebSerial
@@ -642,27 +799,23 @@ function ConnectionPanel({
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
           <label style={fieldLabel}>Baud</label>
-          <select value={baud} onChange={(e) => setBaud(e.target.value)} style={selectStyle}>
+          <select
+            value={baud}
+            onChange={(e) => setBaud(e.target.value)}
+            disabled={connState === 'connected'}
+            style={{ ...selectStyle, opacity: connState === 'connected' ? 0.5 : 1 }}
+          >
             <option value="38400">38400</option>
             <option value="9600">9600</option>
             <option value="115200">115200</option>
           </select>
-          <button
-            type="button"
-            style={{ ...btnBase, background: '#D5001C', color: '#fff' }}
-            disabled={!canConnect}
-            onClick={onConnect}
-          >
-            {obd.busy && !obd.connected ? 'Connecting…' : isWebSerial ? 'Connect USB ELM' : 'Connect'}
-          </button>
-          <button
-            type="button"
-            style={{ ...btnBase, background: '#fff', color: '#0B0B0C', border: '1px solid #C9C9CD' }}
-            disabled={!obd.connected || obd.busy}
-            onClick={() => obd.disconnect()}
-          >
-            Disconnect
-          </button>
+          <ConnectButton
+            connState={connState}
+            canConnect={canConnect}
+            isWebSerial={isWebSerial}
+            onConnect={onConnect}
+            onDisconnect={() => obd.disconnect()}
+          />
         </div>
       </div>
     </section>
@@ -680,9 +833,23 @@ function LivePanel({
   busy: boolean;
   connected: boolean;
 }) {
-  const order = ['Engine', 'Fuel & air', 'Throttle', 'Temps', 'Status'];
-  const groups = live?.groups || {};
-  const keys = [...order.filter((g) => groups[g]), ...Object.keys(groups).filter((g) => !order.includes(g))];
+  const order = ['Engine', 'Fuel trim', 'Fuel & air', 'O2 sensors', 'Throttle', 'Temps', 'Status'];
+  const values = live?.values ?? {};
+
+  // Render a FIXED grid from the full PID catalog (independent of capability
+  // discovery, which can come back incomplete). Every PID always has a tile;
+  // one without a value shows "N/A" in place, so the layout never shifts.
+  const grouped = new Map<string, typeof ALL_LIVE_PIDS>();
+  for (const def of ALL_LIVE_PIDS) {
+    const group = def[2];
+    const list = grouped.get(group) ?? [];
+    list.push(def);
+    grouped.set(group, list);
+  }
+  const keys = [
+    ...order.filter((g) => grouped.has(g)),
+    ...[...grouped.keys()].filter((g) => !order.includes(g)),
+  ];
 
   return (
     <section style={card}>
@@ -698,9 +865,9 @@ function LivePanel({
             Refresh live
           </button>
         </div>
-        {!keys.length ? (
+        {!connected ? (
           <p style={{ margin: 0, color: '#6E6E73', font: `400 14px/1.5 ${sans}` }}>
-            {connected ? 'No live PIDs yet — connect and poll.' : 'Connect to see live PIDs.'}
+            Connect to see live PIDs.
           </p>
         ) : (
           keys.map((group) => (
@@ -723,27 +890,32 @@ function LivePanel({
                   gap: 14,
                 }}
               >
-                {(groups[group] || []).map((m) => (
-                  <div
-                    key={m.key}
-                    style={{ background: '#141416', color: '#fff', borderRadius: 8, padding: '16px 18px', minHeight: 88 }}
-                  >
+                {(grouped.get(group) ?? []).map(([pid, key, , label, unit]) => {
+                  const has = values[key] !== undefined && values[key] !== null;
+                  return (
                     <div
-                      style={{
-                        font: `500 10px/1 ${mono}`,
-                        letterSpacing: '.12em',
-                        color: '#76767B',
-                        marginBottom: 10,
-                      }}
+                      key={key}
+                      style={{ background: '#141416', color: '#fff', borderRadius: 8, padding: '16px 18px', minHeight: 88 }}
                     >
-                      {m.label}
+                      <div
+                        style={{
+                          font: `500 10px/1 ${mono}`,
+                          letterSpacing: '.12em',
+                          color: '#76767B',
+                          marginBottom: 10,
+                        }}
+                      >
+                        {label}
+                      </div>
+                      <div style={{ font: `300 30px/1.1 ${sans}`, wordBreak: 'break-word', color: has ? '#fff' : '#5A5A5F' }}>
+                        {has ? fmt(values[key]) : 'N/A'}
+                      </div>
+                      <div style={{ font: `500 12px/1 ${mono}`, color: '#9A9AA0', marginTop: 8 }}>
+                        {unit || `PID ${pid}`}
+                      </div>
                     </div>
-                    <div style={{ font: `300 30px/1.1 ${sans}`, wordBreak: 'break-word' }}>{fmt(m.value)}</div>
-                    <div style={{ font: `500 12px/1 ${mono}`, color: '#9A9AA0', marginTop: 8 }}>
-                      {m.unit || `PID ${m.pid}`}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           ))
@@ -814,46 +986,621 @@ function Chip({ children, ok }: { children: ReactNode; ok?: boolean }) {
   );
 }
 
+type MapState = 'fault' | 'clean' | 'refused' | 'silent' | 'unknown';
+
+interface MapModule {
+  id: string;
+  name: string;
+  short: string;
+  state: MapState;
+  codes: string[];
+  // Placement on the silhouette in %; null = no known location (listed instead).
+  x: number | null;
+  y: number | null;
+}
+
+// Approximate top-down placement on a mid-engine silhouette (nose left, engine
+// behind the cabin). Deliberately schematic — a health map, not the 3D view.
+// Keyed by module id from lib/obd/uds-modules.ts; ids without an entry here are
+// still shown (as an "other modules" list), so a faulted module is never hidden.
+const MODULE_MAP_POS: Record<string, { x: number; y: number; short: string }> = {
+  'bcm-front': { x: 18, y: 40, short: 'BCM FR' },
+  psm: { x: 24, y: 33, short: 'ABS' },
+  cluster: { x: 37, y: 27, short: 'CLUSTER' },
+  airbag: { x: 45, y: 55, short: 'AIRBAG' },
+  pcm: { x: 35, y: 75, short: 'CLIMATE' },
+  gateway: { x: 55, y: 40, short: 'GATEWAY' },
+  dme: { x: 72, y: 47, short: 'ENGINE' },
+  pdk: { x: 86, y: 56, short: 'PDK' },
+};
+
+const STATE_STYLE: Record<MapState, { fill: string; label: string }> = {
+  fault: { fill: '#D5001C', label: 'Fault stored' },
+  clean: { fill: '#3CD37A', label: 'Reached · clean' },
+  refused: { fill: '#E0A100', label: 'Present · declined' },
+  silent: { fill: '#B4B4B8', label: 'No response' },
+  unknown: { fill: '#fff', label: 'Not scanned' },
+};
+
+/**
+ * Merge every data source into one module list, keyed by id. Data-driven: the
+ * set of modules comes from the per-generation registry + the DME fault read +
+ * the UDS scan results — NOT a hardcoded list — so newly-discovered modules and
+ * their faults always surface. Codes from the Mode 03/07/0A read AND the UDS
+ * scan are merged (a clean emissions read must not mask a UDS fault on the same
+ * ECU). `fault` wins over `clean` wins over `refused` wins over `silent`.
+ */
+function buildMapModules(modules: FaultModule[], scan: ModuleScanData | null, generation: string): MapModule[] {
+  type Acc = { name?: string; codes: string[]; reached: boolean; refused: boolean; silent: boolean };
+  const byId = new Map<string, Acc>();
+  const at = (id: string): Acc => {
+    let a = byId.get(id);
+    if (!a) byId.set(id, (a = { codes: [], reached: false, refused: false, silent: false }));
+    return a;
+  };
+
+  // Registry gives the expected module set + names for this generation.
+  for (const m of udsModulesFor(generation)) at(m.id).name ??= m.name;
+
+  // DME (and any other *available* module) from the generic Mode 03/07/0A read.
+  for (const m of modules) {
+    if (!m.available) continue;
+    const a = at(m.id);
+    a.name = m.name;
+    a.reached = true;
+    a.codes.push(...(m.confirmed ?? []), ...(m.pending ?? []), ...(m.permanent ?? []));
+  }
+
+  // Per-module UDS/KWP scan results.
+  for (const r of scan?.results ?? []) {
+    const a = at(r.id);
+    a.name = r.name;
+    if (r.reachable === 'positive') {
+      a.reached = true;
+      a.codes.push(...(r.confirmedDtcs ?? []), ...(r.pendingDtcs ?? []));
+    } else if (r.reachable === 'refused') a.refused = true;
+    else a.silent = true;
+  }
+
+  return [...byId.entries()].map(([id, a]) => {
+    const codes = [...new Set(a.codes)];
+    const state: MapState = codes.length
+      ? 'fault'
+      : a.reached
+        ? 'clean'
+        : a.refused
+          ? 'refused'
+          : a.silent
+            ? 'silent'
+            : 'unknown';
+    const pos = MODULE_MAP_POS[id];
+    return { id, name: a.name ?? id, short: pos?.short ?? '', state, codes, x: pos?.x ?? null, y: pos?.y ?? null };
+  });
+}
+
+function ClearFaultsControl({
+  onClear,
+  disabled,
+}: {
+  onClear: () => Promise<ClearResult | null>;
+  disabled: boolean;
+}) {
+  const [confirming, setConfirming] = useState(false);
+  const [working, setWorking] = useState(false);
+  const [result, setResult] = useState<ClearResult | null>(null);
+
+  const doClear = async () => {
+    setWorking(true);
+    const r = await onClear();
+    setResult(r);
+    setWorking(false);
+    setConfirming(false);
+  };
+
+  if (confirming) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 10,
+          alignItems: 'center',
+          padding: '10px 14px',
+          border: '1px solid rgba(213,0,28,.35)',
+          borderRadius: 6,
+          background: '#fff',
+        }}
+      >
+        <span style={{ font: `400 13px/1.4 ${sans}`, color: '#8A0011', flex: '1 1 260px' }}>
+          Clear all stored codes? This also resets emissions-readiness monitors, and an active fault (like a live P000C)
+          will return on the next drive. Not reversible.
+        </span>
+        <button
+          type="button"
+          style={{ ...btnBase, background: '#D5001C', color: '#fff' }}
+          disabled={working}
+          onClick={doClear}
+        >
+          {working ? 'Clearing…' : 'Yes, clear codes'}
+        </button>
+        <button
+          type="button"
+          style={{ ...btnBase, background: '#fff', color: '#0B0B0C', border: '1px solid #C9C9CD' }}
+          disabled={working}
+          onClick={() => setConfirming(false)}
+        >
+          Cancel
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        style={{ ...btnBase, background: '#fff', color: '#8A0011', border: '1px solid rgba(213,0,28,.35)' }}
+        disabled={disabled}
+        onClick={() => {
+          setResult(null);
+          setConfirming(true);
+        }}
+      >
+        Clear fault codes
+      </button>
+      {result && (
+        <span style={{ font: `500 12px/1.4 ${mono}`, color: result.cleared.length ? '#1A7A42' : '#8A0011' }}>
+          {result.cleared.length ? `Cleared: ${result.cleared.join(', ')}` : 'No memory acknowledged the clear'}
+          {result.errors.length ? ` (${result.errors.map((e) => `${e.cmd}: ${e.message}`).join('; ')})` : ''}
+        </span>
+      )}
+    </>
+  );
+}
+
 function FaultsPanel({
   modules,
   onRefresh,
   busy,
   connected,
+  describeDtc,
+  moduleScan,
+  onScanModules,
+  onClearFaults,
+  generation,
 }: {
   modules: FaultModule[];
   onRefresh: () => void;
   busy: boolean;
   connected: boolean;
+  describeDtc: (code: string) => FaultCode | undefined;
+  moduleScan: ModuleScanData | null;
+  onScanModules: () => void;
+  onClearFaults: () => Promise<ClearResult | null>;
+  generation: string;
 }) {
+  const [focusId, setFocusId] = useState<string | null>(null);
+  const relevant = useMemo(() => new Set(udsModulesFor(generation).map((m) => m.id)), [generation]);
+  const mapModules = useMemo(
+    () => buildMapModules(modules, moduleScan).filter((m) => relevant.has(m.id) || m.state !== 'unknown'),
+    [modules, moduleScan, relevant],
+  );
+
+  const jumpTo = (id: string) => {
+    setFocusId(id);
+    if (typeof document !== 'undefined') {
+      requestAnimationFrame(() => {
+        document.getElementById(`obd-mod-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    }
+    window.setTimeout(() => setFocusId((cur) => (cur === id ? null : cur)), 2400);
+  };
+
   return (
     <section style={card}>
       <h2 style={cardHead}>Fault codes</h2>
       <div style={{ padding: '20px 22px 24px' }}>
         <p style={{ margin: '0 0 14px', font: `400 14px/1.5 ${sans}`, color: '#3A3A3E' }}>
-          Generic OBD Mode 03 / 07 / 0A reads the engine emissions ECU (DME) only. Click a code to look it up in Fault
-          Finding.
+          Generic OBD Mode 03 / 07 / 0A reads the engine emissions ECU (DME) only. Run the module scan below to probe
+          the rest. Click a code to look it up in Fault Finding.
         </p>
-        <button
-          type="button"
-          style={{ ...btnBase, background: '#fff', color: '#0B0B0C', border: '1px solid #C9C9CD', marginBottom: 14 }}
-          disabled={!connected || busy}
-          onClick={onRefresh}
-        >
-          Refresh faults
-        </button>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 14, alignItems: 'center' }}>
+          <button
+            type="button"
+            style={{ ...btnBase, background: '#fff', color: '#0B0B0C', border: '1px solid #C9C9CD' }}
+            disabled={!connected || busy}
+            onClick={onRefresh}
+          >
+            Refresh faults
+          </button>
+          <ClearFaultsControl onClear={onClearFaults} disabled={!connected || busy} />
+        </div>
+
+        {(modules.length > 0 || moduleScan) && (
+          <FaultMap modules={mapModules} describeDtc={describeDtc} onJump={jumpTo} />
+        )}
+
         {!modules.length ? (
           <p style={{ margin: 0, color: '#6E6E73', font: `400 14px/1.5 ${sans}` }}>
             {connected ? 'No fault scan yet.' : 'Connect to scan fault codes.'}
           </p>
         ) : (
-          modules.map((m) => <ModuleCard key={m.id} module={m} />)
+          modules.map((m) => (
+            <div
+              key={m.id}
+              id={m.available ? `obd-mod-${m.id}` : undefined}
+              className={m.available && focusId === m.id ? 'obdCardFlash' : undefined}
+              style={{ borderRadius: 6 }}
+            >
+              <ModuleCard module={m} describeDtc={describeDtc} />
+            </div>
+          ))
         )}
+
+        <ModuleScanSection
+          scan={moduleScan}
+          onScan={onScanModules}
+          busy={busy}
+          connected={connected}
+          describeDtc={describeDtc}
+          generation={generation}
+          focusId={focusId}
+        />
       </div>
     </section>
   );
 }
 
-function ModuleCard({ module: m }: { module: FaultModule }) {
+/** Top-down module health map — a creative, at-a-glance overview of the scan. */
+function FaultMap({
+  modules,
+  describeDtc,
+  onJump,
+}: {
+  modules: MapModule[];
+  describeDtc: (code: string) => FaultCode | undefined;
+  onJump: (id: string) => void;
+}) {
+  const [sel, setSel] = useState<string | null>(null);
+  const selected = modules.find((m) => m.id === sel) ?? null;
+
+  const counts = useMemo(() => {
+    const c: Record<MapState, number> = { fault: 0, clean: 0, refused: 0, silent: 0, unknown: 0 };
+    for (const m of modules) c[m.state] += 1;
+    return c;
+  }, [modules]);
+
+  const legend: MapState[] = ['fault', 'clean', 'refused', 'silent', 'unknown'];
+
+  return (
+    <div style={{ marginBottom: 24 }}>
+      <div
+        style={{
+          font: `600 11px/1 ${mono}`,
+          letterSpacing: '.1em',
+          color: '#0B0B0C',
+          textTransform: 'uppercase',
+          marginBottom: 12,
+        }}
+      >
+        Module map
+      </div>
+
+      <div className="obdFaultMap" style={{ position: 'relative', width: '100%', maxWidth: 560, margin: '0 auto', aspectRatio: '300 / 150' }}>
+        <svg viewBox="0 0 300 150" width="100%" height="100%" aria-hidden style={{ display: 'block' }}>
+          {[
+            [48, 6],
+            [48, 128],
+            [200, 6],
+            [200, 128],
+          ].map(([x, y], i) => (
+            <rect key={i} x={x} y={y} width={34} height={16} rx={7} fill="#C9C9CD" />
+          ))}
+          <path
+            d="M46,22 C24,22 12,42 12,75 C12,108 24,128 46,128 L236,128 C270,128 288,110 288,80 L288,70 C288,40 270,22 236,22 Z"
+            fill="#F4F4F5"
+            stroke="#D8D8DC"
+            strokeWidth={2}
+          />
+          <path
+            d="M96,50 C96,44 100,40 108,40 L166,40 C176,40 182,50 182,75 C182,100 176,110 166,110 L108,110 C100,110 96,106 96,100 Z"
+            fill="#ECECEE"
+            stroke="#DCDCDF"
+            strokeWidth={1.5}
+          />
+          {[218, 228, 238, 248].map((x) => (
+            <line key={x} x1={x} y1={58} x2={x} y2={92} stroke="#DCDCDF" strokeWidth={2} strokeLinecap="round" />
+          ))}
+          <text x={20} y={78} fill="#B4B4B8" style={{ font: `600 8px ${mono}`, letterSpacing: '.1em' }}>
+            FRONT
+          </text>
+          <text x={248} y={110} fill="#B4B4B8" style={{ font: `600 8px ${mono}`, letterSpacing: '.1em' }}>
+            REAR
+          </text>
+        </svg>
+
+        {modules.map((m) => {
+          const st = STATE_STYLE[m.state];
+          const active = sel === m.id;
+          return (
+            <button
+              key={m.id}
+              type="button"
+              className="obdMapPin"
+              aria-label={`${m.name}: ${st.label}${m.codes.length ? `, ${m.codes.length} codes` : ''}`}
+              aria-pressed={active}
+              onClick={() => setSel((prev) => (prev === m.id ? null : m.id))}
+              style={{
+                position: 'absolute',
+                left: `${m.x}%`,
+                top: `${m.y}%`,
+                transform: 'translate(-50%, -50%)',
+                width: 34,
+                height: 34,
+                borderRadius: '50%',
+                background: 'transparent',
+                border: 'none',
+                padding: 0,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: active ? 4 : 3,
+              }}
+            >
+              <span
+                style={{
+                  width: 22,
+                  height: 22,
+                  borderRadius: '50%',
+                  background: m.state === 'unknown' ? '#fff' : st.fill,
+                  border: active ? '3px solid #0B0B0C' : m.state === 'unknown' ? '2px dashed #B4B4B8' : '2px solid #fff',
+                  boxShadow: '0 1px 3px rgba(0,0,0,.3)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  font: `700 10px/1 ${mono}`,
+                  color: '#fff',
+                }}
+              >
+                {m.state === 'fault' ? m.codes.length : ''}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center', margin: '14px 0 0' }}>
+        {legend.map((s) => (
+          <span
+            key={s}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 7,
+              font: `500 11px/1 ${mono}`,
+              color: counts[s] ? '#3A3A3E' : '#B4B4B8',
+            }}
+          >
+            <span
+              style={{
+                width: 12,
+                height: 12,
+                borderRadius: '50%',
+                background: s === 'unknown' ? '#fff' : STATE_STYLE[s].fill,
+                border: s === 'unknown' ? '1.5px dashed #B4B4B8' : '1.5px solid #fff',
+                boxShadow: '0 0 0 1px #E3E3E5',
+              }}
+            />
+            {STATE_STYLE[s].label} · {counts[s]}
+          </span>
+        ))}
+      </div>
+
+      <p style={{ margin: '10px 0 0', font: `400 12px/1.5 ${sans}`, color: '#9A9AA0', textAlign: 'center' }}>
+        Schematic placement — tap a module for its codes.
+      </p>
+
+      {selected && (
+        <div
+          style={{
+            marginTop: 14,
+            background: '#fff',
+            border: `1px solid ${
+              selected.state === 'fault'
+                ? 'rgba(213,0,28,.3)'
+                : selected.state === 'clean'
+                  ? 'rgba(27,138,75,.35)'
+                  : selected.state === 'refused'
+                    ? 'rgba(178,106,0,.35)'
+                    : '#E3E3E5'
+            }`,
+            borderRadius: 6,
+            padding: '14px 16px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 10 }}>
+            <span style={{ font: `600 14px/1.2 ${sans}` }}>{selected.name}</span>
+            <span
+              style={{
+                font: `600 9px/1 ${mono}`,
+                letterSpacing: '.1em',
+                textTransform: 'uppercase',
+                padding: '4px 8px',
+                borderRadius: 2,
+                background: selected.state === 'unknown' ? '#F0F0F1' : STATE_STYLE[selected.state].fill,
+                color: selected.state === 'unknown' ? '#6E6E73' : '#fff',
+              }}
+            >
+              {STATE_STYLE[selected.state].label}
+            </span>
+          </div>
+          {selected.codes.length ? (
+            <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {selected.codes.map((c) => {
+                const info = describeDtc(c);
+                return (
+                  <li key={c}>
+                    <Link
+                      href={`/faults?q=${encodeURIComponent(c)}`}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        minHeight: 40,
+                        padding: '8px 12px',
+                        borderRadius: 4,
+                        border: '1px solid #E3E3E5',
+                        background: '#fff',
+                        textDecoration: 'none',
+                      }}
+                    >
+                      <span style={{ color: '#D5001C', font: `600 13px/1 ${mono}` }}>{c}</span>
+                      {info && <SeverityTag severity={info.severity} />}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <p style={{ margin: 0, font: `400 13px/1.5 ${sans}`, color: '#6E6E73' }}>
+              {selected.state === 'clean'
+                ? 'Reached and reported no stored codes.'
+                : selected.state === 'refused'
+                  ? 'Module answered but declined the read — the address looks right.'
+                  : selected.state === 'silent'
+                    ? 'No response at this address on this car.'
+                    : 'Not scanned yet — run the module scan below.'}
+            </p>
+          )}
+          {selected.state !== 'unknown' && (
+            <button
+              type="button"
+              onClick={() => onJump(selected.id)}
+              style={{
+                marginTop: 12,
+                minHeight: 40,
+                padding: '0 14px',
+                borderRadius: 4,
+                border: '1px solid #C9C9CD',
+                background: '#fff',
+                color: '#0B0B0C',
+                font: `600 11px/1 ${mono}`,
+                letterSpacing: '.08em',
+                textTransform: 'uppercase',
+                cursor: 'pointer',
+              }}
+            >
+              Jump to details ↓
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ModuleScanSection({
+  scan,
+  onScan,
+  busy,
+  connected,
+  describeDtc,
+  generation,
+  focusId,
+}: {
+  scan: ModuleScanData | null;
+  onScan: () => void;
+  busy: boolean;
+  connected: boolean;
+  describeDtc: (code: string) => FaultCode | undefined;
+  generation: string;
+  focusId: string | null;
+}) {
+  const reach: Record<string, { bg: string; fg: string; label: string }> = {
+    positive: { bg: '#E8F8EE', fg: '#1A7A42', label: 'ANSWERED' },
+    refused: { bg: '#FCEFD8', fg: '#8A5A00', label: 'REACHED · DECLINED' },
+    silent: { bg: '#F0F0F1', fg: '#6E6E73', label: 'NO RESPONSE' },
+  };
+  return (
+    <div style={{ marginTop: 26, borderTop: '1px solid #F0F0F1', paddingTop: 20 }}>
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center', marginBottom: 10 }}>
+        <span style={{ font: `600 12px/1 ${mono}`, letterSpacing: '.1em', color: '#0B0B0C', textTransform: 'uppercase' }}>
+          Module scan (UDS / KWP · beta)
+        </span>
+        <span style={{ font: `600 9px/1 ${mono}`, letterSpacing: '.1em', padding: '4px 8px', borderRadius: 2, background: '#F0F0F1', color: '#6E6E73' }}>
+          {generation}
+        </span>
+      </div>
+      <p style={{ margin: '0 0 14px', font: `400 13px/1.5 ${sans}`, color: '#6E6E73' }}>
+        Read-only probe of non-DME modules (ABS, PDK, airbag, cluster…). Non-DME addresses are candidates until confirmed
+        on a real car — <strong>PRESENT · REFUSED</strong> still means the address is right; <strong>NO RESPONSE</strong> means
+        the id or gateway routing needs adjusting. Requires ignition on.
+      </p>
+      <button
+        type="button"
+        style={{ ...btnBase, background: '#0B0B0C', color: '#fff', marginBottom: 14 }}
+        disabled={!connected || busy}
+        onClick={onScan}
+      >
+        {busy ? 'Scanning…' : 'Scan modules'}
+      </button>
+
+      {!scan ? (
+        <p style={{ margin: 0, color: '#6E6E73', font: `400 14px/1.5 ${sans}` }}>
+          {connected ? 'No module scan yet.' : 'Connect to scan modules.'}
+        </p>
+      ) : (
+        <div>
+          {scan.results.map((r) => {
+            const tone = reach[r.reachable];
+            return (
+              <div
+                key={r.id}
+                id={r.id !== 'dme' ? `obd-mod-${r.id}` : undefined}
+                className={r.id !== 'dme' && focusId === r.id ? 'obdCardFlash' : undefined}
+                style={{ border: '1px solid #E3E3E5', borderRadius: 6, padding: '14px 16px', marginBottom: 12 }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
+                  <span style={{ font: `600 13px/1.2 ${sans}` }}>
+                    {r.name}{' '}
+                    <span style={{ font: `500 11px/1 ${mono}`, color: '#9A9AA0' }}>
+                      {r.reqId} · {r.protocol === 'obd' ? 'OBD-II' : r.protocol.toUpperCase()}
+                    </span>
+                  </span>
+                  <span style={{ font: `600 9px/1 ${mono}`, letterSpacing: '.1em', padding: '4px 8px', borderRadius: 2, background: tone.bg, color: tone.fg }}>
+                    {tone.label}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: r.reachable === 'positive' ? 10 : 0 }}>
+                  {!r.addressConfirmed && <Chip>candidate address</Chip>}
+                  {r.sessionOk && <Chip ok>ext. session OK</Chip>}
+                  {r.detail && <Chip>declined: {r.detail}</Chip>}
+                  {r.reachable === 'silent' && r.addressConfirmed && <Chip>no reply at this id</Chip>}
+                  {r.error && <Chip ok={false}>{r.error}</Chip>}
+                </div>
+                {r.reachable === 'positive' && (
+                  <>
+                    <DtcList label="Confirmed" codes={r.confirmedDtcs} describeDtc={describeDtc} />
+                    <DtcList label="Pending" codes={r.pendingDtcs} describeDtc={describeDtc} />
+                  </>
+                )}
+              </div>
+            );
+          })}
+          <p style={{ margin: '4px 0 0', font: `400 12px/1.5 ${sans}`, color: '#9A9AA0' }}>{scan.note}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ModuleCard({
+  module: m,
+  describeDtc,
+}: {
+  module: FaultModule;
+  describeDtc: (code: string) => FaultCode | undefined;
+}) {
   if (!m.available) {
     return (
       <div
@@ -907,9 +1654,9 @@ function ModuleCard({ module: m }: { module: FaultModule }) {
           OBD-II
         </span>
       </div>
-      <DtcList label="Confirmed (Mode 03)" codes={m.confirmed} />
-      <DtcList label="Pending (Mode 07)" codes={m.pending} />
-      <DtcList label="Permanent (Mode 0A)" codes={m.permanent} />
+      <DtcList label="Confirmed (Mode 03)" codes={m.confirmed} describeDtc={describeDtc} />
+      <DtcList label="Pending (Mode 07)" codes={m.pending} describeDtc={describeDtc} />
+      <DtcList label="Permanent (Mode 0A)" codes={m.permanent} describeDtc={describeDtc} />
       {m.freezeFrame?.dtc && (
         <div style={{ marginTop: 10, font: `500 12px/1.4 ${mono}` }}>
           Freeze frame: {m.freezeFrame.dtc}
@@ -929,7 +1676,15 @@ function ModuleCard({ module: m }: { module: FaultModule }) {
   );
 }
 
-function DtcList({ label, codes }: { label: string; codes: string[] }) {
+function DtcList({
+  label,
+  codes,
+  describeDtc,
+}: {
+  label: string;
+  codes: string[];
+  describeDtc: (code: string) => FaultCode | undefined;
+}) {
   return (
     <div style={{ marginBottom: 12 }}>
       <div style={{ font: `600 11px/1 ${mono}`, letterSpacing: '.08em', color: '#9A9AA0', marginBottom: 8 }}>
@@ -939,30 +1694,67 @@ function DtcList({ label, codes }: { label: string; codes: string[] }) {
         <div style={{ color: '#6E6E73', font: `400 14px/1.4 ${sans}`, padding: '8px 0' }}>(none)</div>
       ) : (
         <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
-          {codes.map((c) => (
-            <li key={c} style={{ margin: '6px 0' }}>
-              <Link
-                href={`/faults?q=${encodeURIComponent(c)}`}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  minHeight: 44,
-                  padding: '10px 14px',
-                  borderRadius: 4,
-                  border: '1px solid #E3E3E5',
-                  background: '#fff',
-                  color: '#D5001C',
-                  textDecoration: 'none',
-                  font: `600 14px/1.3 ${mono}`,
-                }}
-              >
-                {c}
-              </Link>
-            </li>
-          ))}
+          {codes.map((c) => {
+            const info = describeDtc(c);
+            return (
+              <li key={c} style={{ margin: '6px 0' }}>
+                <Link
+                  href={`/faults?q=${encodeURIComponent(c)}`}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    flexDirection: 'column',
+                    gap: 6,
+                    minHeight: 44,
+                    padding: '10px 14px',
+                    borderRadius: 4,
+                    border: '1px solid #E3E3E5',
+                    background: '#fff',
+                    textDecoration: 'none',
+                  }}
+                >
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                    <span style={{ color: '#D5001C', font: `600 14px/1.3 ${mono}` }}>{c}</span>
+                    {info && <SeverityTag severity={info.severity} />}
+                  </span>
+                  {info ? (
+                    <span style={{ color: '#3A3A3E', font: `400 13px/1.4 ${sans}` }}>{info.title}</span>
+                  ) : (
+                    <span style={{ color: '#9A9AA0', font: `400 12px/1.4 ${sans}` }}>
+                      No description on file — tap to search Fault Finding
+                    </span>
+                  )}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>
+  );
+}
+
+function SeverityTag({ severity }: { severity: FaultCode['severity'] }) {
+  const map: Record<string, { bg: string; fg: string }> = {
+    HIGH: { bg: '#FBE3E6', fg: '#8A0011' },
+    MED: { bg: '#FCEFD8', fg: '#8A5A00' },
+    LOW: { bg: '#E8F8EE', fg: '#1A7A42' },
+  };
+  const tone = map[severity] ?? { bg: '#F0F0F1', fg: '#6E6E73' };
+  return (
+    <span
+      style={{
+        font: `600 9px/1 ${mono}`,
+        letterSpacing: '.1em',
+        textTransform: 'uppercase',
+        padding: '4px 8px',
+        borderRadius: 2,
+        background: tone.bg,
+        color: tone.fg,
+      }}
+    >
+      {severity}
+    </span>
   );
 }
 
@@ -1064,6 +1856,236 @@ function VehiclePanel({
         )}
       </div>
     </section>
+  );
+}
+
+/** Small "?" affordance with a tap/hover popover. Works on touch and mouse. */
+// A "?" that toggles a plain-English note. The note expands full-width BELOW
+// the header (flex-basis:100% inside a flex-wrap row) rather than floating, so
+// it never clips off-screen on a phone/tablet. Parent row must be flex-wrap.
+function HelpTip({ text }: { text: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button
+        type="button"
+        aria-label={open ? 'Hide explanation' : 'What is this?'}
+        aria-expanded={open}
+        onClick={() => setOpen((o) => !o)}
+        style={{
+          width: 20,
+          height: 20,
+          borderRadius: '50%',
+          border: `1px solid ${open ? '#0B0B0C' : '#C9C9CD'}`,
+          background: open ? '#0B0B0C' : '#fff',
+          color: open ? '#fff' : '#6E6E73',
+          font: `700 11px/1 ${mono}`,
+          cursor: 'pointer',
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 0,
+          flexShrink: 0,
+        }}
+      >
+        ?
+      </button>
+      {open && (
+        <span
+          role="tooltip"
+          style={{
+            flexBasis: '100%',
+            width: '100%',
+            marginTop: 8,
+            background: '#F4F4F5',
+            border: '1px solid #E9E9EB',
+            borderRadius: 6,
+            padding: '10px 12px',
+            textAlign: 'left',
+            textTransform: 'none',
+            letterSpacing: 0,
+            font: `400 12px/1.55 ${sans}`,
+            color: '#3A3A3E',
+          }}
+        >
+          {text}
+        </span>
+      )}
+    </>
+  );
+}
+
+/** Plain-English explanation of a Mode 06 monitor, keyed by its label prefix. */
+function monitorHelp(monitor: string): string {
+  const m = monitor.toLowerCase();
+  if (m.startsWith('o2 sensor'))
+    return 'Checks one oxygen sensor’s switching speed and voltage. A lazy or slow sensor shows up here — often before it trips a check-engine light — and can quietly hurt fuel economy.';
+  if (m.startsWith('misfire'))
+    return 'Counts combustion events the ECU flagged as misfires. “General” is the whole engine; a per-cylinder row points at one coil, plug, or injector. A handful of counts is normal — steadily climbing numbers are not.';
+  if (m.startsWith('catalyst'))
+    return 'Rates how well the catalytic converter is cleaning the exhaust by comparing the sensors before and after it. A failing result is the classic P0420 / P0430.';
+  if (m.startsWith('evap'))
+    return 'Tests the fuel-vapour (EVAP) system for leaks — sometimes as small as a loose or worn fuel cap.';
+  if (m.startsWith('egr') || m.includes('vvt'))
+    return 'Checks that the exhaust-gas-recirculation / variable-valve-timing actuators respond the way the ECU commanded.';
+  if (m.startsWith('secondary air'))
+    return 'Checks the cold-start air pump that helps the catalytic converter warm up and start working sooner.';
+  return 'One of the ECU’s built-in self-tests. The bar shows where the measured value landed between the ECU’s own pass/fail limits — inside = PASS, outside = FAIL.';
+}
+
+function Mode06Panel({
+  data,
+  onRefresh,
+  busy,
+  connected,
+}: {
+  data: Mode06Data | null;
+  onRefresh: () => void;
+  busy: boolean;
+  connected: boolean;
+}) {
+  // Group tests by monitor label for readability.
+  const groups = useMemo(() => {
+    const map = new Map<string, NonNullable<Mode06Data['tests']>>();
+    for (const t of data?.tests ?? []) {
+      const list = map.get(t.monitor) ?? [];
+      list.push(t);
+      map.set(t.monitor, list);
+    }
+    return [...map.entries()];
+  }, [data]);
+
+  return (
+    <section style={card}>
+      <h2 style={cardHead}>On-board monitors · Mode 06</h2>
+      <div style={{ padding: '20px 22px 24px' }}>
+        <p style={{ margin: '0 0 14px', font: `400 14px/1.5 ${sans}`, color: '#3A3A3E' }}>
+          Each row is a self-diagnostic the ECU runs continuously (O2 response, catalyst efficiency, per-cylinder misfire
+          counts…). The bar shows where the latest measured value sits between the ECU&apos;s own <strong>min and max
+          limits</strong>: <strong>PASS</strong> = inside the limits, <strong>FAIL</strong> = outside. The numbers are the
+          ECU&apos;s internal test units — Mode 06 doesn&apos;t standardise scaling across test types, so the pass/fail and
+          the bar position are the signal, not the absolute value. Misfire monitors are the exception: those values are
+          plain counts.
+        </p>
+        <button
+          type="button"
+          style={{ ...btnBase, background: '#fff', color: '#0B0B0C', border: '1px solid #C9C9CD', marginBottom: 14 }}
+          disabled={!connected || busy}
+          onClick={onRefresh}
+        >
+          {busy ? 'Reading…' : 'Read monitors'}
+        </button>
+
+        {!data ? (
+          <p style={{ margin: 0, color: '#6E6E73', font: `400 14px/1.5 ${sans}` }}>
+            {connected ? 'No monitor read yet.' : 'Connect to read on-board monitors.'}
+          </p>
+        ) : !groups.length ? (
+          <p style={{ margin: 0, color: '#6E6E73', font: `400 14px/1.5 ${sans}` }}>
+            This ECU reported no Mode 06 test results
+            {data.supportedMids.length ? ` (MIDs seen: ${data.supportedMids.join(', ')}).` : '.'}
+          </p>
+        ) : (
+          <>
+            <Mode06Summary data={data} />
+            {groups.map(([monitor, tests]) => (
+              <div key={monitor} style={{ marginBottom: 18 }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                  <span style={{ font: `600 11px/1 ${mono}`, letterSpacing: '.08em', color: '#0B0B0C' }}>{monitor}</span>
+                  <HelpTip text={monitorHelp(monitor)} />
+                </div>
+                <div style={{ display: 'grid', gap: 8 }}>
+                  {tests.map((t, i) => (
+                    <Mode06Row key={`${t.mid}-${t.tid}-${i}`} test={t} />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </>
+        )}
+        {!!data?.errors?.length && (
+          <div style={{ marginTop: 10, color: '#8A0011', font: `500 12px/1.4 ${mono}` }}>
+            {data.errors.map((e) => `MID ${e.mid}: ${e.message}`).join('\n')}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function Mode06Summary({ data }: { data: Mode06Data }) {
+  const total = data.tests.length;
+  const passed = data.tests.filter((t) => t.result === 'pass').length;
+  const failed = data.tests.filter((t) => t.result === 'fail').length;
+  const unknown = data.tests.filter((t) => t.result === 'unknown').length;
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: 8,
+        alignItems: 'center',
+        marginBottom: 18,
+        paddingBottom: 14,
+        borderBottom: '1px solid #F0F0F1',
+      }}
+    >
+      <Chip ok>Read OK · {total} tests</Chip>
+      <Chip ok>{passed} passed</Chip>
+      {failed > 0 && <Chip ok={false}>{failed} failed</Chip>}
+      {unknown > 0 && <Chip>{unknown} unreadable limits</Chip>}
+    </div>
+  );
+}
+
+function Mode06Row({ test: t }: { test: Mode06Test }) {
+  const span = t.max - t.min;
+  const frac = span > 0 ? Math.min(1, Math.max(0, (t.value - t.min) / span)) : null;
+  const tone =
+    t.result === 'pass'
+      ? { bar: '#3CD37A', label: 'PASS', ok: true as const }
+      : t.result === 'fail'
+        ? { bar: '#D5001C', label: 'FAIL', ok: false as const }
+        : { bar: '#B4B4B8', label: '—', ok: undefined };
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 14,
+        flexWrap: 'wrap',
+        border: '1px solid #E3E3E5',
+        borderRadius: 4,
+        padding: '10px 14px',
+      }}
+    >
+      <span style={{ font: `500 11px/1.4 ${mono}`, color: '#9A9AA0', width: 56, flexShrink: 0 }}>TID {t.tid}</span>
+      <div style={{ flex: '1 1 160px', minWidth: 140 }}>
+        <div style={{ position: 'relative', height: 6, background: '#EEEEF0', borderRadius: 3 }}>
+          {frac != null && (
+            <span
+              style={{
+                position: 'absolute',
+                top: -3,
+                left: `calc(${frac * 100}% - 6px)`,
+                width: 12,
+                height: 12,
+                borderRadius: '50%',
+                background: tone.bar,
+                border: '2px solid #fff',
+                boxShadow: '0 0 0 1px #E3E3E5',
+              }}
+            />
+          )}
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, font: `500 11px/1 ${mono}`, color: '#6E6E73' }}>
+          <span>{t.min}</span>
+          <span style={{ color: '#0B0B0C', fontWeight: 600 }}>{t.value}</span>
+          <span>{t.max}</span>
+        </div>
+      </div>
+      <Chip ok={tone.ok}>{tone.label}</Chip>
+    </div>
   );
 }
 
