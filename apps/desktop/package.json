@@ -30,6 +30,7 @@
   "build": {
     "appId": "com.flatsix.desktop",
     "productName": "FLAT·SIX",
+    "npmRebuild": false,
     "icon": "build/icon",
     "artifactName": "FLAT-SIX-${version}-${arch}.${ext}",
     "directories": {

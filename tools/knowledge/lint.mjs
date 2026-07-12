@@ -27,6 +27,7 @@ const SYSTEMS = new Set([
 const SEVERITIES = new Set(['LOW', 'MED', 'HIGH']);
 const SPEC_CATEGORIES = new Set(['torque', 'fluid', 'capacity', 'tolerance', 'electrical', 'tyre']);
 const DTC_RE = /^[PBCU][0-3][0-9A-F]{3}$/; // OBD-II DTC, incl. valid hex-tail codes like P000A / U0100
+const MANUFACTURER_DTC_RE = /^[0-9A-F]{6}$/i; // Porsche/UDS raw codes (e.g. 000401, 89020E)
 
 // ---- Discover generations -----------------------------------------------
 // fault-codes.json -> '981' (default); fault-codes-<gen>.json -> '<gen>'.
@@ -68,7 +69,7 @@ function lintGeneration(gen) {
     const id = f.code;
     if (!isNonEmptyStr(f.code)) push('fault', i, id, 'missing code');
     else {
-      if (!DTC_RE.test(f.code)) push('fault', i, id, `code "${f.code}" is not a valid OBD-II DTC (expected e.g. P0301, P000A, U0100)`);
+      if (!DTC_RE.test(f.code) && !MANUFACTURER_DTC_RE.test(f.code)) push('fault', i, id, `code "${f.code}" is not a valid OBD-II DTC (expected e.g. P0301, P000A, U0100) or 6-digit manufacturer code`);
       if (seenCodes.has(f.code)) push('fault', i, id, `duplicate code "${f.code}"`);
       seenCodes.add(f.code);
     }
