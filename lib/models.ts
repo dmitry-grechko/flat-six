@@ -1,4 +1,4 @@
-import type { BodyType } from './types';
+import type { BodyType, Vehicle } from './types';
 
 /**
  * Registry of selectable car variants — the single source of truth for which
@@ -69,4 +69,23 @@ export const GENERATIONS: string[] = Array.from(new Set(CAR_VARIANTS.map((v) => 
 /** Resolve a stored vehicle.body id to its generation (defaults to 981). */
 export function generationForBody(body: string | null | undefined): string {
   return CAR_VARIANTS.find((v) => v.id === body)?.generation ?? '981';
+}
+
+/**
+ * Resolve a 987's sub-generation: 987.1 (2005–2008, M96/M97) vs 987.2 (2009–2012,
+ * 9A1 DFI). Returns null for non-987 cars (981 has no such split). Used to scope
+ * per-car part numbers — e.g. the 9A1 DFI engine/fuel parts only apply to 987.2.
+ *
+ * Powertrain signals are unambiguous where present (2.9 / PDK = 987.2; 2.7 /
+ * Tiptronic = 987.1); the shared 3.4 S and plain manuals fall back to model year.
+ */
+export function subGeneration(vehicle: Pick<Vehicle, 'body' | 'engine' | 'trans' | 'year'>): '987.1' | '987.2' | null {
+  if (generationForBody(vehicle.body) !== '987') return null;
+  const engine = (vehicle.engine || '').toLowerCase();
+  const trans = (vehicle.trans || '').toLowerCase();
+  if (/\b2\.9\b/.test(engine) || trans.includes('pdk')) return '987.2';
+  if (/\b2\.7\b/.test(engine) || trans.includes('tiptronic')) return '987.1';
+  const year = parseInt(String(vehicle.year ?? '').replace(/\D/g, ''), 10);
+  if (Number.isFinite(year) && year > 0) return year >= 2009 ? '987.2' : '987.1';
+  return null;
 }

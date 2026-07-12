@@ -52,6 +52,10 @@ yarn-error.log*
 # env
 .env*.local
 
+# local session notes / handoff (Claude Code)
+claude.local.md
+CLAUDE.local.md
+
 # typescript / next build info
 *.tsbuildinfo
 

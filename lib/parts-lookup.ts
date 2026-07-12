@@ -67,3 +67,17 @@ export async function lookupPart(partNumber: string, generation?: string): Promi
   const rows = await searchParts(partNumber, 5, generation);
   return rows.find((r) => norm(r.partNumber) === target) ?? rows[0] ?? null;
 }
+
+/**
+ * Strict variant of lookupPart: returns a row ONLY when the catalog contains an
+ * EXACT match for the requested number (no fuzzy "best guess" fallback). This is
+ * the gate behind the garage's verified-or-hidden part display — a number that
+ * isn't genuinely in the OEM catalog resolves to null and is hidden, so a
+ * stale / wrong hand-typed number can never be shown as if it were verified.
+ */
+export async function lookupPartExact(partNumber: string, generation?: string): Promise<CatalogPartRow | null> {
+  const target = norm(partNumber);
+  if (target.length < 6) return null; // full Porsche numbers normalise to ~10-11 chars
+  const rows = await searchParts(partNumber, 5, generation);
+  return rows.find((r) => norm(r.partNumber) === target) ?? null;
+}

@@ -444,7 +444,7 @@
     "category": "fluid",
     "name": "PDK gear oil",
     "value": "SAE 75W-90",
-    "notes": "Separate circuit from the PDK clutch/control fluid. Retailers often mislabel the clutch fluid as 'PDK transmission fluid' — the gears use 75W-90.",
+    "notes": "Separate circuit from the PDK clutch/control fluid. Retailers often mislabel the clutch fluid as 'PDK transmission fluid' — the gears use 75W-90. Porsche P/N 00004330549 (same 75W-90 gear oil as the manual).",
     "appliesTo": [
       "981 PDK"
     ],

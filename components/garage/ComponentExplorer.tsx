@@ -3,13 +3,16 @@
 import { useEffect, useMemo, useRef, useState, type FC } from 'react';
 import { useRouter } from 'next/navigation';
 import { COMPONENTS, SYSTEMS, COLORS, diffDots, DIFF_LABELS, componentsForGeneration, formatInterval } from '@/lib/data';
+import { transmissionMaintenance } from '@/lib/knowledge/transmission';
+import { brakeMaintenance } from '@/lib/knowledge/brakes';
+import { extractPartNumbers, normalizePartNumber } from '@/lib/parts-extract';
 import { useUnits } from '@/lib/units';
 import { track } from '@/lib/analytics';
-import { catalogForSystem, formatPartNumber } from '@/lib/catalog';
-import { lookupPart, type CatalogPartRow } from '@/lib/parts-lookup';
+import { formatPartNumber } from '@/lib/catalog';
+import { lookupPartExact, type CatalogPartRow } from '@/lib/parts-lookup';
 import { exteriorPartsFor } from '@/lib/exterior-parts';
 import { useVehicle, modelGlb } from '@/lib/vehicle-context';
-import { getVariant, generationForBody } from '@/lib/models';
+import { getVariant, generationForBody, subGeneration } from '@/lib/models';
 import { MODEL_CREDITS, cutawayImageFor, engineRefFor } from '@/lib/credits';
 import type { Component, SystemName, Vehicle, EnginePart } from '@/lib/types';
 // GLBViewer is a forwardRef wrapper; it dynamically imports the R3F Canvas
@@ -542,6 +545,19 @@ export default function ComponentExplorer() {
   );
 }
 
+// One part number the card wants to show. `trusted` numbers come from the
+// knowledge base (cited fluids with a Porsche P/N) and are shown unconditionally;
+// every other number is a candidate that is shown ONLY once it resolves in the
+// Supabase OEM catalog.
+interface PartCandidate {
+  key: string;        // normalised, for de-dupe / verification map
+  display: string;    // dotted, for display
+  label?: string;     // knowledge-base description (trusted fluids)
+  detail?: string;    // knowledge-base spec/value (trusted fluids)
+  source?: string;    // citation (trusted fluids)
+  trusted: boolean;
+}
+
 function DetailPanel({ comp, vehicle, generation, n, onClose, onLog, onAsk }: {
   comp: Component; vehicle: Vehicle; generation: string; n: number; onClose: () => void; onLog: () => void; onAsk: (p: string) => void;
 }) {
@@ -552,13 +568,73 @@ function DetailPanel({ comp, vehicle, generation, n, onClose, onLog, onAsk }: {
   const engineRef = engineRefFor(generation);
   const dots = diffDots(comp.diff);
   const diffLabel = DIFF_LABELS[comp.diff - 1];
-  // The static porscheontario.com catalog is 981-specific — don't show its part
-  // numbers on other generations (they'd be misleading).
-  const catalog = generation === '981' ? catalogForSystem(comp.system) : [];
+
+  // Variant-aware, knowledge-sourced spec/torque/notes for the transmission and
+  // brake cards (PDK vs manual, base vs S) — cited data instead of the generic
+  // hand-typed string. Falls back to the component's own copy for everything else.
+  const tx = comp.id === 'trans' ? transmissionMaintenance(vehicle.trans, generation) : null;
+  const bx = brakeMaintenance(comp.id, vehicle, generation);
+  const kb = tx ?? bx;
+  const specFill = kb?.spec ?? comp.spec;
+  const torque = kb?.torque ?? comp.torque;
+  const notes = kb?.note ?? comp.notes;
   const specRows: [string, string][] = [
-    ['Part No.', comp.part], ['Spec / Fill', comp.spec], ['Interval', formatInterval(comp.interval, units)], ['Torque', comp.torque],
+    ['Spec / Fill', specFill], ['Interval', formatInterval(comp.interval, units)], ['Torque', torque],
   ];
-  const askPrompt = `I have a ${vehicle.year} ${vehicle.model}. Walk me through the DIY procedure for: ${comp.label}. Confirm part ${comp.part}, the fill/spec (${comp.spec}) and torque values (${comp.torque}), and flag anything model-specific.`;
+
+  // ── Part numbers: verified-or-hidden against the live OEM catalog ──────────
+  // Trusted knowledge-base fluids (cited, with a Porsche P/N) are always shown.
+  // Every other number the card mentions is extracted from the hand-typed `part`
+  // string and shown ONLY if it resolves exactly in the Supabase parts catalog —
+  // so a stale / wrong hand-typed number can never be displayed.
+  const trustedFluids = tx?.fluids ?? bx?.fluids ?? [];
+  const trustedSig = trustedFluids.map((f) => f.partNumber ?? '').join(',');
+  // Sub-generation (987.1 vs 987.2) scopes which structured candidates apply —
+  // e.g. the 9A1 DFI engine/fuel numbers are 987.2-only, so a 987.1 car never
+  // sees them (its M96/M97 numbers aren't in the catalog → the card stays honest).
+  const subGen = subGeneration(vehicle);
+  const structuredSig = (comp.parts ?? []).map((p) => `${p.number}:${p.appliesTo ?? ''}`).join(',');
+  const candidates = useMemo<PartCandidate[]>(() => {
+    const trusted: PartCandidate[] = trustedFluids
+      .filter((f) => f.partNumber)
+      .map((f) => ({ key: normalizePartNumber(f.partNumber!), display: formatPartNumber(f.partNumber!), label: f.name, detail: f.value, source: f.source, trusted: true }));
+    const seen = new Set(trusted.map((t) => t.key));
+    // Structured candidates (sub-generation-scoped) first, then any numbers still
+    // only living in the free-text `part` string. Both are DB-verified-or-hidden.
+    const structured = (comp.parts ?? [])
+      .filter((p) => !p.appliesTo || p.appliesTo === subGen)
+      .map((p) => p.number);
+    const others: PartCandidate[] = [];
+    for (const num of [...structured, ...extractPartNumbers(comp.part)]) {
+      const key = normalizePartNumber(num);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      others.push({ key, display: formatPartNumber(num), trusted: false });
+    }
+    return [...trusted, ...others];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [comp.part, structuredSig, subGen, trustedSig, generation]);
+
+  const candidateSig = candidates.map((c) => c.key).join(',');
+  const [verified, setVerified] = useState<Record<string, CatalogPartRow | null>>({});
+  const [resolving, setResolving] = useState(false);
+  useEffect(() => {
+    let on = true;
+    if (!candidates.length) { setVerified({}); setResolving(false); return; }
+    setResolving(true);
+    Promise.all(candidates.map((c) =>
+      lookupPartExact(c.display, generation).then((r) => [c.key, r] as const).catch(() => [c.key, null] as const),
+    )).then((pairs) => { if (!on) return; setVerified(Object.fromEntries(pairs)); setResolving(false); });
+    return () => { on = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [candidateSig, generation]);
+
+  // Trusted numbers always show; extracted numbers only once verified.
+  const shownParts = candidates.filter((c) => c.trusted || verified[c.key]);
+  const shownNumbers = shownParts.map((c) => c.display);
+
+  const variantNote = tx ? ` with the ${vehicle.trans}` : bx ? ` (${bx.size === 's' ? 'S/GTS' : 'base'} brakes)` : '';
+  const askPrompt = `I have a ${vehicle.year} ${vehicle.model}${variantNote}. Walk me through the DIY procedure for: ${comp.label}. ${shownNumbers.length ? `Confirm part ${shownNumbers.join(', ')}, and ` : ''}the fill/spec (${specFill}) and torque values (${torque}), and flag anything model-specific.`;
 
   return (
     <div className="fadeUp" style={{ padding: 22 }}>
@@ -584,7 +660,40 @@ function DetailPanel({ comp, vehicle, generation, n, onClose, onLog, onAsk }: {
         ))}
       </div>
 
-      <p style={{ margin: '16px 0 0', font: "400 13px/1.6 'Helvetica Neue',Arial,sans-serif", color: '#46464A' }}>{comp.notes}</p>
+      {(shownParts.length > 0 || resolving) && (
+        <div style={{ marginTop: 18 }}>
+          <div style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.16em', color: '#9A9AA0', marginBottom: 11 }}>
+            PARTS <span style={{ color: '#C4C4C8' }}>· CATALOG-VERIFIED</span>
+          </div>
+          {resolving && shownParts.length === 0 ? (
+            <div style={{ font: `500 11px/1.5 ${mono}`, color: '#B4B4B8', padding: '4px 0' }}>Checking the OEM catalog…</div>
+          ) : shownParts.map((c) => {
+            const row = verified[c.key];
+            const desc = c.trusted ? (c.label ?? row?.description ?? '') : (row?.description ?? '');
+            return (
+              <div key={c.key} style={{ display: 'flex', gap: 12, alignItems: 'baseline', padding: '8px 0', borderBottom: '1px solid #F5F5F6' }}>
+                <span style={{ flex: 1, font: "400 12px/1.45 'Helvetica Neue',Arial,sans-serif", color: '#2A2A2E' }}>
+                  {desc || '—'}
+                  {c.trusted && c.detail && <span style={{ color: '#9A9AA0' }}> · {c.detail}</span>}
+                </span>
+                <span style={{ font: `500 11px/1 ${mono}`, color: '#0B0B0C', whiteSpace: 'nowrap', textAlign: 'right' }}>
+                  {c.display}
+                  {row && (
+                    <span title="Exact match in the OEM parts catalog" style={{ marginLeft: 7, font: `600 8px/1 ${mono}`, letterSpacing: '.08em', color: RED }}>✓ CATALOG</span>
+                  )}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+      {shownParts.length === 0 && !resolving && (
+        <div style={{ marginTop: 16, font: "400 12px/1.5 'Helvetica Neue',Arial,sans-serif", color: '#9A9AA0' }}>
+          No catalog-verified part number for this item — search Fault Finding or ask Claude to confirm before ordering.
+        </div>
+      )}
+
+      <p style={{ margin: '16px 0 0', font: "400 13px/1.6 'Helvetica Neue',Arial,sans-serif", color: '#46464A' }}>{notes}</p>
 
       {comp.system === 'Engine' && (
         <figure style={{ margin: '18px 0 0' }}>
@@ -600,20 +709,6 @@ function DetailPanel({ comp, vehicle, generation, n, onClose, onLog, onAsk }: {
             <a href={engineRef.credit.source} target="_blank" rel="noreferrer" style={{ color: '#6E6E73' }}>{engineRef.credit.author}</a> · {engineRef.credit.license}
           </figcaption>
         </figure>
-      )}
-
-      {catalog.length > 0 && (
-        <div style={{ marginTop: 18 }}>
-          <div style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.16em', color: '#9A9AA0', marginBottom: 11 }}>
-            VERIFIED OEM PARTS <span style={{ color: '#C4C4C8' }}>· porscheontario.com</span>
-          </div>
-          {catalog.map((p) => (
-            <div key={p.name} style={{ display: 'flex', gap: 10, alignItems: 'baseline', padding: '7px 0', borderBottom: '1px solid #F5F5F6' }}>
-              <span style={{ flex: 1, font: "400 12px/1.4 'Helvetica Neue',Arial,sans-serif", color: '#2A2A2E' }}>{p.name}</span>
-              <span style={{ font: `500 11px/1 ${mono}`, color: '#0B0B0C', whiteSpace: 'nowrap' }}>{formatPartNumber(p.partNumber)}</span>
-            </div>
-          ))}
-        </div>
       )}
 
       <div style={{ marginTop: 18 }}>
@@ -734,7 +829,7 @@ function PartDetailCard({ part, vehicle, assemblyLabel, onClose, onLog, onAsk }:
   const [verified, setVerified] = useState<CatalogPartRow | null>(null);
   useEffect(() => {
     let on = true;
-    if (part.partNumber) lookupPart(part.partNumber).then((r) => on && setVerified(r));
+    if (part.partNumber) lookupPartExact(part.partNumber).then((r) => on && setVerified(r));
     else setVerified(null);
     return () => { on = false; };
   }, [part.partNumber]);

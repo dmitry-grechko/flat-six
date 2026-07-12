@@ -21,6 +21,14 @@ export interface Component {
   time: string;
   /** Headline part number string (may list multiple). */
   part: string;
+  /**
+   * Structured candidate OEM part numbers, optionally scoped to a
+   * sub-generation (e.g. `appliesTo: '987.2'` for a 9A1 DFI-only part). The
+   * garage shows each only if it resolves in the Supabase catalog, so these are
+   * DB-verified-or-hidden. Preferred over parsing numbers out of `part` when the
+   * scope matters (e.g. 987.1 M96/M97 vs 987.2 9A1).
+   */
+  parts?: ComponentPart[];
   spec: string;
   interval: string;
   torque: string;
@@ -40,6 +48,16 @@ export interface Component {
   hotspot3d?: string;
   /** Optional richer catalog data (real OEM numbers) from the parts miner. */
   catalog?: CatalogPart;
+}
+
+/** A candidate OEM part number for a component, optionally sub-generation-scoped. */
+export interface ComponentPart {
+  /** Dotted Porsche part number, e.g. "9A1.107.224.00". */
+  number: string;
+  /** Sub-generation this applies to (e.g. "987.2"); omit for all sub-generations. */
+  appliesTo?: string;
+  /** Optional human label if the DB description isn't self-explanatory. */
+  label?: string;
 }
 
 /** Real OEM catalog data sourced from a dealer parts site. */
