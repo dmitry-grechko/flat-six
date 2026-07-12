@@ -173,6 +173,8 @@ export interface Vehicle {
   plate: string;
   /** The owner's current wheel/tyre setup, saved from Tools → fitment. */
   wheelSetup?: WheelSetup;
+  /** Preferred distance unit for this car. Mileage is still stored in miles. */
+  distanceUnit?: 'mi' | 'km';
 }
 
 /** Per-user row in public.profiles (prefs + feature flags). */

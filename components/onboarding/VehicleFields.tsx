@@ -2,7 +2,6 @@
 
 import { COLORS, enginesFor, transmissionsFor, defaultEngine, defaultTransmission } from '@/lib/data';
 import { MODEL_OPTIONS } from '@/lib/vehicle-context';
-import { useUnits } from '@/lib/units';
 import { generationForBody, getVariant } from '@/lib/models';
 import type { BodyType } from '@/lib/types';
 
@@ -13,6 +12,7 @@ export interface VehicleFormState {
   body: BodyType;
   year: string;
   mileage: string;
+  distanceUnit: 'mi' | 'km';
   vin: string;
   plate: string;
   engine: string;
@@ -29,6 +29,7 @@ export function defaultVehicleForm(body: BodyType = 'boxster'): VehicleFormState
     body,
     year: '',
     mileage: '',
+    distanceUnit: 'mi',
     vin: '',
     plate: '',
     engine: variant.defaultEngine ?? defaultEngine(gen),
@@ -81,7 +82,6 @@ export default function VehicleFields({
   value: VehicleFormState;
   onChange: (patch: Partial<VehicleFormState>) => void;
 }) {
-  const { units } = useUnits();
   const gen = generationForBody(value.body);
   const engines = enginesFor(gen);
   const transmissions = transmissionsFor(gen);
@@ -127,12 +127,36 @@ export default function VehicleFields({
           />
         </div>
         <div>
-          <label style={fieldLabel}>Odometer ({units})</label>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
+            <label style={fieldLabel}>Odometer ({value.distanceUnit})</label>
+            <div style={{ display: 'flex', gap: 4 }}>
+              {(['mi', 'km'] as const).map((u) => (
+                <button
+                  key={u}
+                  type="button"
+                  onClick={() => onChange({ distanceUnit: u })}
+                  style={{
+                    font: "500 10px/1 'JetBrains Mono',monospace",
+                    letterSpacing: '.06em',
+                    textTransform: 'uppercase',
+                    padding: '4px 7px',
+                    borderRadius: 2,
+                    cursor: 'pointer',
+                    background: value.distanceUnit === u ? 'var(--red, #D5001C)' : '#F6F6F7',
+                    color: value.distanceUnit === u ? '#fff' : '#6E6E73',
+                    border: `1px solid ${value.distanceUnit === u ? 'var(--red, #D5001C)' : '#DDDDE0'}`,
+                  }}
+                >
+                  {u}
+                </button>
+              ))}
+            </div>
+          </div>
           <input
             required
             value={value.mileage}
             onChange={(e) => onChange({ mileage: e.target.value.replace(/[^0-9]/g, '') })}
-            placeholder={units === 'km' ? 'e.g. 68000' : 'e.g. 42000'}
+            placeholder={value.distanceUnit === 'km' ? 'e.g. 68000' : 'e.g. 42000'}
             style={{ ...inputStyle, fontFamily: mono }}
           />
         </div>

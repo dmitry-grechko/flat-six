@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState, type FC } from 'react';
 import { useRouter } from 'next/navigation';
-import { COMPONENTS, SYSTEMS, COLORS, diffDots, DIFF_LABELS, componentsForGeneration } from '@/lib/data';
+import { COMPONENTS, SYSTEMS, COLORS, diffDots, DIFF_LABELS, componentsForGeneration, formatInterval } from '@/lib/data';
+import { useUnits } from '@/lib/units';
 import { catalogForSystem, formatPartNumber } from '@/lib/catalog';
 import { lookupPart, type CatalogPartRow } from '@/lib/parts-lookup';
 import { exteriorPartsFor } from '@/lib/exterior-parts';
@@ -543,6 +544,7 @@ export default function ComponentExplorer() {
 function DetailPanel({ comp, vehicle, generation, n, onClose, onLog, onAsk }: {
   comp: Component; vehicle: Vehicle; generation: string; n: number; onClose: () => void; onLog: () => void; onAsk: (p: string) => void;
 }) {
+  const { units } = useUnits();
   const engineRef = engineRefFor(generation);
   const dots = diffDots(comp.diff);
   const diffLabel = DIFF_LABELS[comp.diff - 1];
@@ -550,7 +552,7 @@ function DetailPanel({ comp, vehicle, generation, n, onClose, onLog, onAsk }: {
   // numbers on other generations (they'd be misleading).
   const catalog = generation === '981' ? catalogForSystem(comp.system) : [];
   const specRows: [string, string][] = [
-    ['Part No.', comp.part], ['Spec / Fill', comp.spec], ['Interval', comp.interval], ['Torque', comp.torque],
+    ['Part No.', comp.part], ['Spec / Fill', comp.spec], ['Interval', formatInterval(comp.interval, units)], ['Torque', comp.torque],
   ];
   const askPrompt = `I have a ${vehicle.year} ${vehicle.model}. Walk me through the DIY procedure for: ${comp.label}. Confirm part ${comp.part}, the fill/spec (${comp.spec}) and torque values (${comp.torque}), and flag anything model-specific.`;
 

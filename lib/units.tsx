@@ -1,58 +1,27 @@
 'use client';
 
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { useVehicle } from '@/lib/vehicle-context';
 
 /**
- * Distance-unit preference (odometer, service mileage, plan targets).
+ * Distance-unit preference (odometer, service mileage, plan targets, maintenance
+ * intervals). Stored **per car** in `vehicles.distance_unit` and persisted through
+ * the normal vehicle update flow — switching cars switches units.
  *
  * Mileage is ALWAYS stored canonically in **miles** (integers). This preference
- * only controls how distances are displayed and entered — values are converted
- * at the UI boundary via `milesToDisplay` / `displayToMiles`. That keeps stored
- * data consistent regardless of which unit a user picks or switches to.
- *
- * Stored client-side in localStorage (a display preference, works in demo mode
- * and needs no DB migration). Defaults to 'mi'.
+ * only controls how distances are displayed and entered; values convert at the
+ * UI boundary via `milesToDisplay` / `displayToMiles`, so switching a car's unit
+ * never migrates stored data.
  */
 export type DistanceUnit = 'mi' | 'km';
 
-const STORAGE_KEY = 'flatsix.distanceUnit';
 const KM_PER_MI = 1.60934;
 
-interface UnitsCtx {
-  units: DistanceUnit;
-  setUnits: (u: DistanceUnit) => void;
-}
-
-const Ctx = createContext<UnitsCtx | null>(null);
-
-export function UnitsProvider({ children }: { children: React.ReactNode }) {
-  // Start 'mi' for SSR + first client paint, then hydrate from localStorage.
-  const [units, setUnitsState] = useState<DistanceUnit>('mi');
-
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored === 'km' || stored === 'mi') setUnitsState(stored);
-    } catch {
-      /* localStorage unavailable — keep default */
-    }
-  }, []);
-
-  const setUnits = useCallback((u: DistanceUnit) => {
-    setUnitsState(u);
-    try {
-      localStorage.setItem(STORAGE_KEY, u);
-    } catch {
-      /* ignore */
-    }
-  }, []);
-
-  return <Ctx.Provider value={{ units, setUnits }}>{children}</Ctx.Provider>;
-}
-
-/** Read the active distance unit. Falls back to 'mi' outside the provider. */
-export function useUnits(): UnitsCtx {
-  return useContext(Ctx) ?? { units: 'mi', setUnits: () => {} };
+/** Read/set the active car's distance unit. */
+export function useUnits(): { units: DistanceUnit; setUnits: (u: DistanceUnit) => void } {
+  const { vehicle, update } = useVehicle();
+  const units: DistanceUnit = vehicle.distanceUnit === 'km' ? 'km' : 'mi';
+  const setUnits = (u: DistanceUnit) => update({ distanceUnit: u });
+  return { units, setUnits };
 }
 
 function toInt(v: number | string): number {

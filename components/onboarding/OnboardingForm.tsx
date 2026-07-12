@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { MODEL_OPTIONS, useVehicle } from '@/lib/vehicle-context';
-import { useUnits, displayToMiles } from '@/lib/units';
+import { displayToMiles } from '@/lib/units';
 import VehicleFields, { defaultVehicleForm, type VehicleFormState } from './VehicleFields';
 
 const mono = "'JetBrains Mono',monospace";
@@ -11,7 +11,6 @@ const mono = "'JetBrains Mono',monospace";
 export default function OnboardingForm() {
   const router = useRouter();
   const { addVehicle } = useVehicle();
-  const { units } = useUnits();
 
   const [form, setForm] = useState<VehicleFormState>(() => defaultVehicleForm('boxster'));
   const [saving, setSaving] = useState(false);
@@ -34,7 +33,8 @@ export default function OnboardingForm() {
         body: form.body,
         model: selectedModel.modelName,
         year: form.year.trim(),
-        mileage: String(displayToMiles(form.mileage, units)),
+        mileage: String(displayToMiles(form.mileage, form.distanceUnit)),
+        distanceUnit: form.distanceUnit,
         vin: form.vin.trim(),
         plate: form.plate.trim(),
         engine: form.engine,

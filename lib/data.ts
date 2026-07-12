@@ -297,3 +297,23 @@ export function fmtMiles(n: number | string, units: 'mi' | 'km' = 'mi'): string 
   const v = units === 'km' ? Math.round(num * 1.60934) : num;
   return v.toLocaleString('en-US') + ' ' + units;
 }
+
+/**
+ * Format a maintenance-interval string in the chosen distance unit. Intervals are
+ * free text mixing time and distance ("Yearly / 20k mi", "4 yr / 40k",
+ * "PDK 4 yr/40k (factory 120k)"), so we convert only the mileage tokens — "…k mi",
+ * "… mi", and the bare "Nk" thousands shorthand — and leave time (yr) alone.
+ * No-op for 'mi'.
+ */
+export function formatInterval(interval: string, units: 'mi' | 'km' = 'mi'): string {
+  if (units !== 'km') return interval;
+  const kmFromMi = (mi: number) => mi * 1.60934;
+  const num = (s: string) => parseFloat(s.replace(/,/g, '')) || 0;
+  return interval
+    // "20k mi" → thousands of miles → thousands of km
+    .replace(/(\d[\d,]*(?:\.\d+)?)\s*k\s*mi\b/gi, (_, n) => `${Math.round(kmFromMi(num(n) * 1000) / 1000)}k km`)
+    // "44,000 mi" → miles → km
+    .replace(/(\d[\d,]*)\s*mi\b/gi, (_, n) => `${Math.round(kmFromMi(num(n))).toLocaleString('en-US')} km`)
+    // bare "40k" / "120k" (thousands of miles, no unit) → thousands of km, keep "k"
+    .replace(/(\d[\d,]*(?:\.\d+)?)\s*k\b(?!\s*(?:km|mi))/gi, (_, n) => `${Math.round(kmFromMi(num(n) * 1000) / 1000)}k`);
+}

@@ -25,6 +25,7 @@ interface VehicleRow {
   interior_hex: string | null;
   plate: string | null;
   wheel_setup: WheelSetup | null;
+  distance_unit: string | null;
   is_primary: boolean;
 }
 
@@ -49,6 +50,7 @@ function rowToVehicle(r: VehicleRow): StoredVehicle {
     interiorHex: r.interior_hex ?? '',
     plate: r.plate ?? '',
     wheelSetup: r.wheel_setup ?? undefined,
+    distanceUnit: r.distance_unit === 'km' ? 'km' : 'mi',
     isPrimary: r.is_primary,
   };
 }
@@ -68,6 +70,7 @@ function vehicleToRow(v: Partial<Vehicle>): Record<string, unknown> {
   if (v.interiorHex !== undefined) row.interior_hex = v.interiorHex;
   if (v.plate !== undefined) row.plate = v.plate;
   if (v.wheelSetup !== undefined) row.wheel_setup = v.wheelSetup;
+  if (v.distanceUnit !== undefined) row.distance_unit = v.distanceUnit;
   return row;
 }
 

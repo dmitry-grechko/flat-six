@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { MODEL_OPTIONS, useVehicle } from '@/lib/vehicle-context';
-import { useUnits, displayToMiles } from '@/lib/units';
+import { displayToMiles } from '@/lib/units';
 import VehicleFields, { defaultVehicleForm, type VehicleFormState } from '@/components/onboarding/VehicleFields';
 
 const mono = "'JetBrains Mono',monospace";
@@ -21,7 +21,6 @@ export default function AddVehicleModal({
   onClose: () => void;
 }) {
   const { addVehicle } = useVehicle();
-  const { units } = useUnits();
   const [form, setForm] = useState<VehicleFormState>(() => defaultVehicleForm('cayman-987'));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -44,7 +43,8 @@ export default function AddVehicleModal({
         body: form.body,
         model: selectedModel.modelName,
         year: form.year.trim(),
-        mileage: String(displayToMiles(form.mileage, units)),
+        mileage: String(displayToMiles(form.mileage, form.distanceUnit)),
+        distanceUnit: form.distanceUnit,
         vin: form.vin.trim(),
         plate: form.plate.trim(),
         engine: form.engine,
