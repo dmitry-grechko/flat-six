@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { fmtMiles } from '@/lib/data';
@@ -32,15 +33,49 @@ const mono = "'JetBrains Mono',monospace";
 export default function Sidebar({
   open = false,
   onClose,
+  collapsed = false,
+  onToggleCollapse,
 }: {
   open?: boolean;
   onClose?: () => void;
+  collapsed?: boolean;
+  onToggleCollapse?: () => void;
 } = {}) {
   const pathname = usePathname();
   const { vehicle: VEHICLE, vehicles, needsSetup } = useVehicle();
   const { units } = useUnits();
   const [switcherOpen, setSwitcherOpen] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
+
+  // Collapse is a desktop affordance only — below the drawer breakpoint the
+  // sidebar is an off-canvas drawer that always shows full labels. Track the
+  // breakpoint so a persisted "collapsed" state never shrinks the mobile drawer.
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 860px)');
+    const sync = () => setIsMobile(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    window.addEventListener('resize', sync);
+    return () => {
+      mq.removeEventListener('change', sync);
+      window.removeEventListener('resize', sync);
+    };
+  }, []);
+  const showCollapsed = collapsed && !isMobile;
+
+  // When collapsed to the icon rail, labels are hidden — so surface each item's
+  // name in a prompt custom tooltip on hover. A fixed-position element (not a CSS
+  // ::after) is used so it escapes the nav's overflow clip. `railTip` returns the
+  // hover handlers to spread onto each rail control.
+  const [tip, setTip] = useState<{ label: string; top: number } | null>(null);
+  const railTip = (label: string) => ({
+    onMouseEnter: (e: React.MouseEvent<HTMLElement>) => {
+      const r = e.currentTarget.getBoundingClientRect();
+      setTip({ label, top: r.top + r.height / 2 });
+    },
+    onMouseLeave: () => setTip(null),
+  });
 
   // The admin usage panel is visible only to the admin account (or in demo mode,
   // so it can be tested without a real session). The /api/admin route enforces
@@ -56,17 +91,53 @@ export default function Sidebar({
 
   return (
     <aside
-      className={'appSidebar' + (open ? ' open' : '')}
+      className={'appSidebar' + (open ? ' open' : '') + (showCollapsed ? ' collapsed' : '')}
       style={{
-        width: 248, flexShrink: 0, background: '#0B0B0C', color: '#fff',
-        display: 'flex', flexDirection: 'column', position: 'sticky', top: 0, height: '100vh',
+        width: showCollapsed ? 72 : 248, flexShrink: 0, background: '#0B0B0C', color: '#fff',
+        display: 'flex', flexDirection: 'column', position: 'sticky', top: 0, height: '100dvh',
       }}
     >
-      <div style={{ padding: '22px 22px 18px', display: 'flex', alignItems: 'center', gap: 11, borderBottom: '1px solid #1B1B1E' }}>
-        <div style={{ width: 11, height: 11, background: 'var(--red)' }} />
-        <div style={{ font: `700 13px/1 ${mono}`, letterSpacing: '.28em' }}>FLAT·SIX</div>
+      <div
+        style={{
+          padding: showCollapsed ? '20px 0 16px' : '22px 22px 18px',
+          display: 'flex', flexDirection: showCollapsed ? 'column' : 'row',
+          alignItems: 'center', gap: showCollapsed ? 12 : 11, borderBottom: '1px solid #1B1B1E',
+        }}
+      >
+        <div style={{ width: 11, height: 11, background: 'var(--red)', flexShrink: 0 }} />
+        {!showCollapsed && <div style={{ font: `700 13px/1 ${mono}`, letterSpacing: '.28em' }}>FLAT·SIX</div>}
+        <button
+          type="button"
+          className="hideOnMobile sidebarCollapseBtn"
+          onClick={onToggleCollapse}
+          aria-label={showCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          title={showCollapsed ? 'Expand' : 'Collapse'}
+          style={{
+            marginLeft: showCollapsed ? 0 : 'auto', width: 26, height: 26, flexShrink: 0,
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            background: 'none', border: '1px solid #26262A', borderRadius: 5, cursor: 'pointer',
+            color: '#9A9AA0', font: `500 13px/1 ${mono}`, padding: 0,
+          }}
+        >
+          {showCollapsed ? '»' : '«'}
+        </button>
       </div>
 
+      <div className="sidebarScroll" style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
+      {showCollapsed ? (
+        <div style={{ padding: '16px 0 6px', display: 'flex', justifyContent: 'center' }}>
+          <button
+            type="button"
+            onClick={onToggleCollapse}
+            aria-label="Expand sidebar to switch vehicle"
+            {...railTip(VEHICLE.model || 'Your car')}
+            style={{
+              width: 34, height: 34, borderRadius: 4, padding: 0, cursor: 'pointer',
+              background: VEHICLE.colorHex || '#2A2A2E', border: '1px solid rgba(255,255,255,.18)',
+            }}
+          />
+        </div>
+      ) : (
       <div style={{ padding: '18px 18px 6px' }}>
         <div style={{ background: '#141416', border: '1px solid #1F1F22', borderRadius: 4, padding: 14 }}>
           {needsSetup ? (
@@ -115,10 +186,9 @@ export default function Sidebar({
           )}
         </div>
       </div>
+      )}
 
-      <AddVehicleModal open={showAdd} onClose={() => setShowAdd(false)} />
-
-      <nav style={{ padding: '14px 12px', flex: 1 }}>
+      <nav style={{ padding: showCollapsed ? '14px 8px' : '14px 12px' }}>
         {items.map((it) => {
           const on =
             pathname === it.href ||
@@ -132,37 +202,73 @@ export default function Sidebar({
               href={it.href}
               className="navitem"
               onClick={onClose}
+              aria-label={showCollapsed ? it.label : undefined}
+              {...(showCollapsed ? railTip(it.label) : {})}
               style={{
-                display: 'flex', alignItems: 'center', gap: 13, padding: '11px 12px', borderRadius: 4,
+                display: 'flex', alignItems: 'center',
+                justifyContent: showCollapsed ? 'center' : 'flex-start',
+                gap: 13, padding: showCollapsed ? '12px 0' : '11px 12px', borderRadius: 4,
                 cursor: 'pointer', marginBottom: 2, transition: 'background .15s',
                 background: on ? '#fff' : 'transparent', color: on ? '#0B0B0C' : '#9A9AA0',
+                position: 'relative',
               }}
             >
-              <span style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.06em', opacity: .6, width: 18 }}>{it.no}</span>
-              <span style={{ font: "500 13px/1 'Helvetica Neue',Arial,sans-serif", letterSpacing: '.02em', display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{it.label}</span>
-                {it.beta && <BetaBadge tone={on ? 'light' : 'dark'} />}
-              </span>
-              <span style={{ marginLeft: 'auto', width: 6, height: 6, borderRadius: '50%', background: on ? 'var(--red)' : 'transparent', flexShrink: 0 }} />
+              <span style={{ font: `500 10px/1 ${mono}`, letterSpacing: '.06em', opacity: on && showCollapsed ? 1 : .6, width: showCollapsed ? 'auto' : 18 }}>{it.no}</span>
+              {!showCollapsed && (
+                <span style={{ font: "500 13px/1 'Helvetica Neue',Arial,sans-serif", letterSpacing: '.02em', display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{it.label}</span>
+                  {it.beta && <BetaBadge tone={on ? 'light' : 'dark'} />}
+                </span>
+              )}
+              {showCollapsed
+                ? on && <span style={{ position: 'absolute', left: 4, top: '50%', transform: 'translateY(-50%)', width: 4, height: 16, borderRadius: 2, background: 'var(--red)' }} />
+                : <span style={{ marginLeft: 'auto', width: 6, height: 6, borderRadius: '50%', background: on ? 'var(--red)' : 'transparent', flexShrink: 0 }} />}
             </Link>
           );
         })}
       </nav>
+      </div>
 
-      <div style={{ padding: '14px 18px', borderTop: '1px solid #1B1B1E' }}>
+      <AddVehicleModal open={showAdd} onClose={() => setShowAdd(false)} />
+
+      <div style={{ padding: showCollapsed ? '14px 0' : '14px 18px', borderTop: '1px solid #1B1B1E' }}>
         <form action="/auth/signout" method="post">
           <button
             type="submit"
+            aria-label="Sign out"
+            {...(showCollapsed ? railTip('Sign out') : {})}
             style={{
-              display: 'flex', alignItems: 'center', gap: 9, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: showCollapsed ? 'center' : 'flex-start',
+              gap: 9, cursor: 'pointer',
               font: "500 12px/1 'Helvetica Neue',Arial,sans-serif", color: '#76767B',
               background: 'none', border: 'none', padding: 0, width: '100%',
             }}
           >
-            <span style={{ fontFamily: mono }}>←</span> Sign out
+            <span style={{ fontFamily: mono }}>←</span>{!showCollapsed && ' Sign out'}
           </button>
         </form>
       </div>
+
+      {/* Portal to <body> so the tooltip escapes the sidebar's stacking context
+          and can sit above the garage 3D overlays (drei <Html> uses z-index up
+          to ~16.7M) — a z-index alone can't, since the whole aside context is
+          painted below them. */}
+      {showCollapsed && tip && typeof document !== 'undefined' &&
+        createPortal(
+          <div
+            aria-hidden
+            style={{
+              position: 'fixed', left: 80, top: tip.top, transform: 'translateY(-50%)',
+              zIndex: 2147483647, pointerEvents: 'none',
+              background: '#1B1B1E', color: '#fff', border: '1px solid #2E2E33', borderRadius: 5,
+              padding: '7px 11px', font: "500 12px/1 'Helvetica Neue',Arial,sans-serif",
+              whiteSpace: 'nowrap', boxShadow: '0 8px 22px rgba(0,0,0,.45)',
+            }}
+          >
+            {tip.label}
+          </div>,
+          document.body,
+        )}
     </aside>
   );
 }

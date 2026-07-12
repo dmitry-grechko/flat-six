@@ -126,6 +126,18 @@ model-viewer { width: 100%; height: 100%; --poster-color: transparent; }
 .appHamburger span { width: 16px; height: 2px; background: #0B0B0C; border-radius: 1px; }
 .sidebarBackdrop { display: none; }
 
+/* Sidebar mid-section scrolls when the nav + vehicle card exceed the viewport
+   height (short screens / open switcher), keeping the brand + sign-out pinned.
+   Thin dark scrollbar so it reads as part of the black rail. */
+.sidebarScroll { scrollbar-width: thin; scrollbar-color: #2E2E33 transparent; overscroll-behavior: contain; }
+.sidebarScroll::-webkit-scrollbar { width: 8px; }
+.sidebarScroll::-webkit-scrollbar-thumb { background: #2E2E33; border-radius: 4px; }
+.sidebarScroll::-webkit-scrollbar-track { background: transparent; }
+
+/* Desktop sidebar collapse toggle (hidden in drawer mode via .hideOnMobile). */
+.sidebarCollapseBtn { transition: color .15s, border-color .15s, background .15s; }
+.sidebarCollapseBtn:hover { color: #fff; border-color: #3A3A40; background: #141416; }
+
 @media (max-width: 860px) {
   .appHamburger { display: inline-flex !important; }
   .appSidebar {

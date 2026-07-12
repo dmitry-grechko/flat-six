@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Sidebar from './Sidebar';
 import { BetaBadge } from './BetaBadge';
@@ -42,12 +42,35 @@ export default function AppShell({
   const [kicker, title] = PAGE_META[pathname] ?? PAGE_META['/garage'];
   const showBeta = BETA_PATHS.has(pathname);
   const [navOpen, setNavOpen] = useState(false);
+  // Desktop-only collapse of the sidebar into a compact icon rail, remembered
+  // across sessions. The Sidebar itself ignores this below the drawer breakpoint.
+  const [navCollapsed, setNavCollapsed] = useState(false);
+  useEffect(() => {
+    try {
+      setNavCollapsed(localStorage.getItem('flatsix.navCollapsed') === '1');
+    } catch {}
+  }, []);
+  const toggleNavCollapsed = () =>
+    setNavCollapsed((v) => {
+      const next = !v;
+      try {
+        localStorage.setItem('flatsix.navCollapsed', next ? '1' : '0');
+      } catch {}
+      return next;
+    });
   const { focus: obdFocus } = useObdFocus();
   const immersiveObd = pathname === '/obd' && obdFocus;
 
   return (
     <div style={{ display: 'flex', height: '100dvh', overflow: 'hidden', background: '#ECECEE' }}>
-      {!immersiveObd && <Sidebar open={navOpen} onClose={() => setNavOpen(false)} />}
+      {!immersiveObd && (
+        <Sidebar
+          open={navOpen}
+          onClose={() => setNavOpen(false)}
+          collapsed={navCollapsed}
+          onToggleCollapse={toggleNavCollapsed}
+        />
+      )}
       {!immersiveObd && (
         <div
           className={'sidebarBackdrop' + (navOpen ? ' open' : '')}

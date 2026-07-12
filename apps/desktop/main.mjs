@@ -25,6 +25,48 @@ let mainWindow = null;
 let pendingAuthUrl = null;
 /** @type {import('electron').UtilityProcess | null} */
 let nextProc = null;
+// The Next server boots a few seconds after launch. We now show the window
+// immediately (splash) so start-up doesn't feel frozen; this gate tells the
+// deep-link handler to queue auth callbacks until the real app is loaded.
+let serverReady = false;
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+}
+
+/** Instant-paint splash so launch feels responsive while Next boots. The bar is
+ *  pure CSS in the renderer, so it keeps animating even if main briefly blocks. */
+const SPLASH_URL =
+  'data:text/html;charset=utf-8,' +
+  encodeURIComponent(
+    `<!doctype html><meta charset="utf-8"><title>FLAT·SIX</title>` +
+      `<style>html,body{margin:0;height:100%}body{background:#0B0B0C;color:#fff;` +
+      `font-family:'Helvetica Neue',Arial,sans-serif;display:flex;align-items:center;justify-content:center}` +
+      `.w{display:flex;flex-direction:column;align-items:center;gap:20px}` +
+      `.b{display:flex;align-items:center;gap:12px}.s{width:12px;height:12px;background:#D5001C}` +
+      `.n{font-family:'JetBrains Mono',monospace;font-weight:700;letter-spacing:.28em;font-size:15px}` +
+      `.t{width:190px;height:2px;background:#1B1B1E;border-radius:2px;overflow:hidden}` +
+      `.t i{display:block;width:38%;height:100%;background:#D5001C;animation:m 1.1s ease-in-out infinite}` +
+      `@keyframes m{0%{transform:translateX(-110%)}100%{transform:translateX(320%)}}` +
+      `.m{font-size:12px;color:#9A9AA0}</style>` +
+      `<div class="w"><div class="b"><div class="s"></div><div class="n">FLAT·SIX</div></div>` +
+      `<div class="t"><i></i></div><div class="m">Starting your garage…</div></div>`,
+  );
+
+function errorUrl(err) {
+  const msg = escapeHtml((err instanceof Error ? err.message : String(err)).slice(0, 400));
+  return (
+    'data:text/html;charset=utf-8,' +
+    encodeURIComponent(
+      `<!doctype html><meta charset="utf-8"><title>FLAT·SIX</title>` +
+        `<style>html,body{margin:0;height:100%}body{background:#0B0B0C;color:#fff;` +
+        `font-family:'Helvetica Neue',Arial,sans-serif;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px}` +
+        `.n{font-family:'JetBrains Mono',monospace;font-weight:700;letter-spacing:.28em;font-size:14px;color:#D5001C}` +
+        `.m{max-width:520px;color:#9A9AA0;font-size:13px;line-height:1.5;margin-top:14px}</style>` +
+        `<div><div class="n">FLAT·SIX</div><div class="m">Couldn’t start the local app server.<br>${msg}</div></div>`,
+    )
+  );
+}
 
 function flatsixAuthToLocal(url) {
   const u = new URL(url);
@@ -33,12 +75,18 @@ function flatsixAuthToLocal(url) {
 
 function navigateAuthDeepLink(url) {
   const local = url.startsWith('flatsix://') ? flatsixAuthToLocal(url) : url;
-  if (mainWindow && !mainWindow.isDestroyed()) {
+  // Until the local server is up, loading /auth/callback would fail — queue it
+  // and let bootWindow navigate there once the app is ready.
+  if (mainWindow && !mainWindow.isDestroyed() && serverReady) {
     void mainWindow.loadURL(local);
     if (mainWindow.isMinimized()) mainWindow.restore();
     mainWindow.focus();
   } else {
     pendingAuthUrl = local;
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
   }
 }
 
@@ -212,7 +260,7 @@ function applyDockIcon() {
   }
 }
 
-function createWindow(url) {
+function createWindow(startUrl) {
   let icon;
   try {
     icon = resolveAppIcon();
@@ -222,7 +270,7 @@ function createWindow(url) {
   const win = new BrowserWindow({
     width: 1280,
     height: 860,
-    backgroundColor: '#ECECEE',
+    backgroundColor: '#0B0B0C',
     ...(icon ? { icon } : {}),
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
@@ -247,9 +295,28 @@ function createWindow(url) {
       navigateAuthDeepLink(target);
     }
   });
-  const startUrl = pendingAuthUrl || url;
-  pendingAuthUrl = null;
-  void win.loadURL(startUrl);
+  void win.loadURL(startUrl || SPLASH_URL);
+  return win;
+}
+
+/** Show the window immediately (splash), boot Next, then load the real app. */
+async function bootWindow() {
+  serverReady = false;
+  const win = createWindow();
+  try {
+    const url = await startNextServerAsync();
+    const target = pendingAuthUrl || url;
+    pendingAuthUrl = null;
+    await win.loadURL(target);
+    serverReady = true;
+  } catch (e) {
+    console.error(e);
+    try {
+      await win.loadURL(errorUrl(e));
+    } catch {
+      /* ignore */
+    }
+  }
   return win;
 }
 
@@ -404,10 +471,20 @@ function wireIpc() {
   ipcMain.handle('obd:debug', wrap(() => host.debug()));
 }
 
-app.whenReady().then(async () => {
-  registerAuthProtocol();
-  // Drop leftover service workers / HTTP caches from older Desktop builds so
-  // login UI updates are never stuck behind a precached shell.
+/**
+ * The per-version userData dir (see app.setPath above) already isolates caches
+ * between builds, so wiping them on EVERY launch just forces the service worker +
+ * HTTP/code caches to rebuild each start — slow, and pointless. Clear only when
+ * the version changes (the one moment a precached shell from an older build in a
+ * reused profile could linger).
+ */
+async function clearStaleCachesOncePerVersion() {
+  const marker = path.join(app.getPath('userData'), '.cache-version');
+  try {
+    if (fs.readFileSync(marker, 'utf8').trim() === app.getVersion()) return;
+  } catch {
+    /* first run for this profile */
+  }
   try {
     await session.defaultSession.clearCache();
     await session.defaultSession.clearCodeCaches?.({});
@@ -417,19 +494,24 @@ app.whenReady().then(async () => {
   } catch (e) {
     console.warn('Failed to clear session cache:', e);
   }
+  try {
+    fs.mkdirSync(path.dirname(marker), { recursive: true });
+    fs.writeFileSync(marker, app.getVersion());
+  } catch {
+    /* best effort */
+  }
+}
+
+app.whenReady().then(async () => {
+  registerAuthProtocol();
+  await clearStaleCachesOncePerVersion();
   wireIpc();
   if (app.isPackaged) setupAutoUpdater();
   applyDockIcon();
-  try {
-    const url = await startNextServerAsync();
-    createWindow(url);
-  } catch (e) {
-    console.error(e);
-    app.quit();
-  }
+  await bootWindow();
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      void startNextServerAsync().then(createWindow).catch(console.error);
+      void bootWindow();
     }
   });
 });
