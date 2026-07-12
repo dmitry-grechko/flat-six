@@ -7,11 +7,23 @@ import { useVehicle, MODEL_OPTIONS } from '@/lib/vehicle-context';
 import { generationForBody, getVariant } from '@/lib/models';
 import { createClient } from '@/lib/supabase/client';
 import { DEMO_MODE, DEMO_EMAIL } from '@/lib/demo';
+import { useUnits, milesToDisplay, displayToMiles } from '@/lib/units';
 
 export default function Settings() {
   const router = useRouter();
   const { vehicle, update, reset } = useVehicle();
+  const { units, setUnits } = useUnits();
   const [email, setEmail] = useState<string>('');
+
+  // Odometer input buffer: show the stored miles converted to the active unit,
+  // but hold the user's raw keystrokes while editing and commit (→ miles) on blur.
+  const [odoEdit, setOdoEdit] = useState<string | null>(null);
+  const odoDisplay = odoEdit ?? (vehicle.mileage ? String(milesToDisplay(vehicle.mileage, units)) : '');
+  const commitOdo = () => {
+    if (odoEdit === null) return;
+    update({ mileage: odoEdit ? String(displayToMiles(odoEdit, units)) : '' });
+    setOdoEdit(null);
+  };
 
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -132,8 +144,13 @@ export default function Settings() {
             <input value={vehicle.vin} onChange={(e) => update({ vin: e.target.value })} style={{ ...inputStyle, font: "500 14px 'JetBrains Mono',monospace", letterSpacing: '.04em' }} />
           </div>
           <div>
-            <label style={fieldLabel}>Odometer (mi)</label>
-            <input value={vehicle.mileage} onChange={(e) => update({ mileage: e.target.value.replace(/[^0-9]/g, '') })} style={{ ...inputStyle, fontFamily: "'JetBrains Mono',monospace" }} />
+            <label style={fieldLabel}>Odometer ({units})</label>
+            <input
+              value={odoDisplay}
+              onChange={(e) => setOdoEdit(e.target.value.replace(/[^0-9]/g, ''))}
+              onBlur={commitOdo}
+              style={{ ...inputStyle, fontFamily: "'JetBrains Mono',monospace" }}
+            />
           </div>
         </div>
 
@@ -168,6 +185,23 @@ export default function Settings() {
             </span>
           ))}
         </div>
+      </div>
+
+      <div style={{ background: '#fff', border: '1px solid #E3E3E5', borderRadius: 4, padding: 24, marginBottom: 18 }}>
+        <div style={{ font: "500 10px/1 'JetBrains Mono',monospace", letterSpacing: '.16em', color: '#9A9AA0', marginBottom: 18 }}>
+          PREFERENCES
+        </div>
+        <label style={fieldLabel}>Distance units</label>
+        <div style={{ display: 'flex', gap: 8 }}>
+          {(['mi', 'km'] as const).map((u) => (
+            <button key={u} onClick={() => setUnits(u)} style={chip(units === u)}>
+              {u === 'mi' ? 'Miles (mi)' : 'Kilometres (km)'}
+            </button>
+          ))}
+        </div>
+        <p style={{ margin: '10px 0 0', font: "400 12px/1.5 'Helvetica Neue',Arial,sans-serif", color: '#9A9AA0' }}>
+          Applies to the odometer, service history, and maintenance plans across the app.
+        </p>
       </div>
 
       <div style={{ background: '#fff', border: '1px solid #F0CDD2', borderRadius: 4, padding: 24 }}>

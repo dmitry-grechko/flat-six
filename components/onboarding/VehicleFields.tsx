@@ -2,6 +2,7 @@
 
 import { COLORS, enginesFor, transmissionsFor, defaultEngine, defaultTransmission } from '@/lib/data';
 import { MODEL_OPTIONS } from '@/lib/vehicle-context';
+import { useUnits } from '@/lib/units';
 import { generationForBody, getVariant } from '@/lib/models';
 import type { BodyType } from '@/lib/types';
 
@@ -80,6 +81,7 @@ export default function VehicleFields({
   value: VehicleFormState;
   onChange: (patch: Partial<VehicleFormState>) => void;
 }) {
+  const { units } = useUnits();
   const gen = generationForBody(value.body);
   const engines = enginesFor(gen);
   const transmissions = transmissionsFor(gen);
@@ -125,12 +127,12 @@ export default function VehicleFields({
           />
         </div>
         <div>
-          <label style={fieldLabel}>Odometer (mi)</label>
+          <label style={fieldLabel}>Odometer ({units})</label>
           <input
             required
             value={value.mileage}
             onChange={(e) => onChange({ mileage: e.target.value.replace(/[^0-9]/g, '') })}
-            placeholder="e.g. 42000"
+            placeholder={units === 'km' ? 'e.g. 68000' : 'e.g. 42000'}
             style={{ ...inputStyle, fontFamily: mono }}
           />
         </div>

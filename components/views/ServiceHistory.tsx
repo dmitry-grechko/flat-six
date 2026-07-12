@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { fmtMiles } from '@/lib/data';
 import { useVehicle } from '@/lib/vehicle-context';
+import { useUnits } from '@/lib/units';
 import { useServiceRecords } from '@/lib/records-context';
 import type { ServiceRecord } from '@/lib/types';
 
@@ -18,6 +19,7 @@ interface StatCard {
 
 export default function ServiceHistory() {
   const { vehicle } = useVehicle();
+  const { units } = useUnits();
   const { records, loading } = useServiceRecords();
 
   const diyCount = records.filter((r) => r.diy).length;
@@ -26,7 +28,7 @@ export default function ServiceHistory() {
   const stats: StatCard[] = [
     { k: 'TOTAL RECORDS', v: records.length, sub: 'logged services', color: '#0B0B0C' },
     { k: 'DIY JOBS', v: diyCount, sub: 'done yourself', color: 'var(--red, #D5001C)' },
-    { k: 'CURRENT ODO', v: fmtMiles(vehicle.mileage), sub: 'as of last entry', color: '#0B0B0C' },
+    { k: 'CURRENT ODO', v: fmtMiles(vehicle.mileage, units), sub: 'as of last entry', color: '#0B0B0C' },
     { k: 'NEXT DUE', v: 'Oil · 10k', sub: lastOil ? 'since ' + lastOil.date : 'overdue check', color: '#C77700' },
   ];
 
@@ -91,6 +93,7 @@ function EmptyState({ text }: { text: string }) {
 function ServiceRow({ rec }: { rec: ServiceRecord }) {
   const router = useRouter();
   const { remove } = useServiceRecords();
+  const { units } = useUnits();
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
 
@@ -202,7 +205,7 @@ function ServiceRow({ rec }: { rec: ServiceRecord }) {
       </div>
       <div style={{ flexShrink: 0, textAlign: 'right' }}>
         <div style={{ font: "500 13px/1 'JetBrains Mono',monospace", color: '#0B0B0C' }}>{rec.cost}</div>
-        <div style={{ font: "500 10px/1 'JetBrains Mono',monospace", color: '#9A9AA0', marginTop: 5 }}>{fmtMiles(rec.mileage)}</div>
+        <div style={{ font: "500 10px/1 'JetBrains Mono',monospace", color: '#9A9AA0', marginTop: 5 }}>{fmtMiles(rec.mileage, units)}</div>
 
         <div style={{ marginTop: 12, display: 'flex', gap: 12, justifyContent: 'flex-end', alignItems: 'center' }}>
           {confirming ? (

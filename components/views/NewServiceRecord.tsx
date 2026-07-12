@@ -6,6 +6,7 @@ import { REC_TEMPLATES } from '@/lib/data';
 import { useVehicle } from '@/lib/vehicle-context';
 import { useServiceRecords } from '@/lib/records-context';
 import { useServicePlans } from '@/lib/plans-context';
+import { useUnits, milesToDisplay, displayToMiles } from '@/lib/units';
 import { uid } from '@/lib/uid';
 import type { ServiceItem } from '@/lib/types';
 
@@ -136,11 +137,14 @@ function RecordForm({
 }) {
   const router = useRouter();
   const { add, update } = useServiceRecords();
+  const { units } = useUnits();
 
   const [type, setType] = useState<string>(initial.type);
   const [title, setTitle] = useState<string>(initial.title);
   const [date, setDate] = useState<string>(initial.date);
-  const [mileage, setMileage] = useState<string>(initial.mileage);
+  const [mileage, setMileage] = useState<string>(
+    initial.mileage ? String(milesToDisplay(initial.mileage, units)) : '',
+  );
   const [diy, setDiy] = useState<boolean>(initial.diy);
   const [cost, setCost] = useState<string>(initial.cost);
   const [notes, setNotes] = useState<string>(initial.notes);
@@ -181,7 +185,7 @@ function RecordForm({
 
     setSaving(true);
     try {
-      const mi = parseInt(mileage.replace(/[^0-9]/g, ''), 10) || 0;
+      const mi = displayToMiles(mileage, units);
       const payload = {
         date,
         mileage: mi,
@@ -310,10 +314,10 @@ function RecordForm({
             />
           </div>
           <div>
-            <label style={{ ...labelStyle, margin: '0 0 8px' }}>Odometer</label>
+            <label style={{ ...labelStyle, margin: '0 0 8px' }}>Odometer ({units})</label>
             <input
               value={mileage}
-              onChange={(e) => setMileage(e.target.value)}
+              onChange={(e) => setMileage(e.target.value.replace(/[^0-9]/g, ''))}
               style={{ ...inputBase, font: `500 13px ${mono}` }}
             />
           </div>

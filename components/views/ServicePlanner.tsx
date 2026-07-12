@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useServicePlans } from '@/lib/plans-context';
 import { useVehicle } from '@/lib/vehicle-context';
 import { fmtMiles } from '@/lib/data';
+import { useUnits, milesToDisplay, displayToMiles } from '@/lib/units';
 import { uid } from '@/lib/uid';
 import type {
   ServicePlan,
@@ -203,13 +204,14 @@ function PlanCard({
   onStatus: (status: ServicePlanStatus) => void;
 }) {
   const router = useRouter();
+  const { units } = useUnits();
   const [open, setOpen] = useState(true);
   const doneN = plan.items.filter((i) => i.done).length;
   const sm = STATUS_META[plan.status];
 
   const meta: string[] = [];
   if (plan.targetDate) meta.push(plan.targetDate);
-  if (plan.targetMileage) meta.push(fmtMiles(plan.targetMileage));
+  if (plan.targetMileage) meta.push(fmtMiles(plan.targetMileage, units));
 
   return (
     <div style={{ background: '#fff', border: '1px solid #E3E3E5', borderRadius: 4, overflow: 'hidden' }}>
@@ -430,11 +432,12 @@ function PlanEditor({
   onSave: (draft: NewServicePlan, id?: string) => Promise<void>;
   onCancel: () => void;
 }) {
+  const { units } = useUnits();
   const [title, setTitle] = useState(plan?.title ?? '');
   const [status, setStatus] = useState<ServicePlanStatus>(plan?.status ?? 'planning');
   const [targetDate, setTargetDate] = useState(plan?.targetDate ?? '');
   const [targetMileage, setTargetMileage] = useState(
-    plan?.targetMileage ? String(plan.targetMileage) : '',
+    plan?.targetMileage ? String(milesToDisplay(plan.targetMileage, units)) : '',
   );
   const [notes, setNotes] = useState(plan?.notes ?? '');
   const [items, setItems] = useState<EditItem[]>(
@@ -499,7 +502,7 @@ function PlanEditor({
           title: title.trim(),
           status,
           targetDate: targetDate || undefined,
-          targetMileage: targetMileage ? parseInt(targetMileage.replace(/[^0-9]/g, ''), 10) || undefined : undefined,
+          targetMileage: targetMileage ? displayToMiles(targetMileage, units) || undefined : undefined,
           notes: notes.trim() || undefined,
           items: cleanItems,
         },
@@ -537,11 +540,11 @@ function PlanEditor({
             />
           </div>
           <div>
-            <label style={{ ...labelStyle, margin: '0 0 8px' }}>Target odometer</label>
+            <label style={{ ...labelStyle, margin: '0 0 8px' }}>Target odometer ({units})</label>
             <input
               value={targetMileage}
-              onChange={(e) => setTargetMileage(e.target.value)}
-              placeholder="e.g. 60000"
+              onChange={(e) => setTargetMileage(e.target.value.replace(/[^0-9]/g, ''))}
+              placeholder={units === 'km' ? 'e.g. 96000' : 'e.g. 60000'}
               style={{ ...inputBase, font: `500 13px ${mono}` }}
             />
           </div>

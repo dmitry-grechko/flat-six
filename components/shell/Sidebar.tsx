@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { fmtMiles } from '@/lib/data';
 import { useVehicle } from '@/lib/vehicle-context';
+import { useUnits } from '@/lib/units';
 import { createClient } from '@/lib/supabase/client';
 import { isAdminEmail } from '@/lib/admin';
 import { DEMO_MODE } from '@/lib/demo';
@@ -37,6 +38,7 @@ export default function Sidebar({
 } = {}) {
   const pathname = usePathname();
   const { vehicle: VEHICLE, vehicles, needsSetup } = useVehicle();
+  const { units } = useUnits();
   const [switcherOpen, setSwitcherOpen] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
 
@@ -96,7 +98,7 @@ export default function Sidebar({
                   </div>
                 </div>
                 <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between', font: `500 10px/1 ${mono}`, letterSpacing: '.08em', color: '#76767B' }}>
-                  <span>ODO</span><span style={{ color: '#fff' }}>{VEHICLE.mileage ? fmtMiles(VEHICLE.mileage) : '—'}</span>
+                  <span>ODO</span><span style={{ color: '#fff' }}>{VEHICLE.mileage ? fmtMiles(VEHICLE.mileage, units) : '—'}</span>
                 </div>
               </button>
 
