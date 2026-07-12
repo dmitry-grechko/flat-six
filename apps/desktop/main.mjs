@@ -1,7 +1,7 @@
 /**
  * FLAT·SIX Desktop — Next.js garage (standalone) + ObdHost in main.
  */
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, session } from 'electron';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import fs from 'node:fs';
@@ -291,6 +291,16 @@ function wireIpc() {
 
 app.whenReady().then(async () => {
   registerAuthProtocol();
+  // Drop leftover service workers / HTTP caches from older Desktop builds so
+  // login UI updates are never stuck behind a precached shell.
+  try {
+    await session.defaultSession.clearCache();
+    await session.defaultSession.clearStorageData({
+      storages: ['serviceworkers', 'cachestorage'],
+    });
+  } catch (e) {
+    console.warn('Failed to clear session cache:', e);
+  }
   wireIpc();
   if (app.isPackaged) setupAutoUpdater();
   const icon = resolveAppIcon();
