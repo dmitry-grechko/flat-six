@@ -6,7 +6,7 @@ import { createRequire } from 'node:module';
 import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { spawn } from 'node:child_process';
+import { spawn, execFileSync } from 'node:child_process';
 import http from 'node:http';
 import { createObdHost } from './obd-host-runner.mjs';
 
@@ -92,6 +92,27 @@ function waitForServer(url, attempts = 80) {
   });
 }
 
+/** Kill any leftover next-server still holding the Desktop port (PPID=1 orphans). */
+function freeDesktopPort(port) {
+  try {
+    const out = execFileSync('lsof', ['-tiTCP:' + port, '-sTCP:LISTEN'], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+    for (const pid of out.split(/\n/).filter(Boolean)) {
+      const n = Number(pid);
+      if (!Number.isFinite(n) || n === process.pid) continue;
+      try {
+        process.kill(n, 'SIGTERM');
+      } catch {
+        /* already gone */
+      }
+    }
+  } catch {
+    /* nothing listening */
+  }
+}
+
 function resolveServerJs() {
   if (!app.isPackaged) {
     return path.join(__dirname, 'standalone', 'server.js');
@@ -118,6 +139,11 @@ async function startNextServerAsync() {
       'Next standalone server.js missing. Run `npm run build` then `npm --prefix apps/desktop run prepare:standalone`.',
     );
   }
+
+  // A previous Desktop / local pack can leave next-server orphaned on this port.
+  // waitForServer would then happily talk to the OLD build (stale login UI).
+  freeDesktopPort(APP_PORT);
+  await new Promise((r) => setTimeout(r, 300));
 
   nextProc = spawn(process.execPath, [serverJs], {
     cwd: path.dirname(serverJs),
@@ -333,8 +359,25 @@ app.on('window-all-closed', async () => {
     /* ignore */
   }
   if (nextProc) {
-    nextProc.kill();
+    try {
+      nextProc.kill('SIGTERM');
+    } catch {
+      /* ignore */
+    }
     nextProc = null;
   }
+  freeDesktopPort(APP_PORT);
   if (process.platform !== 'darwin') app.quit();
+});
+
+app.on('before-quit', () => {
+  if (nextProc) {
+    try {
+      nextProc.kill('SIGTERM');
+    } catch {
+      /* ignore */
+    }
+    nextProc = null;
+  }
+  freeDesktopPort(APP_PORT);
 });
