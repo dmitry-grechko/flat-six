@@ -35,7 +35,8 @@ const nextConfig = {
 
 const withPWA = withPWAInit({
   dest: 'public',
-  disable: process.env.NODE_ENV === 'development',
+  // Desktop bundles the standalone server — no service worker (stale SW cached old login UI).
+  disable: process.env.NODE_ENV === 'development' || process.env.FLATSIX_DESKTOP_BUILD === 'true',
   // Auto-injection of the registration script does not fire in the App Router
   // build, so we register the SW ourselves in <ServiceWorkerRegister />.
   register: false,

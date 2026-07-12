@@ -49,3 +49,12 @@ if (fs.existsSync(publicSrc)) {
 }
 
 console.log(`Prepared apps/desktop/standalone from Next standalone build (excluded: ${[...EXCLUDE_PUBLIC].join(', ')})`);
+
+// Desktop never ships a service worker — stale SW precache served old login UI after updates.
+if (fs.existsSync(publicDest)) {
+  for (const name of fs.readdirSync(publicDest)) {
+    if (name === 'sw.js' || name.startsWith('workbox-') || name.startsWith('swe-worker-')) {
+      fs.rmSync(path.join(publicDest, name), { recursive: true, force: true });
+    }
+  }
+}

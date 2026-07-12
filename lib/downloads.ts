@@ -24,7 +24,7 @@ export const REPO_URL = 'https://github.com/dmitry-grechko/flat-six';
 export const SITE_URL = 'https://www.flat-six.org';
 
 /** GitHub Release tag — keep in sync with apps/desktop + tools/obd-bridge versions. */
-export const RELEASE_TAG = 'v0.1.1';
+export const RELEASE_TAG = 'v0.1.2';
 const RELEASE_BASE = `${REPO_URL}/releases/download/${RELEASE_TAG}`;
 
 export const DOWNLOADS: DownloadItem[] = [
@@ -34,8 +34,8 @@ export const DOWNLOADS: DownloadItem[] = [
     tagline:
       'Recommended for owners. Full garage app (history, plans, tools, Live OBD) with USB + Classic Bluetooth OBD built in — no terminal.',
     platform: 'Windows (installer + portable) · macOS (DMG, Intel + Apple Silicon)',
-    href: `${RELEASE_BASE}/FLAT-SIX-0.1.1-x64.exe`,
-    hrefMac: `${RELEASE_BASE}/FLAT-SIX-0.1.1-arm64.dmg`,
+    href: `${RELEASE_BASE}/FLAT-SIX-0.1.2-x64.exe`,
+    hrefMac: `${RELEASE_BASE}/FLAT-SIX-0.1.2-arm64.dmg`,
     cta: 'Download for Windows',
     ctaMac: 'Download for Mac',
     audience: 'owners',

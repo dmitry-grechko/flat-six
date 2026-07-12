@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { isElectronShell } from '@/lib/obd/electronClient';
 
 /**
  * Registers the next-pwa service worker.
@@ -10,10 +11,20 @@ import { useEffect } from 'react';
  * never registered and the PWA had no offline support. We register it here on
  * `load` from the root layout instead. Guarded so it is a no-op when the SW
  * file is absent (e.g. `next dev`, where next-pwa is disabled).
+ *
+ * Electron Desktop skips the SW entirely and clears any stale registration left
+ * from an older build (otherwise precached login chunks never update).
  */
 export default function ServiceWorkerRegister() {
   useEffect(() => {
     if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return;
+
+    if (isElectronShell()) {
+      void navigator.serviceWorker.getRegistrations().then((regs) => {
+        for (const reg of regs) void reg.unregister();
+      });
+      return;
+    }
 
     const register = () => {
       navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch((err) => {
