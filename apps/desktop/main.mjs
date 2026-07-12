@@ -165,27 +165,38 @@ async function startNextServerAsync() {
 }
 
 function resolveAppIcon() {
-  // Packaged builds put icon.icns / icon.ico in Resources/ (electron-builder).
-  // Dev looks under apps/desktop/build/.
-  const candidates =
-    process.platform === 'win32'
-      ? [
-          path.join(process.resourcesPath || '', 'icon.ico'),
-          path.join(__dirname, 'build', 'icon.ico'),
-          path.join(__dirname, 'build', 'icon.png'),
-        ]
-      : process.platform === 'darwin'
-        ? [
-            path.join(process.resourcesPath || '', 'icon.icns'),
-            path.join(__dirname, 'build', 'icon.icns'),
-            path.join(__dirname, 'build', 'icon.png'),
-          ]
-        : [path.join(__dirname, 'build', 'icon.png')];
+  // Prefer PNG for BrowserWindow / dock.setIcon — Electron NativeImage often
+  // fails on .icns paths ("Failed to load image"), which used to abort startup
+  // before createWindow ran.
+  const candidates = [
+    path.join(process.resourcesPath || '', 'icon.png'),
+    path.join(__dirname, 'build', 'icon.png'),
+    path.join(process.resourcesPath || '', 'icon.icns'),
+    path.join(__dirname, 'build', 'icon.icns'),
+    path.join(process.resourcesPath || '', 'icon.ico'),
+    path.join(__dirname, 'build', 'icon.ico'),
+  ];
   return candidates.find((p) => p && fs.existsSync(p));
 }
 
-function createWindow(url) {
+function applyDockIcon() {
+  if (process.platform !== 'darwin') return;
   const icon = resolveAppIcon();
+  if (!icon) return;
+  try {
+    app.dock?.setIcon(icon);
+  } catch (e) {
+    console.warn('dock.setIcon failed:', e);
+  }
+}
+
+function createWindow(url) {
+  let icon;
+  try {
+    icon = resolveAppIcon();
+  } catch {
+    icon = undefined;
+  }
   const win = new BrowserWindow({
     width: 1280,
     height: 860,
@@ -357,10 +368,7 @@ app.whenReady().then(async () => {
   }
   wireIpc();
   if (app.isPackaged) setupAutoUpdater();
-  const icon = resolveAppIcon();
-  if (process.platform === 'darwin' && icon) {
-    app.dock?.setIcon(icon);
-  }
+  applyDockIcon();
   try {
     const url = await startNextServerAsync();
     createWindow(url);

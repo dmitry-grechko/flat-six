@@ -1,6 +1,6 @@
 {
   "name": "@flatsix/desktop",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "private": true,
   "main": "main.mjs",
   "description": "FLAT·SIX Desktop — full garage app + in-process OBD",
@@ -52,6 +52,10 @@
         "filter": [
           "**/*"
         ]
+      },
+      {
+        "from": "build/icon.png",
+        "to": "icon.png"
       }
     ],
     "asarUnpack": [
