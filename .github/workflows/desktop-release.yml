@@ -29,9 +29,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Node 20 avoids @vercel/og Invalid URL on Windows when prerendering icon/OG routes.
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 20
           cache: npm
 
       - name: Install root dependencies
@@ -52,13 +53,32 @@ jobs:
 
       - name: Pack Windows installers
         working-directory: apps/desktop
+        run: npm run pack
+
+      - name: Publish Windows release assets
+        if: github.event_name == 'push' || inputs.publish
+        working-directory: apps/desktop
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
         run: |
-          if ("${{ github.event_name }}" -eq "push" -or "${{ inputs.publish }}" -eq "true") {
-            npx electron-builder --win nsis portable --x64 --publish always
-          } else {
-            npm run pack
+          $version = (Get-Content package.json | ConvertFrom-Json).version
+          $tag = "v$version"
+          gh release view $tag 2>$null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create $tag --title $version --prerelease --notes "FLAT·SIX Desktop $version"
+          }
+          $assets = Get-ChildItem release -File | Where-Object {
+            $_.Extension -in '.exe', '.blockmap', '.yml'
+          }
+          foreach ($asset in $assets) {
+            for ($attempt = 1; $attempt -le 3; $attempt++) {
+              gh release upload $tag $asset.FullName --clobber
+              if ($LASTEXITCODE -eq 0) { break }
+              Write-Host "Upload failed for $($asset.Name) (attempt $attempt/3); retrying in 30s..."
+              Start-Sleep -Seconds 30
+            }
+            if ($LASTEXITCODE -ne 0) { exit 1 }
           }
 
       - name: Upload artifacts

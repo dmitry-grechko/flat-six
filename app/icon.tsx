@@ -4,6 +4,7 @@ import { LOGO_DATA_URI } from './logo';
 // Raster PNG fallback favicon for clients that don't accept the SVG in icon.svg.
 export const size = { width: 32, height: 32 };
 export const contentType = 'image/png';
+export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 export default function Icon() {

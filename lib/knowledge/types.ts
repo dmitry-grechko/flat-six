@@ -7,7 +7,7 @@ export type Severity = 'LOW' | 'MED' | 'HIGH';
 export type KnowledgeKind = 'fault' | 'spec' | 'maintenance' | 'issue' | 'article';
 
 export interface FaultCode {
-  code: string;            // e.g. "P0301", "P1128"
+  code: string;            // OBD-II (e.g. "P0301") or 6-digit Porsche/UDS hex (e.g. "89020E")
   title: string;
   system: string;          // Engine|Brakes|Cooling|Transmission|HVAC|Electrical|Fuel|Steering|Exhaust|Suspension|Body
   severity: Severity;

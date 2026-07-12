@@ -21,6 +21,7 @@ export type DownloadItem = {
 };
 
 export const REPO_URL = 'https://github.com/dmitry-grechko/flat-six';
+export const SITE_URL = 'https://www.flat-six.org';
 
 /** GitHub Release tag — keep in sync with apps/desktop + tools/obd-bridge versions. */
 export const RELEASE_TAG = 'v0.1.1';
@@ -57,11 +58,11 @@ export const DOWNLOADS: DownloadItem[] = [
     tagline:
       'Install the full garage from Chrome/Edge. Offline: shell, curated knowledge, and synced garage data. Live OBD via Web Serial (USB) on desktop Chrome.',
     platform: 'Desktop Chrome / Edge · Android Chrome (garage + knowledge offline; live OBD limited)',
-    href: null,
-    cta: 'Install from browser',
+    href: SITE_URL,
+    cta: 'Open site to install',
     audience: 'owners',
     installNotes: [
-      'After the site is deployed: open it in Chrome → Install app.',
+      'Open the site in Chrome or Edge → Install app (address bar or ⋮ menu).',
       'Sync your garage once while online, then airplane mode works for Garage, History, Plans, and Fault Finding (curated knowledge).',
       'Workshop PDFs and AI stay online-only for now.',
     ],

@@ -4,6 +4,7 @@ import { LOGO_DATA_URI } from './logo';
 export const alt = 'FLAT·SIX — a free, open-source garage for the Boxster & Cayman (987, 981, and more)';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
+export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 // Social share card. Auto-wired by Next into openGraph.images and twitter.images.
