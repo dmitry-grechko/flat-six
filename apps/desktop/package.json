@@ -40,7 +40,10 @@
     "files": [
       "main.mjs",
       "preload.cjs",
-      "obd-host-runner.mjs"
+      "obd-host-runner.mjs",
+      "build/icon.png",
+      "build/icon.icns",
+      "build/icon.ico"
     ],
     "extraResources": [
       {

@@ -1,12 +1,12 @@
 /**
  * FLAT·SIX Desktop — Next.js garage (standalone) + ObdHost in main.
  */
-import { app, BrowserWindow, ipcMain, session } from 'electron';
+import { app, BrowserWindow, ipcMain, session, utilityProcess } from 'electron';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { spawn, execFileSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import http from 'node:http';
 import { createObdHost } from './obd-host-runner.mjs';
 
@@ -22,6 +22,8 @@ app.setPath('userData', path.join(app.getPath('appData'), '@flatsix', `desktop-$
 let mainWindow = null;
 /** @type {string | null} */
 let pendingAuthUrl = null;
+/** @type {import('electron').UtilityProcess | null} */
+let nextProc = null;
 
 function flatsixAuthToLocal(url) {
   const u = new URL(url);
@@ -70,9 +72,6 @@ app.on('open-url', (event, url) => {
 
 const startupDeepLink = process.argv.find((arg) => typeof arg === 'string' && arg.startsWith('flatsix://'));
 if (startupDeepLink) pendingAuthUrl = flatsixAuthToLocal(startupDeepLink);
-
-/** @type {import('node:child_process').ChildProcess | null} */
-let nextProc = null;
 
 function waitForServer(url, attempts = 80) {
   return new Promise((resolve, reject) => {
@@ -145,15 +144,20 @@ async function startNextServerAsync() {
   freeDesktopPort(APP_PORT);
   await new Promise((r) => setTimeout(r, 300));
 
-  nextProc = spawn(process.execPath, [serverJs], {
+  // utilityProcess runs Node without a second Dock icon (spawn(process.execPath)
+  // with ELECTRON_RUN_AS_NODE briefly flashes a generic "exec" tile on macOS).
+  nextProc = utilityProcess.fork(serverJs, [], {
     cwd: path.dirname(serverJs),
     env: {
       ...process.env,
       PORT: String(APP_PORT),
       HOSTNAME: '127.0.0.1',
-      ELECTRON_RUN_AS_NODE: '1',
     },
-    stdio: 'inherit',
+    stdio: 'pipe',
+    serviceName: 'flatsix-web',
+  });
+  nextProc.on('exit', (code) => {
+    if (code && code !== 0) console.error('Next server exited', code);
   });
 
   await waitForServer(`http://127.0.0.1:${APP_PORT}`);
@@ -161,17 +165,23 @@ async function startNextServerAsync() {
 }
 
 function resolveAppIcon() {
-  const buildDir = path.join(__dirname, 'build');
-  if (process.platform === 'win32') {
-    const ico = path.join(buildDir, 'icon.ico');
-    if (fs.existsSync(ico)) return ico;
-  }
-  if (process.platform === 'darwin') {
-    const icns = path.join(buildDir, 'icon.icns');
-    if (fs.existsSync(icns)) return icns;
-  }
-  const png = path.join(buildDir, 'icon.png');
-  return fs.existsSync(png) ? png : undefined;
+  // Packaged builds put icon.icns / icon.ico in Resources/ (electron-builder).
+  // Dev looks under apps/desktop/build/.
+  const candidates =
+    process.platform === 'win32'
+      ? [
+          path.join(process.resourcesPath || '', 'icon.ico'),
+          path.join(__dirname, 'build', 'icon.ico'),
+          path.join(__dirname, 'build', 'icon.png'),
+        ]
+      : process.platform === 'darwin'
+        ? [
+            path.join(process.resourcesPath || '', 'icon.icns'),
+            path.join(__dirname, 'build', 'icon.icns'),
+            path.join(__dirname, 'build', 'icon.png'),
+          ]
+        : [path.join(__dirname, 'build', 'icon.png')];
+  return candidates.find((p) => p && fs.existsSync(p));
 }
 
 function createWindow(url) {
@@ -360,7 +370,7 @@ app.on('window-all-closed', async () => {
   }
   if (nextProc) {
     try {
-      nextProc.kill('SIGTERM');
+      nextProc.kill();
     } catch {
       /* ignore */
     }
@@ -373,7 +383,7 @@ app.on('window-all-closed', async () => {
 app.on('before-quit', () => {
   if (nextProc) {
     try {
-      nextProc.kill('SIGTERM');
+      nextProc.kill();
     } catch {
       /* ignore */
     }
