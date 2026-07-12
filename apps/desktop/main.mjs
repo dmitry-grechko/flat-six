@@ -14,6 +14,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const host = createObdHost(process.platform);
 const APP_PORT = Number(process.env.FLATSIX_DESKTOP_PORT || 3911);
 
+// Isolate Chromium profile per app version so a leftover service-worker cache
+// from an older Desktop build can never keep serving a stale login UI.
+app.setPath('userData', path.join(app.getPath('appData'), '@flatsix', `desktop-${app.getVersion()}`));
+
 /** @type {import('electron').BrowserWindow | null} */
 let mainWindow = null;
 /** @type {string | null} */
@@ -295,8 +299,9 @@ app.whenReady().then(async () => {
   // login UI updates are never stuck behind a precached shell.
   try {
     await session.defaultSession.clearCache();
+    await session.defaultSession.clearCodeCaches?.({});
     await session.defaultSession.clearStorageData({
-      storages: ['serviceworkers', 'cachestorage'],
+      storages: ['serviceworkers', 'cachestorage', 'caches', 'shadercache'],
     });
   } catch (e) {
     console.warn('Failed to clear session cache:', e);
