@@ -1,12 +1,13 @@
 {
   "name": "flatsix-obd-bridge",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "description": "Local ELM327 OBD bridge + test UI for FLAT·SIX",
   "scripts": {
     "start": "node --import tsx server.mjs",
-    "dev": "node --import tsx --watch server.mjs"
+    "dev": "node --import tsx --watch server.mjs",
+    "pack": "node scripts/pack.mjs"
   },
   "dependencies": {
     "serialport": "^13.0.0",

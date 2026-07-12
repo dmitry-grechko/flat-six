@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { bridgeBaseUrl, createHttpObdClient } from './httpClient';
 import { createWebSerialClient, webSerialAvailable } from './webSerial';
 import { createElectronObdClient, isElectronShell } from './electronClient';
+import { DEMO_MODE } from '@/lib/demo';
+import type { ObdScan } from '@/lib/types';
 import type {
   ConnectOptions,
   DebugLogEntry,
@@ -280,6 +282,57 @@ export function useObdBridge(initialMode?: ObdTransportMode) {
     }
   }, []);
 
+  /**
+   * Persist the current scan (faults + live + Mode 06 + module scan) to the
+   * garage so the get_obd_scan MCP tool can read it back for the AI. The active
+   * car's generation and garage vehicleId live on the OBD page, not the
+   * transport, so the caller passes them in. POSTs to /api/obd/scans → saveObdScan.
+   */
+  const saveScan = useCallback(
+    async (
+      opts: { vehicleId?: string | null; generation: string },
+    ): Promise<{ ok: boolean; scan?: ObdScan; error?: string }> => {
+      setError(null);
+      if (DEMO_MODE) {
+        const msg = 'Saving scans needs a signed-in garage (not available in demo).';
+        setError(msg);
+        return { ok: false, error: msg };
+      }
+      const payload = {
+        vehicleId: opts.vehicleId ?? null,
+        generation: opts.generation,
+        faults: status?.lastFaults ?? null,
+        live: status?.lastLive ?? null,
+        mode06,
+        moduleScan,
+      };
+      if (!payload.faults && !payload.live && !payload.mode06 && !payload.moduleScan) {
+        const msg = 'Nothing to save yet — read faults or live data first.';
+        setError(msg);
+        return { ok: false, error: msg };
+      }
+      try {
+        const res = await fetch('/api/obd/scans', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const body = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          const msg = typeof body?.error === 'string' ? body.error : `Save failed (${res.status})`;
+          setError(msg);
+          return { ok: false, error: msg };
+        }
+        return { ok: true, scan: body.scan as ObdScan };
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        setError(msg);
+        return { ok: false, error: msg };
+      }
+    },
+    [status, mode06, moduleScan],
+  );
+
   // Prefer Web Serial / Electron once we know the environment (avoids hydration mismatch).
   useEffect(() => {
     setWebSerialOk(webSerialAvailable());
@@ -375,6 +428,7 @@ export function useObdBridge(initialMode?: ObdTransportMode) {
     refreshMode06,
     scanModules,
     clearFaults,
+    saveScan,
     mode06,
     moduleScan,
     loadDebug,

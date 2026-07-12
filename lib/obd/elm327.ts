@@ -20,7 +20,7 @@ import {
   parsePidBitmap,
   PROMPT,
 } from './decode';
-import { ALL_LIVE_PIDS, PID_BITMAP_QUERY, PRIORITY_PIDS, UDS_PLACEHOLDER_MODULES } from './pids';
+import { ALL_LIVE_PIDS, PID_BITMAP_QUERY, PRIORITY_PIDS } from './pids';
 import { obdProfile } from './profiles';
 import type {
   AdapterKind,
@@ -389,6 +389,9 @@ export class Elm327 implements ObdAdapter {
   }
 
   async readFaults(): Promise<FaultsData> {
+    // Just the DME here (generic OBD Mode 03/07/0A). The other modules are read
+    // for real by scanModules() and shown in the Module scan section — no more
+    // static "requires UDS" placeholders.
     const out: FaultsData = {
       at: new Date().toISOString(),
       modules: [
@@ -403,15 +406,6 @@ export class Elm327 implements ObdAdapter {
           readiness: null,
           errors: [],
         },
-        ...UDS_PLACEHOLDER_MODULES.map((m) => ({
-          id: m.id,
-          name: m.name,
-          available: false,
-          note: m.note,
-          confirmed: [] as string[],
-          pending: [] as string[],
-          permanent: [] as string[],
-        })),
       ],
     };
 

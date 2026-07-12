@@ -76,6 +76,7 @@ Procedure: [`docs/procedures/full-app-offline.md`](./docs/procedures/full-app-of
 - Add a model variant → [`docs/procedures/adding-model-variant.md`](./docs/procedures/adding-model-variant.md)
 - Add a generation → [`docs/procedures/adding-new-generation.md`](./docs/procedures/adding-new-generation.md)
 - Build a feature → [`docs/procedures/building-features.md`](./docs/procedures/building-features.md)
+- Discover OBD modules + manufacturer faults (per generation) → [`docs/procedures/obd-module-discovery.md`](./docs/procedures/obd-module-discovery.md)
 - Full-app offline (Desktop + PWA) → [`docs/procedures/full-app-offline.md`](./docs/procedures/full-app-offline.md)
 - Public SEO / marketing pages → [`docs/procedures/public-seo-pages.md`](./docs/procedures/public-seo-pages.md)
 

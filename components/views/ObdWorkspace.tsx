@@ -2,9 +2,11 @@
 
 import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { useObdBridge } from '@/lib/obd/useObdBridge';
-import { useVehicle } from '@/lib/vehicle-context';
+import { useVehicle, modelGlb } from '@/lib/vehicle-context';
 import { generationForBody } from '@/lib/models';
+import type { EnginePart } from '@/lib/types';
 import { getFaultCodes, type FaultCode } from '@/lib/knowledge';
 import { ALL_LIVE_PIDS } from '@/lib/obd/pids';
 import { mono, sans } from '@/components/tools/ui';
@@ -25,6 +27,17 @@ import { useObdFocus } from '@/lib/obd/ObdFocusContext';
 import { createClient } from '@/lib/supabase/client';
 import { isAdminEmail } from '@/lib/admin';
 import { DEMO_MODE } from '@/lib/demo';
+
+// The 3D car viewer pulls in three.js/R3F — load it only when the 3D map is
+// opened (client-only; R3F can't SSR).
+const ObdCarViewer = dynamic(() => import('@/components/garage/GLBViewer'), {
+  ssr: false,
+  loading: () => (
+    <div style={{ display: 'grid', placeItems: 'center', height: '100%', font: `500 12px/1 ${mono}`, color: '#9A9AA0' }}>
+      Loading 3D…
+    </div>
+  ),
+});
 
 const TABS = [
   { id: 'connection', label: 'Connection' },
@@ -98,7 +111,7 @@ function fmt(v: unknown): string {
 }
 
 export default function ObdWorkspace() {
-  const { vehicle: garageVehicle } = useVehicle();
+  const { vehicle: garageVehicle, activeId } = useVehicle();
   const obd = useObdBridge();
   const { focus: obdFocus, setFocus: setObdFocus, toggleFocus } = useObdFocus();
   const [tab, setTab] = useState<TabId>('connection');
@@ -393,7 +406,10 @@ export default function ObdWorkspace() {
           moduleScan={obd.moduleScan}
           onScanModules={() => obd.scanModules(generation)}
           onClearFaults={() => obd.clearFaults(generation)}
+          onSaveScan={() => obd.saveScan({ vehicleId: activeId, generation })}
           generation={generation}
+          glbSrc={modelGlb(garageVehicle.body)}
+          paintHex={garageVehicle.colorHex}
         />
       )}
       {tab === 'monitors' && (
@@ -1003,15 +1019,24 @@ interface MapModule {
 // behind the cabin). Deliberately schematic — a health map, not the 3D view.
 // Keyed by module id from lib/obd/uds-modules.ts; ids without an entry here are
 // still shown (as an "other modules" list), so a faulted module is never hidden.
+// Percentages of the traced-silhouette container (nose left). The greenhouse
+// spans ~33–80% of length, engine bay ~80–93% — keep engine/PDK pins behind it.
 const MODULE_MAP_POS: Record<string, { x: number; y: number; short: string }> = {
   'bcm-front': { x: 18, y: 40, short: 'BCM FR' },
   psm: { x: 24, y: 33, short: 'ABS' },
-  cluster: { x: 37, y: 27, short: 'CLUSTER' },
-  airbag: { x: 45, y: 55, short: 'AIRBAG' },
-  pcm: { x: 35, y: 75, short: 'CLIMATE' },
-  gateway: { x: 55, y: 40, short: 'GATEWAY' },
-  dme: { x: 72, y: 47, short: 'ENGINE' },
-  pdk: { x: 86, y: 56, short: 'PDK' },
+  cluster: { x: 40, y: 30, short: 'CLUSTER' },
+  airbag: { x: 48, y: 55, short: 'AIRBAG' },
+  pcm: { x: 40, y: 72, short: 'PCM' },
+  gateway: { x: 58, y: 42, short: 'GATEWAY' },
+  dme: { x: 82, y: 45, short: 'ENGINE' },
+  pdk: { x: 88, y: 62, short: 'PDK' },
+  'bcm-rear': { x: 84, y: 32, short: 'BCM RR' },
+  eps: { x: 28, y: 46, short: 'STEERING' },
+  tpms: { x: 50, y: 22, short: 'TPMS' },
+  climate: { x: 34, y: 66, short: 'CLIMATE' },
+  epb: { x: 78, y: 55, short: 'PARK BRK' },
+  'park-assist': { x: 94, y: 50, short: 'PARK ASST' },
+  'mod-7f1': { x: 58, y: 40, short: 'GATEWAY' },
 };
 
 const STATE_STYLE: Record<MapState, { fill: string; label: string }> = {
@@ -1020,6 +1045,45 @@ const STATE_STYLE: Record<MapState, { fill: string; label: string }> = {
   refused: { fill: '#E0A100', label: 'Present · declined' },
   silent: { fill: '#B4B4B8', label: 'No response' },
   unknown: { fill: '#fff', label: 'Not scanned' },
+};
+
+// Pin fill for the 3D view — like STATE_STYLE but 'unknown' is a visible grey
+// (a white pin would vanish against the light 3D scene background).
+function pinColorFor(state: MapState): string {
+  return state === 'unknown' ? '#9A9AA0' : STATE_STYLE[state].fill;
+}
+
+// True top-view silhouette traced from the real 981 Boxster model
+// (public/models/boxster-real.glb): triangles projected onto the ground plane,
+// outline + greenhouse iso-contour extracted, simplified. Nose LEFT, door
+// mirrors included. Regenerate with:
+//   node tools/trace-topview.mjs public/models/boxster-real.glb 0.76
+const CAR_TOP_VIEWBOX = '0 0 300 144';
+const CAR_TOP_OUTLINE =
+  'M136.0,8.9L131.1,10.5L127.5,13.3L119.9,15.1L66.3,15.1L42.3,16.9L32.0,20.0L26.7,23.8L22.0,29.7L18.4,35.5L14.1,43.3L11.0,50.9L9.0,61.4L8.6,73.8L9.2,84.6L11.5,95.0L22.0,113.2L27.4,120.4L30.5,122.8L34.6,124.4L49.1,127.8L80.1,128.5L119.7,128.1L126.6,129.4L131.6,133.2L136.0,134.7L137.0,134.7L137.7,133.6L136.3,128.1L138.6,127.8L166.1,127.4L178.4,128.6L188.5,128.0L216.5,129.3L239.8,129.0L258.5,127.5L264.5,126.3L271.6,123.1L276.2,120.4L279.1,117.5L281.9,113.1L285.8,104.3L289.9,88.4L291.1,73.8L290.8,61.5L289.9,54.8L287.8,45.2L284.6,35.9L280.7,27.8L277.8,23.9L273.8,21.2L265.6,17.1L259.1,14.9L255.3,14.3L215.3,13.9L192.2,15.2L179.7,14.7L166.2,15.8L138.6,15.4L136.3,15.1L138.4,8.7L137.2,8.7Z';
+const CAR_TOP_CABIN =
+  'M140.0,25.0L126.2,25.5L123.0,26.2L120.6,28.2L112.8,38.6L109.3,40.3L104.6,40.2L101.3,48.8L99.1,57.2L97.7,69.8L97.8,79.0L99.1,86.0L101.4,94.6L104.5,101.5L105.9,102.6L111.1,103.4L112.8,104.6L121.7,116.2L129.4,117.6L136.0,117.9L160.3,117.5L186.4,115.9L189.0,116.6L197.6,116.2L207.7,115.0L213.1,113.6L217.5,111.7L224.5,106.8L226.6,99.7L227.4,98.6L230.7,96.7L231.8,93.1L233.9,92.2L235.2,90.9L236.4,88.2L236.6,86.1L238.2,84.3L238.7,81.4L238.7,61.8L238.2,59.0L236.5,56.7L235.9,53.5L234.1,51.2L231.8,50.2L230.2,45.9L227.4,44.6L223.7,36.4L217.1,31.2L210.6,28.8L199.2,27.0L190.4,26.6L186.4,27.3L173.1,26.1L141.7,25.1Z';
+
+// Approximate anchors on the exterior GLB as "nx ny nz" fractions of the model
+// AABB half-extents from center. Convention (from lib/exterior-parts.ts):
+// +Z = front, −Z = rear, +Y = up, +X = left. First-pass placements — refine on
+// the real model. Modules without an anchor fall back to the "other" list.
+const MODULE_3D_POS: Record<string, string> = {
+  'bcm-front': '0.15 0.05 0.55', // front luggage compartment
+  psm: '0 -0.05 0.45', // ABS unit, front
+  cluster: '0.4 0.4 0.35', // driver-side dash
+  pcm: '0 0.25 0.3', // centre dash (head unit)
+  airbag: '0 -0.1 0.15', // centre console
+  gateway: '0 0 0.2', // central, under dash
+  dme: '0.15 0 -0.5', // mid-engine bay, behind cabin
+  pdk: '0 -0.2 -0.7', // transaxle, rear
+  'bcm-rear': '0.15 0.05 -0.55', // rear compartment
+  eps: '0 0 0.45', // steering rack, front axle
+  tpms: '0 0.1 0.15', // central receiver
+  climate: '0 0.1 0.32', // centre console
+  epb: '0 -0.2 -0.55', // rear axle
+  'park-assist': '0 0 -0.85', // rear bumper
+  'mod-7f1': '0 0 0.2', // central gateway, under dash
 };
 
 /**
@@ -1076,6 +1140,37 @@ function buildMapModules(modules: FaultModule[], scan: ModuleScanData | null, ge
     const pos = MODULE_MAP_POS[id];
     return { id, name: a.name ?? id, short: pos?.short ?? '', state, codes, x: pos?.x ?? null, y: pos?.y ?? null };
   });
+}
+
+function SaveScanControl({
+  onSave,
+  disabled,
+}: {
+  onSave: () => Promise<{ ok: boolean; error?: string }>;
+  disabled: boolean;
+}) {
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+  const doSave = async () => {
+    setSaving(true);
+    setMsg(null);
+    const r = await onSave();
+    setSaving(false);
+    setMsg(r.ok ? 'Saved — an AI assistant can read this scan over MCP.' : (r.error ?? 'Save failed'));
+  };
+  return (
+    <>
+      <button
+        type="button"
+        onClick={doSave}
+        disabled={disabled || saving}
+        style={{ ...btnBase, background: '#0B0B0C', color: '#fff', opacity: saving ? 0.7 : 1 }}
+      >
+        {saving ? 'Saving…' : 'Save scan'}
+      </button>
+      {msg && <span style={{ font: `500 12px/1.4 ${mono}`, color: '#6E6E73', alignSelf: 'center' }}>{msg}</span>}
+    </>
+  );
 }
 
 function ClearFaultsControl({
@@ -1167,7 +1262,10 @@ function FaultsPanel({
   moduleScan,
   onScanModules,
   onClearFaults,
+  onSaveScan,
   generation,
+  glbSrc,
+  paintHex,
 }: {
   modules: FaultModule[];
   onRefresh: () => void;
@@ -1177,13 +1275,15 @@ function FaultsPanel({
   moduleScan: ModuleScanData | null;
   onScanModules: () => void;
   onClearFaults: () => Promise<ClearResult | null>;
+  onSaveScan: () => Promise<{ ok: boolean; error?: string }>;
   generation: string;
+  glbSrc: string;
+  paintHex?: string;
 }) {
   const [focusId, setFocusId] = useState<string | null>(null);
-  const relevant = useMemo(() => new Set(udsModulesFor(generation).map((m) => m.id)), [generation]);
   const mapModules = useMemo(
-    () => buildMapModules(modules, moduleScan).filter((m) => relevant.has(m.id) || m.state !== 'unknown'),
-    [modules, moduleScan, relevant],
+    () => buildMapModules(modules, moduleScan, generation),
+    [modules, moduleScan, generation],
   );
 
   const jumpTo = (id: string) => {
@@ -1214,10 +1314,17 @@ function FaultsPanel({
             Refresh faults
           </button>
           <ClearFaultsControl onClear={onClearFaults} disabled={!connected || busy} />
+          <SaveScanControl onSave={onSaveScan} disabled={!connected || busy} />
         </div>
 
         {(modules.length > 0 || moduleScan) && (
-          <FaultMap modules={mapModules} describeDtc={describeDtc} onJump={jumpTo} />
+          <FaultMap
+            modules={mapModules}
+            describeDtc={describeDtc}
+            onJump={jumpTo}
+            glbSrc={glbSrc}
+            paintHex={paintHex}
+          />
         )}
 
         {!modules.length ? (
@@ -1251,18 +1358,46 @@ function FaultsPanel({
   );
 }
 
-/** Top-down module health map — a creative, at-a-glance overview of the scan. */
+/** Module health map — schematic silhouette or the real 3D car, pins by state. */
 function FaultMap({
   modules,
   describeDtc,
   onJump,
+  glbSrc,
+  paintHex,
 }: {
   modules: MapModule[];
   describeDtc: (code: string) => FaultCode | undefined;
   onJump: (id: string) => void;
+  glbSrc: string;
+  paintHex?: string;
 }) {
   const [sel, setSel] = useState<string | null>(null);
+  const [view, setView] = useState<'schematic' | '3d'>('schematic');
   const selected = modules.find((m) => m.id === sel) ?? null;
+
+  // Pins go on the silhouette; modules with no known location but a real result
+  // (reached / faulted / refused) are listed below so faults are never hidden.
+  const pins = useMemo(() => modules.filter((m) => m.x != null && m.y != null), [modules]);
+  const others = useMemo(() => modules.filter((m) => m.x == null && m.state !== 'unknown'), [modules]);
+
+  // 3D pins: the same modules, anchored on the exterior GLB and coloured by state.
+  const parts3d = useMemo<EnginePart[]>(
+    () =>
+      modules
+        .filter((m) => MODULE_3D_POS[m.id])
+        .map((m) => ({
+          id: m.id,
+          node: '',
+          label: `${m.name} — ${STATE_STYLE[m.state].label}`,
+          assembly: 'ECU',
+          system: 'Electrical',
+          hotspotNorm: MODULE_3D_POS[m.id],
+          pinColor: pinColorFor(m.state),
+          pinBadge: m.state === 'fault' ? String(m.codes.length) : '',
+        })),
+    [modules],
+  );
 
   const counts = useMemo(() => {
     const c: Record<MapState, number> = { fault: 0, clean: 0, refused: 0, silent: 0, unknown: 0 };
@@ -1272,54 +1407,87 @@ function FaultMap({
 
   const legend: MapState[] = ['fault', 'clean', 'refused', 'silent', 'unknown'];
 
+  const segBtn = (active: boolean): CSSProperties => ({
+    minHeight: 36,
+    padding: '0 12px',
+    borderRadius: 4,
+    border: active ? '1px solid #0B0B0C' : '1px solid #C9C9CD',
+    background: active ? '#0B0B0C' : '#fff',
+    color: active ? '#fff' : '#0B0B0C',
+    font: `600 10px/1 ${mono}`,
+    letterSpacing: '.1em',
+    textTransform: 'uppercase',
+    cursor: 'pointer',
+  });
+
   return (
     <div style={{ marginBottom: 24 }}>
-      <div
-        style={{
-          font: `600 11px/1 ${mono}`,
-          letterSpacing: '.1em',
-          color: '#0B0B0C',
-          textTransform: 'uppercase',
-          marginBottom: 12,
-        }}
-      >
-        Module map
+      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+        <span style={{ font: `600 11px/1 ${mono}`, letterSpacing: '.1em', color: '#0B0B0C', textTransform: 'uppercase' }}>
+          Module map
+        </span>
+        <div style={{ display: 'inline-flex', gap: 6, marginLeft: 'auto' }}>
+          <button type="button" style={segBtn(view === 'schematic')} onClick={() => setView('schematic')}>
+            Schematic
+          </button>
+          <button type="button" style={segBtn(view === '3d')} onClick={() => setView('3d')}>
+            3D
+          </button>
+        </div>
+        <span
+          title="X-ray cutaway view is coming soon"
+          style={{
+            font: `600 9px/1 ${mono}`,
+            letterSpacing: '.1em',
+            textTransform: 'uppercase',
+            padding: '5px 8px',
+            borderRadius: 2,
+            background: '#F0F0F1',
+            color: '#9A9AA0',
+          }}
+        >
+          X-ray · soon
+        </span>
       </div>
 
-      <div className="obdFaultMap" style={{ position: 'relative', width: '100%', maxWidth: 560, margin: '0 auto', aspectRatio: '300 / 150' }}>
-        <svg viewBox="0 0 300 150" width="100%" height="100%" aria-hidden style={{ display: 'block' }}>
-          {[
-            [48, 6],
-            [48, 128],
-            [200, 6],
-            [200, 128],
-          ].map(([x, y], i) => (
-            <rect key={i} x={x} y={y} width={34} height={16} rx={7} fill="#C9C9CD" />
-          ))}
-          <path
-            d="M46,22 C24,22 12,42 12,75 C12,108 24,128 46,128 L236,128 C270,128 288,110 288,80 L288,70 C288,40 270,22 236,22 Z"
-            fill="#F4F4F5"
-            stroke="#D8D8DC"
-            strokeWidth={2}
+      {view === '3d' && (
+        <div
+          style={{
+            position: 'relative',
+            width: '100%',
+            maxWidth: 560,
+            margin: '0 auto',
+            height: 'clamp(280px, 56vw, 420px)',
+            border: '1px solid #E3E3E5',
+            borderRadius: 8,
+            overflow: 'hidden',
+            background: '#eef0f2',
+          }}
+        >
+          <ObdCarViewer
+            src={glbSrc}
+            paintHex={paintHex}
+            parts={parts3d}
+            selectedPartId={sel}
+            onSelectPart={(id) => setSel((prev) => (prev === id ? null : id))}
           />
-          <path
-            d="M96,50 C96,44 100,40 108,40 L166,40 C176,40 182,50 182,75 C182,100 176,110 166,110 L108,110 C100,110 96,106 96,100 Z"
-            fill="#ECECEE"
-            stroke="#DCDCDF"
-            strokeWidth={1.5}
-          />
-          {[218, 228, 238, 248].map((x) => (
-            <line key={x} x1={x} y1={58} x2={x} y2={92} stroke="#DCDCDF" strokeWidth={2} strokeLinecap="round" />
-          ))}
-          <text x={20} y={78} fill="#B4B4B8" style={{ font: `600 8px ${mono}`, letterSpacing: '.1em' }}>
+        </div>
+      )}
+
+      {view === 'schematic' && (
+      <div className="obdFaultMap" style={{ position: 'relative', width: '100%', maxWidth: 560, margin: '0 auto', aspectRatio: '300 / 144' }}>
+        <svg viewBox={CAR_TOP_VIEWBOX} width="100%" height="100%" aria-hidden style={{ display: 'block' }}>
+          <path d={CAR_TOP_OUTLINE} fill="#F4F4F5" stroke="#C9C9CD" strokeWidth={1.6} strokeLinejoin="round" />
+          <path d={CAR_TOP_CABIN} fill="#ECECEE" stroke="#D8D8DC" strokeWidth={1.2} strokeLinejoin="round" />
+          <text x={24} y={106} fill="#B4B4B8" style={{ font: `600 8px ${mono}`, letterSpacing: '.1em' }}>
             FRONT
           </text>
-          <text x={248} y={110} fill="#B4B4B8" style={{ font: `600 8px ${mono}`, letterSpacing: '.1em' }}>
+          <text x={252} y={106} fill="#B4B4B8" style={{ font: `600 8px ${mono}`, letterSpacing: '.1em' }}>
             REAR
           </text>
         </svg>
 
-        {modules.map((m) => {
+        {pins.map((m) => {
           const st = STATE_STYLE[m.state];
           const active = sel === m.id;
           return (
@@ -1368,6 +1536,7 @@ function FaultMap({
           );
         })}
       </div>
+      )}
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center', margin: '14px 0 0' }}>
         {legend.map((s) => (
@@ -1397,8 +1566,51 @@ function FaultMap({
       </div>
 
       <p style={{ margin: '10px 0 0', font: `400 12px/1.5 ${sans}`, color: '#9A9AA0', textAlign: 'center' }}>
-        Schematic placement — tap a module for its codes.
+        {view === '3d'
+          ? 'Approximate locations on the exterior body — drag to rotate, tap a pin. X-ray cutaway coming soon.'
+          : 'Schematic placement — tap a module for its codes.'}
       </p>
+
+      {others.length > 0 && (
+        <div style={{ marginTop: 16 }}>
+          <div style={{ font: `600 10px/1 ${mono}`, letterSpacing: '.12em', color: '#6E6E73', textTransform: 'uppercase', marginBottom: 10 }}>
+            Other modules (no mapped location)
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            {others.map((m) => {
+              const st = STATE_STYLE[m.state];
+              const active = sel === m.id;
+              return (
+                <button
+                  key={m.id}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => setSel((prev) => (prev === m.id ? null : m.id))}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    minHeight: 40,
+                    padding: '8px 12px',
+                    borderRadius: 4,
+                    border: `1px solid ${active ? '#0B0B0C' : '#E3E3E5'}`,
+                    background: '#fff',
+                    cursor: 'pointer',
+                    font: `500 12px/1.2 ${sans}`,
+                    color: '#0B0B0C',
+                  }}
+                >
+                  <span style={{ width: 10, height: 10, borderRadius: '50%', background: st.fill, boxShadow: '0 0 0 1px #E3E3E5', flexShrink: 0 }} />
+                  {m.name}
+                  {m.state === 'fault' && (
+                    <span style={{ font: `700 10px/1 ${mono}`, color: '#D5001C' }}>· {m.codes.length}</span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {selected && (
         <div

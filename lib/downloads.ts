@@ -20,6 +20,12 @@ export type DownloadItem = {
   audience: 'owners' | 'contributors';
 };
 
+export const REPO_URL = 'https://github.com/dmitry-grechko/flat-six';
+
+/** GitHub Release tag — keep in sync with apps/desktop + tools/obd-bridge versions. */
+export const RELEASE_TAG = 'v0.1.1';
+const RELEASE_BASE = `${REPO_URL}/releases/download/${RELEASE_TAG}`;
+
 export const DOWNLOADS: DownloadItem[] = [
   {
     id: 'desktop',
@@ -27,13 +33,14 @@ export const DOWNLOADS: DownloadItem[] = [
     tagline:
       'Recommended for owners. Full garage app (history, plans, tools, Live OBD) with USB + Classic Bluetooth OBD built in — no terminal.',
     platform: 'Windows (installer + portable) · macOS (DMG, Intel + Apple Silicon)',
-    href: null,
-    hrefMac: null,
+    href: `${RELEASE_BASE}/FLAT-SIX-0.1.1-x64.exe`,
+    hrefMac: `${RELEASE_BASE}/FLAT-SIX-0.1.1-arm64.dmg`,
     cta: 'Download for Windows',
     ctaMac: 'Download for Mac',
     audience: 'owners',
     installNotes: [
-      'Packaged builds publish via GitHub Releases after testing — buttons say “soon” until then.',
+      'Windows: NSIS installer (auto-update) or grab the portable .exe from the same GitHub Release.',
+      'Mac: Apple silicon DMG below; Intel Macs — use the x64 DMG on the release page.',
       'Installed Desktop checks GitHub for updates on launch and downloads them in the background.',
       'Live OBD uses the adapter inside the app. Documents and AI still need network.',
     ],
@@ -65,14 +72,14 @@ export const DOWNLOADS: DownloadItem[] = [
     tagline:
       'Local serial helper for contributors when you are not using Desktop. Owners should use FLAT·SIX Desktop instead.',
     platform: 'Windows · macOS · Linux',
-    href: null,
-    cta: 'Lab helper',
+    href: `${RELEASE_BASE}/FLAT-SIX-OBD-Bridge-0.1.1.zip`,
+    cta: 'Download bridge zip',
     audience: 'contributors',
     installNotes: [
-      'Not a double-click owner app — for lab / browser Live OBD without Desktop.',
+      'Unzip, open a terminal in the folder, run npm start, then open http://127.0.0.1:8765.',
+      'Requires Node 22+. Not a double-click owner app — use FLAT·SIX Desktop instead.',
       'Desktop Chrome USB ELM usually does not need this — use Web Serial on Live OBD or install Desktop.',
     ],
   },
 ];
 
-export const REPO_URL = 'https://github.com/dmitry-grechko/flat-six';

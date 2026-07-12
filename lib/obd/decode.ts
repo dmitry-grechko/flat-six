@@ -369,6 +369,9 @@ const MODE06_MID_LABELS: Record<string, string> = {
   '06': 'O2 Sensor · Bank 2 Sensor 2',
   '07': 'O2 Sensor · Bank 2 Sensor 3',
   '08': 'O2 Sensor · Bank 2 Sensor 4',
+  // Supported models are flat-six, so only $A1–$A6 are real cylinders. $A0 and
+  // any higher misfire MID ($A7+ — the DME reports one with no $A0) are the
+  // ECU's aggregate/auxiliary misfire monitor, NOT a 7th cylinder.
   A0: 'Misfire · general',
   A1: 'Misfire · Cylinder 1',
   A2: 'Misfire · Cylinder 2',
@@ -376,11 +379,7 @@ const MODE06_MID_LABELS: Record<string, string> = {
   A4: 'Misfire · Cylinder 4',
   A5: 'Misfire · Cylinder 5',
   A6: 'Misfire · Cylinder 6',
-  A7: 'Misfire · Cylinder 7',
-  A8: 'Misfire · Cylinder 8',
-  A9: 'Misfire · Cylinder 9',
-  AA: 'Misfire · Cylinder 10',
-  AB: 'Misfire · Cylinder 11',
+  A7: 'Misfire · aggregate',
 };
 
 export function mode06Label(mid: string): string {

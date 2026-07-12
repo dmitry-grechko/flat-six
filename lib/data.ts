@@ -280,6 +280,7 @@ export const MCP_TOOLS: McpTool[] = [
   { name: 'get_my_vehicles', desc: 'List the vehicles in your garage.', auth: true },
   { name: 'get_service_history', desc: 'Read service records for a vehicle.', auth: true },
   { name: 'log_service_record', desc: 'Add a service record to a vehicle.', auth: true },
+  { name: 'get_obd_scan', desc: 'Read the latest saved OBD scan, with DTCs cross-referenced to the knowledge base.', auth: true },
 ];
 
 // (RAG sources are now computed from real data in components/views/AiConnect.tsx

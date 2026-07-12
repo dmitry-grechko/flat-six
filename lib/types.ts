@@ -1,6 +1,7 @@
 // ---- Core domain types (the contract all UI + agents build against) ----
 
 import type { WheelSpec } from './fitment/oem';
+import type { FaultsData, LiveData, Mode06Data, ModuleScanData } from './obd/types';
 
 export type SystemName =
   | 'Engine' | 'Brakes' | 'Cooling' | 'Transmission' | 'HVAC'
@@ -128,6 +129,31 @@ export interface ServicePlan {
   createdAt: string;
 }
 
+/**
+ * A saved OBD scan snapshot (Live OBD → Supabase → MCP → AI). Mirrors a
+ * public.obd_scans row (migration 0012). The four read-model blobs are the
+ * exact shapes Live OBD produces (lib/obd/types.ts) — stored as jsonb, decoded
+ * by nothing in SQL. The get_obd_scan MCP tool reads the latest of these and
+ * cross-references each DTC against the knowledge base for the scan generation.
+ */
+export interface ObdScan {
+  id: string;
+  /** Garage vehicle this scan belongs to, or null if it wasn't pinned to a car. */
+  vehicleId: string | null;
+  /** Car generation the scan was read for (981/987/…) — keeps DTC lookups generation-safe. */
+  generation: string;
+  /** ISO timestamp the snapshot was saved. */
+  createdAt: string;
+  /** DME + module confirmed/pending/permanent DTCs. */
+  faults: FaultsData | null;
+  /** Live PID values + readiness monitors. */
+  live: LiveData | null;
+  /** On-board monitor (Mode 06) test results. */
+  mode06: Mode06Data | null;
+  /** Per-module UDS/KWP probe results. */
+  moduleScan: ModuleScanData | null;
+}
+
 // Selectable car-variant ids (also stored as vehicle.body). Legacy 981 values
 // stay 'boxster'/'cayman'; newer generations are suffixed. See lib/models.ts.
 export type BodyType = 'boxster' | 'cayman' | 'cayman-gt4-981' | 'cayman-987' | 'boxster-987' | 'spyder-987';
@@ -216,6 +242,10 @@ export interface EnginePart {
    * node (exterior models) or when a fixed pin is preferred over the mesh centroid.
    */
   hotspotNorm?: string;
+  /** Optional pin fill colour (e.g. OBD fault state). Defaults to the dark pin. */
+  pinColor?: string;
+  /** Optional short text inside the pin instead of its sequence number ('' = blank). */
+  pinBadge?: string;
 }
 
 /** Parts manifest for one assembled model (e.g. the engine). */

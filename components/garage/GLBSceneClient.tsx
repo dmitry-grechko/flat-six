@@ -203,6 +203,9 @@ function Model({ src, paintHex, parts, selectedPartId, onSelectPart }: {
       <primitive object={cloned} />
       {hotspots.map(({ part, pos, n }) => {
         const active = part.id === selectedPartId;
+        // `pinColor` (e.g. an OBD fault state) overrides the default pin; when
+        // unset the pin keeps its original dark / red-on-select look.
+        const bg = part.pinColor ?? (active ? '#D5001C' : 'rgba(11,11,12,.88)');
         return (
           <Html key={part.id} position={[pos.x, pos.y, pos.z]} center zIndexRange={[20, 0]} style={{ pointerEvents: 'auto' }}>
             <button
@@ -210,12 +213,13 @@ function Model({ src, paintHex, parts, selectedPartId, onSelectPart }: {
               title={part.label}
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center', width: 24, height: 24, borderRadius: '50%',
-                background: active ? '#D5001C' : 'rgba(11,11,12,.88)', color: '#fff', border: '2px solid #fff',
-                font: "600 11px/1 'JetBrains Mono',monospace", cursor: 'pointer', boxShadow: '0 2px 7px rgba(0,0,0,.5)',
+                background: bg, color: '#fff', border: '2px solid #fff',
+                font: "600 11px/1 'JetBrains Mono',monospace", cursor: 'pointer',
+                boxShadow: active ? '0 0 0 3px rgba(11,11,12,.85), 0 2px 7px rgba(0,0,0,.5)' : '0 2px 7px rgba(0,0,0,.5)',
                 transform: active ? 'scale(1.15)' : 'none', transition: 'transform .15s',
               }}
             >
-              {n}
+              {part.pinBadge ?? n}
             </button>
           </Html>
         );

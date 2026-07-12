@@ -1,5 +1,25 @@
 [
   {
+    "code": "000401",
+    "title": "Gateway — high-speed bus power-on reset (benign)",
+    "system": "Electrical",
+    "severity": "LOW",
+    "description": "Informational fault logged by the central gateway (CAN/CAN-Gateway): the high-speed CAN bus (HSB) performed a power-on reset — typically after the battery was disconnected/reconnected or a low-voltage event. Benign; clears on its own once the bus stays powered. Read over UDS from the gateway module, not the engine ECU (raw manufacturer code 00 04 01).",
+    "symptoms": [
+      "No drivability effect",
+      "May appear after a battery disconnect or jump start"
+    ],
+    "causes": [
+      "Battery disconnected/reconnected",
+      "Low battery voltage / weak battery",
+      "Normal power-cycle after service"
+    ],
+    "diagnosis": [
+      "Confirm battery health and terminals",
+      "Clear the code; it should not return if voltage is stable"
+    ]
+  },
+  {
     "code": "89020E",
     "title": "Front luggage/engine-compartment light — defective",
     "system": "Body",

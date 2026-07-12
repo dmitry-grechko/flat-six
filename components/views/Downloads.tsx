@@ -2,7 +2,7 @@
 
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
-import { DOWNLOADS, REPO_URL, type DownloadItem } from '@/lib/downloads';
+import { DOWNLOADS, REPO_URL, RELEASE_TAG, type DownloadItem } from '@/lib/downloads';
 import { BetaBadge } from '@/components/shell/BetaBadge';
 
 const mono = "'JetBrains Mono',monospace";
@@ -199,8 +199,11 @@ export default function Downloads() {
           <Link href="/obd" style={{ color: '#D5001C', textDecoration: 'none', fontWeight: 500 }}>
             Live OBD
           </Link>{' '}
-          already supports USB Web Serial on desktop Chrome. Installers land on GitHub Releases after
-          testing.
+          already supports USB Web Serial on desktop Chrome. Installers are on{' '}
+          <a href={`${REPO_URL}/releases/tag/${RELEASE_TAG}`} style={{ color: '#D5001C', textDecoration: 'none', fontWeight: 500 }}>
+            GitHub Releases
+          </a>
+          .
         </p>
       </div>
 

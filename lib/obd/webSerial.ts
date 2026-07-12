@@ -127,8 +127,23 @@ export function webSerialAvailable(): boolean {
   return typeof navigator !== 'undefined' && 'serial' in navigator;
 }
 
+/**
+ * Module-level singleton. The open serial session lives inside the client, so it
+ * MUST survive React remounts — navigating away from /obd and back rebuilds the
+ * hook, and a fresh client would both report "disconnected" and fail to reopen
+ * the port the orphaned session still holds ("port occupied"). One client = one
+ * persistent session for the tab's lifetime.
+ */
+let webSerialClient: ObdClient | null = null;
+
 /** In-process ObdClient over Web Serial (no local bridge). USB ELM327 only. */
 export function createWebSerialClient(): ObdClient {
+  if (webSerialClient) return webSerialClient;
+  webSerialClient = buildWebSerialClient();
+  return webSerialClient;
+}
+
+function buildWebSerialClient(): ObdClient {
   let session: Elm327 | null = null;
   let polling = false;
   let pollTimer: ReturnType<typeof setTimeout> | null = null;

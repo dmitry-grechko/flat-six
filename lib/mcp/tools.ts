@@ -7,7 +7,9 @@ import {
   getKnownIssues,
   searchKnowledge,
   DEFAULT_GENERATION,
+  type FaultCode,
 } from '@/lib/knowledge';
+import type { FaultsData, LiveData, Mode06Data, ModuleScanData } from '@/lib/obd/types';
 import { searchCatalog, formatPartNumber } from '@/lib/catalog';
 import { GENERATIONS, generationForBody } from '@/lib/models';
 import { resolveUser, AUTH_REQUIRED_MESSAGE, publicClient } from './auth';
@@ -837,6 +839,60 @@ export function registerTools(server: McpServer): void {
     },
   );
 
+  server.registerTool(
+    'get_obd_scan',
+    {
+      title: 'Get the latest saved OBD scan',
+      description:
+        'Read the most recent OBD scan the owner saved from Live OBD for ONE vehicle (scans are ' +
+        'never shared across cars). Returns the fault list with every DTC cross-referenced to its ' +
+        "knowledge-base entry (title, system, severity, likely causes, diagnosis) for the car's " +
+        'generation, plus a live-data and module-scan summary. This server cannot read the car ' +
+        'directly — the owner must connect and save a scan in Live OBD first. Pass vehicleId when ' +
+        'the garage has multiple vehicles. Requires authentication.',
+      inputSchema: {
+        vehicleId: z
+          .string()
+          .uuid()
+          .optional()
+          .describe('Vehicle id from get_my_vehicles. Required when the garage has multiple cars.'),
+      },
+    },
+    async ({ vehicleId }, extra) => {
+      const user = await resolveUser(extra.authInfo?.token);
+      if (!user) return err(AUTH_REQUIRED_MESSAGE);
+
+      const resolved = await resolveGarageVehicle(extra.authInfo!.token!, vehicleId);
+      if (!resolved.ok) return err(resolved.message);
+
+      // Latest saved snapshot for this car (RLS scopes to the token's user).
+      const { data, error } = await user.supabase
+        .from('obd_scans')
+        .select('*')
+        .eq('vehicle_id', resolved.vehicle.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) return err(`Could not load saved OBD scan: ${error.message}`);
+      if (!data) {
+        return garageScopedJson(resolved.vehicle, resolved.ambiguous, resolved.garageCount, {
+          scan: null,
+          message:
+            `No saved OBD scan yet for ${formatVehicleLabel(resolved.vehicle)}. Open Live OBD (/obd), ` +
+            'connect to the car, read faults / live data, then tap "Save scan" to store a snapshot ' +
+            'the AI can read here.',
+        });
+      }
+
+      // Cross-reference DTCs against the scan's OWN stored generation when
+      // present, else the vehicle's — never mix 981 and 987 fault tables.
+      const gen = (data.generation as string) || resolved.vehicle.generation;
+      return garageScopedJson(resolved.vehicle, resolved.ambiguous, resolved.garageCount, {
+        scan: summarizeObdScan(data as ObdScanRowLoose, gen),
+      });
+    },
+  );
+
   // ---------------------------------------------------------------------------
   // Service plans — plan upcoming work, gather parts + how-to links.
   // ---------------------------------------------------------------------------
@@ -1029,6 +1085,111 @@ function normalizeServiceItems(items: ServiceItemInput[] | undefined) {
   return (items ?? [])
     .map((it) => (typeof it === 'string' ? { name: it.trim() } : { ...it, name: it.name.trim() }))
     .filter((it) => it.name.length > 0);
+}
+
+// ---------------------------------------------------------------------------
+// Saved OBD scan → AI summary (get_obd_scan). Cross-references every DTC against
+// the generation's fault-code knowledge and condenses the live / module-scan
+// blobs. Raw jsonb shapes mirror lib/obd/types.ts.
+// ---------------------------------------------------------------------------
+
+/** A public.obd_scans row as returned by select('*') (snake_case, jsonb blobs). */
+type ObdScanRowLoose = {
+  id: string;
+  created_at: string;
+  generation: string | null;
+  faults: unknown;
+  live: unknown;
+  mode06: unknown;
+  module_scan: unknown;
+};
+
+/** Resolve one DTC to its knowledge-base entry (or flag it unknown to the KB). */
+function describeDtc(byCode: Map<string, FaultCode>, code: string) {
+  const f = byCode.get(code.toUpperCase());
+  if (!f) return { code, knownToKb: false as const };
+  return {
+    code,
+    knownToKb: true as const,
+    title: f.title,
+    system: f.system,
+    severity: f.severity,
+    description: f.description,
+    causes: f.causes,
+    diagnosis: f.diagnosis,
+  };
+}
+
+/** Build the get_obd_scan payload: cross-referenced faults + live/module summaries. */
+function summarizeObdScan(row: ObdScanRowLoose, generation: string) {
+  const byCode = new Map<string, FaultCode>();
+  for (const f of getFaultCodes(generation)) byCode.set(f.code.toUpperCase(), f);
+  const describe = (code: string) => describeDtc(byCode, code);
+
+  const faults = (row.faults ?? null) as FaultsData | null;
+  const faultModules = (faults?.modules ?? []).map((m) => ({
+    module: m.name,
+    id: m.id,
+    available: m.available,
+    mil: m.readiness?.mil ?? null,
+    confirmed: m.confirmed.map(describe),
+    pending: m.pending.map(describe),
+    permanent: m.permanent.map(describe),
+  }));
+  const dtcCount = faultModules.reduce(
+    (n, m) => n + m.confirmed.length + m.pending.length + m.permanent.length,
+    0,
+  );
+
+  const live = (row.live ?? null) as LiveData | null;
+  const liveSummary = live
+    ? {
+        at: live.at,
+        protocol: live.protocol,
+        adapter: live.adapter,
+        readiness: live.readiness,
+        values: live.values,
+        errorCount: live.errors?.length ?? 0,
+      }
+    : null;
+
+  const mode06 = (row.mode06 ?? null) as Mode06Data | null;
+  const mode06Summary = mode06
+    ? {
+        at: mode06.at,
+        testCount: mode06.tests.length,
+        failed: mode06.tests.filter((t) => t.result === 'fail'),
+      }
+    : null;
+
+  const moduleScan = (row.module_scan ?? null) as ModuleScanData | null;
+  const moduleScanSummary = moduleScan
+    ? {
+        at: moduleScan.at,
+        generation: moduleScan.generation,
+        note: moduleScan.note,
+        modulesProbed: moduleScan.results.length,
+        reachable: moduleScan.results.filter((r) => r.reachable === 'positive').map((r) => r.name),
+        modulesWithFaults: moduleScan.results
+          .filter((r) => r.confirmedDtcs.length > 0 || r.pendingDtcs.length > 0)
+          .map((r) => ({
+            module: r.name,
+            reachable: r.reachable,
+            confirmed: r.confirmedDtcs.map(describe),
+            pending: r.pendingDtcs.map(describe),
+          })),
+      }
+    : null;
+
+  return {
+    scanId: row.id,
+    savedAt: row.created_at,
+    generation,
+    faults: { at: faults?.at ?? null, dtcCount, modules: faultModules },
+    live: liveSummary,
+    mode06: mode06Summary,
+    moduleScan: moduleScanSummary,
+  };
 }
 
 /** Coerce plan items into the stored shape, generating stable ids + cleaning links. */

@@ -1,0 +1,50 @@
+# OBD Bridge release — zip bundle (lib/obd + tools/obd-bridge) for contributors.
+#
+# Bump tools/obd-bridge/package.json version before tagging.
+# Tag push v* publishes; workflow_dispatch uploads artifacts only unless publish=true.
+
+name: Bridge release
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Upload to GitHub Releases (uses GITHUB_TOKEN)'
+        type: boolean
+        default: false
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  pack:
+    name: Pack bridge zip
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: tools/obd-bridge/package-lock.json
+
+      - name: Pack bridge bundle
+        run: node tools/obd-bridge/scripts/pack.mjs
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: obd-bridge
+          path: tools/obd-bridge/release/*.zip
+
+      - name: Publish to GitHub Releases
+        if: github.event_name == 'push' || inputs.publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=$(node -p "require('./tools/obd-bridge/package.json').version")
+          TAG="v${VERSION}"
+          ASSET="tools/obd-bridge/release/FLAT-SIX-OBD-Bridge-${VERSION}.zip"
+          gh release view "$TAG" 2>/dev/null || gh release create "$TAG" --title "$VERSION" --prerelease --notes "FLAT·SIX OBD Bridge ${VERSION}"
+          gh release upload "$TAG" "$ASSET" --clobber

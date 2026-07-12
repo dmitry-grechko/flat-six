@@ -169,4 +169,11 @@ assert(gen[gen.length - 1].cylinder === null, 'misfire: general row sorts last')
 const labelled = mode06([misfire('A1', null, 3, 'Misfire · Cylinder 4')]);
 assert(misfireCounts(labelled)[0].cylinder === 4, 'misfire: cylinder read from label');
 
+// A 7th misfire MID on a flat-six (cylinders=6) is NOT cylinder 7 — it's capped
+// to a general/aggregate row, even if its label claims "Cylinder 7".
+const withA7 = mode06([misfire('A2', 2, 17), misfire('A5', 5, 15), misfire('A7', null, 1, 'Misfire · Cylinder 7')]);
+const a7Out = misfireCounts(withA7, 6);
+assert(!a7Out.some((c) => c.cylinder === 7), 'misfire: A7 not a phantom cylinder 7 on a flat-six');
+assert(a7Out.some((c) => c.cylinder === null), 'misfire: A7 folded into a general/aggregate row');
+
 console.log('lib/obd insights tests OK');

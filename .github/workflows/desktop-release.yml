@@ -1,11 +1,10 @@
-# Desktop release — manual dispatch until signing + GH_TOKEN are configured.
+# Desktop release — tag push v* publishes; workflow_dispatch for manual packs.
 #
 # Prerequisites:
-#   - Repository secret GH_TOKEN (PAT with `repo` scope) or use GITHUB_TOKEN for same-repo releases
+#   - Bump apps/desktop/package.json version before tagging
 #   - Optional: code-signing certs (Windows Authenticode, macOS Developer ID)
-#   - Bump apps/desktop/package.json version before running
 #
-# First-time setup: uncomment the publish step and test on a draft prerelease.
+# Unsigned builds are fine for beta — SmartScreen/Gatekeeper may warn on first open.
 
 name: Desktop release
 
@@ -13,9 +12,12 @@ on:
   workflow_dispatch:
     inputs:
       publish:
-        description: 'Upload to GitHub Releases (requires GH_TOKEN)'
+        description: 'Upload to GitHub Releases (uses GITHUB_TOKEN)'
         type: boolean
         default: false
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   build-win:
@@ -46,13 +48,18 @@ jobs:
         run: npm --prefix apps/desktop run prepare:standalone
 
       - name: Pack Windows installers
-        run: npm --prefix apps/desktop run pack
-        # TODO: when publish input is true, use:
-        # run: npx electron-builder --win nsis portable --x64 --publish always
-        # env:
-        #   GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        working-directory: apps/desktop
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if ("${{ github.event_name }}" -eq "push" -or "${{ inputs.publish }}" -eq "true") {
+            npx electron-builder --win nsis portable --x64 --publish always
+          } else {
+            npm run pack
+          }
 
       - name: Upload artifacts
+        if: github.event_name == 'workflow_dispatch' && !inputs.publish
         uses: actions/upload-artifact@v4
         with:
           name: desktop-win
@@ -86,14 +93,18 @@ jobs:
         run: npm --prefix apps/desktop run prepare:standalone
 
       - name: Pack macOS DMG + zip
-        run: npm --prefix apps/desktop run pack:mac
-        # TODO: publish — npx electron-builder --mac dmg zip --x64 --arm64 --publish always
-        # env:
-        #   GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        #   CSC_LINK: ${{ secrets.MAC_CERT_BASE64 }}
-        #   CSC_KEY_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
+        working-directory: apps/desktop
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ github.event_name }}" = "push" ] || [ "${{ inputs.publish }}" = "true" ]; then
+            npx electron-builder --mac dmg zip --x64 --arm64 --publish always
+          else
+            npm run pack:mac
+          fi
 
       - name: Upload artifacts
+        if: github.event_name == 'workflow_dispatch' && !inputs.publish
         uses: actions/upload-artifact@v4
         with:
           name: desktop-mac

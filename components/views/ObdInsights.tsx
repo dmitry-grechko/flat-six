@@ -219,8 +219,8 @@ export function ReadinessInsight({ live }: { live: LiveData | null }) {
 
 /* ------------------------------------------------------------ 3) misfire insight */
 
-export function MisfireInsight({ mode06 }: { mode06: Mode06Data | null }) {
-  const rows = misfireCounts(mode06);
+export function MisfireInsight({ mode06, cylinders }: { mode06: Mode06Data | null; cylinders?: number }) {
+  const rows = misfireCounts(mode06, cylinders);
   const outliers = rows.filter((r) => r.outlier);
   const maxCount = Math.max(1, ...rows.map((r) => r.count));
 

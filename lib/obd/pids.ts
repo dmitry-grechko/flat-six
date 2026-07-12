@@ -54,11 +54,3 @@ export const ALL_LIVE_PIDS: PidDef[] = [...PRIORITY_PIDS, ...SECONDARY_PIDS];
 
 /** Mode 01 bitmap PIDs that unlock the next range. */
 export const PID_BITMAP_QUERY = ['00', '20', '40', '60', '80', 'A0'] as const;
-
-export const UDS_PLACEHOLDER_MODULES = [
-  { id: 'pdk', name: 'PDK / Transmission', note: 'Requires UDS — not on generic ELM327' },
-  { id: 'psm', name: 'PSM / ABS', note: 'Requires UDS — not on generic ELM327' },
-  { id: 'airbag', name: 'Airbag', note: 'Requires UDS — not on generic ELM327' },
-  { id: 'gateway', name: 'Gateway', note: 'Requires UDS — not on generic ELM327' },
-  { id: 'pcm', name: 'PCM / Climate', note: 'Requires UDS — not on generic ELM327' },
-] as const;

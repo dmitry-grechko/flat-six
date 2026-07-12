@@ -153,6 +153,7 @@ Common, repeatable work has step-by-step runbooks under
 | [Adding a model variant](./docs/procedures/adding-model-variant.md) | New `BodyType` (e.g. a Spyder) — registry, GLB, credits, colors |
 | [Adding a new generation](./docs/procedures/adding-new-generation.md) | A whole new generation (e.g. 991/718) — knowledge, docs, 3D, fitment |
 | [Building features](./docs/procedures/building-features.md) | Design-system rules, backend/MCP changes, when to update these docs |
+| [OBD module discovery](./docs/procedures/obd-module-discovery.md) | Find a car's diagnostic modules + read the manufacturer fault memory PIWIS shows (per generation) — sweep, protocol, encode |
 
 The same rules are encoded for AI pair-programming in [`CLAUDE.md`](./CLAUDE.md) and
 [`.cursor/rules/`](./.cursor/rules) so Claude Code and Cursor follow them automatically.
