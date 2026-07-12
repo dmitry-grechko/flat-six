@@ -35,8 +35,9 @@ tab bars — test at 375 px. Nav item = route (`app/*/page.tsx` + `AppShell` +
 `lib/obd/httpClient.ts` — or **Web Serial** for USB ELM in desktop Chrome/Edge
 (no helper). Classic Bluetooth still needs the bridge or Electron Desktop.
 **Downloads** (`/downloads`, beta) lists **FLAT·SIX Desktop** + **PWA** (full garage)
-and lab Bridge — catalog in `lib/downloads.ts` (`href` / `hrefMac` when GitHub
-Releases publish). No npm install commands on that page.
+and lab Bridge — links resolve from the latest GitHub Release at request time
+(`lib/github-release.ts`, ~5 min cache). No hardcoded version tag; no npm install
+commands on that page.
 
 ## Full-app offline (Desktop + PWA)
 

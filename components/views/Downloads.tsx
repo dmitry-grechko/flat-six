@@ -2,7 +2,7 @@
 
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
-import { DOWNLOADS, REPO_URL, type DownloadItem } from '@/lib/downloads';
+import { REPO_URL, type DownloadItem } from '@/lib/downloads';
 import { BetaBadge } from '@/components/shell/BetaBadge';
 
 const mono = "'JetBrains Mono',monospace";
@@ -68,6 +68,21 @@ function DownloadCard({ item }: { item: DownloadItem }) {
           {item.name}
         </h2>
         <BetaBadge tone="page" />
+        {item.versionLabel && (
+          <span
+            style={{
+              font: `600 9px/1 ${mono}`,
+              letterSpacing: '.1em',
+              textTransform: 'uppercase',
+              color: '#0B0B0C',
+              border: '1px solid #E3E3E5',
+              padding: '5px 8px',
+              borderRadius: 2,
+            }}
+          >
+            {item.versionLabel}
+          </span>
+        )}
         <span
           style={{
             font: `600 9px/1 ${mono}`,
@@ -110,6 +125,42 @@ function DownloadCard({ item }: { item: DownloadItem }) {
           </li>
         ))}
       </ul>
+      {item.macNotes && item.macNotes.length > 0 && (
+        <div
+          style={{
+            margin: '0 0 18px',
+            padding: '12px 14px',
+            background: '#F4F4F5',
+            border: '1px solid #E3E3E5',
+            borderRadius: 4,
+          }}
+        >
+          <div
+            style={{
+              font: `600 10px/1 ${mono}`,
+              letterSpacing: '.1em',
+              color: '#6E6E73',
+              marginBottom: 8,
+            }}
+          >
+            MAC FIRST LAUNCH
+          </div>
+          <ul
+            style={{
+              margin: 0,
+              padding: '0 0 0 18px',
+              font: `400 13px/1.65 ${sans}`,
+              color: '#3A3A3E',
+            }}
+          >
+            {item.macNotes.map((note) => (
+              <li key={note} style={{ marginBottom: 4 }}>
+                {note}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
         {item.href ? (
           <a href={item.href} style={{ ...btnBase, background: '#D5001C', color: '#fff' }} target="_blank" rel="noreferrer">
@@ -132,19 +183,19 @@ function DownloadCard({ item }: { item: DownloadItem }) {
             <SoonButton label={item.ctaMac} />
           ))}
         <a
-          href={REPO_URL}
+          href={REPO_URL + '/releases'}
           target="_blank"
           rel="noreferrer"
           style={{ ...btnBase, background: '#fff', color: '#0B0B0C', border: '1px solid #C9C9CD' }}
         >
-          Source on GitHub
+          All releases
         </a>
       </div>
     </article>
   );
 }
 
-export default function Downloads() {
+export default function Downloads({ items }: { items: DownloadItem[] }) {
   return (
     <div className="padView" style={{ padding: 28, maxWidth: 880, display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ ...card, borderColor: 'rgba(213,0,28,.28)' }}>
@@ -161,12 +212,12 @@ export default function Downloads() {
           <Link href="/obd" style={{ color: '#D5001C', textDecoration: 'none', fontWeight: 500 }}>
             Live OBD
           </Link>{' '}
-          already supports USB Web Serial on desktop Chrome. Installers land on GitHub Releases after
-          testing.
+          already supports USB Web Serial on desktop Chrome. Download buttons always track the latest
+          GitHub Release — no manual version bump on the site.
         </p>
       </div>
 
-      {DOWNLOADS.map((item) => (
+      {items.map((item) => (
         <DownloadCard key={item.id} item={item} />
       ))}
     </div>

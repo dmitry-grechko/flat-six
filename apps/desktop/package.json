@@ -12,9 +12,9 @@
     "dev": "node ./scripts/dev.mjs",
     "prepare:standalone": "node scripts/prepare-standalone.mjs",
     "prepack": "node scripts/bundle-host.mjs && node scripts/prepare-standalone.mjs && node scripts/build-icons.mjs",
-    "pack": "electron-builder --win nsis portable --x64",
+    "pack": "electron-builder --win --x64",
     "pack:mac": "electron-builder --mac dmg zip --x64 --arm64",
-    "pack:all": "electron-builder --win nsis portable --x64 --mac dmg zip --x64 --arm64"
+    "pack:all": "electron-builder --win --x64 --mac dmg zip --x64 --arm64"
   },
   "dependencies": {
     "electron-updater": "^6.8.9",
@@ -30,6 +30,8 @@
   "build": {
     "appId": "com.flatsix.desktop",
     "productName": "FLAT·SIX",
+    "npmRebuild": false,
+    "nodeGypRebuild": false,
     "icon": "build/icon",
     "directories": {
       "output": "release"
@@ -38,33 +40,29 @@
       "main.mjs",
       "preload.cjs",
       "obd-host-runner.mjs",
+      "build/icon.png",
+      "build/icon.icns",
+      "build/icon.ico"
+    ],
+    "extraResources": [
       {
         "from": "standalone",
         "to": "standalone",
-        "filter": [
-          "**/*"
-        ]
+        "filter": ["**/*"]
+      },
+      {
+        "from": "build/icon.png",
+        "to": "icon.png"
       }
     ],
     "asarUnpack": [
-      "standalone/**/*",
       "node_modules/serialport/**/*",
       "node_modules/@serialport/**/*"
     ],
     "win": {
       "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        },
-        {
-          "target": "portable",
-          "arch": [
-            "x64"
-          ]
-        }
+        { "target": "nsis", "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
       ],
       "signAndEditExecutable": false
     },
@@ -73,7 +71,11 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "FLAT·SIX"
+      "shortcutName": "FLAT·SIX",
+      "artifactName": "FLAT-SIX-Setup-${version}-${arch}.${ext}"
+    },
+    "portable": {
+      "artifactName": "FLAT-SIX-${version}-${arch}-portable.${ext}"
     },
     "mac": {
       "target": [

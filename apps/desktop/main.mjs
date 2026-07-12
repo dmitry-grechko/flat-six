@@ -6,13 +6,17 @@ import { createRequire } from 'node:module';
 import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { spawn } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import http from 'node:http';
 import { createObdHost } from './obd-host-runner.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const host = createObdHost(process.platform);
 const APP_PORT = Number(process.env.FLATSIX_DESKTOP_PORT || 3911);
+const IS_PORTABLE = Boolean(process.env.PORTABLE_EXECUTABLE_DIR);
+
+// Isolate Chromium profile per version so stale SW caches can't pin an old UI.
+app.setPath('userData', path.join(app.getPath('appData'), '@flatsix', `desktop-${app.getVersion()}`));
 
 /** @type {import('node:child_process').ChildProcess | null} */
 let nextProc = null;
@@ -35,11 +39,59 @@ function waitForServer(url, attempts = 80) {
   });
 }
 
+/** Free the Desktop Next port — previous launches (esp. portable) often leave orphans. */
+function freeDesktopPort(port) {
+  if (process.platform === 'win32') {
+    try {
+      const out = execFileSync('cmd.exe', ['/c', `netstat -ano | findstr :${port}`], {
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+      });
+      const pids = new Set();
+      for (const line of out.split(/\r?\n/)) {
+        if (!/LISTENING/i.test(line)) continue;
+        const m = line.trim().match(/(\d+)\s*$/);
+        if (m) pids.add(Number(m[1]));
+      }
+      for (const pid of pids) {
+        if (!Number.isFinite(pid) || pid === process.pid) continue;
+        try {
+          execFileSync('taskkill', ['/PID', String(pid), '/T', '/F'], { stdio: 'ignore' });
+        } catch {
+          /* already gone */
+        }
+      }
+    } catch {
+      /* nothing listening */
+    }
+    return;
+  }
+  try {
+    const out = execFileSync('lsof', ['-tiTCP:' + port, '-sTCP:LISTEN'], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+    for (const pid of out.split(/\n/).filter(Boolean)) {
+      const n = Number(pid);
+      if (!Number.isFinite(n) || n === process.pid) continue;
+      try {
+        process.kill(n, 'SIGTERM');
+      } catch {
+        /* already gone */
+      }
+    }
+  } catch {
+    /* nothing listening */
+  }
+}
+
 function resolveServerJs() {
   if (!app.isPackaged) {
     return path.join(__dirname, 'standalone', 'server.js');
   }
   const candidates = [
+    // Prefer extraResources (electron-builder strips nested node_modules from asar)
+    path.join(process.resourcesPath, 'standalone', 'server.js'),
     path.join(process.resourcesPath, 'app.asar.unpacked', 'standalone', 'server.js'),
     path.join(__dirname, 'standalone', 'server.js'),
   ];
@@ -57,6 +109,9 @@ async function startNextServerAsync() {
       'Next standalone server.js missing. Run `npm run build` then `npm --prefix apps/desktop run prepare:standalone`.',
     );
   }
+
+  freeDesktopPort(APP_PORT);
+  await new Promise((r) => setTimeout(r, 300));
 
   nextProc = spawn(process.execPath, [serverJs], {
     cwd: path.dirname(serverJs),
@@ -112,6 +167,16 @@ function broadcastUpdateStatus(status) {
 }
 
 function setupAutoUpdater() {
+  // Portable builds share no install dir — electron-updater checksums break when
+  // NSIS + portable collide on the same artifact name (fixed in package.json).
+  if (IS_PORTABLE) {
+    broadcastUpdateStatus({
+      phase: 'error',
+      message: 'Portable builds do not auto-update. Install the NSIS Setup build from Downloads.',
+    });
+    return;
+  }
+
   const { autoUpdater } = createRequire(import.meta.url)('electron-updater');
   autoUpdater.autoDownload = true;
   autoUpdater.autoInstallOnAppQuit = false;
@@ -145,7 +210,9 @@ function setupAutoUpdater() {
   });
 
   setTimeout(() => {
-    autoUpdater.checkForUpdates().catch(() => {});
+    autoUpdater.checkForUpdates().catch((err) => {
+      broadcastUpdateStatus({ phase: 'error', message: err?.message || String(err) });
+    });
   }, 3000);
 }
 

@@ -8,6 +8,7 @@ apps/desktop/obd-host-runner.mjs
 apps/desktop/build/icon.png
 apps/desktop/build/icon.ico
 apps/desktop/build/icon.icns
+.tmp-release/
 /.pnp
 .pnp.js
 
