@@ -53,7 +53,7 @@ jobs:
 
       - name: Pack Windows installers
         working-directory: apps/desktop
-        run: npm run pack
+        run: npx electron-builder --win nsis portable --x64 --publish never
 
       - name: Publish Windows release assets
         if: github.event_name == 'push' || inputs.publish
