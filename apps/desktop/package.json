@@ -1,6 +1,6 @@
 {
   "name": "@flatsix/desktop",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "private": true,
   "main": "main.mjs",
   "description": "FLAT·SIX Desktop — full garage app + in-process OBD",
@@ -41,6 +41,7 @@
       "main.mjs",
       "preload.cjs",
       "obd-host-runner.mjs",
+      "mac-updater.mjs",
       "build/icon.png",
       "build/icon.icns",
       "build/icon.ico"

@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import http from 'node:http';
 import { createObdHost } from './obd-host-runner.mjs';
+import { createMacUpdater } from './mac-updater.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const host = createObdHost(process.platform);
@@ -239,18 +240,39 @@ function broadcastUpdateStatus(status) {
 }
 
 function setupAutoUpdater() {
-  const { autoUpdater } = createRequire(import.meta.url)('electron-updater');
-  autoUpdater.autoDownload = true;
-  // Login lives outside AppShell (no update banner). Quitting must still apply a
-  // downloaded update so owners are not stuck on an old build at the sign-in screen.
-  autoUpdater.autoInstallOnAppQuit = true;
-
   /** @type {Record<string, unknown> | null} */
   let lastStatus = null;
   const push = (status) => {
     lastStatus = status;
     broadcastUpdateStatus(status);
   };
+  // Late subscribers (e.g. login page) miss events that fired before mount.
+  ipcMain.handle('update:lastStatus', () => lastStatus);
+
+  // macOS: the ad-hoc-signed build can't apply updates via Squirrel.Mac (needs
+  // Developer ID + notarization). Use our own download → verify → swap → relaunch
+  // updater instead. Windows keeps electron-updater (it applies without signing).
+  if (process.platform === 'darwin') {
+    const mac = createMacUpdater({ push });
+    ipcMain.handle('update:check', async () => {
+      await mac.check();
+      return { ok: true };
+    });
+    ipcMain.handle('update:install', () => {
+      mac.install();
+      return { ok: true };
+    });
+    setTimeout(() => {
+      mac.check().catch((err) => push({ phase: 'error', message: err?.message || String(err) }));
+    }, 3000);
+    return;
+  }
+
+  const { autoUpdater } = createRequire(import.meta.url)('electron-updater');
+  autoUpdater.autoDownload = true;
+  // Login lives outside AppShell (no update banner). Quitting must still apply a
+  // downloaded update so owners are not stuck on an old build at the sign-in screen.
+  autoUpdater.autoInstallOnAppQuit = true;
 
   autoUpdater.on('checking-for-update', () => push({ phase: 'checking' }));
   autoUpdater.on('update-available', (info) => {
@@ -279,8 +301,6 @@ function setupAutoUpdater() {
     autoUpdater.quitAndInstall();
     return { ok: true };
   });
-  // Late subscribers (e.g. login page) miss events that fired before mount.
-  ipcMain.handle('update:lastStatus', () => lastStatus);
 
   setTimeout(() => {
     autoUpdater.checkForUpdates().catch((err) => {
