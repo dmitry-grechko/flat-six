@@ -53,6 +53,12 @@ jobs:
       - name: Prepare Electron standalone
         run: npm --prefix apps/desktop run prepare:standalone
 
+      - name: Bundle OBD host + icons
+        run: |
+          npm --prefix apps/desktop run bundle:host
+          npm --prefix apps/desktop run icons
+          test -f apps/desktop/obd-host-runner.mjs
+
       - name: Pack Windows installers
         working-directory: apps/desktop
         run: npx electron-builder --win nsis portable --x64 --publish never
@@ -118,6 +124,12 @@ jobs:
 
       - name: Prepare Electron standalone
         run: npm --prefix apps/desktop run prepare:standalone
+
+      - name: Bundle OBD host + icons
+        run: |
+          npm --prefix apps/desktop run bundle:host
+          npm --prefix apps/desktop run icons
+          test -f apps/desktop/obd-host-runner.mjs
 
       - name: Pack macOS DMG + zip
         working-directory: apps/desktop

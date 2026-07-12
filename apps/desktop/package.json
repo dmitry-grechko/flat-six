@@ -11,10 +11,10 @@
     "start": "electron .",
     "dev": "node ./scripts/dev.mjs",
     "prepare:standalone": "node scripts/prepare-standalone.mjs",
-    "prepack": "node scripts/bundle-host.mjs && node scripts/prepare-standalone.mjs && node scripts/build-icons.mjs",
-    "pack": "electron-builder --win nsis portable --x64",
-    "pack:mac": "electron-builder --mac dmg zip --x64 --arm64",
-    "pack:all": "electron-builder --win nsis portable --x64 --mac dmg zip --x64 --arm64"
+    "prepack:artifacts": "node scripts/bundle-host.mjs && node scripts/prepare-standalone.mjs && node scripts/build-icons.mjs",
+    "pack": "npm run bundle:host && npm run icons && electron-builder --win nsis portable --x64",
+    "pack:mac": "npm run bundle:host && npm run icons && electron-builder --mac dmg zip --x64 --arm64",
+    "pack:all": "npm run bundle:host && npm run icons && electron-builder --win nsis portable --x64 --mac dmg zip --x64 --arm64"
   },
   "dependencies": {
     "electron-updater": "^6.8.9",
