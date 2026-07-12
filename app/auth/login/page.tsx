@@ -8,6 +8,7 @@ import {
   magicLinkRedirectUrl,
   needsInAppSignInHandoff,
 } from '@/lib/auth/magic-link';
+import { DesktopUpdateBanner } from '@/components/shell/DesktopUpdateBanner';
 
 const mono = "'JetBrains Mono',monospace";
 const sans = "'Helvetica Neue',Arial,sans-serif";
@@ -111,12 +112,20 @@ function LoginForm() {
       style={{
         minHeight: '100vh',
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        flexDirection: 'column',
         background: '#ECECEE',
-        padding: 24,
       }}
     >
+      <DesktopUpdateBanner />
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 24,
+        }}
+      >
       <div
         style={{
           width: '100%',
@@ -283,6 +292,7 @@ function LoginForm() {
         <p style={{ font: `400 11px/1.5 ${sans}`, color: '#9A9AA0', margin: '24px 0 0' }}>
           No password needed. We email a one-time code and sign-in link.
         </p>
+      </div>
       </div>
     </div>
   );

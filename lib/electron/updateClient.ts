@@ -31,6 +31,9 @@ export function useDesktopUpdate() {
     setSkipped(readSkipped());
     const api = window.flatsix;
     if (!api?.onUpdateStatus) return;
+    void api.updateLastStatus?.().then((s) => {
+      if (s && typeof s === 'object' && 'phase' in s) setStatus(s as DesktopUpdateStatus);
+    });
     return api.onUpdateStatus((s) => setStatus(s));
   }, []);
 

@@ -10,4 +10,5 @@ contextBridge.exposeInMainWorld('flatsix', {
   },
   updateInstall: () => ipcRenderer.invoke('update:install'),
   updateCheck: () => ipcRenderer.invoke('update:check'),
+  updateLastStatus: () => ipcRenderer.invoke('update:lastStatus'),
 });

@@ -8,6 +8,7 @@ export interface FlatsixElectronApi {
   onUpdateStatus?: (callback: (status: DesktopUpdateStatus) => void) => () => void;
   updateInstall?: () => Promise<unknown>;
   updateCheck?: () => Promise<unknown>;
+  updateLastStatus?: () => Promise<DesktopUpdateStatus | null>;
 }
 
 declare global {

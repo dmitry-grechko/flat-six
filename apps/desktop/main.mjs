@@ -230,25 +230,34 @@ function broadcastUpdateStatus(status) {
 function setupAutoUpdater() {
   const { autoUpdater } = createRequire(import.meta.url)('electron-updater');
   autoUpdater.autoDownload = true;
-  autoUpdater.autoInstallOnAppQuit = false;
+  // Login lives outside AppShell (no update banner). Quitting must still apply a
+  // downloaded update so owners are not stuck on an old build at the sign-in screen.
+  autoUpdater.autoInstallOnAppQuit = true;
 
-  autoUpdater.on('checking-for-update', () => broadcastUpdateStatus({ phase: 'checking' }));
+  /** @type {Record<string, unknown> | null} */
+  let lastStatus = null;
+  const push = (status) => {
+    lastStatus = status;
+    broadcastUpdateStatus(status);
+  };
+
+  autoUpdater.on('checking-for-update', () => push({ phase: 'checking' }));
   autoUpdater.on('update-available', (info) => {
-    broadcastUpdateStatus({
+    push({
       phase: 'available',
       version: info.version,
       releaseNotes: typeof info.releaseNotes === 'string' ? info.releaseNotes : undefined,
     });
   });
-  autoUpdater.on('update-not-available', () => broadcastUpdateStatus({ phase: 'uptodate' }));
+  autoUpdater.on('update-not-available', () => push({ phase: 'uptodate' }));
   autoUpdater.on('error', (err) => {
-    broadcastUpdateStatus({ phase: 'error', message: err?.message || String(err) });
+    push({ phase: 'error', message: err?.message || String(err) });
   });
   autoUpdater.on('download-progress', (p) => {
-    broadcastUpdateStatus({ phase: 'downloading', percent: Math.round(p.percent) });
+    push({ phase: 'downloading', percent: Math.round(p.percent) });
   });
   autoUpdater.on('update-downloaded', (info) => {
-    broadcastUpdateStatus({ phase: 'ready', version: info.version });
+    push({ phase: 'ready', version: info.version });
   });
 
   ipcMain.handle('update:check', async () => {
@@ -259,9 +268,13 @@ function setupAutoUpdater() {
     autoUpdater.quitAndInstall();
     return { ok: true };
   });
+  // Late subscribers (e.g. login page) miss events that fired before mount.
+  ipcMain.handle('update:lastStatus', () => lastStatus);
 
   setTimeout(() => {
-    autoUpdater.checkForUpdates().catch(() => {});
+    autoUpdater.checkForUpdates().catch((err) => {
+      push({ phase: 'error', message: err?.message || String(err) });
+    });
   }, 3000);
 }
 
