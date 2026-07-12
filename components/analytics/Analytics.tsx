@@ -26,10 +26,19 @@ export default function Analytics() {
     else if (consent === null) setNeedsChoice(true);
   }, []);
 
+  // Fires on route changes; no-ops until consent is granted (analyticsEnabled).
   useEffect(() => {
     if (pathname) trackPageView(pathname);
   }, [pathname]);
 
+  // Accepting mid-page doesn't change `pathname`, so send the current page_view
+  // now — otherwise a first-time visitor who accepts and never navigates is
+  // invisible to GA.
+  const handleChoose = () => {
+    setNeedsChoice(false);
+    if (getConsent() === 'granted' && pathname) trackPageView(pathname);
+  };
+
   if (electron || !needsChoice) return null;
-  return <ConsentBanner onChoose={() => setNeedsChoice(false)} />;
+  return <ConsentBanner onChoose={handleChoose} />;
 }
