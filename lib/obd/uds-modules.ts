@@ -80,13 +80,44 @@ const CANDIDATES_981: UdsModule[] = [
   { id: 'mod-7f1', name: 'Module 0x7F1 (gateway?)', reqId: '7F1', respId: '7F9', protocol: 'uds', addressConfirmed: true, note: 'Responds; F1 97 blank — likely the gateway.' },
 ];
 
+// Audi A4 (B9, MLB evo) — DISCOVERED + VERIFIED live on a 2017 A4 (VIN WAUFNAF42HN…),
+// USB ELM327, ISO 15765-4 CAN 11-bit 500 kbps. An open-filter sweep of 0x700–0x7FF found
+// 25 responders; each was identified with UDS `22 F1 97` (system name) + `22 F1 87` (VW
+// part number). VAG uses the SAME req+0x6A response convention as the 981. All modules
+// answered UDS `19 02` (fault read) and were clean. The DME (7E0, generic OBD Mode 03) is
+// the shared `DME` entry above. Notes: `respId` collisions (74E/750 → 7B8, 773/774 → 7DD)
+// are paired sensors / infotainment sub-modules; the ABS module (713) also answers on its
+// powertrain-CAN address 7E4/7EC (not re-listed); 7F1 responds but refuses identity in the
+// default session (protected). See tools/obd-bridge/ + docs/procedures/obd-module-discovery.md.
+const CONFIRMED_AUDI_B9: UdsModule[] = [
+  { id: 'steering-column', name: 'Steering column module', reqId: '70C', respId: '776', protocol: 'uds', addressConfirmed: true, note: 'F1 97 = Lenks.Modul; part 4M0907129GK.' },
+  { id: 'bcm', name: 'Body control (BCM1)', reqId: '70E', respId: '778', protocol: 'uds', addressConfirmed: true, note: 'F1 97 = BCM1 MLBevo; part 8W0907063CG.' },
+  { id: 'gateway', name: 'Gateway', reqId: '710', respId: '77A', protocol: 'uds', addressConfirmed: true, note: 'F1 97 = Gateway; part 4M1907468D.' },
+  { id: 'eps', name: 'Steering assist (EPS)', reqId: '712', respId: '77C', protocol: 'uds', addressConfirmed: true, note: 'F1 97 = EPS_MLBEVO_ZF; part 8W0909144G.' },
+  { id: 'abs', name: 'ABS / ESP', reqId: '713', respId: '77D', protocol: 'uds', addressConfirmed: true, note: 'F1 97 = ESP9 Plus (Bosch); part 8W0907379G. Also answers on 7E4/7EC.' },
+  { id: 'cluster', name: 'Instrument cluster (Virtual Cockpit)', reqId: '714', respId: '77E', protocol: 'uds', addressConfirmed: true, note: 'F1 97 = FBenRDW; part 8W5920790C (Virtual Cockpit). Units = long coding DID 0600, byte 1 bit 1 (dual_speedometer); write needs security access level 3 (27 03).' },
+  { id: 'airbag', name: 'Airbag / SRS', reqId: '715', respId: '77F', protocol: 'uds', addressConfirmed: true, note: 'F1 97 = Airbag10.44; part 8W0959655G.' },
+  { id: 'front-camera', name: 'Front camera / driving assist', reqId: '730', respId: '79A', protocol: 'uds', addressConfirmed: true, note: 'F1 97 = FLA; part 8W0857511C.' },
+  { id: 'climate', name: 'Climate (3-zone)', reqId: '746', respId: '7B0', protocol: 'uds', addressConfirmed: true, note: 'F1 97 = Klima Zone 3; part 8W0820043G.' },
+  { id: 'door-driver', name: 'Door control, driver', reqId: '74A', respId: '7B4', protocol: 'uds', addressConfirmed: true, note: 'F1 97 = TSG FS; part 4M0959793E.' },
+  { id: 'door-passenger', name: 'Door control, passenger', reqId: '74B', respId: '7B5', protocol: 'uds', addressConfirmed: true, note: 'F1 97 = TSG BFS; part 4M0959792E.' },
+  { id: 'seat-memory', name: 'Seat memory, driver', reqId: '74C', respId: '7B6', protocol: 'uds', addressConfirmed: true, note: 'F1 97 = MEM-FS; part 4M1959760.' },
+  { id: 'radar-rear', name: 'Rear radar (lane-change assist)', reqId: '74E', respId: '7B8', protocol: 'uds', addressConfirmed: true, note: 'F1 97 = MRR1Rear; part 4M0907566D.' },
+  { id: 'radar-rear-2', name: 'Rear radar (second sensor)', reqId: '750', respId: '7B8', protocol: 'uds', addressConfirmed: true, note: 'Responds; shares resp 7B8 with 74E — paired rear sensor, identity not returned.' },
+  { id: 'gear-selector', name: 'Gear selector (shift-by-wire)', reqId: '753', respId: '7BD', protocol: 'uds', addressConfirmed: true, note: 'F1 97 = GSM-LL; part 8W1713041L.' },
+  { id: 'area-view', name: 'Area View camera (360°)', reqId: '769', respId: '7D3', protocol: 'uds', addressConfirmed: true, note: 'F1 97 = Areaview 2; part 4M0907428E.' },
+  { id: 'mib', name: 'Infotainment (MIB2)', reqId: '76F', respId: '7D9', protocol: 'uds', addressConfirmed: true, note: 'F1 97 = MIB2_amp_P_B9; part 8W0035465.' },
+  { id: 'nav', name: 'Navigation / multimedia', reqId: '773', respId: '7DD', protocol: 'uds', addressConfirmed: true, note: 'F1 97 = MU-P-LNS-US (US-spec); part 8W5035880.' },
+  { id: 'mib-sub', name: 'Infotainment sub-module', reqId: '774', respId: '7DD', protocol: 'uds', addressConfirmed: true, note: 'Responds; shares resp 7DD with 773 — identity not returned.' },
+  { id: 'trans', name: 'Transmission (S tronic DL382)', reqId: '7E1', respId: '7E9', protocol: 'uds', addressConfirmed: true, note: 'F1 97 = 0CL 20TFSINAR; part 8W1927155B. Also a generic-OBD emissions ECU.' },
+  { id: 'mod-7f1', name: 'Protected module (7F1)', reqId: '7F1', respId: '7F9', protocol: 'uds', addressConfirmed: true, note: 'Responds but refuses 22 F1 97 in the default session — likely immobilizer / access control.' },
+];
+
 const REGISTRY: Record<string, UdsModule[]> = {
   '987': [DME, ...CANDIDATES_987],
   '981': [DME, ...CANDIDATES_981],
-  // Audi A4 (B9) — DEV. The DME/ECM answers generic OBD (Mode 03/07) like any
-  // car; VAG manufacturer modules (UDS/ISO 14229) are TODO — discover on-car with
-  // tools/obd-bridge/uds-probe.mjs and add their verified ids here.
-  'audi-b9': [DME],
+  // Audi A4 (B9) — DEV. DME (7E0) via generic OBD Mode 03; VAG modules mapped + verified live.
+  'audi-b9': [DME, ...CONFIRMED_AUDI_B9],
 };
 
 /** Modules to scan for a generation. Unknown generations fall back to DME-only. */

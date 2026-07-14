@@ -6,11 +6,13 @@
  * marks it out of any public engine release — it's a personal / in-development
  * car, not part of the open Porsche packs.
  *
- * What works today: the DME/ECM answers generic OBD-II (Mode 01 live data, Mode 03
- * generic DTCs) like any compliant car. What is UNVERIFIED — the "collect the
- * data" work dev mode exists to hold — is VAG manufacturer fault memory, the
- * non-DME module map (UDS / ISO 14229), enhanced PIDs, and DID identity reads. The
- * profile below is generic UDS until confirmed on the actual car.
+ * VERIFIED live on a 2017 A4 (B9) over ISO 15765-4 (CAN 11-bit, 500 kbps): the
+ * DME/ECM answers generic OBD-II (Mode 01 live data, Mode 03 generic DTCs) and UDS
+ * `19 02`, and the full VAG module map (25 modules, UDS / ISO 14229) was discovered
+ * and identified — see `uds-modules.ts` (`REGISTRY['audi-b9']`). Still open: enhanced
+ * live PIDs (VAG `22` DIDs) and any manufacturer fault descriptions (the car scanned
+ * clean, so none captured yet). Note: cluster coding writes (e.g. km↔mph units in the
+ * Virtual Cockpit long coding) are gated by UDS security access level 3 — read-only here.
  */
 import { registerVehiclePack } from './packs';
 import { udsModulesFor } from './uds-modules';
@@ -30,8 +32,8 @@ registerVehiclePack({
       readSid: '19',
       clearCmd: '14FFFFFF',
       clearSid: '14',
-      verified: false,
-      note: 'Candidate — B9 is VAG UDS (ISO 14229). Generic OBD Mode 03 is confirmed-universal; manufacturer fault memory + module addresses are unverified. Discover on-car with tools/obd-bridge/uds-probe.mjs.',
+      verified: true,
+      note: 'Verified on a 2017 A4 (B9): ECM 7E0/7E8 answers generic OBD Mode 03 (scanned clean) and UDS 19 02. 25 VAG modules mapped via open-filter sweep — req+0x6A response ids (see uds-modules.ts). Clear (14) stays behind the UI confirm.',
     },
     modules: udsModulesFor('audi-b9'),
   },
