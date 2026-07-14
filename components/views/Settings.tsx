@@ -3,18 +3,20 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { colorsFor, enginesFor, transmissionsFor, defaultEngine, defaultTransmission } from '@/lib/data';
-import { useVehicle, visibleModelOptions } from '@/lib/vehicle-context';
+import { useVehicle } from '@/lib/vehicle-context';
 import { useIsAdmin } from '@/lib/useIsAdmin';
+import ModelPicker from '@/components/shell/ModelPicker';
 import { generationForBody, getVariant } from '@/lib/models';
 import { createClient } from '@/lib/supabase/client';
 import { DEMO_MODE, DEMO_EMAIL } from '@/lib/demo';
-import { useUnits, milesToDisplay, displayToMiles } from '@/lib/units';
+import { useUnits, milesToDisplay, displayToMiles, useAccountUnits } from '@/lib/units';
 import { track } from '@/lib/analytics';
 
 export default function Settings() {
   const router = useRouter();
   const { vehicle, update, reset } = useVehicle();
   const { units, setUnits } = useUnits();
+  const { torque, pressure, setTorque, setPressure } = useAccountUnits();
   const isAdmin = useIsAdmin();
   const [email, setEmail] = useState<string>('');
 
@@ -73,9 +75,14 @@ export default function Settings() {
     textTransform: 'uppercase',
     color: '#9A9AA0',
   };
+  const sectionHeading: React.CSSProperties = {
+    font: "600 12px/1 'JetBrains Mono',monospace", letterSpacing: '.16em', textTransform: 'uppercase',
+    color: '#0B0B0C', margin: '2px 2px 12px',
+  };
 
   return (
     <div className="padView" style={{ padding: 28, maxWidth: 880 }}>
+      <div style={sectionHeading}>Account settings</div>
       <div style={{ background: '#fff', border: '1px solid #E3E3E5', borderRadius: 4, padding: 24, marginBottom: 18 }}>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: 18 }}>
           <div style={{ font: "500 10px/1 'JetBrains Mono',monospace", letterSpacing: '.16em', color: '#9A9AA0' }}>ACCOUNT</div>
@@ -95,6 +102,33 @@ export default function Settings() {
       </div>
 
       <div style={{ background: '#fff', border: '1px solid #E3E3E5', borderRadius: 4, padding: 24, marginBottom: 18 }}>
+        <div style={{ font: "500 10px/1 'JetBrains Mono',monospace", letterSpacing: '.16em', color: '#9A9AA0', marginBottom: 18 }}>
+          UNITS OF MEASUREMENT
+        </div>
+        <label style={fieldLabel}>Torque</label>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 18 }}>
+          {(['Nm', 'ft-lb'] as const).map((u) => (
+            <button key={u} onClick={() => { setTorque(u); track('units_changed', { torque: u }); }} style={chip(torque === u)}>
+              {u === 'Nm' ? 'Newton-metres (Nm)' : 'Foot-pounds (ft·lb)'}
+            </button>
+          ))}
+        </div>
+        <label style={fieldLabel}>Air / tyre pressure</label>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {(['bar', 'psi'] as const).map((u) => (
+            <button key={u} onClick={() => { setPressure(u); track('units_changed', { pressure: u }); }} style={chip(pressure === u)}>
+              {u === 'bar' ? 'Bar' : 'Pounds / in² (psi)'}
+            </button>
+          ))}
+        </div>
+        <p style={{ margin: '10px 0 0', font: "400 12px/1.5 'Helvetica Neue',Arial,sans-serif", color: '#9A9AA0' }}>
+          Applies to torque specs and tyre-pressure figures across the app. Saved for your account on this device.
+        </p>
+      </div>
+
+      <div style={sectionHeading}>Vehicle settings</div>
+
+      <div style={{ background: '#fff', border: '1px solid #E3E3E5', borderRadius: 4, padding: 24, marginBottom: 18 }}>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: 18 }}>
           <div style={{ font: "500 10px/1 'JetBrains Mono',monospace", letterSpacing: '.16em', color: '#9A9AA0' }}>VEHICLE</div>
           <button
@@ -106,27 +140,23 @@ export default function Settings() {
         </div>
 
         <label style={fieldLabel}>Model (rendered in 3D)</label>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
-          {visibleModelOptions(isAdmin).map((m) => (
-            <button
-              key={m.id}
-              onClick={() => {
-                // A variant with a signature powertrain (e.g. GT4 = 3.8 / manual)
-                // snaps to it; otherwise keep a still-valid selection, else default.
-                const target = getVariant(m.id);
-                const g = target.generation;
-                const patch: Partial<typeof vehicle> = { body: m.id, model: m.modelName };
-                if (target.defaultEngine) patch.engine = target.defaultEngine;
-                else if (!enginesFor(g).includes(vehicle.engine)) patch.engine = defaultEngine(g);
-                if (target.defaultTransmission) patch.trans = target.defaultTransmission;
-                else if (!transmissionsFor(g).includes(vehicle.trans)) patch.trans = defaultTransmission(g);
-                update(patch);
-              }}
-              style={chip(vehicle.body === m.id)}
-            >
-              {m.label}
-            </button>
-          ))}
+        <div style={{ marginBottom: 20 }}>
+          <ModelPicker
+            value={vehicle.body}
+            isAdmin={isAdmin}
+            onSelect={(id) => {
+              // A variant with a signature powertrain (e.g. GT4 = 3.8 / manual)
+              // snaps to it; otherwise keep a still-valid selection, else default.
+              const target = getVariant(id);
+              const g = target.generation;
+              const patch: Partial<typeof vehicle> = { body: id, model: target.modelName };
+              if (target.defaultEngine) patch.engine = target.defaultEngine;
+              else if (!enginesFor(g).includes(vehicle.engine)) patch.engine = defaultEngine(g);
+              if (target.defaultTransmission) patch.trans = target.defaultTransmission;
+              else if (!transmissionsFor(g).includes(vehicle.trans)) patch.trans = defaultTransmission(g);
+              update(patch);
+            }}
+          />
         </div>
 
         <div className="stackSm" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 20 }}>
@@ -188,14 +218,9 @@ export default function Settings() {
             </span>
           ))}
         </div>
-      </div>
 
-      <div style={{ background: '#fff', border: '1px solid #E3E3E5', borderRadius: 4, padding: 24, marginBottom: 18 }}>
-        <div style={{ font: "500 10px/1 'JetBrains Mono',monospace", letterSpacing: '.16em', color: '#9A9AA0', marginBottom: 18 }}>
-          PREFERENCES
-        </div>
-        <label style={fieldLabel}>Distance units</label>
-        <div style={{ display: 'flex', gap: 8 }}>
+        <label style={fieldLabel}>Distance units (this car)</label>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
           {(['mi', 'km'] as const).map((u) => (
             <button key={u} onClick={() => { setUnits(u); track('units_changed', { unit: u }); }} style={chip(units === u)}>
               {u === 'mi' ? 'Miles (mi)' : 'Kilometres (km)'}
@@ -203,7 +228,7 @@ export default function Settings() {
           ))}
         </div>
         <p style={{ margin: '10px 0 0', font: "400 12px/1.5 'Helvetica Neue',Arial,sans-serif", color: '#9A9AA0' }}>
-          Applies to the odometer, service history, and maintenance plans across the app.
+          Odometer, service history and maintenance plans for this car. Stored per vehicle — switching cars switches units.
         </p>
       </div>
 

@@ -4,6 +4,7 @@ import { useMemo, useState, type CSSProperties } from 'react';
 import { useVehicle } from '@/lib/vehicle-context';
 import { generationForBody } from '@/lib/models';
 import { presetsForGeneration, PCD, CENTER_BORE_MM, WHEEL_BOLT_TORQUE } from '@/lib/fitment/oem';
+import { useAccountUnits, formatTorque } from '@/lib/units';
 import { mono, sans } from '@/components/tools/ui';
 import WillItFit from '@/components/tools/WillItFit';
 import TireSizeCalc from '@/components/tools/TireSizeCalc';
@@ -34,6 +35,7 @@ export default function ToolsLibrary() {
   const [presetId, setPresetId] = useState<string>('');
   const preset = presets.find((p) => p.id === presetId) ?? presets[0];
   const hasFitment = presets.length > 0;
+  const { torque: torqueUnit } = useAccountUnits();
   const noFitment = (
     <div style={{ padding: 24, color: '#6E6E73', font: `400 14px/1.55 ${sans}` }}>
       No OEM wheel/tyre fitment data on file for this vehicle yet.
@@ -80,7 +82,7 @@ export default function ToolsLibrary() {
           <>
             <span style={chip()}>PCD {PCD}</span>
             <span style={chip()}>Bore {CENTER_BORE_MM} mm</span>
-            <span style={chip()}>Wheel bolt {WHEEL_BOLT_TORQUE[gen as '981' | '987']}</span>
+            <span style={chip()}>Wheel bolt {formatTorque(WHEEL_BOLT_TORQUE[gen as '981' | '987'], torqueUnit)}</span>
           </>
         )}
       </div>

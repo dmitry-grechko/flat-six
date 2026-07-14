@@ -9,6 +9,7 @@ import knownIssuesJson from './known-issues.json';
 import { ARTICLES } from './articles';
 import faultCodes987Json from './fault-codes-987.json';
 import specs987Json from './specs-987.json';
+import specsAudiB9Json from './specs-audi-b9.json';
 import maintenance987Json from './maintenance-987.json';
 import knownIssues987Json from './known-issues-987.json';
 import { ARTICLES_987 } from './articles-987';
@@ -58,6 +59,16 @@ const GENERATION_KB: Record<string, KnowledgeBundle> = {
     maintenance: maintenance987Json as MaintenanceItem[],
     knownIssues: knownIssues987Json as KnownIssue[],
     articles: ARTICLES_987,
+  },
+  // Audi A4 (B9) — dev car. Verified fluids/capacities/tyre-pressures extracted
+  // from the factory fluid + tyre-pressure tables. Faults/known-issues/articles
+  // are still empty (honest absence) until more Audi data is collected.
+  'audi-b9': {
+    faultCodes: [],
+    specs: specsAudiB9Json as Spec[],
+    maintenance: [],
+    knownIssues: [],
+    articles: [],
   },
 };
 

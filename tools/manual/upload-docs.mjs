@@ -48,6 +48,7 @@ function storageKeyFor(rel) {
     if ((m = sub.match(/^Training Books\/(.+)$/))) return `shared/training/${m[1]}`;
     if ((m = sub.match(/^987 Maintenance\/(.+)$/))) return `987/maintenance/${m[1]}`;
     if ((m = sub.match(/^981 Parts\/(.+)$/))) return `981/parts/${m[1]}`;
+    if ((m = sub.match(/^Audi A4 B9\/(.+)$/))) return `audi-b9/${m[1]}`;
   }
   return r; // fallback: unchanged
 }
@@ -134,6 +135,7 @@ function collectLocalFiles() {
   walk(path.join(PUBLIC, 'mobile_tech_library/981 Parts'));
   walk(path.join(PUBLIC, 'mobile_tech_library/Service Information Technik/Boxster-Cayman'), (n) => sitAllow.has(n));
   walk(path.join(PUBLIC, 'mobile_tech_library/Training Books'), (n) => trainAllow.has(n));
+  walk(path.join(PUBLIC, 'mobile_tech_library/Audi A4 B9'));
   return files;
 }
 

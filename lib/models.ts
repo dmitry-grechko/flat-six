@@ -50,6 +50,12 @@ export interface CarVariant {
    * explicitly for other marques (e.g. 'Audi') as multi-marque support lands.
    */
   make?: string;
+  /**
+   * Nameplate / model line for the cascading picker (e.g. 'Boxster', 'Cayman',
+   * 'A4', future '911'). Defaults to the capitalised bodyStyle for Porsche
+   * mid-engine cars; set explicitly for other marques. See variantNameplate().
+   */
+  nameplate?: string;
 }
 
 export const CAR_VARIANTS: CarVariant[] = [
@@ -69,7 +75,7 @@ export const CAR_VARIANTS: CarVariant[] = [
   // model picker. FLAT·SIX's first non-Porsche marque — a scaffold to collect
   // models/data on. No 2D cutaway / 3D X-ray yet (honest absence); OBD runs on a
   // generic-UDS pack (lib/obd/pack-audi-b9.ts). Powertrain is provisional.
-  { id: 'audi-a4-b9', make: 'Audi', generation: 'audi-b9', bodyStyle: 'sedan', label: 'A4 (B9) · dev', modelName: 'Audi A4 (B9)', glb: '/models/audi-a4-b9.glb', hasCutaway2D: false, hasXray3D: false, status: 'development', defaultEngine: '2.0 TFSI', defaultTransmission: '7-Speed S tronic (DSG)' },
+  { id: 'audi-a4-b9', make: 'Audi', nameplate: 'A4', generation: 'audi-b9', bodyStyle: 'sedan', label: 'A4 (B9) · dev', modelName: 'Audi A4 (B9)', glb: '/models/audi-a4-b9.glb', hasCutaway2D: false, hasXray3D: false, status: 'development', defaultEngine: '2.0 TFSI', defaultTransmission: '7-Speed S tronic (DSG)' },
 ];
 
 export function getVariant(id: BodyType): CarVariant {
@@ -82,6 +88,47 @@ export function variantGlb(id: BodyType): string {
 
 /** All distinct generations we know about, e.g. ['981','987']. */
 export const GENERATIONS: string[] = Array.from(new Set(CAR_VARIANTS.map((v) => v.generation)));
+
+// ---- Cascading picker helpers (Brand → Model → Year → variant) -------------
+
+/** Model-year range per generation, shown on the picker's "year" step. */
+export const GENERATION_YEARS: Record<string, string> = {
+  '987': '2005–2012',
+  '981': '2012–2016',
+  '991': '2011–2019',
+  'audi-b9': '2016–2024',
+};
+export function generationYears(gen: string): string {
+  return GENERATION_YEARS[gen] ?? '';
+}
+
+/** Short generation code for display (e.g. 'audi-b9' → 'B9', '981' → '981'). */
+export function generationCode(gen: string): string {
+  return gen.replace(/^audi-/i, '').toUpperCase();
+}
+
+/** Brand for a variant (defaults to Porsche). */
+export function variantMake(v: CarVariant): string {
+  return v.make ?? 'Porsche';
+}
+
+/** Nameplate / model line (Boxster & Cayman derive from bodyStyle). */
+export function variantNameplate(v: CarVariant): string {
+  if (v.nameplate) return v.nameplate;
+  if (v.bodyStyle === 'boxster') return 'Boxster';
+  if (v.bodyStyle === 'cayman') return 'Cayman';
+  return v.modelName;
+}
+
+/** Leaf label — modelName without the trailing "(gen)" (e.g. "Cayman GT4"). */
+export function variantShortName(v: CarVariant): string {
+  return v.modelName.replace(/\s*\([^)]*\)\s*$/, '').trim();
+}
+
+/** Selectable variants for the current user — 'development' cars are admin-only. */
+export function visibleVariants(isAdmin: boolean): CarVariant[] {
+  return isAdmin ? CAR_VARIANTS : CAR_VARIANTS.filter((v) => v.status !== 'development');
+}
 
 /** Resolve a stored vehicle.body id to its generation (defaults to 981). */
 export function generationForBody(body: string | null | undefined): string {

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { getSpecs, type Spec } from '@/lib/knowledge';
+import { useAccountUnits, formatTorque, type TorqueUnit } from '@/lib/units';
 import { searchTorqueManual, type ManualHit } from '@/lib/manual-lookup';
 import { manualHitHref } from '@/lib/documents';
 import { useDocumentsAccess } from '@/lib/hooks/useDocumentsAccess';
@@ -45,6 +46,7 @@ function extractTorques(text: string): string[] {
 
 export default function TorqueFinder({ gen }: { gen: string }) {
   const [q, setQ] = useState('');
+  const { torque: torqueUnit } = useAccountUnits();
 
   // "Search the full manual" tier: plain FTS (no embeddings) over the manual.
   // The app is auth-gated except in demo mode, so we simply skip this tier in
@@ -153,7 +155,7 @@ export default function TorqueFinder({ gen }: { gen: string }) {
           <ToolSection>{g.label}</ToolSection>
           <InfoBox style={{ padding: '4px 16px' }}>
             {g.items.map((s) => (
-              <TorqueRow key={s.id} spec={s} />
+              <TorqueRow key={s.id} spec={s} unit={torqueUnit} />
             ))}
           </InfoBox>
         </div>
@@ -234,7 +236,7 @@ function ManualTorqueRow({ hit }: { hit: ManualHit }) {
   );
 }
 
-function TorqueRow({ spec }: { spec: Spec }) {
+function TorqueRow({ spec, unit }: { spec: Spec; unit: TorqueUnit }) {
   const factory = isFactorySource(spec.source);
   return (
     <div style={{ padding: '13px 0', borderBottom: '1px solid #F0F0F1' }}>
@@ -261,7 +263,7 @@ function TorqueRow({ spec }: { spec: Spec }) {
             </span>
           )}
         </div>
-        <span style={{ font: `600 16px/1.1 ${mono}`, color: RED, whiteSpace: 'nowrap' }}>{spec.value}</span>
+        <span style={{ font: `600 16px/1.1 ${mono}`, color: RED, whiteSpace: 'nowrap' }}>{formatTorque(spec.value, unit)}</span>
       </div>
 
       {spec.notes && (

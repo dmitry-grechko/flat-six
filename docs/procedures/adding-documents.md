@@ -97,6 +97,26 @@ once embedded). Knowledge JSON flows through `search_knowledge` /
   to scope by generation, use `get_spec` for DIY shortcuts, and fall through to
   `search_workshop_manual` → `get_manual_procedure` for factory depth.
 
+## Bulk import for a non-Porsche marque (Audi B9 reference)
+
+For a whole marque's doc set, don't hand-register each file:
+
+1. Drop the source PDFs anywhere, then `node tools/manual/stage-audi-docs.mjs <srcDir>`
+   — it curates an A4-relevant, **de-duplicated** set (skips the duplicate service-
+   manual tree + off-engine docs), categorises + copies into
+   `public/mobile_tech_library/Audi A4 B9/<category>/`, gs-compresses any file
+   >50 MB, **key-sanitises filenames** (Supabase Storage rejects unicode dashes),
+   and emits `lib/documents-audi-b9.json`.
+2. `lib/documents.ts` maps that manifest → `DocumentMeta` (generation `audi-b9`).
+   Add the marque's key to the `DocGeneration` union + `documentsForGeneration`
+   allow-list (and keep Porsche `'shared'` docs off non-Porsche cars).
+3. Add a target to `parse-mtl.mjs` `TARGETS`, then `node parse-mtl.mjs data/mtl-<m>.json`,
+   **filter to that generation's rows**, `node import-manual.mjs …`, `npm run db:embed-manual`.
+   `manual_sections.generation` has no constraint, so any key works.
+4. Extract structured specs (fluids, capacities, tyre pressures) into
+   `lib/knowledge/specs-<gen>.json` + wire into `GENERATION_KB`. `kb:lint` picks up
+   any generation with at least one bundle file.
+
 ## Checklist
 
 - [ ] PDF under `public/` canonical path

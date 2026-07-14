@@ -6,6 +6,8 @@
  * is the only thing the app ships.
  */
 
+import audiDocsManifest from './documents-audi-b9.json';
+
 export type DocCategory =
   | 'workshop'
   | 'diagnostic'
@@ -14,7 +16,7 @@ export type DocCategory =
   | 'maintenance'
   | 'parts';
 
-export type DocGeneration = '981' | '987' | 'shared';
+export type DocGeneration = '981' | '987' | 'shared' | 'audi-b9';
 
 export interface DocumentMeta {
   /** Stable id used in URLs (?doc=…) and Storage object keys. */
@@ -399,11 +401,30 @@ function slug(s: string): string {
     .slice(0, 80);
 }
 
-/** Full catalog shown in the Documents tab (981 / 987 scoped). */
+/**
+ * Audi A4 (B9) — dev car. Generated from the staged, curated, de-duplicated doc
+ * set (tools/manual/stage-audi-docs.mjs → lib/documents-audi-b9.json). Storage
+ * keys mirror tools/manual/upload-docs.mjs (`audi-b9/<category>/<file>`).
+ */
+const AUDI_B9_DOCS: DocumentMeta[] = (
+  audiDocsManifest as { file: string; title: string; category: DocCategory; sizeMb: number }[]
+).map((d) => ({
+  id: `audi-b9-${slug(d.file.replace(/\.pdf$/i, ''))}`,
+  title: d.title,
+  subtitle: 'Audi A4 (B9)',
+  category: d.category,
+  generations: ['audi-b9'],
+  storagePath: `audi-b9/${d.file}`,
+  localUrl: publicUrl(`${MTL}/Audi A4 B9/${d.file}`),
+  sizeLabel: `~${d.sizeMb} MB`,
+}));
+
+/** Full catalog shown in the Documents tab (981 / 987 / audi-b9 scoped). */
 export const DOCUMENTS: DocumentMeta[] = [
   ...WORKSHOP_VOLUMES,
   ...WORKSHOP_VOLUMES_9871,
   ...WORKSHOP_VOLUMES_9872,
+  ...AUDI_B9_DOCS,
 
   // ---- 981 Parts ----
   parts981('981 Parts Catalog 2012-2016.pdf', '981 Parts Catalog', 'Official PET parts catalog · Boxster/Cayman (981) 2012–2016 · 794 pp', '~31 MB'),
@@ -589,15 +610,16 @@ export function resolveWorkshopViewerLink(
 
 export function documentsForGeneration(gen: string | null | undefined): DocumentMeta[] {
   if (!gen) return DOCUMENTS;
-  // Only Porsche doc-generations (981/987) have a factory library. 'shared' docs
-  // are shared across THOSE generations, not marque-agnostic — so an unknown /
-  // non-Porsche generation (e.g. audi-b9) has no factory docs and returns [],
-  // rather than leaking the Porsche library.
-  const PORSCHE_DOC_GENS: DocGeneration[] = ['981', '987'];
-  if (!PORSCHE_DOC_GENS.includes(gen as DocGeneration)) return [];
-  return DOCUMENTS.filter(
-    (d) => d.generations.includes('shared') || d.generations.includes(gen as DocGeneration),
-  );
+  // Only generations we actually stock docs for get a library; anything else
+  // returns [] (honest absence) rather than leaking another marque's docs.
+  const KNOWN_DOC_GENS: DocGeneration[] = ['981', '987', 'audi-b9'];
+  if (!KNOWN_DOC_GENS.includes(gen as DocGeneration)) return [];
+  return DOCUMENTS.filter((d) => {
+    if (d.generations.includes(gen as DocGeneration)) return true;
+    // 'shared' docs are Porsche-marque general references — keep them off a
+    // non-Porsche car.
+    return gen !== 'audi-b9' && d.generations.includes('shared');
+  });
 }
 
 /** Basename of a storage path without `.pdf`. */

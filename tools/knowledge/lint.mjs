@@ -30,14 +30,16 @@ const DTC_RE = /^[PBCU][0-3][0-9A-F]{3}$/; // OBD-II DTC, incl. valid hex-tail c
 const MANUFACTURER_DTC_RE = /^[0-9A-F]{6}$/i; // Porsche/UDS raw codes (e.g. 000401, 89020E)
 
 // ---- Discover generations -----------------------------------------------
-// fault-codes.json -> '981' (default); fault-codes-<gen>.json -> '<gen>'.
+// <base>.json -> '981' (default); <base>-<gen>.json -> '<gen>'. Scans every
+// bundle base so a generation with only some bundles (e.g. audi-b9 = specs only)
+// is still linted.
 function discoverGenerations() {
-  const gens = [];
+  const gens = new Set();
   for (const f of readdirSync(KB_DIR)) {
-    const m = f.match(/^fault-codes(?:-([^.]+))?\.json$/);
-    if (m) gens.push(m[1] ?? '981');
+    const m = f.match(/^(?:fault-codes|specs|maintenance|known-issues)(?:-([^.]+))?\.json$/);
+    if (m) gens.add(m[1] ?? '981');
   }
-  return gens.sort();
+  return [...gens].sort();
 }
 
 function load(gen, base) {
