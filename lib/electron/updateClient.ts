@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { isElectronShell } from '@/lib/obd/electronClient';
+import { isElectronShell } from '@/lib/electron/shell';
 
 export type DesktopUpdateStatus =
   | { phase: 'idle' }

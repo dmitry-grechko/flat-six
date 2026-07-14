@@ -2,7 +2,7 @@
  * Smoke tests for the per-generation OBD profile registry.
  * Run: npx tsx lib/obd/profiles.test.ts
  */
-import { obdProfile, OBD_PROFILE_GENERATIONS } from './profiles';
+import { obdProfile, obdProfileGenerations } from './profiles';
 
 function assert(cond: boolean, msg: string) {
   if (!cond) throw new Error(msg);
@@ -26,6 +26,6 @@ const pUnknown = obdProfile('zzz');
 assert(pUnknown.dme.protocol === 'uds', 'unknown → UDS default');
 assert(pUnknown.modules.length >= 1, 'unknown → at least DME');
 
-assert(OBD_PROFILE_GENERATIONS.includes('981'), 'registry lists 981');
+assert(obdProfileGenerations().includes('981'), 'registry lists 981');
 
 console.log('lib/obd profiles tests OK');

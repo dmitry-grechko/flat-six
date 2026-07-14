@@ -1,0 +1,23 @@
+{
+  "name": "@flatsix/obd-core",
+  "version": "0.1.0",
+  "description": "Framework-agnostic OBD-II / KWP2000 / UDS engine for ELM327 adapters. Generic Mode 01/03/06/07/0A decoders plus a per-generation Porsche module-scan + DME-profile layer. No React, Next, Supabase, or app dependencies.",
+  "license": "MIT",
+  "private": true,
+  "keywords": [
+    "obd",
+    "obd-ii",
+    "elm327",
+    "uds",
+    "kwp2000",
+    "iso-tp",
+    "diagnostics",
+    "web-serial",
+    "porsche"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dmitry-grechko/flat-six",
+    "directory": "lib/obd"
+  }
+}

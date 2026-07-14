@@ -174,7 +174,7 @@ export interface ObdScan {
 
 // Selectable car-variant ids (also stored as vehicle.body). Legacy 981 values
 // stay 'boxster'/'cayman'; newer generations are suffixed. See lib/models.ts.
-export type BodyType = 'boxster' | 'cayman' | 'cayman-gt4-981' | 'cayman-987' | 'boxster-987' | 'spyder-987';
+export type BodyType = 'boxster' | 'cayman' | 'cayman-gt4-981' | 'cayman-987' | 'boxster-987' | 'spyder-987' | 'audi-a4-b9';
 
 export interface Vehicle {
   /** which 3D model to render */

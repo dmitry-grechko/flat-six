@@ -39,6 +39,11 @@ license (CC BY 4.0 — https://creativecommons.org/licenses/by/4.0/). Required a
   > NonCommercial term is fine — but any redistributed derivative of this model
   > must stay under the same CC BY-NC-SA licence.
 
+- **"Audi a4 2017"** (https://skfb.ly/pwU8o) by **davidthe19th**,
+  licensed under [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/).
+  Served as `public/models/audi-a4-b9.glb` (for the in-development, admin-only
+  Audi A4 (B9)).
+
 The in-app attribution is shown in the Garage 3D viewer (exterior view).
 
 ## Procedural models (internals)

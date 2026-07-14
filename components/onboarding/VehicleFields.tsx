@@ -1,7 +1,8 @@
 'use client';
 
-import { COLORS, enginesFor, transmissionsFor, defaultEngine, defaultTransmission } from '@/lib/data';
-import { MODEL_OPTIONS } from '@/lib/vehicle-context';
+import { colorsFor, enginesFor, transmissionsFor, defaultEngine, defaultTransmission } from '@/lib/data';
+import { visibleModelOptions } from '@/lib/vehicle-context';
+import { useIsAdmin } from '@/lib/useIsAdmin';
 import { generationForBody, getVariant } from '@/lib/models';
 import type { BodyType } from '@/lib/types';
 
@@ -82,6 +83,7 @@ export default function VehicleFields({
   value: VehicleFormState;
   onChange: (patch: Partial<VehicleFormState>) => void;
 }) {
+  const isAdmin = useIsAdmin();
   const gen = generationForBody(value.body);
   const engines = enginesFor(gen);
   const transmissions = transmissionsFor(gen);
@@ -90,7 +92,7 @@ export default function VehicleFields({
     <>
       <label style={fieldLabel}>Model</label>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
-        {MODEL_OPTIONS.map((m) => (
+        {visibleModelOptions(isAdmin).map((m) => (
           <button
             key={m.id}
             type="button"
@@ -195,7 +197,7 @@ export default function VehicleFields({
 
       <label style={fieldLabel}>Paint — {value.colorName}</label>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-        {COLORS.map((c) => (
+        {colorsFor(gen).map((c) => (
           <span key={c.hex} className="colorSwatch">
             <button
               type="button"

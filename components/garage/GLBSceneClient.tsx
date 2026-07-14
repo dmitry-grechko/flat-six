@@ -13,14 +13,24 @@ import type { EnginePart } from '@/lib/types';
 //   • Ddiaz boxster → "…Car_Paint…"          • 987 models → "car_paint" / "…CARSKIN…"
 //   • GT4 (OUTPISTON) → "Vehicle_Exterior_mm_ext"
 //   • Ddiaz cayman (981) → "Cphong3SG1" (its M_Paint_Metal + M_Paint_Plastic shell)
-const BODY_MAT = /paint|car|Vehicle_Exterior_mm_ext$|^Cphong3SG1$/i;
+//   • Audi A4 B9 (davidthe19th) → "A4_tex" (a single-atlas "clay" material shared
+//     by body + rims + trim, so paint colours body and rims together; glass
+//     "a4_tex_glass" stays excluded by the $ anchor)
+const BODY_MAT = /paint|car|Vehicle_Exterior_mm_ext$|^Cphong3SG1$|^A4_tex$/i;
 // A material can read as "paint-ish" by substring yet not be the painted shell —
 // e.g. the Spyder's underbody is "…CARBOTTOM…" which the /car/ term catches.
 // Exclude underbody/undertray/floor panels so they keep their own dark finish.
 const NOT_BODY_MAT = /bottom|under|floor/i;
-const TYRE_MAT = /^1529b39_dds$|^c4bb8b1e_dds1$|^c5ebe6d_dds$|MAT_Tire/i;
-const DISC_RIM_MAT = /MAT_Disk|MAT_Hub|MAT_Brake/i;
+const TYRE_MAT = /^1529b39_dds$|^c4bb8b1e_dds1$|^c5ebe6d_dds$|MAT_Tire|sidewall/i;
+const DISC_RIM_MAT = /MAT_Disk|MAT_Hub|MAT_Brake|tormoz/i;
 const YELLOW_MAP_MAT = /_dds/i;
+// Audi A4 (B9, davidthe19th) is a single-atlas "clay" model: head/tail-lamp lenses
+// (vehiclelights), window glass (a4_tex_glass) and the grille frame (bumper_frame)
+// otherwise render as flat white primer. Give them lens / tinted-glass / dark-trim
+// looks. These names are Audi-specific, so Porsche models are untouched.
+const LENS_MAT = /vehiclelights/i;
+const GLASS_MAT = /a4_tex_glass/i;
+const GRILLE_MAT = /bumper_frame/i;
 const HILITE = new THREE.Color('#D5001C');
 
 function isStandardMat(m: THREE.Material): m is THREE.MeshStandardMaterial {
@@ -39,8 +49,10 @@ function Model({ src, paintHex, parts, selectedPartId, onSelectPart }: {
   const { scene } = useGLTF(src);
   const cloned = useMemo(() => scene.clone(true), [scene]);
 
-  // Make materials instance-local (clone), then fix wheel/tyre/disc colours.
+  // Make materials instance-local (clone), detect wheel rims geometrically, then
+  // fix wheel/tyre/rim/lens/glass/grille colours.
   useEffect(() => {
+    // Pass 1 — clone materials so edits stay instance-local; keep shadows.
     cloned.traverse((obj) => {
       const mesh = obj as THREE.Mesh;
       if (!mesh.isMesh) return;
@@ -49,19 +61,71 @@ function Model({ src, paintHex, parts, selectedPartId, onSelectPart }: {
       mesh.material = Array.isArray(mesh.material)
         ? mesh.material.map((m) => m.clone())
         : mesh.material.clone();
+      (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).forEach((mat) => {
+        if (isStandardMat(mat) && mat.opacity < 1) { mat.transparent = true; mat.depthWrite = false; }
+      });
+    });
 
+    // Pass 2 — rim detection. On single-atlas "clay" models (e.g. the Audi A4) the
+    // wheel rims share the BODY material, so the paint pass would tint them. A rim
+    // is the body-material mesh concentric with a tyre (tyres we CAN identify by
+    // material). Flag it → rendered silver + skipped by the paint pass. This is
+    // name-independent (GLTFLoader overwrites glTF mesh names with node names). The
+    // concentric distance guard means it never fires on models whose rims are a
+    // separate material (e.g. the Porsche GLBs) — no body panel gets mis-silvered.
+    cloned.updateMatrixWorld(true);
+    const bbox = new THREE.Box3();
+    const firstMatName = (m: THREE.Mesh) =>
+      ((Array.isArray(m.material) ? m.material[0] : m.material)?.name) || '';
+    const tyres: { center: THREE.Vector3; radius: number }[] = [];
+    const bodyMeshes: { mesh: THREE.Mesh; center: THREE.Vector3 }[] = [];
+    cloned.traverse((obj) => {
+      const mesh = obj as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      const nm = firstMatName(mesh);
+      if (TYRE_MAT.test(nm)) {
+        bbox.setFromObject(mesh);
+        const size = bbox.getSize(new THREE.Vector3());
+        tyres.push({ center: bbox.getCenter(new THREE.Vector3()), radius: Math.max(size.x, size.y, size.z) * 0.5 });
+      } else if (BODY_MAT.test(nm) && !NOT_BODY_MAT.test(nm)) {
+        bodyMeshes.push({ mesh, center: bbox.setFromObject(mesh).getCenter(new THREE.Vector3()) });
+      }
+    });
+    for (const tyre of tyres) {
+      let rim: THREE.Mesh | null = null;
+      let best = Infinity;
+      for (const b of bodyMeshes) {
+        const d = b.center.distanceTo(tyre.center);
+        if (d < best) { best = d; rim = b.mesh; }
+      }
+      // Only a body mesh CONCENTRIC with the tyre is a rim (guards other marques).
+      if (rim && best < tyre.radius * 0.5) rim.userData.__rim = true;
+    }
+
+    // Pass 3 — recolour by material (rims first, by flag).
+    cloned.traverse((obj) => {
+      const mesh = obj as THREE.Mesh;
+      if (!mesh.isMesh) return;
       const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
       mats.forEach((mat) => {
         if (!mat || !isStandardMat(mat)) return;
-        if (mat.opacity < 1) {
-          mat.transparent = true;
-          mat.depthWrite = false;
-        }
         const name = mat.name || '';
-        if (TYRE_MAT.test(name)) {
+        if (mesh.userData.__rim) {
+          // Machined-aluminium wheel — never body colour.
+          mat.map = null; mat.color = new THREE.Color('#b7bbc0'); mat.metalness = 0.85; mat.roughness = 0.35; mat.needsUpdate = true;
+        } else if (TYRE_MAT.test(name)) {
           mat.map = null; mat.color = new THREE.Color('#1a1a1c'); mat.metalness = 0.05; mat.roughness = 0.85; mat.needsUpdate = true;
         } else if (DISC_RIM_MAT.test(name)) {
           mat.map = null; mat.color = new THREE.Color('#8a8d92'); mat.metalness = 0.9; mat.roughness = 0.35; mat.needsUpdate = true;
+        } else if (LENS_MAT.test(name)) {
+          // Head/tail-lamp lens — light, slightly reflective (reads as glass, not primer).
+          mat.map = null; mat.color = new THREE.Color('#b9bdc2'); mat.metalness = 0.25; mat.roughness = 0.18; mat.needsUpdate = true;
+        } else if (GLASS_MAT.test(name)) {
+          // Window glass — dark tinted + semi-transparent.
+          mat.map = null; mat.color = new THREE.Color('#1c2026'); mat.metalness = 0.1; mat.roughness = 0.06; mat.opacity = 0.5; mat.transparent = true; mat.depthWrite = false; mat.needsUpdate = true;
+        } else if (GRILLE_MAT.test(name)) {
+          // Grille frame — dark trim.
+          mat.map = null; mat.color = new THREE.Color('#26282b'); mat.metalness = 0.5; mat.roughness = 0.5; mat.needsUpdate = true;
         } else if (YELLOW_MAP_MAT.test(name)) {
           mat.map = null; mat.color = new THREE.Color('#9a9da2'); mat.metalness = 0.6; mat.roughness = 0.5; mat.needsUpdate = true;
         }
@@ -78,7 +142,8 @@ function Model({ src, paintHex, parts, selectedPartId, onSelectPart }: {
       const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
       mats.forEach((mat) => {
         const nm = mat?.name || '';
-        if (mat && isStandardMat(mat) && BODY_MAT.test(nm) && !NOT_BODY_MAT.test(nm)) {
+        // Skip rims (silvered in the fixup pass) so changing paint never tints them.
+        if (mat && isStandardMat(mat) && BODY_MAT.test(nm) && !NOT_BODY_MAT.test(nm) && !mesh.userData.__rim) {
           // Drop any baked albedo (baseColor) texture so the chosen paint
           // renders true instead of multiplying/overriding it — some models
           // (e.g. the GT4) bake the body colour into a map. Normal/AO/roughness

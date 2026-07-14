@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type FC } from 'react';
 import { useRouter } from 'next/navigation';
-import { COMPONENTS, SYSTEMS, COLORS, diffDots, DIFF_LABELS, componentsForGeneration, formatInterval } from '@/lib/data';
+import { COMPONENTS, SYSTEMS, colorsFor, diffDots, DIFF_LABELS, componentsForGeneration, formatInterval } from '@/lib/data';
 import { transmissionMaintenance } from '@/lib/knowledge/transmission';
 import { brakeMaintenance } from '@/lib/knowledge/brakes';
 import { extractPartNumbers, normalizePartNumber } from '@/lib/parts-extract';
@@ -333,7 +333,7 @@ export default function ComponentExplorer() {
                         <div style={{ position: 'absolute', left: 0, bottom: 'calc(100% + 8px)', width: 'min(236px, 72vw)', background: 'rgba(255,255,255,.98)', border: '1px solid #E3E3E5', borderRadius: 8, boxShadow: '0 12px 30px rgba(0,0,0,.18)', padding: 12 }}>
                           <div style={{ font: `600 9px/1 ${mono}`, letterSpacing: '.14em', color: '#9A9AA0', marginBottom: 10 }}>PAINT</div>
                           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                            {COLORS.map((c) => (
+                            {colorsFor(variant.generation).map((c) => (
                               <span key={c.hex} className="colorSwatch">
                                 <button
                                   onClick={() => { setPaint(c.hex); setPaintOpen(false); }}

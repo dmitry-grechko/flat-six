@@ -83,6 +83,10 @@ const CANDIDATES_981: UdsModule[] = [
 const REGISTRY: Record<string, UdsModule[]> = {
   '987': [DME, ...CANDIDATES_987],
   '981': [DME, ...CANDIDATES_981],
+  // Audi A4 (B9) — DEV. The DME/ECM answers generic OBD (Mode 03/07) like any
+  // car; VAG manufacturer modules (UDS/ISO 14229) are TODO — discover on-car with
+  // tools/obd-bridge/uds-probe.mjs and add their verified ids here.
+  'audi-b9': [DME],
 };
 
 /** Modules to scan for a generation. Unknown generations fall back to DME-only. */

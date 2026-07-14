@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { useObdBridge } from '@/lib/obd/useObdBridge';
+import { useObdBridge } from '@/lib/obd-react/useObdBridge';
 import { useVehicle, modelGlb } from '@/lib/vehicle-context';
 import { generationForBody } from '@/lib/models';
 import type { EnginePart } from '@/lib/types';
@@ -23,7 +23,7 @@ import type {
 } from '@/lib/obd/types';
 import { udsModulesFor } from '@/lib/obd/uds-modules';
 import { BetaBadge } from '@/components/shell/BetaBadge';
-import { useObdFocus } from '@/lib/obd/ObdFocusContext';
+import { useObdFocus } from '@/lib/obd-react/ObdFocusContext';
 import { createClient } from '@/lib/supabase/client';
 import { isAdminEmail } from '@/lib/admin';
 import { DEMO_MODE } from '@/lib/demo';

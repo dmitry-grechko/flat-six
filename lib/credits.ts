@@ -66,6 +66,15 @@ export const MODEL_CREDITS: Record<BodyType, ModelCredit> = {
     license: CC_BY_NC_SA,
     licenseUrl: CC_BY_NC_SA_URL,
   },
+  // CC BY 4.0 — the same permissive, commercial-friendly licence as the
+  // Boxster/Cayman models above (attribution required, no NonCommercial term).
+  'audi-a4-b9': {
+    title: 'Audi a4 2017',
+    author: 'davidthe19th',
+    source: 'https://skfb.ly/pwU8o',
+    license: CC_BY,
+    licenseUrl: CC_BY_URL,
+  },
 };
 
 export const MODEL_CREDIT_LIST = Object.values(MODEL_CREDITS);

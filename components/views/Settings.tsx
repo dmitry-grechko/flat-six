@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { COLORS, enginesFor, transmissionsFor, defaultEngine, defaultTransmission } from '@/lib/data';
-import { useVehicle, MODEL_OPTIONS } from '@/lib/vehicle-context';
+import { colorsFor, enginesFor, transmissionsFor, defaultEngine, defaultTransmission } from '@/lib/data';
+import { useVehicle, visibleModelOptions } from '@/lib/vehicle-context';
+import { useIsAdmin } from '@/lib/useIsAdmin';
 import { generationForBody, getVariant } from '@/lib/models';
 import { createClient } from '@/lib/supabase/client';
 import { DEMO_MODE, DEMO_EMAIL } from '@/lib/demo';
@@ -14,6 +15,7 @@ export default function Settings() {
   const router = useRouter();
   const { vehicle, update, reset } = useVehicle();
   const { units, setUnits } = useUnits();
+  const isAdmin = useIsAdmin();
   const [email, setEmail] = useState<string>('');
 
   // Odometer input buffer: show the stored miles converted to the active unit,
@@ -105,7 +107,7 @@ export default function Settings() {
 
         <label style={fieldLabel}>Model (rendered in 3D)</label>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
-          {MODEL_OPTIONS.map((m) => (
+          {visibleModelOptions(isAdmin).map((m) => (
             <button
               key={m.id}
               onClick={() => {
@@ -171,7 +173,7 @@ export default function Settings() {
 
         <label style={fieldLabel}>Paint — {vehicle.colorName}</label>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 4 }}>
-          {COLORS.map((c) => (
+          {colorsFor(generationForBody(vehicle.body)).map((c) => (
             <span key={c.hex} className="colorSwatch">
               <button
                 aria-label={c.name}

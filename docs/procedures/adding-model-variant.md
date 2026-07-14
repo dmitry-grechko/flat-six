@@ -30,6 +30,15 @@ viewer all read from here automatically.
 - Add the credit to `lib/credits.ts` (`MODEL_CREDITS[id]`) **and** `NOTICE.md`.
   Watch the licence — e.g. a CC BY-NC-SA asset is fine for this non-commercial
   project but can't ship commercially.
+- For the paint picker to tint the model, the GLB's body-shell material name must
+  match `BODY_MAT` in `components/garage/GLBSceneClient.tsx`. Inspect the GLB's
+  material names and add the body one (e.g. the Audi A4's `A4_tex`) to that regex.
+
+> **Non-Porsche marque or a not-yet-ready car?** Set `make` and
+> `status: 'development'` on the `CarVariant`, and see the *Multi-marque, staging,
+> and the golden scoping rule* section of
+> [adding-new-generation.md](./adding-new-generation.md) — the registry checklist
+> and the "never collapse the generation" rule apply.
 
 ## 4. Options that differ (engines / trans / colors)
 
@@ -57,7 +66,8 @@ If the variant runs unique OEM wheels, add a `FitmentPreset` in
 ## Checklist
 
 - [ ] `BodyType` extended (`lib/types.ts`)
-- [ ] `CarVariant` added (`lib/models.ts`)
+- [ ] `CarVariant` added (`lib/models.ts`) — `make` + `status` if non-Porsche / staged
 - [ ] GLB in `public/models/` + credit in `lib/credits.ts` + `NOTICE.md`
+- [ ] Paint tints the model (GLB body material added to `BODY_MAT`); `colorsFor` palette if the marque differs
 - [ ] Options/colors/fitment extended if the variant differs
 - [ ] Picker + viewer verified; `tsc` clean

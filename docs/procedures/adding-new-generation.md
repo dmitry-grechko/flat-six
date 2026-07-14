@@ -11,6 +11,50 @@ it touches every layer. Do it in this order and keep each layer consistent.
 > variant. So you can land the selectable exterior + knowledge first and flip the
 > visual flags on later.
 
+## Multi-marque, staging (dev/prod), and the golden scoping rule
+
+Generations are no longer Porsche-only. Two mechanisms and one rule make adding
+any car — including a non-Porsche marque, or a car you want live for admins only
+while you build it — safe:
+
+- **`make` + staging** (`lib/models.ts`): set `make: 'Audi'` (defaults to
+  `'Porsche'`) and `status: 'development'` on the `CarVariant`. A `development`
+  variant is hidden from the model picker for non-admins (`useIsAdmin()` +
+  `visibleModelOptions()` in `lib/vehicle-context.tsx`) but is fully functional
+  once in a garage — this is how a WIP car ships to production for admin testing.
+  Flip to `status: 'stable'` (or drop the field) to launch it. `bodyStyle` accepts
+  `'sedan'` for non-mid-engine bodies; extend the union for more.
+
+- **THE GOLDEN SCOPING RULE — never collapse the generation.** Every surface must
+  read the vehicle's *actual* generation and let the registries return an **honest
+  empty** for one they don't cover. Do **NOT** write
+  `const gen = g === '987' ? '987' : '981'` (or any `?? '981'` on a display path):
+  it maps every unknown/non-Porsche car to 981 and shows Porsche parts, docs,
+  torque and fitment on it. Pass the real generation — `documentsForGeneration`,
+  `presetsForGeneration`, `getSpecs`, `alignmentForGeneration`, `exteriorPartsFor`
+  and `colorsFor` already return empty/`[]` for unknown generations. When empty,
+  render a "no data for this vehicle yet" state, not Porsche data. (This
+  anti-pattern caused every leak in the Audi B9 rollout.)
+
+### Registries a new marque / generation touches
+
+| Concern | Registry / file | Unknown-gen behaviour |
+| --- | --- | --- |
+| Variant + staging | `CAR_VARIANTS` (`lib/models.ts`) — `make`, `status`, `bodyStyle`, `glb`, `hasCutaway2D/hasXray3D` | n/a (you add it) |
+| Powertrain | `GENERATION_POWERTRAIN` (`lib/data.ts`) | falls back to 981 — **add an entry** |
+| Paint | `GENERATION_COLORS` / `colorsFor` (`lib/data.ts`) | falls back to Porsche `COLORS` — **add a `COLORS_<x>` palette** |
+| Knowledge (faults/specs/maint/issues) | `GENERATION_KB` (`lib/knowledge`) | empty bundle ✓ |
+| Documents | `documentsForGeneration` (`lib/documents.ts`) | `[]` for non-981/987 ✓ |
+| Fitment / alignment | `presetsForGeneration` / `alignmentForGeneration` (`lib/fitment`) | `[]` / `null` ✓ |
+| Exterior pins | `exteriorPartsFor` (`lib/exterior-parts.ts`) | `[]` ✓ |
+| OBD | `registerVehiclePack` (`lib/obd/packs.ts` + a `pack-<x>.ts` imported by `profiles.ts`) | generic-UDS fallback ✓ |
+| 3D paint tint | `BODY_MAT` regex (`components/garage/GLBSceneClient.tsx`) | **add the GLB's body material name** |
+| Model credit | `MODEL_CREDITS` (`lib/credits.ts`, `Record<BodyType>`) + `NOTICE.md` | **required** (tsc fails otherwise) |
+
+A non-Porsche marque should show honest-empty knowledge / docs / tools / pins
+until you collect its data — that is expected, not a bug. The **Audi A4 (B9)** is
+the reference example: grep `audi-b9` / `audi-a4-b9` to see every touch point.
+
 ## 1. Variant registry — `lib/models.ts` + `lib/types.ts`
 
 - Add the generation to the `CarVariant.generation` union.

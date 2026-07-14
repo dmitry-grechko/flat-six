@@ -11,7 +11,7 @@ export interface CarVariant {
   /** stable id, also stored as vehicle.body */
   id: BodyType;
   generation: '981' | '987' | '991' | (string & {});
-  bodyStyle: 'boxster' | 'cayman';
+  bodyStyle: 'boxster' | 'cayman' | 'sedan';
   /** short label for the model picker chip, e.g. "Cayman (987)" */
   label: string;
   /** default vehicle.model when this variant is chosen, e.g. "Cayman S (987)" */
@@ -38,6 +38,18 @@ export interface CarVariant {
    */
   defaultEngine?: string;
   defaultTransmission?: string;
+  /**
+   * Release gate. 'development' variants are hidden from the model picker for
+   * non-admin users (but stay fully functional once in a garage) — the mechanism
+   * for shipping an in-progress car to production for admin testing before it is
+   * made public. Defaults to 'stable' when unset.
+   */
+  status?: 'stable' | 'development';
+  /**
+   * Manufacturer. Defaults to 'Porsche' when unset (every legacy variant). Set
+   * explicitly for other marques (e.g. 'Audi') as multi-marque support lands.
+   */
+  make?: string;
 }
 
 export const CAR_VARIANTS: CarVariant[] = [
@@ -53,6 +65,11 @@ export const CAR_VARIANTS: CarVariant[] = [
   { id: 'boxster-987', generation: '987', bodyStyle: 'boxster', label: 'Boxster (987)', modelName: 'Boxster S (987)', glb: '/models/cayman-987.glb', hasCutaway2D: true, hasXray3D: true },
   // Boxster Spyder (987.2) — dedicated exterior GLB; shares 987 cutaway + X-ray.
   { id: 'spyder-987', generation: '987', bodyStyle: 'boxster', label: 'Spyder (987)', modelName: 'Boxster Spyder (987)', glb: '/models/spyder-987.glb', hasCutaway2D: true, hasXray3D: true },
+  // Audi A4 (B9, 2016–2023) — DEV MODE (status: 'development'): admin-only in the
+  // model picker. FLAT·SIX's first non-Porsche marque — a scaffold to collect
+  // models/data on. No 2D cutaway / 3D X-ray yet (honest absence); OBD runs on a
+  // generic-UDS pack (lib/obd/pack-audi-b9.ts). Powertrain is provisional.
+  { id: 'audi-a4-b9', make: 'Audi', generation: 'audi-b9', bodyStyle: 'sedan', label: 'A4 (B9) · dev', modelName: 'Audi A4 (B9)', glb: '/models/audi-a4-b9.glb', hasCutaway2D: false, hasXray3D: false, status: 'development', defaultEngine: '2.0 TFSI', defaultTransmission: '7-Speed S tronic (DSG)' },
 ];
 
 export function getVariant(id: BodyType): CarVariant {

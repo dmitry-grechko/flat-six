@@ -6,7 +6,7 @@ import Sidebar from './Sidebar';
 import { BetaBadge } from './BetaBadge';
 import { useVehicle } from '@/lib/vehicle-context';
 import { useOffline } from '@/lib/offline/OfflineProvider';
-import { useObdFocus } from '@/lib/obd/ObdFocusContext';
+import { useObdFocus } from '@/lib/obd-react/ObdFocusContext';
 import { DesktopUpdateBanner } from './DesktopUpdateBanner';
 
 const mono = "'JetBrains Mono',monospace";

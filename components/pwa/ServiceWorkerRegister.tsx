@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { isElectronShell } from '@/lib/obd/electronClient';
+import { isElectronShell } from '@/lib/electron/shell';
 
 /**
  * Registers the next-pwa service worker.

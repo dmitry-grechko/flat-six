@@ -26,8 +26,9 @@ export default function DocumentLibrary() {
   const docId = searchParams.get('doc');
   const pageParam = Number(searchParams.get('page') || '0');
   const { vehicle } = useVehicle();
-  const vehicleGen = generationForBody(vehicle.body);
-  const gen = vehicleGen === '987' || vehicleGen === '981' ? vehicleGen : '981';
+  // Use the vehicle's ACTUAL generation — never collapse to 981. A non-Porsche
+  // generation resolves to an empty library (honest absence) instead of the 981 set.
+  const gen = generationForBody(vehicle.body);
   const { allowed, loading } = useDocumentsAccess();
 
   const [q, setQ] = useState('');
@@ -198,7 +199,9 @@ export default function DocumentLibrary() {
 
       {filtered.length === 0 && (
         <div style={{ padding: 32, textAlign: 'center', color: '#9A9AA0', font: "400 14px 'Helvetica Neue',Arial,sans-serif" }}>
-          No documents match this filter.
+          {q.trim()
+            ? 'No documents match this filter.'
+            : `No factory documents on file for ${vehicle.model || gen} yet.`}
         </div>
       )}
     </div>

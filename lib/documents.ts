@@ -589,6 +589,12 @@ export function resolveWorkshopViewerLink(
 
 export function documentsForGeneration(gen: string | null | undefined): DocumentMeta[] {
   if (!gen) return DOCUMENTS;
+  // Only Porsche doc-generations (981/987) have a factory library. 'shared' docs
+  // are shared across THOSE generations, not marque-agnostic — so an unknown /
+  // non-Porsche generation (e.g. audi-b9) has no factory docs and returns [],
+  // rather than leaking the Porsche library.
+  const PORSCHE_DOC_GENS: DocGeneration[] = ['981', '987'];
+  if (!PORSCHE_DOC_GENS.includes(gen as DocGeneration)) return [];
   return DOCUMENTS.filter(
     (d) => d.generations.includes('shared') || d.generations.includes(gen as DocGeneration),
   );

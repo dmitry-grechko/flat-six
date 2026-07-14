@@ -17,7 +17,7 @@ type ExteriorDef = Omit<EnginePart, 'system'> & {
   /** Generations this pin applies to. */
   generations: Array<'981' | '987'>;
   /** Body styles; omit = both boxster and cayman. Soft-top only on boxster. */
-  bodyStyles?: Array<'boxster' | 'cayman'>;
+  bodyStyles?: Array<'boxster' | 'cayman' | 'sedan'>;
 };
 
 const EXTERIOR_DEFS: ExteriorDef[] = [
@@ -282,9 +282,12 @@ const EXTERIOR_DEFS: ExteriorDef[] = [
 
 export function exteriorPartsFor(body: BodyType): EnginePart[] {
   const variant = getVariant(body);
-  const gen = variant.generation === '987' ? '987' : '981';
+  // Match the vehicle's ACTUAL generation — never collapse to 981. EXTERIOR_DEFS
+  // only cover Porsche 981/987, so any other generation (e.g. a non-Porsche
+  // marque like audi-b9) correctly matches nothing and returns [] — no Porsche
+  // pins leak onto it.
   return EXTERIOR_DEFS.filter((d) => {
-    if (!d.generations.includes(gen)) return false;
+    if (!d.generations.includes(variant.generation as '981' | '987')) return false;
     if (d.bodyStyles && !d.bodyStyles.includes(variant.bodyStyle)) return false;
     return true;
   }).map(({ generations: _g, bodyStyles: _b, ...part }) => part);
