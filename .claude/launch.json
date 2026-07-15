@@ -6,6 +6,13 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["next", "dev"],
       "autoPort": true
+    },
+    {
+      "name": "flatsix-demo",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["next", "dev"],
+      "autoPort": true,
+      "env": { "NEXT_PUBLIC_DEMO_MODE": "true" }
     }
   ]
 }

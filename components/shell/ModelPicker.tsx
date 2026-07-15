@@ -40,9 +40,11 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
 const uniq = (arr: string[]) => Array.from(new Set(arr));
 
 /**
- * Cascading vehicle picker: Brand → Model → Year/Generation → variant. Replaces
- * the flat, mixed-generation chip list so the selector stays intuitive as more
- * marques/models are added. Single-option levels auto-advance; the final leaf
+ * Cascading vehicle picker: Brand → Model → Generation → variant. Collapses to a
+ * one-line summary of the selected car once chosen; "Change" re-opens the cascade.
+ * This keeps the panel compact and makes the model identity (which drives the 3D
+ * model + all per-generation data) the single source of truth — no free-text model
+ * field to drift out of sync. Single-option levels auto-advance; the final leaf
  * commits via onSelect. Dev-mode cars are admin-only (visibleVariants).
  */
 export default function ModelPicker({
@@ -57,6 +59,8 @@ export default function ModelPicker({
   const variants = visibleVariants(isAdmin);
   const current = variants.find((v) => v.id === value);
 
+  // Collapsed to the summary when we already have a valid car; expanded otherwise.
+  const [editing, setEditing] = useState(!current);
   const [brand, setBrand] = useState<string | null>(current ? variantMake(current) : null);
   const [nameplate, setNameplate] = useState<string | null>(current ? variantNameplate(current) : null);
   const [gen, setGen] = useState<string | null>(current ? current.generation : null);
@@ -78,6 +82,19 @@ export default function ModelPicker({
         )
       : [];
 
+  const openEdit = () => {
+    if (current) {
+      setBrand(variantMake(current));
+      setNameplate(variantNameplate(current));
+      setGen(current.generation);
+    }
+    setEditing(true);
+  };
+  const commit = (id: BodyType) => {
+    onSelect(id);
+    setEditing(false);
+  };
+
   const pickBrand = (b: string) => {
     setBrand(b);
     const ms = uniq(variants.filter((v) => variantMake(v) === b).map(variantNameplate));
@@ -96,11 +113,48 @@ export default function ModelPicker({
     const vs = variants.filter(
       (v) => variantMake(v) === brand && variantNameplate(v) === nameplate && v.generation === g,
     );
-    if (vs.length === 1) onSelect(vs[0].id); // single variant → commit immediately
+    if (vs.length === 1) commit(vs[0].id); // single variant → commit + collapse
   };
 
+  // Collapsed summary of the selected car.
+  if (!editing && current) {
+    const meta = [generationCode(current.generation), generationYears(current.generation), 'rendered in 3D']
+      .filter(Boolean)
+      .join(' · ');
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px', background: '#FAFAFB', border: '1px solid #E3E3E5', borderRadius: 4 }}>
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div style={{ font: `500 16px/1.2 ${sans}`, color: '#0B0B0C' }}>
+            {variantMake(current)} {variantShortName(current)}
+          </div>
+          <div style={{ font: `500 11px/1.3 ${mono}`, letterSpacing: '.04em', color: '#9A9AA0', marginTop: 3 }}>{meta}</div>
+        </div>
+        <button
+          type="button"
+          onClick={openEdit}
+          style={{ flex: 'none', padding: '8px 13px', borderRadius: 2, border: '1px solid #DDDDE0', background: '#fff', font: `500 11px/1 ${mono}`, letterSpacing: '.06em', color: '#6E6E73', cursor: 'pointer' }}
+        >
+          CHANGE
+        </button>
+      </div>
+    );
+  }
+
+  // Expanded cascade.
   return (
     <div>
+      {current && (
+        <div style={{ display: 'flex', marginBottom: 12 }}>
+          <button
+            type="button"
+            onClick={() => setEditing(false)}
+            style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', font: `500 10px/1 ${mono}`, letterSpacing: '.08em', color: '#9A9AA0' }}
+          >
+            CANCEL
+          </button>
+        </div>
+      )}
+
       <Row label="Brand">
         {brands.map((b) => (
           <button key={b} type="button" onClick={() => pickBrand(b)} style={chip(brand === b)}>
@@ -120,10 +174,10 @@ export default function ModelPicker({
       )}
 
       {brand && nameplate && (
-        <Row label="Year">
+        <Row label="Generation">
           {gens.map((g) => (
             <button key={g} type="button" onClick={() => pickGen(g)} style={chip(gen === g)}>
-              {generationYears(g) ? `${generationYears(g)} · ${generationCode(g)}` : generationCode(g)}
+              {generationYears(g) ? `${generationCode(g)} · ${generationYears(g)}` : generationCode(g)}
             </button>
           ))}
         </Row>
@@ -132,7 +186,7 @@ export default function ModelPicker({
       {brand && nameplate && gen && leaves.length > 1 && (
         <Row label="Variant">
           {leaves.map((v) => (
-            <button key={v.id} type="button" onClick={() => onSelect(v.id)} style={chip(value === v.id)}>
+            <button key={v.id} type="button" onClick={() => commit(v.id)} style={chip(value === v.id)}>
               {variantShortName(v)}
             </button>
           ))}

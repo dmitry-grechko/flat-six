@@ -79,6 +79,10 @@ export default function Settings() {
     font: "600 12px/1 'JetBrains Mono',monospace", letterSpacing: '.16em', textTransform: 'uppercase',
     color: '#0B0B0C', margin: '2px 2px 12px',
   };
+  const subLabel: React.CSSProperties = {
+    font: "500 10px/1 'JetBrains Mono',monospace", letterSpacing: '.16em', textTransform: 'uppercase',
+    color: '#9A9AA0', margin: '0 0 14px',
+  };
 
   return (
     <div className="padView" style={{ padding: 28, maxWidth: 880 }}>
@@ -139,14 +143,16 @@ export default function Settings() {
           </button>
         </div>
 
-        <label style={fieldLabel}>Model (rendered in 3D)</label>
-        <div style={{ marginBottom: 20 }}>
+        <div style={subLabel}>Model</div>
+        <div style={{ marginBottom: 22 }}>
           <ModelPicker
             value={vehicle.body}
             isAdmin={isAdmin}
             onSelect={(id) => {
               // A variant with a signature powertrain (e.g. GT4 = 3.8 / manual)
               // snaps to it; otherwise keep a still-valid selection, else default.
+              // model follows the variant name — the picker owns it, so there's no
+              // free-text field to drift out of sync.
               const target = getVariant(id);
               const g = target.generation;
               const patch: Partial<typeof vehicle> = { body: id, model: target.modelName };
@@ -159,11 +165,10 @@ export default function Settings() {
           />
         </div>
 
+        <div style={{ height: 1, background: '#EDEDEF', margin: '0 0 20px' }} />
+        <div style={subLabel}>This car</div>
+
         <div className="stackSm" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 20 }}>
-          <div>
-            <label style={fieldLabel}>Model name</label>
-            <input value={vehicle.model} onChange={(e) => update({ model: e.target.value })} style={inputStyle} />
-          </div>
           <div>
             <label style={fieldLabel}>Model year</label>
             <input value={vehicle.year} onChange={(e) => update({ year: e.target.value })} style={inputStyle} />
@@ -171,10 +176,6 @@ export default function Settings() {
           <div>
             <label style={fieldLabel}>Licence plate</label>
             <input value={vehicle.plate} onChange={(e) => update({ plate: e.target.value })} style={inputStyle} />
-          </div>
-          <div style={{ gridColumn: '1 / 3' }}>
-            <label style={fieldLabel}>Chassis VIN</label>
-            <input value={vehicle.vin} onChange={(e) => update({ vin: e.target.value })} style={{ ...inputStyle, font: "500 14px 'JetBrains Mono',monospace", letterSpacing: '.04em' }} />
           </div>
           <div>
             <label style={fieldLabel}>Odometer ({units})</label>
@@ -184,6 +185,10 @@ export default function Settings() {
               onBlur={commitOdo}
               style={{ ...inputStyle, fontFamily: "'JetBrains Mono',monospace" }}
             />
+          </div>
+          <div style={{ gridColumn: '1 / 4' }}>
+            <label style={fieldLabel}>Chassis VIN</label>
+            <input value={vehicle.vin} onChange={(e) => update({ vin: e.target.value })} style={{ ...inputStyle, font: "500 14px 'JetBrains Mono',monospace", letterSpacing: '.04em' }} />
           </div>
         </div>
 
@@ -202,7 +207,7 @@ export default function Settings() {
         </div>
 
         <label style={fieldLabel}>Paint — {vehicle.colorName}</label>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 4 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 4, marginBottom: 22 }}>
           {colorsFor(generationForBody(vehicle.body)).map((c) => (
             <span key={c.hex} className="colorSwatch">
               <button
