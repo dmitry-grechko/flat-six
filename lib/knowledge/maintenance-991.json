@@ -1,0 +1,27 @@
+[
+  {
+    "id": "991-oil-service",
+    "task": "Engine oil & filter service",
+    "intervalMiles": 12000,
+    "intervalMonths": 24,
+    "system": "Engine",
+    "notes": "Per the flexible service-reminder indicator, at the latest after 20,000 km / 12,000 miles or 2 years (A markets). For race-track use the oil & filter must be changed every 10,000 km / 6,000 miles. MA103/MA104 capacity 7.5 L.",
+    "source": "Porsche 991 Workshop Manual · WM 030400 Oil change service"
+  },
+  {
+    "id": "991-drive-belt",
+    "task": "Accessory (poly-V) drive belt replacement",
+    "intervalMiles": 40000,
+    "system": "Engine",
+    "notes": "Maintenance item 'Check drive belt' must always be performed at 60,000 km / 40,000 miles.",
+    "source": "Porsche 991 Workshop Manual · WM 031400 Intermediate maintenance"
+  },
+  {
+    "id": "991-brake-fluid-change",
+    "task": "Brake fluid change",
+    "intervalMonths": 24,
+    "system": "Brakes",
+    "notes": "DOT 4, every 2 years regardless of mileage (standard Porsche interval). Bleed at both bleeder valves on each caliper.",
+    "source": "Porsche 991 Workshop Manual · WM 470107 Bleeding the brake system"
+  }
+]

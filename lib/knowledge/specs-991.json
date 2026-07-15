@@ -1,0 +1,52 @@
+[
+  {
+    "id": "991-oil-capacity",
+    "category": "capacity",
+    "name": "Engine oil capacity (oil change)",
+    "value": "7.5 L (with or without filter)",
+    "notes": "MA103 / MA104 flat-six (991.1 Carrera 3.4 / 3.8, naturally aspirated). After engine disassembly: 10.1 L (10.4 L for China / MA104). The 991.2 twin-turbo 3.0 (MDC/MDD), Turbo 3.8 and GT 4.0 engines differ — check the manual for those.",
+    "appliesTo": ["3.4 L Flat-Six (Carrera)", "3.8 L Flat-Six (Carrera S/GTS)"],
+    "source": "Porsche 991 Workshop Manual · WM 170155 Changing engine oil and oil filter"
+  },
+  {
+    "id": "991-oil-drain-torque",
+    "category": "torque",
+    "name": "Engine oil drain plug",
+    "value": "50 Nm (37 ft·lb)",
+    "notes": "Use a new sealing ring each time.",
+    "source": "Porsche 991 Workshop Manual · WM 170155 Changing engine oil and oil filter"
+  },
+  {
+    "id": "991-spark-plug-torque",
+    "category": "torque",
+    "name": "Spark plug",
+    "value": "32 Nm (24 ft·lb) ±2 Nm",
+    "notes": "Flat-six, one plug per cylinder (coil-on-plug).",
+    "source": "Porsche 991 Workshop Manual · spark plug replacement"
+  },
+  {
+    "id": "991-wheel-bolt-torque",
+    "category": "torque",
+    "name": "Wheel fastening bolt",
+    "value": "160 Nm (118 ft·lb)",
+    "notes": "Bolted wheels. Central-lock wheels (GT3 / Turbo option) use a single central bolt with a different procedure and much higher torque (central bolt spec > 400 Nm; GT3 cheese-head retaining bolts M8 = 31 Nm) — do not apply 160 Nm to a central lock.",
+    "source": "Porsche 991 Workshop Manual · Removing and installing wheel"
+  },
+  {
+    "id": "991-brake-fluid",
+    "category": "fluid",
+    "name": "Brake fluid",
+    "value": "DOT 4",
+    "notes": "Use only new DOT 4. Each caliper has two bleeder valves — bleed at both. Bleeding / change pressure approx. 2.0 bar (29 psi).",
+    "source": "Porsche 991 Workshop Manual · WM 470107 Bleeding the brake system"
+  },
+  {
+    "id": "991-pdk-fluid-capacity",
+    "category": "capacity",
+    "name": "PDK transmission oil (dry fill)",
+    "value": "3.3 L",
+    "notes": "7-speed PDK dual-clutch transaxle. Dry-fill capacity from the manual; a service refill (drain-and-fill) takes less. PDK uses its own approved ATF — do not substitute manual gear oil.",
+    "appliesTo": ["7-Speed PDK"],
+    "source": "Porsche 991 Workshop Manual · PDK transmission (filling capacity)"
+  }
+]

@@ -3,7 +3,7 @@
  * session cookie never lands in the app unless we complete sign-in here.
  */
 
-import { isElectronShell } from '@/lib/obd/electronClient';
+import { isElectronShell } from '@/lib/electron/shell';
 
 export function isInstalledPwa(): boolean {
   if (typeof window === 'undefined') return false;

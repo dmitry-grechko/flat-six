@@ -6,6 +6,8 @@
  * is the only thing the app ships.
  */
 
+import audiDocsManifest from './documents-audi-b9.json';
+
 export type DocCategory =
   | 'workshop'
   | 'diagnostic'
@@ -14,7 +16,7 @@ export type DocCategory =
   | 'maintenance'
   | 'parts';
 
-export type DocGeneration = '981' | '987' | 'shared';
+export type DocGeneration = '981' | '987' | '991' | 'shared' | 'audi-b9';
 
 export interface DocumentMeta {
   /** Stable id used in URLs (?doc=…) and Storage object keys. */
@@ -211,13 +213,32 @@ export const WORKSHOP_VOLUMES_9872: DocumentMeta[] = [
   },
 ];
 
+/**
+ * 911 (991, 2011–2019) factory service manual — compressed volumes.
+ * Page ranges match `public/manual/volumes-991.json` (npm run manual:compress-991).
+ */
+export const WORKSHOP_VOLUMES_991: DocumentMeta[] = [
+  { id: '991-workshop-manual-v1', title: '991 Workshop Manual — Vol 1', subtitle: 'Pages 1–1376 · 911 (991) 2011–2019', category: 'workshop', generations: ['991'], storagePath: '991/workshop/991-workshop-manual-v1.pdf', localUrl: '/manual/991-workshop-manual-v1.pdf', sizeLabel: '~29 MB' },
+  { id: '991-workshop-manual-v2', title: '991 Workshop Manual — Vol 2', subtitle: 'Pages 1377–2752 · 911 (991) 2011–2019', category: 'workshop', generations: ['991'], storagePath: '991/workshop/991-workshop-manual-v2.pdf', localUrl: '/manual/991-workshop-manual-v2.pdf', sizeLabel: '~29 MB' },
+  { id: '991-workshop-manual-v3', title: '991 Workshop Manual — Vol 3', subtitle: 'Pages 2753–4128 · 911 (991) 2011–2019', category: 'workshop', generations: ['991'], storagePath: '991/workshop/991-workshop-manual-v3.pdf', localUrl: '/manual/991-workshop-manual-v3.pdf', sizeLabel: '~31 MB' },
+  { id: '991-workshop-manual-v4', title: '991 Workshop Manual — Vol 4', subtitle: 'Pages 4129–5504 · 911 (991) 2011–2019', category: 'workshop', generations: ['991'], storagePath: '991/workshop/991-workshop-manual-v4.pdf', localUrl: '/manual/991-workshop-manual-v4.pdf', sizeLabel: '~33 MB' },
+  { id: '991-workshop-manual-v5', title: '991 Workshop Manual — Vol 5', subtitle: 'Pages 5505–6880 · 911 (991) 2011–2019', category: 'workshop', generations: ['991'], storagePath: '991/workshop/991-workshop-manual-v5.pdf', localUrl: '/manual/991-workshop-manual-v5.pdf', sizeLabel: '~28 MB' },
+  { id: '991-workshop-manual-v6', title: '991 Workshop Manual — Vol 6', subtitle: 'Pages 6881–8256 · 911 (991) 2011–2019', category: 'workshop', generations: ['991'], storagePath: '991/workshop/991-workshop-manual-v6.pdf', localUrl: '/manual/991-workshop-manual-v6.pdf', sizeLabel: '~36 MB' },
+];
+
 /** Absolute page ranges matching `npm run manual:compress` (6087 pages / 3). */
 export const WORKSHOP_VOLUME_RANGES: ReadonlyArray<{
   id: string;
   startPage: number;
   endPage: number;
-  series?: '981' | '9871' | '9872';
+  series?: '981' | '9871' | '9872' | '991';
 }> = [
+  { id: '991-workshop-manual-v1', startPage: 1, endPage: 1376, series: '991' },
+  { id: '991-workshop-manual-v2', startPage: 1377, endPage: 2752, series: '991' },
+  { id: '991-workshop-manual-v3', startPage: 2753, endPage: 4128, series: '991' },
+  { id: '991-workshop-manual-v4', startPage: 4129, endPage: 5504, series: '991' },
+  { id: '991-workshop-manual-v5', startPage: 5505, endPage: 6880, series: '991' },
+  { id: '991-workshop-manual-v6', startPage: 6881, endPage: 8256, series: '991' },
   { id: '981-workshop-manual-v1', startPage: 1, endPage: 2029, series: '981' },
   { id: '981-workshop-manual-v2', startPage: 2030, endPage: 4058, series: '981' },
   { id: '981-workshop-manual-v3', startPage: 4059, endPage: 6087, series: '981' },
@@ -234,9 +255,9 @@ export const WORKSHOP_VOLUME_RANGES: ReadonlyArray<{
   { id: '987-workshop-9872-v8', startPage: 5524, endPage: 6309, series: '9872' },
 ];
 
-/** Every workshop volume across generations (981 + 987.1 + 987.2). */
+/** Every workshop volume across generations (981 + 987.1 + 987.2 + 991). */
 export function allWorkshopVolumes(): DocumentMeta[] {
-  return [...WORKSHOP_VOLUMES, ...WORKSHOP_VOLUMES_9871, ...WORKSHOP_VOLUMES_9872];
+  return [...WORKSHOP_VOLUMES, ...WORKSHOP_VOLUMES_9871, ...WORKSHOP_VOLUMES_9872, ...WORKSHOP_VOLUMES_991];
 }
 
 /**
@@ -246,7 +267,7 @@ export function allWorkshopVolumes(): DocumentMeta[] {
  */
 export function workshopVolumeForPage(
   absolutePage: number,
-  series: '981' | '9871' | '9872' = '981',
+  series: '981' | '9871' | '9872' | '991' = '981',
 ): {
   doc: DocumentMeta;
   pageInVolume: number;
@@ -261,10 +282,11 @@ export function workshopVolumeForPage(
 }
 
 /** Infer workshop series from a volume doc id. */
-export function workshopSeriesForDocId(docId: string | null | undefined): '981' | '9871' | '9872' | null {
+export function workshopSeriesForDocId(docId: string | null | undefined): '981' | '9871' | '9872' | '991' | null {
   if (!docId) return null;
   if (docId.startsWith('987-workshop-9872')) return '9872';
   if (docId.startsWith('987-workshop-9871')) return '9871';
+  if (docId.startsWith('991-workshop')) return '991';
   if (docId.startsWith('981-workshop')) return '981';
   return null;
 }
@@ -399,11 +421,31 @@ function slug(s: string): string {
     .slice(0, 80);
 }
 
-/** Full catalog shown in the Documents tab (981 / 987 scoped). */
+/**
+ * Audi A4 (B9) — dev car. Generated from the staged, curated, de-duplicated doc
+ * set (tools/manual/stage-audi-docs.mjs → lib/documents-audi-b9.json). Storage
+ * keys mirror tools/manual/upload-docs.mjs (`audi-b9/<category>/<file>`).
+ */
+const AUDI_B9_DOCS: DocumentMeta[] = (
+  audiDocsManifest as { file: string; title: string; category: DocCategory; sizeMb: number }[]
+).map((d) => ({
+  id: `audi-b9-${slug(d.file.replace(/\.pdf$/i, ''))}`,
+  title: d.title,
+  subtitle: 'Audi A4 (B9)',
+  category: d.category,
+  generations: ['audi-b9'],
+  storagePath: `audi-b9/${d.file}`,
+  localUrl: publicUrl(`${MTL}/Audi A4 B9/${d.file}`),
+  sizeLabel: `~${d.sizeMb} MB`,
+}));
+
+/** Full catalog shown in the Documents tab (981 / 987 / audi-b9 scoped). */
 export const DOCUMENTS: DocumentMeta[] = [
   ...WORKSHOP_VOLUMES,
   ...WORKSHOP_VOLUMES_9871,
   ...WORKSHOP_VOLUMES_9872,
+  ...WORKSHOP_VOLUMES_991,
+  ...AUDI_B9_DOCS,
 
   // ---- 981 Parts ----
   parts981('981 Parts Catalog 2012-2016.pdf', '981 Parts Catalog', 'Official PET parts catalog · Boxster/Cayman (981) 2012–2016 · 794 pp', '~31 MB'),
@@ -580,7 +622,7 @@ export function resolveWorkshopViewerLink(
 
   const len = range.endPage - range.startPage + 1;
   if (abs > len) {
-    return workshopVolumeForPage(abs, series ?? (range.series as '981' | '9871' | '9872') ?? '981');
+    return workshopVolumeForPage(abs, series ?? (range.series as '981' | '9871' | '9872' | '991') ?? '981');
   }
 
   const doc = allWorkshopVolumes().find((v) => v.id === docId) ?? WORKSHOP_VOLUMES[0];
@@ -589,9 +631,16 @@ export function resolveWorkshopViewerLink(
 
 export function documentsForGeneration(gen: string | null | undefined): DocumentMeta[] {
   if (!gen) return DOCUMENTS;
-  return DOCUMENTS.filter(
-    (d) => d.generations.includes('shared') || d.generations.includes(gen as DocGeneration),
-  );
+  // Only generations we actually stock docs for get a library; anything else
+  // returns [] (honest absence) rather than leaking another marque's docs.
+  const KNOWN_DOC_GENS: DocGeneration[] = ['981', '987', '991', 'audi-b9'];
+  if (!KNOWN_DOC_GENS.includes(gen as DocGeneration)) return [];
+  return DOCUMENTS.filter((d) => {
+    if (d.generations.includes(gen as DocGeneration)) return true;
+    // 'shared' docs are Porsche-marque general references — keep them off a
+    // non-Porsche car.
+    return gen !== 'audi-b9' && d.generations.includes('shared');
+  });
 }
 
 /** Basename of a storage path without `.pdf`. */
@@ -628,6 +677,9 @@ export function resolveDocumentForManualHit(hit: {
     }
     if (hit.generation === '987') {
       return WORKSHOP_VOLUMES_9871[0] ?? WORKSHOP_VOLUMES[0];
+    }
+    if (hit.generation === '991') {
+      return WORKSHOP_VOLUMES_991[0] ?? WORKSHOP_VOLUMES[0];
     }
     return WORKSHOP_VOLUMES[0];
   }
@@ -692,7 +744,7 @@ function manualHitHrefBase(hit: {
   if (src === 'workshop') {
     const series =
       workshopSeriesForDocId(hit.docId) ??
-      (hit.generation === '987' ? '9871' : '981');
+      (hit.generation === '991' ? '991' : hit.generation === '987' ? '9871' : '981');
     // Explicit volume id with a page already inside the volume.
     if (hit.docId && WORKSHOP_VOLUME_RANGES.some((r) => r.id === hit.docId)) {
       const range = WORKSHOP_VOLUME_RANGES.find((r) => r.id === hit.docId)!;

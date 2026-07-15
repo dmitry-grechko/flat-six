@@ -49,6 +49,74 @@ export const COLORS: PaintColor[] = [
   { name: 'MAHOGANY', hex: '#3C2B25' },
 ];
 
+// Factory paint offered on the Audi A4 (B9, 2016–2019 — 2017 MY). Swatch hexes are
+// display approximations, not paint-match values (as with COLORS). Kept separate
+// from the Porsche palette so each marque shows its own colours (see colorsFor).
+export const COLORS_AUDI_B9: PaintColor[] = [
+  // Whites / silvers / greys
+  { name: 'IBIS WHITE', hex: '#EDEEEC' }, { name: 'GLACIER WHITE METALLIC', hex: '#DFE3E4' },
+  { name: 'FLORETT SILVER METALLIC', hex: '#A7ACB0' }, { name: 'MONSOON GREY METALLIC', hex: '#565B60' },
+  { name: 'MANHATTAN GREY METALLIC', hex: '#3C4145' }, { name: 'DAYTONA GREY PEARL', hex: '#494D51' },
+  // Blacks
+  { name: 'BRILLIANT BLACK', hex: '#0E0E10' }, { name: 'MYTHOS BLACK METALLIC', hex: '#191A1C' },
+  // Blues
+  { name: 'ARA BLUE CRYSTAL', hex: '#16467E' }, { name: 'SCUBA BLUE METALLIC', hex: '#2C5F86' },
+  { name: 'NAVARRA BLUE METALLIC', hex: '#23375F' },
+  // Reds / greens
+  { name: 'MATADOR RED METALLIC', hex: '#6E1622' }, { name: 'TANGO RED METALLIC', hex: '#B01B1B' },
+  { name: 'GOTLAND GREEN METALLIC', hex: '#2E4A40' },
+];
+
+// Factory paint offered on the 911 (991, 2011–2019) — a far wider range than the
+// Boxster/Cayman, incl. the GT/special colours. Swatch hexes are display
+// approximations, not paint-match values. Kept separate so the 911 shows its own
+// palette (see colorsFor). Standard + metallic + special/GT groups.
+export const COLORS_991: PaintColor[] = [
+  // Whites / silvers / greys
+  { name: 'CARRARA WHITE METALLIC', hex: '#E9EAEC' }, { name: 'WHITE', hex: '#E8E8EA' },
+  { name: 'GT SILVER METALLIC', hex: '#C6C8CA' }, { name: 'RHODIUM SILVER METALLIC', hex: '#97999C' },
+  { name: 'PLATINUM SILVER METALLIC', hex: '#B4B7BA' }, { name: 'AGATE GREY METALLIC', hex: '#45484B' },
+  { name: 'CHALK', hex: '#C7C6BE' }, { name: 'CRAYON', hex: '#B8BBBD' },
+  // Blacks
+  { name: 'BLACK', hex: '#131316' }, { name: 'JET BLACK METALLIC', hex: '#17181A' },
+  { name: 'BASALT BLACK METALLIC', hex: '#1B1C1E' },
+  // Blues
+  { name: 'SAPPHIRE BLUE METALLIC', hex: '#27364E' }, { name: 'DARK BLUE METALLIC', hex: '#1E2A44' },
+  { name: 'NIGHT BLUE METALLIC', hex: '#1B2740' }, { name: 'GRAPHITE BLUE METALLIC', hex: '#2B3A4A' },
+  { name: 'GENTIAN BLUE METALLIC', hex: '#1F3A6E' }, { name: 'MIAMI BLUE', hex: '#00A0C6' },
+  // Reds
+  { name: 'GUARDS RED', hex: '#D5001C' }, { name: 'CARMINE RED', hex: '#97011F' },
+  { name: 'LAVA ORANGE', hex: '#E5501F' },
+  // Yellows / greens
+  { name: 'RACING YELLOW', hex: '#EFC03B' }, { name: 'AVENTURINE GREEN METALLIC', hex: '#2E4A3B' },
+  { name: 'LIZARD GREEN', hex: '#7FA01E' }, { name: 'PYTHON GREEN', hex: '#6E7B2E' },
+  // Earth / special
+  { name: 'MAHOGANY METALLIC', hex: '#3C2B25' }, { name: 'COGNAC METALLIC', hex: '#7A4B29' },
+  { name: 'ULTRAVIOLET', hex: '#5B4B8A' },
+];
+
+// Per-generation paint registry. Porsche 981/987 share the base COLORS palette;
+// the 911 (991) has its own wider palette; other marques register their own here.
+// Unknown → COLORS.
+const GENERATION_COLORS: Record<string, PaintColor[]> = {
+  'audi-b9': COLORS_AUDI_B9,
+  '991': COLORS_991,
+};
+
+// Preserve the historical Porsche seed colour (GT Silver) for cars with no marque
+// palette, so new-vehicle defaults are unchanged for the 981/987.
+const DEFAULT_COLOR_PORSCHE: PaintColor = { name: 'GT SILVER', hex: '#C6C8CA' };
+
+/** Paint options for a generation (the Porsche COLORS palette unless a marque overrides). */
+export function colorsFor(generation: string): PaintColor[] {
+  return GENERATION_COLORS[generation] ?? COLORS;
+}
+
+/** Seed paint for a new vehicle of this generation (first of a marque palette; GT Silver for Porsche). */
+export function defaultColor(generation: string): PaintColor {
+  return GENERATION_COLORS[generation]?.[0] ?? DEFAULT_COLOR_PORSCHE;
+}
+
 // Engine + transmission options are GENERATION-SPECIFIC:
 //  • 981 (2012–2016): 2.7 / 3.4 S / 3.4 GTS / 3.8 Spyder-GT4; manual or PDK (never Tiptronic).
 //  • 987 (2005–2012): 2.7 (987.1) / 2.9 (987.2) / 3.4 S; manual, 5-spd Tiptronic S (987.1)
@@ -57,6 +125,22 @@ export const ENGINES_981 = ['2.7 L Flat-Six', '3.4 L Flat-Six (S)', '3.4 L Flat-
 export const ENGINES_987 = ['2.7 L Flat-Six', '2.9 L Flat-Six', '3.4 L Flat-Six (S)'];
 export const TRANS_981 = ['6-Speed Manual', '7-Speed PDK'];
 export const TRANS_987 = ['5-Speed Manual', '6-Speed Manual', '5-Speed Tiptronic S', '7-Speed PDK'];
+
+// 911 (991): 991.1 is NA (3.4 Carrera / 3.8 S·GTS / 3.8 GT3 / 4.0 GT3 RS·R);
+//  991.2 Carreras are 3.0 twin-turbo; Turbo/S + GT2 RS are 3.8 twin-turbo; GT3/RS,
+//  Touring, Speedster are 4.0 NA. Manual (7- or 6-spd) or PDK by trim. Engine ids
+//  MUST match lib/models.ts ENG (per-variant defaults reference these strings).
+export const ENGINES_991 = [
+  '3.4 L Flat-Six (Carrera)',
+  '3.8 L Flat-Six (Carrera S/GTS)',
+  '3.0 L Twin-Turbo Flat-Six (Carrera)',
+  '3.0 L Twin-Turbo Flat-Six (Carrera S/GTS)',
+  '3.8 L Flat-Six (GT3)',
+  '4.0 L Flat-Six (GT3/RS)',
+  '3.8 L Twin-Turbo Flat-Six (Turbo/S)',
+  '3.8 L Twin-Turbo Flat-Six (GT2 RS)',
+];
+export const TRANS_991 = ['7-Speed Manual', '6-Speed Manual', '7-Speed PDK'];
 
 // Back-compat aliases (default to the 981 sets).
 export const ENGINES = ENGINES_981;
@@ -85,6 +169,11 @@ export interface GenerationPowertrain {
 const GENERATION_POWERTRAIN: Record<string, GenerationPowertrain> = {
   '981': { engines: ENGINES_981, transmissions: TRANS_981, defaultEngine: '3.4 L Flat-Six (S)', defaultTransmission: '7-Speed PDK' },
   '987': { engines: ENGINES_987, transmissions: TRANS_987, defaultEngine: '3.4 L Flat-Six (S)', defaultTransmission: '6-Speed Manual' },
+  // 911 (991) — seed defaults to a 991.1 Carrera S/PDK; each trim carries its own
+  // signature powertrain via CarVariant.defaultEngine/defaultTransmission.
+  '991': { engines: ENGINES_991, transmissions: TRANS_991, defaultEngine: '3.8 L Flat-Six (Carrera S/GTS)', defaultTransmission: '7-Speed PDK' },
+  // Audi A4 (B9) — DEV scaffold; provisional powertrain (confirm before relying).
+  'audi-b9': { engines: ['2.0 TFSI'], transmissions: ['7-Speed S tronic (DSG)'], defaultEngine: '2.0 TFSI', defaultTransmission: '7-Speed S tronic (DSG)' },
 };
 
 function powertrain(generation: string): GenerationPowertrain {

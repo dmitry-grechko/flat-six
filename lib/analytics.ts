@@ -1,4 +1,4 @@
-import { isElectronShell } from '@/lib/obd/electronClient';
+import { isElectronShell } from '@/lib/electron/shell';
 
 /**
  * Privacy-respecting Google Analytics (GA4) with Consent Mode v2.

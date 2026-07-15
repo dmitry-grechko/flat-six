@@ -543,7 +543,7 @@ export function negativeResponseInfo(
 export function classifyObdResponse(
   raw: string,
   reqSid: string,
-): 'positive' | 'refused' | 'silent' {
+): 'positive' | 'refused' | 'silent' | 'pending' {
   if (!raw) return 'silent';
   const r = raw.toUpperCase();
   if (/NO DATA|UNABLE TO CONNECT|CAN ERROR|BUS INIT|STOPPED|SEARCHING|^ERROR|\?/m.test(r)) {
@@ -551,10 +551,17 @@ export function classifyObdResponse(
   }
   const bytes: string[] = r.replace(/[^0-9A-F]/g, '').match(/.{2}/g) ?? [];
   const sid = reqSid.toUpperCase();
-  const i7f = bytes.indexOf('7F');
-  if (i7f >= 0 && bytes[i7f + 1] === sid) return 'refused';
+  // A positive reply wins even if a `7F <sid> 78` (response-pending) frame preceded
+  // it — many UDS modules send one or more 0x78 "please wait" frames before the real
+  // answer, and the ELM concatenates them into one buffer.
   const pos = (parseInt(sid, 16) + 0x40).toString(16).toUpperCase().padStart(2, '0');
   if (bytes.includes(pos)) return 'positive';
+  const i7f = bytes.indexOf('7F');
+  if (i7f >= 0 && bytes[i7f + 1] === sid) {
+    // 0x78 = responsePending: the module is present and working, not refusing. Report
+    // 'pending' so the caller can wait/retry rather than mark the module refused.
+    return bytes[i7f + 2] === '78' ? 'pending' : 'refused';
+  }
   return 'silent';
 }
 

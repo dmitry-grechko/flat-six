@@ -543,6 +543,12 @@ export class Elm327 implements ObdAdapter {
     await this.command('ATSP6'); // ISO 15765-4 CAN, 500k
     await this.command('ATCAF1'); // ISO-TP auto-framing (assemble multi-frame)
     await this.command('ATH0'); // headers off — filter with receive address instead
+    // Force ISO-TP flow control: many clone ELM327s don't auto-send the flow-control
+    // frame, so a module's multi-frame reply (long DTC list, identity) truncates to
+    // its first frame. ATFCSM1 makes the ELM send our FC (CTS, block size 0, STmin 0)
+    // whenever it sees a First Frame; the per-module tx header is set in the loop below.
+    await this.command('ATFCSD300000');
+    await this.command('ATFCSM1');
 
     try {
       for (const m of modules) {
@@ -560,12 +566,14 @@ export class Elm327 implements ObdAdapter {
         };
         try {
           await this.command(`ATSH${m.reqId}`);
+          await this.command(`ATFCSH${m.reqId}`); // flow-control tx header = this module's request id
           await this.command(`ATCRA${m.respId}`);
 
           if (m.protocol === 'obd') {
             // DME / generic OBD ECU: DTCs via Mode 03 (confirmed) + 07 (pending).
             const raw3 = await this.command('03', 4000).catch(() => '');
-            res.reachable = classifyObdResponse(raw3, '03');
+            const c3 = classifyObdResponse(raw3, '03');
+            res.reachable = c3 === 'pending' ? 'refused' : c3; // DME Mode 03 doesn't pend in practice
             if (res.reachable === 'positive') {
               res.confirmedDtcs = parseDtcs(raw3, '03');
               const raw7 = await this.command('07', 4000).catch(() => '');
@@ -604,19 +612,42 @@ export class Elm327 implements ObdAdapter {
 
             // KWP2000 read-all-by-status (18 00 FF 00) — the sub-function the 981
             // ECUs accept (18 02 / 18 01 are rejected). UDS uses 19 02 FF.
-            const dtcCmd = proto === 'uds' ? '1902FF' : '1800FF00';
             const dtcSid = proto === 'uds' ? '19' : '18';
-            const raw = await this.command(dtcCmd, 4000).catch(() => '');
-            res.reachable = classifyObdResponse(raw, dtcSid);
-            if (res.reachable === 'positive') {
+            const readDtc = async (cmd: string) => {
+              const raw = await this.command(cmd, 5000).catch(() => '');
+              return { raw, cls: classifyObdResponse(raw, dtcSid) };
+            };
+            let { raw, cls } = await readDtc(proto === 'uds' ? '1902FF' : '1800FF00');
+            // UDS "response pending" (0x78): the module is present but still computing.
+            // Wait and re-read ONCE; only take the retry if it's not worse (a re-sent
+            // request while the first is pending can desync a slow module into silence,
+            // so we never let a retry downgrade a known-present 'pending' to 'silent').
+            if (cls === 'pending') {
+              await new Promise((r) => setTimeout(r, 500));
+              const retry = await readDtc(proto === 'uds' ? '1902FF' : '1800FF00');
+              if (retry.cls !== 'silent') ({ raw, cls } = retry);
+            }
+            // Some modules reject the "any status" mask as responseTooLong (0x14) —
+            // fall back to confirmed-only (mask 0x08).
+            if (proto === 'uds' && cls === 'refused' && negativeResponseInfo(raw)?.nrc === '14') {
+              ({ raw, cls } = await readDtc('190208'));
+            }
+            if (cls === 'positive') {
+              res.reachable = 'positive';
               for (const d of parseUdsDtcs(raw, proto)) {
                 // UDS status bit 3 (0x08) = confirmedDTC; otherwise treat as pending.
                 if (d.status & 0x08) res.confirmedDtcs.push(d.code);
                 else res.pendingDtcs.push(d.code);
               }
-            } else if (res.reachable === 'refused') {
+            } else if (cls === 'pending') {
+              res.reachable = 'refused'; // present, but never returned a final answer
+              res.detail = 'response pending';
+            } else if (cls === 'refused') {
+              res.reachable = 'refused';
               const nr = negativeResponseInfo(raw);
               if (nr) res.detail = nr.nrcName;
+            } else {
+              res.reachable = 'silent';
             }
           }
         } catch (e) {

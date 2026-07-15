@@ -10,10 +10,6 @@ function getInvoke(): Invoke {
   return api.invoke;
 }
 
-export function isElectronShell(): boolean {
-  return typeof window !== 'undefined' && window.flatsix?.isElectron === true;
-}
-
 /** ObdClient over Electron preload IPC (serialport in main). */
 export function createElectronObdClient(): ObdClient {
   const invoke = getInvoke();

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { isElectronShell } from '@/lib/obd/electronClient';
+import { isElectronShell } from '@/lib/electron/shell';
 import { getConsent, loadGa, trackPageView } from '@/lib/analytics';
 import ConsentBanner from './ConsentBanner';
 

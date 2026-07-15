@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type FC } from 'react';
 import { useRouter } from 'next/navigation';
-import { COMPONENTS, SYSTEMS, COLORS, diffDots, DIFF_LABELS, componentsForGeneration, formatInterval } from '@/lib/data';
+import { COMPONENTS, SYSTEMS, colorsFor, diffDots, DIFF_LABELS, componentsForGeneration, formatInterval } from '@/lib/data';
 import { transmissionMaintenance } from '@/lib/knowledge/transmission';
 import { brakeMaintenance } from '@/lib/knowledge/brakes';
 import { extractPartNumbers, normalizePartNumber } from '@/lib/parts-extract';
@@ -13,7 +13,8 @@ import { lookupPartExact, type CatalogPartRow } from '@/lib/parts-lookup';
 import { exteriorPartsFor } from '@/lib/exterior-parts';
 import { useVehicle, modelGlb } from '@/lib/vehicle-context';
 import { getVariant, generationForBody, subGeneration } from '@/lib/models';
-import { MODEL_CREDITS, cutawayImageFor, engineRefFor } from '@/lib/credits';
+import { modelCreditFor, cutawayImageFor, engineRefFor } from '@/lib/credits';
+import { GITHUB_ISSUES } from '@/components/marketing/tokens';
 import type { Component, SystemName, Vehicle, EnginePart } from '@/lib/types';
 // GLBViewer is a forwardRef wrapper; it dynamically imports the R3F Canvas
 // (ssr:false) internally so we can keep a working ref through it.
@@ -49,6 +50,11 @@ export default function ComponentExplorer() {
   // the 981 has the 3D X-ray internals today (987 renders exterior 3D + 2D).
   const variant = getVariant(vehicle.body);
   const generation = generationForBody(vehicle.body);
+  // Exterior model attribution (resolves a stand-in's credit via its GLB owner).
+  const credit = modelCreditFor(vehicle.body);
+  // True when this trim has no dedicated GLB and renders a same-family stand-in —
+  // drives the "3D model not available yet" notice + badge in the 3D exterior view.
+  const modelStandIn = variant.modelAvailable === false;
   const hasCutaway2D = variant.hasCutaway2D;
   const hasXray3D = variant.hasXray3D;
   const activeComponents = componentsForGeneration(generation);
@@ -296,6 +302,26 @@ export default function ComponentExplorer() {
             </div>
           )}
 
+          {/* Stand-in exterior: this trim has no dedicated GLB, so a same-family 991
+              model is shown. Invite a contribution rather than implying it's exact. */}
+          {view === '3d' && !xray && modelStandIn && (
+            <a
+              href={GITHUB_ISSUES}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                position: 'absolute', top: 14, left: '50%', transform: 'translateX(-50%)', zIndex: 4,
+                display: 'flex', alignItems: 'center', gap: 7, maxWidth: '82%',
+                background: 'rgba(11,11,12,.82)', border: '1px solid #6E6E73', borderRadius: 20,
+                padding: '7px 14px', font: `600 9px/1.35 ${mono}`, letterSpacing: '.04em',
+                color: '#E3E3E5', textAlign: 'center', textDecoration: 'none',
+              }}
+            >
+              <span style={{ fontSize: 11, lineHeight: 1 }}>⚠</span>
+              No exact 3D model for this trim yet — showing a similar 991. Contribute one on GitHub →
+            </a>
+          )}
+
           {view === '3d' && (
             <div style={{ position: 'absolute', inset: 0 }}>
               {xray && assemblyId === null ? (
@@ -333,7 +359,7 @@ export default function ComponentExplorer() {
                         <div style={{ position: 'absolute', left: 0, bottom: 'calc(100% + 8px)', width: 'min(236px, 72vw)', background: 'rgba(255,255,255,.98)', border: '1px solid #E3E3E5', borderRadius: 8, boxShadow: '0 12px 30px rgba(0,0,0,.18)', padding: 12 }}>
                           <div style={{ font: `600 9px/1 ${mono}`, letterSpacing: '.14em', color: '#9A9AA0', marginBottom: 10 }}>PAINT</div>
                           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                            {COLORS.map((c) => (
+                            {colorsFor(variant.generation).map((c) => (
                               <span key={c.hex} className="colorSwatch">
                                 <button
                                   onClick={() => { setPaint(c.hex); setPaintOpen(false); }}
@@ -367,12 +393,16 @@ export default function ComponentExplorer() {
                 </div>
                 {!xray && (
                   <div style={{ pointerEvents: 'auto', font: `500 9px/1.5 ${mono}`, letterSpacing: '.04em', color: '#A6A6AB', textAlign: 'center' }}>
-                    {MODEL_CREDITS[vehicle.body].title} ·{' '}
-                    <a href={MODEL_CREDITS[vehicle.body].source} target="_blank" rel="noreferrer" style={{ color: '#6E6E73' }}>
-                      {MODEL_CREDITS[vehicle.body].author}
-                    </a>{' '}·{' '}
-                    <a href={MODEL_CREDITS[vehicle.body].licenseUrl} target="_blank" rel="noreferrer" style={{ color: '#6E6E73' }}>
-                      {MODEL_CREDITS[vehicle.body].license}
+                    {credit.title} ·{' '}
+                    {credit.source ? (
+                      <a href={credit.source} target="_blank" rel="noreferrer" style={{ color: '#6E6E73' }}>
+                        {credit.author}
+                      </a>
+                    ) : (
+                      <span style={{ color: '#6E6E73' }}>{credit.author}</span>
+                    )}{' '}·{' '}
+                    <a href={credit.licenseUrl} target="_blank" rel="noreferrer" style={{ color: '#6E6E73' }}>
+                      {credit.license}
                     </a>
                   </div>
                 )}
@@ -385,7 +415,7 @@ export default function ComponentExplorer() {
                     : selectedFlow
                       ? `FLOW · ${selectedFlow.label.toUpperCase()}`
                       : 'ALL SYSTEMS · CLICK A SYSTEM TO INSPECT')
-                  : `${vehicle.model.toUpperCase()} · REAL MODEL`}
+                  : `${vehicle.model.toUpperCase()} · ${modelStandIn ? 'STAND-IN MODEL' : 'REAL MODEL'}`}
               </div>
 
             </div>

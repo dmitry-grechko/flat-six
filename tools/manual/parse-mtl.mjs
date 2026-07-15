@@ -70,6 +70,11 @@ const TARGETS = [
       'P10W 911 Carrera-Boxster-Cayman Engine Repair.pdf': '987',
     },
   },
+  {
+    generation: 'audi-b9',
+    source: 'mtl-audi',
+    dir: path.join(PUBLIC, 'mobile_tech_library/Audi A4 B9'),
+  },
 ];
 
 const MAX_CHARS = 6000;

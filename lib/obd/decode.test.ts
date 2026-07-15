@@ -92,5 +92,7 @@ assert(kwpReal.length === 1 && kwpReal[0].code === 'P000C' && kwpReal[0].status 
 assert(classifyObdResponse('5902FF0000', '19') === 'positive', 'classify positive');
 assert(classifyObdResponse('7F1911', '19') === 'refused', 'classify refused (present)');
 assert(classifyObdResponse('NO DATA', '19') === 'silent', 'classify silent');
+assert(classifyObdResponse('7F1978', '19') === 'pending', 'classify response-pending (0x78)');
+assert(classifyObdResponse('7F19785902FF0000', '19') === 'positive', 'pending then positive = positive');
 
 console.log('lib/obd decode tests OK');

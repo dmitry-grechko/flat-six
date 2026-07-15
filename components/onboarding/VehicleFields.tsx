@@ -1,7 +1,8 @@
 'use client';
 
-import { COLORS, enginesFor, transmissionsFor, defaultEngine, defaultTransmission } from '@/lib/data';
-import { MODEL_OPTIONS } from '@/lib/vehicle-context';
+import { colorsFor, enginesFor, transmissionsFor, defaultEngine, defaultTransmission } from '@/lib/data';
+import ModelPicker from '@/components/shell/ModelPicker';
+import { useIsAdmin } from '@/lib/useIsAdmin';
 import { generationForBody, getVariant } from '@/lib/models';
 import type { BodyType } from '@/lib/types';
 
@@ -82,6 +83,7 @@ export default function VehicleFields({
   value: VehicleFormState;
   onChange: (patch: Partial<VehicleFormState>) => void;
 }) {
+  const isAdmin = useIsAdmin();
   const gen = generationForBody(value.body);
   const engines = enginesFor(gen);
   const transmissions = transmissionsFor(gen);
@@ -89,30 +91,26 @@ export default function VehicleFields({
   return (
     <>
       <label style={fieldLabel}>Model</label>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
-        {MODEL_OPTIONS.map((m) => (
-          <button
-            key={m.id}
-            type="button"
-            onClick={() => {
-              // Switching model may change the valid engine/transmission sets.
-              // A variant with a signature powertrain (e.g. GT4 = 3.8 / manual)
-              // snaps to it; otherwise keep the current selection when it's still
-              // valid for the new generation, else fall back to its default.
-              const target = getVariant(m.id);
-              const g = target.generation;
-              const patch: Partial<VehicleFormState> = { body: m.id };
-              if (target.defaultEngine) patch.engine = target.defaultEngine;
-              else if (!enginesFor(g).includes(value.engine)) patch.engine = defaultEngine(g);
-              if (target.defaultTransmission) patch.trans = target.defaultTransmission;
-              else if (!transmissionsFor(g).includes(value.trans)) patch.trans = defaultTransmission(g);
-              onChange(patch);
-            }}
-            style={chip(value.body === m.id)}
-          >
-            {m.label}
-          </button>
-        ))}
+      <div style={{ marginBottom: 20 }}>
+        <ModelPicker
+          value={value.body}
+          isAdmin={isAdmin}
+          startExpanded
+          onSelect={(id) => {
+            // Switching model may change the valid engine/transmission sets.
+            // A variant with a signature powertrain (e.g. GT4 = 3.8 / manual)
+            // snaps to it; otherwise keep the current selection when it's still
+            // valid for the new generation, else fall back to its default.
+            const target = getVariant(id);
+            const g = target.generation;
+            const patch: Partial<VehicleFormState> = { body: id };
+            if (target.defaultEngine) patch.engine = target.defaultEngine;
+            else if (!enginesFor(g).includes(value.engine)) patch.engine = defaultEngine(g);
+            if (target.defaultTransmission) patch.trans = target.defaultTransmission;
+            else if (!transmissionsFor(g).includes(value.trans)) patch.trans = defaultTransmission(g);
+            onChange(patch);
+          }}
+        />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
@@ -195,7 +193,7 @@ export default function VehicleFields({
 
       <label style={fieldLabel}>Paint — {value.colorName}</label>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-        {COLORS.map((c) => (
+        {colorsFor(gen).map((c) => (
           <span key={c.hex} className="colorSwatch">
             <button
               type="button"

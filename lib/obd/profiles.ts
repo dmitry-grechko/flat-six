@@ -16,6 +16,8 @@
  */
 
 import { udsModulesFor, type UdsModule } from './uds-modules';
+import { registerVehiclePack, vehiclePack, registeredVehicleKeys } from './packs';
+import './pack-audi-b9'; // built-in marque pack — registers the Audi B9 (dev) on load
 
 export interface DmeFaultAccess {
   /** Protocol the DME's manufacturer fault memory speaks. */
@@ -65,8 +67,15 @@ const UDS_DME: Omit<DmeFaultAccess, 'verified' | 'note'> = {
   clearSid: '14',
 };
 
-const PROFILES: Record<string, ObdProfile> = {
-  '981': {
+// ---- Built-in vehicle packs -------------------------------------------------
+// The engine is marque-agnostic: specific vehicles live in the pack registry
+// (packs.ts), not in the decode/protocol core. Porsche generations register
+// here; other marques register from their own pack module (e.g. pack-audi-b9.ts,
+// imported below so it registers when the engine loads).
+
+registerVehiclePack({
+  key: '981', make: 'Porsche', model: 'Boxster / Cayman (981)', generation: '981', visibility: 'public',
+  profile: {
     generation: '981',
     cylinders: 6,
     dme: {
@@ -76,7 +85,11 @@ const PROFILES: Record<string, ObdProfile> = {
     },
     modules: udsModulesFor('981'),
   },
-  '987': {
+});
+
+registerVehiclePack({
+  key: '987', make: 'Porsche', model: 'Boxster / Cayman (987)', generation: '987', visibility: 'public',
+  profile: {
     generation: '987',
     cylinders: 6,
     dme: {
@@ -86,7 +99,11 @@ const PROFILES: Record<string, ObdProfile> = {
     },
     modules: udsModulesFor('987'),
   },
-  '991': {
+});
+
+registerVehiclePack({
+  key: '991', make: 'Porsche', model: '911 (991)', generation: '991', visibility: 'public',
+  profile: {
     generation: '991',
     cylinders: 6,
     dme: {
@@ -96,7 +113,7 @@ const PROFILES: Record<string, ObdProfile> = {
     },
     modules: udsModulesFor('991'),
   },
-};
+});
 
 const DEFAULT_PROFILE: ObdProfile = {
   generation: 'generic',
@@ -109,10 +126,13 @@ const DEFAULT_PROFILE: ObdProfile = {
   modules: udsModulesFor(''),
 };
 
-/** Generations we have a tuned OBD profile for. */
-export const OBD_PROFILE_GENERATIONS = Object.keys(PROFILES);
+/** Generations/vehicles the engine has a tuned OBD pack for — a live view of the
+ *  registry (includes marque packs registered by their own modules). */
+export function obdProfileGenerations(): string[] {
+  return registeredVehicleKeys();
+}
 
-/** The OBD profile for a generation (falls back to UDS defaults). */
+/** The OBD profile for a generation / vehicle key (falls back to UDS defaults). */
 export function obdProfile(generation: string): ObdProfile {
-  return PROFILES[generation] ?? DEFAULT_PROFILE;
+  return vehiclePack(generation)?.profile ?? DEFAULT_PROFILE;
 }

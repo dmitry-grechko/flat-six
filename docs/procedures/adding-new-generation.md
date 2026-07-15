@@ -11,6 +11,50 @@ it touches every layer. Do it in this order and keep each layer consistent.
 > variant. So you can land the selectable exterior + knowledge first and flip the
 > visual flags on later.
 
+## Multi-marque, staging (dev/prod), and the golden scoping rule
+
+Generations are no longer Porsche-only. Two mechanisms and one rule make adding
+any car — including a non-Porsche marque, or a car you want live for admins only
+while you build it — safe:
+
+- **`make` + staging** (`lib/models.ts`): set `make: 'Audi'` (defaults to
+  `'Porsche'`) and `status: 'development'` on the `CarVariant`. A `development`
+  variant is hidden from the model picker for non-admins (`useIsAdmin()` +
+  `visibleModelOptions()` in `lib/vehicle-context.tsx`) but is fully functional
+  once in a garage — this is how a WIP car ships to production for admin testing.
+  Flip to `status: 'stable'` (or drop the field) to launch it. `bodyStyle` accepts
+  `'sedan'` for non-mid-engine bodies; extend the union for more.
+
+- **THE GOLDEN SCOPING RULE — never collapse the generation.** Every surface must
+  read the vehicle's *actual* generation and let the registries return an **honest
+  empty** for one they don't cover. Do **NOT** write
+  `const gen = g === '987' ? '987' : '981'` (or any `?? '981'` on a display path):
+  it maps every unknown/non-Porsche car to 981 and shows Porsche parts, docs,
+  torque and fitment on it. Pass the real generation — `documentsForGeneration`,
+  `presetsForGeneration`, `getSpecs`, `alignmentForGeneration`, `exteriorPartsFor`
+  and `colorsFor` already return empty/`[]` for unknown generations. When empty,
+  render a "no data for this vehicle yet" state, not Porsche data. (This
+  anti-pattern caused every leak in the Audi B9 rollout.)
+
+### Registries a new marque / generation touches
+
+| Concern | Registry / file | Unknown-gen behaviour |
+| --- | --- | --- |
+| Variant + staging | `CAR_VARIANTS` (`lib/models.ts`) — `make`, `status`, `bodyStyle`, `glb`, `hasCutaway2D/hasXray3D` | n/a (you add it) |
+| Powertrain | `GENERATION_POWERTRAIN` (`lib/data.ts`) | falls back to 981 — **add an entry** |
+| Paint | `GENERATION_COLORS` / `colorsFor` (`lib/data.ts`) | falls back to Porsche `COLORS` — **add a `COLORS_<x>` palette** |
+| Knowledge (faults/specs/maint/issues) | `GENERATION_KB` (`lib/knowledge`) | empty bundle ✓ |
+| Documents | `documentsForGeneration` (`lib/documents.ts`) | `[]` for non-981/987 ✓ |
+| Fitment / alignment | `presetsForGeneration` / `alignmentForGeneration` (`lib/fitment`) | `[]` / `null` ✓ |
+| Exterior pins | `exteriorPartsFor` (`lib/exterior-parts.ts`) | `[]` ✓ |
+| OBD | `registerVehiclePack` (`lib/obd/packs.ts` + a `pack-<x>.ts` imported by `profiles.ts`) | generic-UDS fallback ✓ |
+| 3D paint tint | `BODY_MAT` regex (`components/garage/GLBSceneClient.tsx`) | **add the GLB's body material name** |
+| Model credit | `MODEL_CREDITS` (`lib/credits.ts`, `Record<BodyType>`) + `NOTICE.md` | **required** (tsc fails otherwise) |
+
+A non-Porsche marque should show honest-empty knowledge / docs / tools / pins
+until you collect its data — that is expected, not a bug. The **Audi A4 (B9)** is
+the reference example: grep `audi-b9` / `audi-a4-b9` to see every touch point.
+
 ## 1. Variant registry — `lib/models.ts` + `lib/types.ts`
 
 - Add the generation to the `CarVariant.generation` union.
@@ -92,3 +136,37 @@ budget for real work, not a 987-style copy:
   charge pipes, boost sensors and their DTCs — systems the NA cars don't have.
 - **Trim breadth** — the 911 range is far wider than a Boxster/Cayman generation,
   which makes trim-aware rendering (issue #2) and more GLBs (issue #1) load-bearing.
+
+### ✅ 991 reference implementation (shipped — grep `991`)
+
+The **991** is now a full, public generation and is the reference for a wide-trim
+generation. What it added on top of the mid-engine checklist:
+
+- **Full trim matrix (~48 variants)** in `CAR_VARIANTS` with two new optional
+  `CarVariant` fields: `phase` (`'991.1'|'991.2'` — a picker "Series" step; data
+  still scopes by `generation:'991'`) and `modelAvailable` (see stand-ins below).
+  `bodyStyle` gained `'coupe' | 'targa' | 'cabriolet'`.
+- **Cascading picker with derived sub-steps** — `ModelPicker.tsx` is data-driven:
+  it inserts a **Series** step (from `phase`) and a **Body** step (from `bodyStyle`)
+  only when they discriminate, and auto-advances single-option levels. So 981/987/A4
+  are unchanged while the 911 reads Brand → 911 → 991.1/991.2 → Coupe/Cab/Targa → Trim.
+- **Stand-in GLBs + contribute notice** — 12 GLBs cover the range; trims without a
+  dedicated model set `modelAvailable:false` and reuse a same-family GLB. The garage
+  (`ComponentExplorer.tsx`) then shows a "no exact 3D model yet — contribute on GitHub"
+  pill + a "STAND-IN MODEL" badge, and `modelCreditFor()` (now `Partial<Record<…>>`
+  keyed by the GLB-owning variant) resolves the stand-in's credit via its `glb` path.
+- **Wide-palette colours** — `COLORS_991` (incl. the GT/PTS colours) via `GENERATION_COLORS`.
+- **Powertrain** — one `GENERATION_POWERTRAIN['991']` superset (NA + turbo + GT engines,
+  7-/6-speed manual + PDK); each trim snaps to its signature via `defaultEngine`/`defaultTransmission`.
+- **Docs pipeline for a single huge manual** — `manual:compress-991` splits the 8,256-pp
+  factory manual into ≤48 MB volumes (`compress-991-workshop.mjs` → `volumes-991.json`);
+  `manual:parse-991` (`parse-991-workshop.mjs`, same Mitchell/WM format as the 987) →
+  `data/manual-991.json`; `db:import-991` → `manual_sections`; `db:embed-manual` embeds;
+  `docs:upload -- --only 991` pushes just the volumes to Storage. `documents.ts` gained
+  `WORKSHOP_VOLUMES_991` + the `'991'` series across the volume/deep-link helpers.
+- **Knowledge (two-layer, unchanged design)** — curated `specs/known-issues/maintenance-991.json`
+  (specs verified + cited from the factory manual) wired into `GENERATION_KB`, **plus** the
+  embedded manual. Fault codes stay `[]` (honest absence; Fault Finding leans on the manual).
+- **Honest absence** — no 2D cutaway / 3D X-ray internals (rear-engine layout not authored):
+  `hasCutaway2D:false`, `hasXray3D:false`; exterior pins / fitment return empty. OBD modules
+  are 981-platform **candidates** (`uds-modules.ts` `REGISTRY['991']`, all `addressConfirmed:false`).

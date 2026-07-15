@@ -1,4 +1,5 @@
 import type { BodyType } from './types';
+import { CAR_VARIANTS, getVariant } from './models';
 
 export interface ModelCredit {
   title: string;
@@ -14,8 +15,11 @@ const CC_BY_URL = 'http://creativecommons.org/licenses/by/4.0/';
 const CC_BY_NC_SA = 'CC BY-NC-SA 4.0';
 const CC_BY_NC_SA_URL = 'http://creativecommons.org/licenses/by-nc-sa/4.0/';
 
-// Third-party 3D models used for the exterior, attributed per their CC-BY licence.
-export const MODEL_CREDITS: Record<BodyType, ModelCredit> = {
+// Third-party 3D models used for the exterior, attributed per their CC licence.
+// Keyed by the GLB-OWNING variant (one entry per distinct model file). Stand-in
+// variants that reuse another trim's GLB resolve to that model's credit via
+// modelCreditFor() — so this is Partial<Record<…>> (not every BodyType has an entry).
+export const MODEL_CREDITS: Partial<Record<BodyType, ModelCredit>> = {
   boxster: {
     title: '2015 Porsche Boxster GTS (718)',
     author: 'Ddiaz Design',
@@ -66,7 +70,88 @@ export const MODEL_CREDITS: Record<BodyType, ModelCredit> = {
     license: CC_BY_NC_SA,
     licenseUrl: CC_BY_NC_SA_URL,
   },
+  // CC BY 4.0 — the same permissive, commercial-friendly licence as the
+  // Boxster/Cayman models above (attribution required, no NonCommercial term).
+  'audi-a4-b9': {
+    title: 'Audi a4 2017',
+    author: 'davidthe19th',
+    source: 'https://skfb.ly/pwU8o',
+    license: CC_BY,
+    licenseUrl: CC_BY_URL,
+  },
+
+  // ── 911 (991) — 12 distinct GLBs, keyed by their owning variant. Licences
+  //    confirmed by the uploader. FLAT·SIX is non-commercial, so the NC term is
+  //    satisfied; redistributed derivatives of NC-SA models must keep that licence.
+  'carrera-s-991-1': {
+    title: 'Porsche 911 Carrera S (991)', author: 'Mona x Supercars',
+    source: 'https://skfb.ly/puQyE', license: CC_BY, licenseUrl: CC_BY_URL,
+  },
+  // ⚠ Sketchfab source URL not provided by the uploader — author + licence confirmed.
+  'gt3-991-1': {
+    title: '2014 Porsche 911 GT3 (991)', author: 'Ddiaz Design',
+    source: 'https://sketchfab.com/Ddiaz-design', license: CC_BY_NC_SA, licenseUrl: CC_BY_NC_SA_URL,
+  },
+  'turbo-991-1': {
+    title: '2014 Porsche 911 Turbo (991)', author: 'Ddiaz Design',
+    source: 'https://skfb.ly/pIzJW', license: CC_BY_NC_SA, licenseUrl: CC_BY_NC_SA_URL,
+  },
+  'gt3-rs-991-1': {
+    title: '2017 Porsche 911 (991) GT3 RS', author: 'Ddiaz Design',
+    source: 'https://skfb.ly/pKqWy', license: CC_BY_NC_SA, licenseUrl: CC_BY_NC_SA_URL,
+  },
+  'carrera-gts-991-2': {
+    title: '2018 Porsche 911 Carrera GTS', author: 'Ddiaz Design',
+    source: 'https://skfb.ly/pstzT', license: CC_BY, licenseUrl: CC_BY_URL,
+  },
+  'turbo-s-991-2': {
+    title: '2016 Porsche 911 Turbo S (991.2)', author: 'Ddiaz Design',
+    source: 'https://skfb.ly/pBzUB', license: CC_BY_NC_SA, licenseUrl: CC_BY_NC_SA_URL,
+  },
+  'turbo-s-exclusive-991-2': {
+    title: '2017 Porsche 911 Turbo S Exclusive Series 991.2', author: 'Ddiaz Design',
+    source: 'https://skfb.ly/pBzWY', license: CC_BY_NC_SA, licenseUrl: CC_BY_NC_SA_URL,
+  },
+  'gt3-rs-991-2': {
+    title: '2019 Porsche 911 (991.2) GT3 RS', author: 'Ddiaz Design',
+    source: 'https://skfb.ly/pKr8Z', license: CC_BY_NC_SA, licenseUrl: CC_BY_NC_SA_URL,
+  },
+  'gt3-rs-weissach-991-2': {
+    title: '2019 Porsche 911 (991.2) GT3 RS Weissach Package', author: 'Ddiaz Design',
+    source: 'https://skfb.ly/pKrVC', license: CC_BY_NC_SA, licenseUrl: CC_BY_NC_SA_URL,
+  },
+  'gt2-rs-clubsport-991-2': {
+    title: '2019 Porsche 911 GT2 RS Clubsport 23 Salzburg', author: 'Ddiaz Design',
+    source: 'https://skfb.ly/pspyP', license: CC_BY, licenseUrl: CC_BY_URL,
+  },
+  'speedster-991-2': {
+    title: '2019 Porsche 911 Speedster (991.2)', author: 'Ddiaz Design',
+    source: 'https://skfb.ly/ps7GY', license: CC_BY, licenseUrl: CC_BY_URL,
+  },
+  'targa-4s-991-2': {
+    title: '2019 Porsche 911 Targa 4S (991.2)', author: 'Ddiaz Design',
+    source: 'https://skfb.ly/ps7KB', license: CC_BY, licenseUrl: CC_BY_URL,
+  },
 };
+
+/**
+ * Resolve the model credit for a vehicle body. Direct hit for a GLB-owning variant;
+ * a stand-in variant (which reuses another trim's GLB) resolves to that GLB's owner's
+ * credit by matching the glb path. Always returns a credit (never undefined) so the
+ * garage attribution line stays safe for any BodyType.
+ */
+const FALLBACK_CREDIT: ModelCredit = MODEL_CREDITS.boxster ?? {
+  title: 'FLAT·SIX 3D model', author: 'Community', source: 'https://github.com/dmitry-grechko/flat-six',
+  license: CC_BY, licenseUrl: CC_BY_URL,
+};
+
+export function modelCreditFor(body: BodyType): ModelCredit {
+  const direct = MODEL_CREDITS[body];
+  if (direct) return direct;
+  const glb = getVariant(body).glb;
+  const owner = CAR_VARIANTS.find((v) => v.glb === glb && MODEL_CREDITS[v.id]);
+  return (owner && MODEL_CREDITS[owner.id]) || FALLBACK_CREDIT;
+}
 
 export const MODEL_CREDIT_LIST = Object.values(MODEL_CREDITS);
 

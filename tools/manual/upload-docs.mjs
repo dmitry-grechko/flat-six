@@ -22,6 +22,12 @@ const CHUNK = 6 * 1024 * 1024;
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const mtlOnly = process.argv.includes('--mtl-only');
+// `--only <model>` uploads ONLY that model's workshop volumes (e.g. `--only 991`),
+// so a new generation's volumes can be pushed without re-uploading the full library.
+const onlyModel = (() => {
+  const i = process.argv.indexOf('--only');
+  return i >= 0 ? process.argv[i + 1] : null;
+})();
 
 if (!url || !key) {
   console.error('Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.');
@@ -48,6 +54,7 @@ function storageKeyFor(rel) {
     if ((m = sub.match(/^Training Books\/(.+)$/))) return `shared/training/${m[1]}`;
     if ((m = sub.match(/^987 Maintenance\/(.+)$/))) return `987/maintenance/${m[1]}`;
     if ((m = sub.match(/^981 Parts\/(.+)$/))) return `981/parts/${m[1]}`;
+    if ((m = sub.match(/^Audi A4 B9\/(.+)$/))) return `audi-b9/${m[1]}`;
   }
   return r; // fallback: unchanged
 }
@@ -71,6 +78,19 @@ function collectLocalFiles() {
         storagePath: `987/workshop/${v.file}`,
         local: path.join(PUBLIC, 'manual', v.file),
       });
+    }
+  }
+  // 991 compressed workshop volumes (from compress-991-workshop.mjs)
+  {
+    const manifestPath = path.join(PUBLIC, 'manual/volumes-991.json');
+    if (fs.existsSync(manifestPath)) {
+      const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+      for (const v of manifest.volumes ?? []) {
+        volumeFiles.push({
+          storagePath: `991/workshop/${v.file}`,
+          local: path.join(PUBLIC, 'manual', v.file),
+        });
+      }
     }
   }
   const volumesPresent = volumeFiles.filter((f) => fs.existsSync(f.local));
@@ -134,6 +154,7 @@ function collectLocalFiles() {
   walk(path.join(PUBLIC, 'mobile_tech_library/981 Parts'));
   walk(path.join(PUBLIC, 'mobile_tech_library/Service Information Technik/Boxster-Cayman'), (n) => sitAllow.has(n));
   walk(path.join(PUBLIC, 'mobile_tech_library/Training Books'), (n) => trainAllow.has(n));
+  walk(path.join(PUBLIC, 'mobile_tech_library/Audi A4 B9'));
   return files;
 }
 
@@ -180,9 +201,13 @@ async function uploadSmall(localPath, objectPath) {
   if (error) throw error;
 }
 
-const files = collectLocalFiles();
+let files = collectLocalFiles();
+if (onlyModel) {
+  files = files.filter((f) => f.storagePath.startsWith(`${onlyModel}/workshop/`));
+  console.log(`--only ${onlyModel}: ${files.length} workshop volume(s).`);
+}
 if (
-  !mtlOnly &&
+  !mtlOnly && !onlyModel &&
   !files.some((f) => f.storagePath.startsWith('981-workshop-manual'))
 ) {
   console.warn(

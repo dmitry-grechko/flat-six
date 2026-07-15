@@ -632,12 +632,13 @@ export function registerTools(server: McpServer): void {
     },
     async ({ generation, vehicleId }, extra) => {
       const scope = await resolveKnowledgeScope(generation, vehicleId, extra.authInfo?.token);
-      const gen = scope.generation === '987' ? '987' : '981';
+      const presets = presetsForGeneration(scope.generation);
+      if (!presets.length) return err(`No wheel-fitment data for generation ${scope.generation}.`);
       return scopedJson(scope, {
         pcd: PCD,
         centerBoreMm: CENTER_BORE_MM,
-        wheelBoltTorque: WHEEL_BOLT_TORQUE[gen],
-        presets: presetsForGeneration(gen),
+        wheelBoltTorque: WHEEL_BOLT_TORQUE[scope.generation as '981' | '987'],
+        presets,
       });
     },
   );
@@ -665,8 +666,7 @@ export function registerTools(server: McpServer): void {
     },
     async ({ rimWidth, rimDiameter, offsetEt, tyreWidth, tyreAspect, axle, presetId, generation, vehicleId }, extra) => {
       const scope = await resolveKnowledgeScope(generation, vehicleId, extra.authInfo?.token);
-      const gen = scope.generation === '987' ? '987' : '981';
-      const presets = presetsForGeneration(gen);
+      const presets = presetsForGeneration(scope.generation);
       const preset = (presetId ? getPreset(presetId) : undefined) ?? presets[0] ?? null;
       const which = axle ?? 'rear';
       const oem = preset ? (which === 'front' ? preset.front : preset.rear) : null;

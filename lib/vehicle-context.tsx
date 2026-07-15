@@ -12,7 +12,7 @@ import {
 } from './db/vehicles';
 import type { Vehicle, BodyType } from './types';
 import { CAR_VARIANTS, variantGlb } from './models';
-import { defaultEngine, defaultTransmission } from './data';
+import { defaultEngine, defaultTransmission, defaultColor } from './data';
 
 /** Placeholder shown while the garage loads or before onboarding completes. */
 const EMPTY_VEHICLE: Vehicle = {
@@ -32,6 +32,19 @@ const EMPTY_VEHICLE: Vehicle = {
 // Derived from the car-variant registry (lib/models.ts) — add generations there.
 export const MODEL_OPTIONS: { id: BodyType; label: string; glb: string; modelName: string }[] =
   CAR_VARIANTS.map((v) => ({ id: v.id, label: v.label, glb: v.glb, modelName: v.modelName }));
+
+/**
+ * The model-picker list filtered for the current user. `development` variants
+ * (see `CarVariant.status` in lib/models.ts) are admin-only — non-admins never
+ * see an in-progress car in the picker, though a dev car already sitting in a
+ * garage stays fully functional. Pass the result of `useIsAdmin()`.
+ */
+export function visibleModelOptions(isAdmin: boolean): typeof MODEL_OPTIONS {
+  if (isAdmin) return MODEL_OPTIONS;
+  return CAR_VARIANTS
+    .filter((v) => v.status !== 'development')
+    .map((v) => ({ id: v.id, label: v.label, glb: v.glb, modelName: v.modelName }));
+}
 
 export function modelGlb(body: BodyType): string {
   return variantGlb(body);
@@ -132,8 +145,8 @@ export function VehicleProvider({ children }: { children: React.ReactNode }) {
           body: variant.id,
           engine: variant.defaultEngine ?? defaultEngine(variant.generation),
           trans: variant.defaultTransmission ?? defaultTransmission(variant.generation),
-          colorName: 'GT Silver Metallic',
-          colorHex: '#C6C8CA',
+          colorName: defaultColor(variant.generation).name,
+          colorHex: defaultColor(variant.generation).hex,
           ...v,
         },
         { primary: vehicles.length === 0 },

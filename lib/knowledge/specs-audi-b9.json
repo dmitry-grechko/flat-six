@@ -1,0 +1,88 @@
+[
+  {
+    "id": "a4b9-oil-capacity",
+    "category": "capacity",
+    "name": "Engine oil capacity (with filter)",
+    "value": "5.2 L (5.5 qt)",
+    "notes": "2.0 TFSI (EA888 Gen 3). Approximate — always verify on the dipstick/refill.",
+    "appliesTo": ["2.0 TFSI"],
+    "source": "Audi Repair Manual · 2017–2018 Fluid Capacity Tables (A4 8W)"
+  },
+  {
+    "id": "a4b9-oil-spec",
+    "category": "fluid",
+    "name": "Engine oil specification",
+    "value": "VW 502 00 (5W-40)",
+    "notes": "CYMC 2.0 TFSI uses VW 502 00 (5W-40). The B-cycle DBPA engine uses VW 508 00 / 509 00 (0W-20) — check the oil placard / engine code.",
+    "appliesTo": ["2.0 TFSI"],
+    "source": "Audi Repair Manual · 2017–2018 Fluid Capacity Tables (A4 8W)"
+  },
+  {
+    "id": "a4b9-coolant-capacity",
+    "category": "capacity",
+    "name": "Coolant capacity",
+    "value": "10.0 L (10.5 qt)",
+    "notes": "G13 (VW/Audi) coolant. Refer to the parts catalog for the exact spec.",
+    "appliesTo": ["2.0 TFSI"],
+    "source": "Audi Repair Manual · 2017–2018 Fluid Capacity Tables (A4 8W)"
+  },
+  {
+    "id": "a4b9-atf-s-tronic",
+    "category": "fluid",
+    "name": "Transmission fluid — 7-speed S tronic (DL382)",
+    "value": "ATF 4.35 L initial / 3.5 L refill",
+    "notes": "0CK/0CL/0CJ dual-clutch. Mechatronic/gearbox (MTF) initial fill 3.8 L; rear final drive 0.67–0.95 L.",
+    "appliesTo": ["7-Speed S tronic (DSG)"],
+    "source": "Audi Repair Manual · 2017–2018 Fluid Capacity Tables (A4 8W)"
+  },
+  {
+    "id": "a4b9-atf-tiptronic",
+    "category": "fluid",
+    "name": "Transmission fluid — 8-speed Tiptronic (0D5)",
+    "value": "8.6 L initial / 3.6–4.0 L refill",
+    "notes": "quattro automatic. Front final drive 1.0 L initial / ~0.9 L refill; transfer case 1.0 L.",
+    "appliesTo": ["8-Speed Tiptronic"],
+    "source": "Audi Repair Manual · 2017–2018 Fluid Capacity Tables (A4 8W)"
+  },
+  {
+    "id": "a4b9-manual-gearbox-oil",
+    "category": "fluid",
+    "name": "Manual gearbox oil — 6-speed (0CX)",
+    "value": "1.8 L (1.9 qt)",
+    "notes": "Rear final drive (0DB) 0.67 L (0.7 qt).",
+    "appliesTo": ["6-Speed Manual"],
+    "source": "Audi Repair Manual · 2017–2018 Fluid Capacity Tables (A4 8W)"
+  },
+  {
+    "id": "a4b9-brake-fluid-capacity",
+    "category": "capacity",
+    "name": "Brake fluid capacity (system)",
+    "value": "1.0 L (1.1 qt)",
+    "notes": "Full system fill. Use a DOT 4 / VW-spec fluid; refer to the parts catalog.",
+    "source": "Audi Repair Manual · 2017–2018 Fluid Capacity Tables (A4 8W)"
+  },
+  {
+    "id": "a4b9-washer-fluid-capacity",
+    "category": "capacity",
+    "name": "Washer fluid reservoir",
+    "value": "4.8 L (5.1 qt)",
+    "source": "Audi Repair Manual · 2017–2018 Fluid Capacity Tables (A4 8W)"
+  },
+  {
+    "id": "a4b9-ac-refrigerant",
+    "category": "capacity",
+    "name": "A/C refrigerant charge",
+    "value": "R134a 590 g / R1234yf 525 g",
+    "notes": "PAG compressor oil 110 cc. 2018-MY cars built during 2017 may use R1234yf — confirm the under-hood label before servicing.",
+    "source": "Audi Repair Manual · 2017–2018 Fluid Capacity Tables (A4 8W)"
+  },
+  {
+    "id": "a4b9-tyre-pressure-normal",
+    "category": "tyre",
+    "name": "Cold tyre pressure (normal load)",
+    "value": "F 2.2 bar (32 psi) / R 2.0 bar (29 psi)",
+    "notes": "Base A4 2.0 on 16–18\" wheels. Some 18–19\" fitments run F 2.3 bar (33 psi) / R 2.2 bar (32 psi). Always follow the driver's-door-jamb placard for your exact wheel/load.",
+    "appliesTo": ["2.0 TFSI"],
+    "source": "Audi MY2016 Normal Load Condition Tire Pressure Table (A4 2.0)"
+  }
+]

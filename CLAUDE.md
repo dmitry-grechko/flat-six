@@ -18,8 +18,18 @@ A change isn't done until the **five layers** it can touch are consistent:
 - Static reference data → `lib/` (`data.ts`, `models.ts`, `knowledge/`,
   `fitment/`, `documents.ts`, `credits.ts`, `catalog.ts`). Version-controlled, same for everyone.
 - Per-user data → Postgres via `lib/db/*`; every row has `user_id`, RLS = `auth.uid() = user_id`.
-- Variant registry: `lib/models.ts` (`CAR_VARIANTS`) is the single source of truth for models.
-- Knowledge is **per generation** — never let 981 and 987 data cross.
+- Variant registry: `lib/models.ts` (`CAR_VARIANTS`) is the single source of truth
+  for models. `make` (default `'Porsche'`) supports other marques; `status:
+  'development'` hides a car from the model picker for non-admins (`useIsAdmin` +
+  `visibleModelOptions`) while keeping it fully live — the dev→prod staging gate.
+  Per-generation data (powertrain, `colorsFor` paint, OBD `VehiclePack` in
+  `lib/obd/packs.ts`, exterior pins, docs, fitment) lives in registries that return
+  an **honest empty** for unknown generations.
+- Knowledge is **per generation** — never let 981 and 987 data cross, and **never
+  collapse the generation**: `g === '987' ? '987' : '981'` (or `?? '981'` on a
+  display path) shows Porsche data on other marques. Pass the real generation and
+  render a "no data yet" state when a registry returns empty. New marque/generation
+  checklist → [`adding-new-generation.md`](./docs/procedures/adding-new-generation.md).
 
 ## Design system (match it exactly)
 

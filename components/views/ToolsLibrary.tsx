@@ -4,6 +4,7 @@ import { useMemo, useState, type CSSProperties } from 'react';
 import { useVehicle } from '@/lib/vehicle-context';
 import { generationForBody } from '@/lib/models';
 import { presetsForGeneration, PCD, CENTER_BORE_MM, WHEEL_BOLT_TORQUE } from '@/lib/fitment/oem';
+import { useAccountUnits, formatTorque } from '@/lib/units';
 import { mono, sans } from '@/components/tools/ui';
 import WillItFit from '@/components/tools/WillItFit';
 import TireSizeCalc from '@/components/tools/TireSizeCalc';
@@ -25,12 +26,21 @@ type TabId = (typeof TABS)[number]['id'];
 
 export default function ToolsLibrary() {
   const { vehicle } = useVehicle();
-  const vehicleGen = generationForBody(vehicle.body);
-  const gen = vehicleGen === '987' || vehicleGen === '981' ? vehicleGen : '981';
+  // Use the vehicle's ACTUAL generation — never collapse to 981. Generations with
+  // no OEM fitment (e.g. a non-Porsche marque) resolve to empty presets, and the
+  // Porsche-specific quick-ref chips below are hidden.
+  const gen = generationForBody(vehicle.body);
 
   const presets = useMemo(() => presetsForGeneration(gen), [gen]);
   const [presetId, setPresetId] = useState<string>('');
   const preset = presets.find((p) => p.id === presetId) ?? presets[0];
+  const hasFitment = presets.length > 0;
+  const { torque: torqueUnit } = useAccountUnits();
+  const noFitment = (
+    <div style={{ padding: 24, color: '#6E6E73', font: `400 14px/1.55 ${sans}` }}>
+      No OEM wheel/tyre fitment data on file for this vehicle yet.
+    </div>
+  );
 
   const [tab, setTab] = useState<TabId>('torque');
 
@@ -40,13 +50,13 @@ export default function ToolsLibrary() {
         return <TorqueFinder gen={gen} />;
       case 'fit':
         // no key: keep disk edits while on the tab; OEM baseline updates live via prop.
-        return <WillItFit preset={preset} />;
+        return preset ? <WillItFit preset={preset} /> : noFitment;
       case 'tyre':
-        return <TireSizeCalc key={preset?.id ?? 'none'} preset={preset} />;
+        return preset ? <TireSizeCalc key={preset.id} preset={preset} /> : noFitment;
       case 'offset':
-        return <OffsetCalc key={preset?.id ?? 'none'} preset={preset} />;
+        return preset ? <OffsetCalc key={preset.id} preset={preset} /> : noFitment;
       case 'stagger':
-        return <StaggerCalc key={preset?.id ?? 'none'} preset={preset} />;
+        return preset ? <StaggerCalc key={preset.id} preset={preset} /> : noFitment;
       case 'align':
         return <AlignmentReference gen={gen} />;
       default:
@@ -68,9 +78,13 @@ export default function ToolsLibrary() {
       {/* Quick reference chips */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center', marginBottom: 14 }}>
         <span style={chip('red')}>{gen}</span>
-        <span style={chip()}>PCD {PCD}</span>
-        <span style={chip()}>Bore {CENTER_BORE_MM} mm</span>
-        <span style={chip()}>Wheel bolt {WHEEL_BOLT_TORQUE[gen]}</span>
+        {hasFitment && (
+          <>
+            <span style={chip()}>PCD {PCD}</span>
+            <span style={chip()}>Bore {CENTER_BORE_MM} mm</span>
+            <span style={chip()}>Wheel bolt {formatTorque(WHEEL_BOLT_TORQUE[gen as '981' | '987'], torqueUnit)}</span>
+          </>
+        )}
       </div>
 
       {/* Tabs (horizontally scrollable on mobile) */}
