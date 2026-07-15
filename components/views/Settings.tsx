@@ -168,7 +168,7 @@ export default function Settings() {
         <div style={{ height: 1, background: '#EDEDEF', margin: '0 0 20px' }} />
         <div style={subLabel}>This car</div>
 
-        <div className="stackSm" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 20 }}>
+        <div className="carFieldsGrid" style={{ marginBottom: 20 }}>
           <div>
             <label style={fieldLabel}>Model year</label>
             <input value={vehicle.year} onChange={(e) => update({ year: e.target.value })} style={inputStyle} />
@@ -186,7 +186,7 @@ export default function Settings() {
               style={{ ...inputStyle, fontFamily: "'JetBrains Mono',monospace" }}
             />
           </div>
-          <div style={{ gridColumn: '1 / 4' }}>
+          <div style={{ gridColumn: '1 / -1' }}>
             <label style={fieldLabel}>Chassis VIN</label>
             <input value={vehicle.vin} onChange={(e) => update({ vin: e.target.value })} style={{ ...inputStyle, font: "500 14px 'JetBrains Mono',monospace", letterSpacing: '.04em' }} />
           </div>

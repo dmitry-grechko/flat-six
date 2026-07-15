@@ -113,7 +113,7 @@ export default function VehicleFields({
         />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
+      <div className="formGrid2" style={{ marginBottom: 20 }}>
         <div>
           <label style={fieldLabel}>Model year</label>
           <input

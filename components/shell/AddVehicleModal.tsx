@@ -67,6 +67,7 @@ export default function AddVehicleModal({
   return createPortal(
     <div
       onClick={onClose}
+      className="modalScrim"
       style={{
         position: 'fixed',
         inset: 0,
@@ -75,12 +76,12 @@ export default function AddVehicleModal({
         display: 'flex',
         alignItems: 'flex-start',
         justifyContent: 'center',
-        padding: '32px 20px',
         overflow: 'auto',
       }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="modalCard"
         style={{
           width: '100%',
           maxWidth: 560,
@@ -88,7 +89,6 @@ export default function AddVehicleModal({
           background: '#fff',
           border: '1px solid #E3E3E5',
           borderRadius: 6,
-          padding: 32,
           boxShadow: '0 24px 60px rgba(0,0,0,.4)',
         }}
       >

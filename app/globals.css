@@ -156,11 +156,24 @@ model-viewer { width: 100%; height: 100%; --poster-color: transparent; }
   .hideOnMobile { display: none !important; }
 }
 
+/* --- Responsive form grids (define columns in CSS, not inline, so the mobile
+   override below always wins — an inline grid-template-columns can't be beaten
+   by a class rule) --- */
+.carFieldsGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.formGrid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* --- Add-vehicle modal surface (padding tightens on mobile) --- */
+.modalScrim { padding: 32px 20px; }
+.modalCard { padding: 32px; }
+
 /* --- Content views: collapse grids + tighten page padding --- */
 @media (max-width: 760px) {
   .padView { padding: 16px !important; }
   .stackSm { grid-template-columns: 1fr !important; }
   .statCardsSm { grid-template-columns: 1fr 1fr !important; }
+  .carFieldsGrid, .formGrid2 { grid-template-columns: 1fr; }
+  .modalScrim { padding: 16px 10px; }
+  .modalCard { padding: 20px; }
 }
 
 /* --- Live OBD: immersive focus + touch-friendly chrome --- */
