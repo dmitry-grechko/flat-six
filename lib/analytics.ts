@@ -63,9 +63,14 @@ export function loadGa(): void {
   window.__flatsixGaLoaded = true;
 
   window.dataLayer = window.dataLayer || [];
-  const gtag: Window['gtag'] = (...args: unknown[]) => {
-    window.dataLayer!.push(args);
-  };
+  // gtag.js only recognizes a queued entry as a command when the pushed value
+  // is the `arguments` object itself. Pushing a plain array makes GTM treat it
+  // as a dataLayer variable and silently drop the command — so no hit is ever
+  // sent. This must be a real function (not an arrow) to have `arguments`.
+  function gtag(..._args: unknown[]) {
+    // eslint-disable-next-line prefer-rest-params
+    window.dataLayer!.push(arguments);
+  }
   window.gtag = gtag;
 
   gtag('consent', 'default', {
