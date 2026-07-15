@@ -105,16 +105,28 @@ const TRN = { m7: '7-Speed Manual', m6: '6-Speed Manual', pdk: '7-Speed PDK' } a
 const B991 = { generation: '991' as const, nameplate: '911', hasCutaway2D: false, hasXray3D: false };
 
 export const CAR_VARIANTS: CarVariant[] = [
-  { id: 'boxster', generation: '981', bodyStyle: 'boxster', label: 'Boxster (981)', modelName: 'Boxster S (981)', glb: '/models/boxster-real.glb', hasCutaway2D: true, hasXray3D: true },
-  { id: 'cayman', generation: '981', bodyStyle: 'cayman', label: 'Cayman (981)', modelName: 'Cayman S (981)', glb: '/models/cayman.glb', hasCutaway2D: true, hasXray3D: true },
+  // Base Boxster / Cayman (981) — entry-level 2.7 L cars, distinct from the S so a
+  // base owner isn't forced to pick "S". Share the 981 GLB/cutaway/knowledge; credit
+  // resolves via the shared GLB (modelCreditFor). 981 offered no 5-speed (6MT/PDK).
+  { id: 'boxster-base-981', generation: '981', bodyStyle: 'boxster', label: 'Boxster (981)', modelName: 'Boxster (981)', glb: '/models/boxster-real.glb', hasCutaway2D: true, hasXray3D: true, defaultEngine: '2.7 L Flat-Six', defaultTransmission: '6-Speed Manual' },
+  { id: 'boxster', generation: '981', bodyStyle: 'boxster', label: 'Boxster S (981)', modelName: 'Boxster S (981)', glb: '/models/boxster-real.glb', hasCutaway2D: true, hasXray3D: true, defaultEngine: '3.4 L Flat-Six (S)', defaultTransmission: '7-Speed PDK' },
+  { id: 'cayman-base-981', generation: '981', bodyStyle: 'cayman', label: 'Cayman (981)', modelName: 'Cayman (981)', glb: '/models/cayman.glb', hasCutaway2D: true, hasXray3D: true, defaultEngine: '2.7 L Flat-Six', defaultTransmission: '6-Speed Manual' },
+  { id: 'cayman', generation: '981', bodyStyle: 'cayman', label: 'Cayman S (981)', modelName: 'Cayman S (981)', glb: '/models/cayman.glb', hasCutaway2D: true, hasXray3D: true, defaultEngine: '3.4 L Flat-Six (S)', defaultTransmission: '7-Speed PDK' },
   // Cayman GT4 (981) — dedicated exterior GLB; shares the 981 cutaway + X-ray.
   // Only ever a 3.8 L flat-six with a 6-speed manual (no PDK), so it carries a
   // signature powertrain instead of the generic 981 S/PDK default.
   { id: 'cayman-gt4-981', generation: '981', bodyStyle: 'cayman', label: 'Cayman GT4 (981)', modelName: 'Cayman GT4 (981)', glb: '/models/cayman-gt4-981.glb', hasCutaway2D: true, hasXray3D: true, defaultEngine: '3.8 L Flat-Six (Spyder/GT4)', defaultTransmission: '6-Speed Manual' },
-  { id: 'cayman-987', generation: '987', bodyStyle: 'cayman', label: 'Cayman (987)', modelName: 'Cayman S (987)', glb: '/models/cayman-987.glb', hasCutaway2D: true, hasXray3D: true },
+  // Base Cayman (987) — entry-level (2.7 L, 5-speed manual on the 987.1), distinct
+  // from the S. Shares the 987 GLB/cutaway/knowledge; credit via the shared GLB.
+  { id: 'cayman-base-987', generation: '987', bodyStyle: 'cayman', label: 'Cayman (987)', modelName: 'Cayman (987)', glb: '/models/cayman-987.glb', hasCutaway2D: true, hasXray3D: true, defaultEngine: '2.7 L Flat-Six', defaultTransmission: '5-Speed Manual' },
+  { id: 'cayman-987', generation: '987', bodyStyle: 'cayman', label: 'Cayman S (987)', modelName: 'Cayman S (987)', glb: '/models/cayman-987.glb', hasCutaway2D: true, hasXray3D: true, defaultEngine: '3.4 L Flat-Six (S)', defaultTransmission: '6-Speed Manual' },
   // No Boxster 987 GLB yet — reuse the Cayman 987 model for the 3D exterior.
   // Same generation, so it shares the 987 cutaway + knowledge + documents.
-  { id: 'boxster-987', generation: '987', bodyStyle: 'boxster', label: 'Boxster (987)', modelName: 'Boxster S (987)', glb: '/models/cayman-987.glb', hasCutaway2D: true, hasXray3D: true },
+  // Base Boxster (987) — the entry-level car (2.7 L, 5-speed manual as standard on
+  // the 987.1). Distinct from the S so a base owner isn't forced to pick "S". Shares
+  // the 987 GLB/cutaway/knowledge; credit resolves via the shared GLB (modelCreditFor).
+  { id: 'boxster-base-987', generation: '987', bodyStyle: 'boxster', label: 'Boxster (987)', modelName: 'Boxster (987)', glb: '/models/cayman-987.glb', hasCutaway2D: true, hasXray3D: true, defaultEngine: '2.7 L Flat-Six', defaultTransmission: '5-Speed Manual' },
+  { id: 'boxster-987', generation: '987', bodyStyle: 'boxster', label: 'Boxster S (987)', modelName: 'Boxster S (987)', glb: '/models/cayman-987.glb', hasCutaway2D: true, hasXray3D: true, defaultEngine: '3.4 L Flat-Six (S)', defaultTransmission: '6-Speed Manual' },
   // Boxster Spyder (987.2) — dedicated exterior GLB; shares 987 cutaway + X-ray.
   { id: 'spyder-987', generation: '987', bodyStyle: 'boxster', label: 'Spyder (987)', modelName: 'Boxster Spyder (987)', glb: '/models/spyder-987.glb', hasCutaway2D: true, hasXray3D: true },
   // Audi A4 (B9, 2016–2023) — DEV MODE (status: 'development'): admin-only in the
@@ -218,6 +230,36 @@ export function variantNameplate(v: CarVariant): string {
   if (v.bodyStyle === 'boxster') return 'Boxster';
   if (v.bodyStyle === 'cayman') return 'Cayman';
   return v.modelName;
+}
+
+/** Parse a "2005–2012" style model-year range → [min, max] (handles en-dash + hyphen). */
+function parseYearRange(range: string): [number, number] | null {
+  const m = range.match(/(\d{4})\s*[–-]\s*(\d{4})/);
+  return m ? [Number(m[1]), Number(m[2])] : null;
+}
+
+/**
+ * The sibling generation whose model-year range contains `year` for a given
+ * make + nameplate — e.g. Boxster + 2005 → '987' (the 987 is 2005–2012; the 981
+ * is 2012–2016). Returns null if none matches or the range is unknown. Used to
+ * catch a model-year that doesn't fit the picked generation (a 2005 car left on
+ * the 981 wouldn't offer the 5-speed manual it actually had). Prefers an exact
+ * match; treats a boundary-overlap year as ambiguous (returns null → no nag).
+ */
+export function generationForYear(make: string, nameplate: string, year: number): string | null {
+  if (!Number.isFinite(year)) return null;
+  const gens = Array.from(
+    new Set(
+      CAR_VARIANTS.filter((v) => variantMake(v) === make && variantNameplate(v) === nameplate).map(
+        (v) => v.generation,
+      ),
+    ),
+  );
+  const hits = gens.filter((g) => {
+    const r = parseYearRange(generationYears(g));
+    return r && year >= r[0] && year <= r[1];
+  });
+  return hits.length === 1 ? hits[0] : null;
 }
 
 /** Leaf label — modelName without the trailing "(gen)" (e.g. "Cayman GT4"). */

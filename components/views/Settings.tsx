@@ -6,7 +6,10 @@ import { colorsFor, enginesFor, transmissionsFor, defaultEngine, defaultTransmis
 import { useVehicle } from '@/lib/vehicle-context';
 import { useIsAdmin } from '@/lib/useIsAdmin';
 import ModelPicker from '@/components/shell/ModelPicker';
-import { generationForBody, getVariant } from '@/lib/models';
+import {
+  generationForBody, getVariant, generationForYear, generationYears, generationCode,
+  variantMake, variantNameplate,
+} from '@/lib/models';
 import { createClient } from '@/lib/supabase/client';
 import { DEMO_MODE, DEMO_EMAIL } from '@/lib/demo';
 import { useUnits, milesToDisplay, displayToMiles, useAccountUnits } from '@/lib/units';
@@ -19,6 +22,16 @@ export default function Settings() {
   const { torque, pressure, setTorque, setPressure } = useAccountUnits();
   const isAdmin = useIsAdmin();
   const [email, setEmail] = useState<string>('');
+
+  // Flag a model-year that doesn't fit the selected generation (e.g. a 2005 car
+  // left on the 981, which never offered the 5-speed manual it actually had).
+  const settingsVariant = getVariant(vehicle.body);
+  const settingsGen = generationForBody(vehicle.body);
+  const suggestedGen =
+    String(vehicle.year).trim().length === 4
+      ? generationForYear(variantMake(settingsVariant), variantNameplate(settingsVariant), parseInt(String(vehicle.year), 10))
+      : null;
+  const yearGenMismatch = !!suggestedGen && suggestedGen !== settingsGen;
 
   // Odometer input buffer: show the stored miles converted to the active unit,
   // but hold the user's raw keystrokes while editing and commit (→ miles) on blur.
@@ -164,6 +177,24 @@ export default function Settings() {
             }}
           />
         </div>
+
+        {yearGenMismatch && suggestedGen && (
+          <div
+            style={{
+              display: 'flex', gap: 8, alignItems: 'flex-start', margin: '0 0 20px',
+              padding: '10px 12px', background: '#fff', border: '1px solid #E8CE8E', borderRadius: 4,
+              font: "500 12px/1.45 'Helvetica Neue',Arial,sans-serif", color: '#8A6D1E',
+            }}
+          >
+            <span aria-hidden style={{ lineHeight: 1.2 }}>⚠</span>
+            <span>
+              A {vehicle.year} {variantNameplate(settingsVariant)} is the{' '}
+              <strong>{generationCode(suggestedGen)} ({generationYears(suggestedGen)})</strong>, but this car is
+              set to the {generationCode(settingsGen)} ({generationYears(settingsGen)}). Pick the{' '}
+              {generationCode(suggestedGen)} above so the correct engines and gearboxes appear.
+            </span>
+          </div>
+        )}
 
         <div style={{ height: 1, background: '#EDEDEF', margin: '0 0 20px' }} />
         <div style={subLabel}>This car</div>

@@ -175,7 +175,8 @@ export interface ObdScan {
 // Selectable car-variant ids (also stored as vehicle.body). Legacy 981 values
 // stay 'boxster'/'cayman'; newer generations are suffixed. See lib/models.ts.
 export type BodyType =
-  | 'boxster' | 'cayman' | 'cayman-gt4-981' | 'cayman-987' | 'boxster-987' | 'spyder-987'
+  | 'boxster' | 'boxster-base-981' | 'cayman' | 'cayman-base-981' | 'cayman-gt4-981'
+  | 'cayman-987' | 'cayman-base-987' | 'boxster-base-987' | 'boxster-987' | 'spyder-987'
   | 'audi-a4-b9'
   // 911 (991) — full trim matrix, id pattern <trim>-<body?>-991-<phase>. See CAR_VARIANTS.
   // 991.1 (2012–2016)

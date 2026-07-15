@@ -3,7 +3,10 @@
 import { colorsFor, enginesFor, transmissionsFor, defaultEngine, defaultTransmission } from '@/lib/data';
 import ModelPicker from '@/components/shell/ModelPicker';
 import { useIsAdmin } from '@/lib/useIsAdmin';
-import { generationForBody, getVariant } from '@/lib/models';
+import {
+  generationForBody, getVariant, generationForYear, generationYears, generationCode,
+  variantMake, variantNameplate,
+} from '@/lib/models';
 import type { BodyType } from '@/lib/types';
 
 const mono = "'JetBrains Mono',monospace";
@@ -84,9 +87,19 @@ export default function VehicleFields({
   onChange: (patch: Partial<VehicleFormState>) => void;
 }) {
   const isAdmin = useIsAdmin();
+  const variant = getVariant(value.body);
   const gen = generationForBody(value.body);
   const engines = enginesFor(gen);
   const transmissions = transmissionsFor(gen);
+
+  // The model year and the picked generation can disagree (e.g. a 2005 Boxster
+  // left on the 981, whose only manual is a 6-speed) — nudge to the generation
+  // whose year range actually contains the year, where the right gearboxes live.
+  const suggestedGen =
+    value.year.trim().length === 4
+      ? generationForYear(variantMake(variant), variantNameplate(variant), parseInt(value.year, 10))
+      : null;
+  const yearGenMismatch = !!suggestedGen && suggestedGen !== gen;
 
   return (
     <>
@@ -112,6 +125,24 @@ export default function VehicleFields({
           }}
         />
       </div>
+
+      {yearGenMismatch && suggestedGen && (
+        <div
+          style={{
+            display: 'flex', gap: 8, alignItems: 'flex-start', margin: '-4px 0 20px',
+            padding: '10px 12px', background: '#fff', border: '1px solid #E8CE8E', borderRadius: 4,
+            font: "500 12px/1.45 'Helvetica Neue',Arial,sans-serif", color: '#8A6D1E',
+          }}
+        >
+          <span aria-hidden style={{ lineHeight: 1.2 }}>⚠</span>
+          <span>
+            A {value.year} {variantNameplate(variant)} is the{' '}
+            <strong>{generationCode(suggestedGen)} ({generationYears(suggestedGen)})</strong>, but you've
+            selected the {generationCode(gen)} ({generationYears(gen)}). Pick the {generationCode(suggestedGen)}{' '}
+            above so the correct engines and gearboxes appear.
+          </span>
+        </div>
+      )}
 
       <div className="formGrid2" style={{ marginBottom: 20 }}>
         <div>
