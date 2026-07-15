@@ -10,8 +10,11 @@ import { ARTICLES } from './articles';
 import faultCodes987Json from './fault-codes-987.json';
 import specs987Json from './specs-987.json';
 import specsAudiB9Json from './specs-audi-b9.json';
+import specs991Json from './specs-991.json';
 import maintenance987Json from './maintenance-987.json';
+import maintenance991Json from './maintenance-991.json';
 import knownIssues987Json from './known-issues-987.json';
+import knownIssues991Json from './known-issues-991.json';
 import { ARTICLES_987 } from './articles-987';
 import type {
   FaultCode,
@@ -59,6 +62,16 @@ const GENERATION_KB: Record<string, KnowledgeBundle> = {
     maintenance: maintenance987Json as MaintenanceItem[],
     knownIssues: knownIssues987Json as KnownIssue[],
     articles: ARTICLES_987,
+  },
+  // 911 (991) — specs / known-issues / maintenance populated (specs verified from
+  // the factory manual + cited). Fault codes are empty (honest absence): Fault
+  // Finding leans on the embedded 991 workshop manual + generic OBD, as with Audi.
+  '991': {
+    faultCodes: [],
+    specs: specs991Json as Spec[],
+    maintenance: maintenance991Json as MaintenanceItem[],
+    knownIssues: knownIssues991Json as KnownIssue[],
+    articles: [],
   },
   // Audi A4 (B9) — dev car. Verified fluids/capacities/tyre-pressures extracted
   // from the factory fluid + tyre-pressure tables. Faults/known-issues/articles

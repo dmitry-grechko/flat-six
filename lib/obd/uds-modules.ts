@@ -113,9 +113,32 @@ const CONFIRMED_AUDI_B9: UdsModule[] = [
   { id: 'mod-7f1', name: 'Protected module (7F1)', reqId: '7F1', respId: '7F9', protocol: 'uds', addressConfirmed: true, note: 'Responds but refuses 22 F1 97 in the default session — likely immobilizer / access control.' },
 ];
 
+// 911 (991) shares the Porsche electronics platform/era with the 981 (common
+// PIWIS, same module families), so the 981's live-verified request ids are the
+// best CANDIDATE starting points for a 991. NONE are confirmed on a real 991
+// (addressConfirmed:false) — the scan will report which actually answer; a
+// `refused` 7F still proves the address, `silent` means routing differs. Verify
+// with tools/obd-bridge/ and record findings here (never cross generations).
+const CANDIDATES_991: UdsModule[] = [
+  { id: 'tpms', name: 'TPMS (tyre pressure)', reqId: '70B', respId: '775', protocol: 'uds', addressConfirmed: false, note: 'Candidate — 981-platform address; verify on a real 991.' },
+  { id: 'bcm-front', name: 'BCM front (body)', reqId: '70E', respId: '778', protocol: 'uds', addressConfirmed: false, note: 'Candidate — 981-platform address; verify on a real 991.' },
+  { id: 'eps', name: 'Steering (EPS)', reqId: '712', respId: '77C', protocol: 'uds', addressConfirmed: false, note: 'Candidate — 981-platform address; verify on a real 991.' },
+  { id: 'psm', name: 'PSM / ABS', reqId: '713', respId: '77D', protocol: 'uds', addressConfirmed: false, note: 'Candidate — 981-platform address; verify on a real 991.' },
+  { id: 'cluster', name: 'Instrument cluster', reqId: '714', respId: '77E', protocol: 'uds', addressConfirmed: false, note: 'Candidate — 981-platform address; verify on a real 991.' },
+  { id: 'airbag', name: 'Airbag / SRS', reqId: '715', respId: '77F', protocol: 'uds', addressConfirmed: false, note: 'Candidate — 981-platform address; verify on a real 991.' },
+  { id: 'pdk', name: 'PDK / Transmission', reqId: '71E', respId: '788', protocol: 'uds', addressConfirmed: false, note: 'Candidate — 981 PDK speaks KWP at this id; the 991 may use UDS. Verify protocol + address on a real 991.' },
+  { id: 'climate', name: 'Climate', reqId: '746', respId: '7B0', protocol: 'uds', addressConfirmed: false, note: 'Candidate — 981-platform address; verify on a real 991.' },
+  { id: 'epb', name: 'Parking brake (EPB)', reqId: '752', respId: '7BC', protocol: 'uds', addressConfirmed: false, note: 'Candidate — 981-platform address; verify on a real 991.' },
+  { id: 'pcm', name: 'PCM head unit', reqId: '773', respId: '7DD', protocol: 'uds', addressConfirmed: false, note: 'Candidate — 981 PCM speaks KWP; the 991 (PCM 4.0) may differ. Verify on a real 991.' },
+  { id: 'gateway', name: 'Gateway', reqId: '7F1', respId: '7F9', protocol: 'uds', addressConfirmed: false, note: 'Candidate — 981-platform address; verify on a real 991.' },
+];
+
 const REGISTRY: Record<string, UdsModule[]> = {
   '987': [DME, ...CANDIDATES_987],
   '981': [DME, ...CANDIDATES_981],
+  // 911 (991) — DME (7E0) via generic OBD Mode 03; non-DME modules are candidates
+  // ported from the same-era 981 platform (all addressConfirmed:false).
+  '991': [DME, ...CANDIDATES_991],
   // Audi A4 (B9) — DEV. DME (7E0) via generic OBD Mode 03; VAG modules mapped + verified live.
   'audi-b9': [DME, ...CONFIRMED_AUDI_B9],
 };

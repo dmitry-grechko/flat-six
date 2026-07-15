@@ -11,7 +11,7 @@ export interface CarVariant {
   /** stable id, also stored as vehicle.body */
   id: BodyType;
   generation: '981' | '987' | '991' | (string & {});
-  bodyStyle: 'boxster' | 'cayman' | 'sedan';
+  bodyStyle: 'boxster' | 'cayman' | 'sedan' | 'coupe' | 'targa' | 'cabriolet';
   /** short label for the model picker chip, e.g. "Cayman (987)" */
   label: string;
   /** default vehicle.model when this variant is chosen, e.g. "Cayman S (987)" */
@@ -56,7 +56,53 @@ export interface CarVariant {
    * mid-engine cars; set explicitly for other marques. See variantNameplate().
    */
   nameplate?: string;
+  /**
+   * Sub-generation / "series" for the picker (e.g. '991.1' | '991.2'). Data is
+   * still scoped by `generation` ('991'); `phase` only adds a picker step and is
+   * shown in the summary. Undefined for cars with no such split (981/987/A4).
+   */
+  phase?: string;
+  /**
+   * Whether `glb` is this variant's OWN dedicated model. `false` means it renders
+   * a same-family stand-in (another trim's GLB) — the garage shows a "3D model not
+   * available yet, contribute on GitHub" notice. Defaults to true when unset.
+   */
+  modelAvailable?: boolean;
 }
+
+// ---- 991 (911) trim matrix -------------------------------------------------
+// 12 exterior GLBs cover the whole range; trims without a dedicated model reuse a
+// same-family stand-in (modelAvailable:false → the garage shows a "contribute on
+// GitHub" notice). Every 991 shares generation:'991' for data scoping; phase
+// (991.1/991.2) + bodyStyle (coupe/cabriolet/targa) drive the picker cascade only.
+const GLB = {
+  cs1: '/models/carrera-s-991-1.glb',
+  gt3_1: '/models/gt3-991-1.glb',
+  turbo1: '/models/turbo-991-1.glb',
+  gt3rs1: '/models/gt3-rs-991-1.glb',
+  gts2: '/models/carrera-gts-991-2.glb',
+  ts2: '/models/turbo-s-991-2.glb',
+  tse2: '/models/turbo-s-exclusive-991-2.glb',
+  gt3rs2: '/models/gt3-rs-991-2.glb',
+  gt3rsw2: '/models/gt3-rs-weissach-991-2.glb',
+  gt2cs2: '/models/gt2-rs-clubsport-991-2.glb',
+  speed2: '/models/speedster-991-2.glb',
+  targa2: '/models/targa-4s-991-2.glb',
+} as const;
+// 991 engine/transmission ids — MUST match GENERATION_POWERTRAIN['991'] in lib/data.ts.
+const ENG = {
+  c34: '3.4 L Flat-Six (Carrera)',
+  c38: '3.8 L Flat-Six (Carrera S/GTS)',
+  c30: '3.0 L Twin-Turbo Flat-Six (Carrera)',
+  c30s: '3.0 L Twin-Turbo Flat-Six (Carrera S/GTS)',
+  gt38: '3.8 L Flat-Six (GT3)',
+  gt40: '4.0 L Flat-Six (GT3/RS)',
+  t38: '3.8 L Twin-Turbo Flat-Six (Turbo/S)',
+  gt2: '3.8 L Twin-Turbo Flat-Six (GT2 RS)',
+} as const;
+const TRN = { m7: '7-Speed Manual', m6: '6-Speed Manual', pdk: '7-Speed PDK' } as const;
+// Shared 991 base (rear-engine: no 2D cutaway / 3D X-ray internals yet — honest absence).
+const B991 = { generation: '991' as const, nameplate: '911', hasCutaway2D: false, hasXray3D: false };
 
 export const CAR_VARIANTS: CarVariant[] = [
   { id: 'boxster', generation: '981', bodyStyle: 'boxster', label: 'Boxster (981)', modelName: 'Boxster S (981)', glb: '/models/boxster-real.glb', hasCutaway2D: true, hasXray3D: true },
@@ -76,6 +122,60 @@ export const CAR_VARIANTS: CarVariant[] = [
   // models/data on. No 2D cutaway / 3D X-ray yet (honest absence); OBD runs on a
   // generic-UDS pack (lib/obd/pack-audi-b9.ts). Powertrain is provisional.
   { id: 'audi-a4-b9', make: 'Audi', nameplate: 'A4', generation: 'audi-b9', bodyStyle: 'sedan', label: 'A4 (B9) · dev', modelName: 'Audi A4 (B9)', glb: '/models/audi-a4-b9.glb', hasCutaway2D: false, hasXray3D: false, status: 'development', defaultEngine: '2.0 TFSI', defaultTransmission: '7-Speed S tronic (DSG)' },
+
+  // ── 991.1 (2012–2016): NA flat-six Carreras, first-gen Turbo/GT3 ──
+  { ...B991, id: 'carrera-991-1', phase: '991.1', bodyStyle: 'coupe', label: 'Carrera (991.1)', modelName: '911 Carrera (991.1)', glb: GLB.cs1, defaultEngine: ENG.c34, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'carrera-cab-991-1', phase: '991.1', bodyStyle: 'cabriolet', label: 'Carrera Cabriolet (991.1)', modelName: '911 Carrera Cabriolet (991.1)', glb: GLB.cs1, defaultEngine: ENG.c34, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'carrera-s-991-1', phase: '991.1', bodyStyle: 'coupe', label: 'Carrera S (991.1)', modelName: '911 Carrera S (991.1)', glb: GLB.cs1, defaultEngine: ENG.c38, defaultTransmission: TRN.pdk },
+  { ...B991, id: 'carrera-s-cab-991-1', phase: '991.1', bodyStyle: 'cabriolet', label: 'Carrera S Cabriolet (991.1)', modelName: '911 Carrera S Cabriolet (991.1)', glb: GLB.cs1, defaultEngine: ENG.c38, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'carrera-4-991-1', phase: '991.1', bodyStyle: 'coupe', label: 'Carrera 4 (991.1)', modelName: '911 Carrera 4 (991.1)', glb: GLB.cs1, defaultEngine: ENG.c34, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'carrera-4-cab-991-1', phase: '991.1', bodyStyle: 'cabriolet', label: 'Carrera 4 Cabriolet (991.1)', modelName: '911 Carrera 4 Cabriolet (991.1)', glb: GLB.cs1, defaultEngine: ENG.c34, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'carrera-4s-991-1', phase: '991.1', bodyStyle: 'coupe', label: 'Carrera 4S (991.1)', modelName: '911 Carrera 4S (991.1)', glb: GLB.cs1, defaultEngine: ENG.c38, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'carrera-4s-cab-991-1', phase: '991.1', bodyStyle: 'cabriolet', label: 'Carrera 4S Cabriolet (991.1)', modelName: '911 Carrera 4S Cabriolet (991.1)', glb: GLB.cs1, defaultEngine: ENG.c38, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'carrera-gts-991-1', phase: '991.1', bodyStyle: 'coupe', label: 'Carrera GTS (991.1)', modelName: '911 Carrera GTS (991.1)', glb: GLB.cs1, defaultEngine: ENG.c38, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'carrera-gts-cab-991-1', phase: '991.1', bodyStyle: 'cabriolet', label: 'Carrera GTS Cabriolet (991.1)', modelName: '911 Carrera GTS Cabriolet (991.1)', glb: GLB.cs1, defaultEngine: ENG.c38, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'carrera-4-gts-991-1', phase: '991.1', bodyStyle: 'coupe', label: 'Carrera 4 GTS (991.1)', modelName: '911 Carrera 4 GTS (991.1)', glb: GLB.cs1, defaultEngine: ENG.c38, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'carrera-4-gts-cab-991-1', phase: '991.1', bodyStyle: 'cabriolet', label: 'Carrera 4 GTS Cabriolet (991.1)', modelName: '911 Carrera 4 GTS Cabriolet (991.1)', glb: GLB.cs1, defaultEngine: ENG.c38, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'targa-4-991-1', phase: '991.1', bodyStyle: 'targa', label: 'Targa 4 (991.1)', modelName: '911 Targa 4 (991.1)', glb: GLB.targa2, defaultEngine: ENG.c34, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'targa-4s-991-1', phase: '991.1', bodyStyle: 'targa', label: 'Targa 4S (991.1)', modelName: '911 Targa 4S (991.1)', glb: GLB.targa2, defaultEngine: ENG.c38, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'turbo-991-1', phase: '991.1', bodyStyle: 'coupe', label: 'Turbo (991.1)', modelName: '911 Turbo (991.1)', glb: GLB.turbo1, defaultEngine: ENG.t38, defaultTransmission: TRN.pdk },
+  { ...B991, id: 'turbo-cab-991-1', phase: '991.1', bodyStyle: 'cabriolet', label: 'Turbo Cabriolet (991.1)', modelName: '911 Turbo Cabriolet (991.1)', glb: GLB.turbo1, defaultEngine: ENG.t38, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'turbo-s-991-1', phase: '991.1', bodyStyle: 'coupe', label: 'Turbo S (991.1)', modelName: '911 Turbo S (991.1)', glb: GLB.turbo1, defaultEngine: ENG.t38, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'turbo-s-cab-991-1', phase: '991.1', bodyStyle: 'cabriolet', label: 'Turbo S Cabriolet (991.1)', modelName: '911 Turbo S Cabriolet (991.1)', glb: GLB.turbo1, defaultEngine: ENG.t38, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'gt3-991-1', phase: '991.1', bodyStyle: 'coupe', label: 'GT3 (991.1)', modelName: '911 GT3 (991.1)', glb: GLB.gt3_1, defaultEngine: ENG.gt38, defaultTransmission: TRN.pdk },
+  { ...B991, id: 'gt3-rs-991-1', phase: '991.1', bodyStyle: 'coupe', label: 'GT3 RS (991.1)', modelName: '911 GT3 RS (991.1)', glb: GLB.gt3rs1, defaultEngine: ENG.gt40, defaultTransmission: TRN.pdk },
+  { ...B991, id: '911-r-991-1', phase: '991.1', bodyStyle: 'coupe', label: '911 R (991.1)', modelName: '911 R (991.1)', glb: GLB.gt3_1, defaultEngine: ENG.gt40, defaultTransmission: TRN.m6, modelAvailable: false },
+
+  // ── 991.2 (2016–2019): 3.0 TT Carreras, 4.0 GT3/RS, GT2 RS, Speedster ──
+  { ...B991, id: 'carrera-991-2', phase: '991.2', bodyStyle: 'coupe', label: 'Carrera (991.2)', modelName: '911 Carrera (991.2)', glb: GLB.gts2, defaultEngine: ENG.c30, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'carrera-cab-991-2', phase: '991.2', bodyStyle: 'cabriolet', label: 'Carrera Cabriolet (991.2)', modelName: '911 Carrera Cabriolet (991.2)', glb: GLB.gts2, defaultEngine: ENG.c30, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'carrera-s-991-2', phase: '991.2', bodyStyle: 'coupe', label: 'Carrera S (991.2)', modelName: '911 Carrera S (991.2)', glb: GLB.gts2, defaultEngine: ENG.c30s, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'carrera-s-cab-991-2', phase: '991.2', bodyStyle: 'cabriolet', label: 'Carrera S Cabriolet (991.2)', modelName: '911 Carrera S Cabriolet (991.2)', glb: GLB.gts2, defaultEngine: ENG.c30s, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'carrera-4-991-2', phase: '991.2', bodyStyle: 'coupe', label: 'Carrera 4 (991.2)', modelName: '911 Carrera 4 (991.2)', glb: GLB.gts2, defaultEngine: ENG.c30, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'carrera-4-cab-991-2', phase: '991.2', bodyStyle: 'cabriolet', label: 'Carrera 4 Cabriolet (991.2)', modelName: '911 Carrera 4 Cabriolet (991.2)', glb: GLB.gts2, defaultEngine: ENG.c30, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'carrera-4s-991-2', phase: '991.2', bodyStyle: 'coupe', label: 'Carrera 4S (991.2)', modelName: '911 Carrera 4S (991.2)', glb: GLB.gts2, defaultEngine: ENG.c30s, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'carrera-4s-cab-991-2', phase: '991.2', bodyStyle: 'cabriolet', label: 'Carrera 4S Cabriolet (991.2)', modelName: '911 Carrera 4S Cabriolet (991.2)', glb: GLB.gts2, defaultEngine: ENG.c30s, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'carrera-gts-991-2', phase: '991.2', bodyStyle: 'coupe', label: 'Carrera GTS (991.2)', modelName: '911 Carrera GTS (991.2)', glb: GLB.gts2, defaultEngine: ENG.c30s, defaultTransmission: TRN.pdk },
+  { ...B991, id: 'carrera-gts-cab-991-2', phase: '991.2', bodyStyle: 'cabriolet', label: 'Carrera GTS Cabriolet (991.2)', modelName: '911 Carrera GTS Cabriolet (991.2)', glb: GLB.gts2, defaultEngine: ENG.c30s, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'carrera-4-gts-991-2', phase: '991.2', bodyStyle: 'coupe', label: 'Carrera 4 GTS (991.2)', modelName: '911 Carrera 4 GTS (991.2)', glb: GLB.gts2, defaultEngine: ENG.c30s, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'carrera-4-gts-cab-991-2', phase: '991.2', bodyStyle: 'cabriolet', label: 'Carrera 4 GTS Cabriolet (991.2)', modelName: '911 Carrera 4 GTS Cabriolet (991.2)', glb: GLB.gts2, defaultEngine: ENG.c30s, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'targa-4-991-2', phase: '991.2', bodyStyle: 'targa', label: 'Targa 4 (991.2)', modelName: '911 Targa 4 (991.2)', glb: GLB.targa2, defaultEngine: ENG.c30, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'targa-4s-991-2', phase: '991.2', bodyStyle: 'targa', label: 'Targa 4S (991.2)', modelName: '911 Targa 4S (991.2)', glb: GLB.targa2, defaultEngine: ENG.c30s, defaultTransmission: TRN.pdk },
+  { ...B991, id: 'targa-4-gts-991-2', phase: '991.2', bodyStyle: 'targa', label: 'Targa 4 GTS (991.2)', modelName: '911 Targa 4 GTS (991.2)', glb: GLB.targa2, defaultEngine: ENG.c30s, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'turbo-991-2', phase: '991.2', bodyStyle: 'coupe', label: 'Turbo (991.2)', modelName: '911 Turbo (991.2)', glb: GLB.ts2, defaultEngine: ENG.t38, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'turbo-cab-991-2', phase: '991.2', bodyStyle: 'cabriolet', label: 'Turbo Cabriolet (991.2)', modelName: '911 Turbo Cabriolet (991.2)', glb: GLB.ts2, defaultEngine: ENG.t38, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'turbo-s-991-2', phase: '991.2', bodyStyle: 'coupe', label: 'Turbo S (991.2)', modelName: '911 Turbo S (991.2)', glb: GLB.ts2, defaultEngine: ENG.t38, defaultTransmission: TRN.pdk },
+  { ...B991, id: 'turbo-s-cab-991-2', phase: '991.2', bodyStyle: 'cabriolet', label: 'Turbo S Cabriolet (991.2)', modelName: '911 Turbo S Cabriolet (991.2)', glb: GLB.ts2, defaultEngine: ENG.t38, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'turbo-s-exclusive-991-2', phase: '991.2', bodyStyle: 'coupe', label: 'Turbo S Exclusive Series (991.2)', modelName: '911 Turbo S Exclusive Series (991.2)', glb: GLB.tse2, defaultEngine: ENG.t38, defaultTransmission: TRN.pdk },
+  { ...B991, id: 'gt3-991-2', phase: '991.2', bodyStyle: 'coupe', label: 'GT3 (991.2)', modelName: '911 GT3 (991.2)', glb: GLB.gt3rs2, defaultEngine: ENG.gt40, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'gt3-touring-991-2', phase: '991.2', bodyStyle: 'coupe', label: 'GT3 Touring (991.2)', modelName: '911 GT3 Touring (991.2)', glb: GLB.gt3rs2, defaultEngine: ENG.gt40, defaultTransmission: TRN.m6, modelAvailable: false },
+  { ...B991, id: 'gt3-rs-991-2', phase: '991.2', bodyStyle: 'coupe', label: 'GT3 RS (991.2)', modelName: '911 GT3 RS (991.2)', glb: GLB.gt3rs2, defaultEngine: ENG.gt40, defaultTransmission: TRN.pdk },
+  { ...B991, id: 'gt2-rs-991-2', phase: '991.2', bodyStyle: 'coupe', label: 'GT2 RS (991.2)', modelName: '911 GT2 RS (991.2)', glb: GLB.gt2cs2, defaultEngine: ENG.gt2, defaultTransmission: TRN.pdk, modelAvailable: false },
+  { ...B991, id: 'speedster-991-2', phase: '991.2', bodyStyle: 'cabriolet', label: 'Speedster (991.2)', modelName: '911 Speedster (991.2)', glb: GLB.speed2, defaultEngine: ENG.gt40, defaultTransmission: TRN.m6 },
+
+  // ── 991.2 customs (dedicated GLB) ──
+  { ...B991, id: 'gt3-rs-weissach-991-2', phase: '991.2', bodyStyle: 'coupe', label: 'GT3 RS Weissach (991.2)', modelName: '911 GT3 RS Weissach (991.2)', glb: GLB.gt3rsw2, defaultEngine: ENG.gt40, defaultTransmission: TRN.pdk },
+  { ...B991, id: 'gt2-rs-clubsport-991-2', phase: '991.2', bodyStyle: 'coupe', label: 'GT2 RS Clubsport (991.2)', modelName: '911 GT2 RS Clubsport (991.2)', glb: GLB.gt2cs2, defaultEngine: ENG.gt2, defaultTransmission: TRN.pdk },
 ];
 
 export function getVariant(id: BodyType): CarVariant {
@@ -123,6 +223,20 @@ export function variantNameplate(v: CarVariant): string {
 /** Leaf label — modelName without the trailing "(gen)" (e.g. "Cayman GT4"). */
 export function variantShortName(v: CarVariant): string {
   return v.modelName.replace(/\s*\([^)]*\)\s*$/, '').trim();
+}
+
+/**
+ * Trim-only chip label for the picker leaf, after Brand/Model/Series/Body are
+ * chosen: drops the "911 " nameplate prefix and a trailing body word ("Cabriolet")
+ * so 911s read as "Carrera S" / "Turbo S" / "Targa 4S". Keeps the "911 " prefix
+ * when stripping would leave a bare token (the "911 R"). No-op for Boxster/Cayman/
+ * A4 (their short name has no "911 " prefix), so it equals variantShortName there.
+ */
+export function variantTrimLabel(v: CarVariant): string {
+  const short = variantShortName(v);
+  const stripped = short.replace(/^911\s+/, '').replace(/\s+Cabriolet$/i, '');
+  if (stripped.length >= 2) return stripped;
+  return short.replace(/\s+Cabriolet$/i, '');
 }
 
 /** Selectable variants for the current user — 'development' cars are admin-only. */

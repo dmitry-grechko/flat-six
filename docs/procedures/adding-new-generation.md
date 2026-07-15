@@ -136,3 +136,37 @@ budget for real work, not a 987-style copy:
   charge pipes, boost sensors and their DTCs — systems the NA cars don't have.
 - **Trim breadth** — the 911 range is far wider than a Boxster/Cayman generation,
   which makes trim-aware rendering (issue #2) and more GLBs (issue #1) load-bearing.
+
+### ✅ 991 reference implementation (shipped — grep `991`)
+
+The **991** is now a full, public generation and is the reference for a wide-trim
+generation. What it added on top of the mid-engine checklist:
+
+- **Full trim matrix (~48 variants)** in `CAR_VARIANTS` with two new optional
+  `CarVariant` fields: `phase` (`'991.1'|'991.2'` — a picker "Series" step; data
+  still scopes by `generation:'991'`) and `modelAvailable` (see stand-ins below).
+  `bodyStyle` gained `'coupe' | 'targa' | 'cabriolet'`.
+- **Cascading picker with derived sub-steps** — `ModelPicker.tsx` is data-driven:
+  it inserts a **Series** step (from `phase`) and a **Body** step (from `bodyStyle`)
+  only when they discriminate, and auto-advances single-option levels. So 981/987/A4
+  are unchanged while the 911 reads Brand → 911 → 991.1/991.2 → Coupe/Cab/Targa → Trim.
+- **Stand-in GLBs + contribute notice** — 12 GLBs cover the range; trims without a
+  dedicated model set `modelAvailable:false` and reuse a same-family GLB. The garage
+  (`ComponentExplorer.tsx`) then shows a "no exact 3D model yet — contribute on GitHub"
+  pill + a "STAND-IN MODEL" badge, and `modelCreditFor()` (now `Partial<Record<…>>`
+  keyed by the GLB-owning variant) resolves the stand-in's credit via its `glb` path.
+- **Wide-palette colours** — `COLORS_991` (incl. the GT/PTS colours) via `GENERATION_COLORS`.
+- **Powertrain** — one `GENERATION_POWERTRAIN['991']` superset (NA + turbo + GT engines,
+  7-/6-speed manual + PDK); each trim snaps to its signature via `defaultEngine`/`defaultTransmission`.
+- **Docs pipeline for a single huge manual** — `manual:compress-991` splits the 8,256-pp
+  factory manual into ≤48 MB volumes (`compress-991-workshop.mjs` → `volumes-991.json`);
+  `manual:parse-991` (`parse-991-workshop.mjs`, same Mitchell/WM format as the 987) →
+  `data/manual-991.json`; `db:import-991` → `manual_sections`; `db:embed-manual` embeds;
+  `docs:upload -- --only 991` pushes just the volumes to Storage. `documents.ts` gained
+  `WORKSHOP_VOLUMES_991` + the `'991'` series across the volume/deep-link helpers.
+- **Knowledge (two-layer, unchanged design)** — curated `specs/known-issues/maintenance-991.json`
+  (specs verified + cited from the factory manual) wired into `GENERATION_KB`, **plus** the
+  embedded manual. Fault codes stay `[]` (honest absence; Fault Finding leans on the manual).
+- **Honest absence** — no 2D cutaway / 3D X-ray internals (rear-engine layout not authored):
+  `hasCutaway2D:false`, `hasXray3D:false`; exterior pins / fitment return empty. OBD modules
+  are 981-platform **candidates** (`uds-modules.ts` `REGISTRY['991']`, all `addressConfirmed:false`).

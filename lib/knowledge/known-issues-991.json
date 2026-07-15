@@ -1,0 +1,64 @@
+[
+  {
+    "id": "991-bore-scoring",
+    "title": "Cylinder bore scoring (991.1 3.4 / 3.8)",
+    "system": "Engine",
+    "severity": "HIGH",
+    "affected": "991.1 Carrera 3.4 / 3.8 (MA1 flat-six), 2012–2016; typically cylinders 5/6",
+    "symptoms": [
+      "Ticking / rattling from one bank, often when warm",
+      "Rising oil consumption",
+      "Light grey/blue smoke, fuel smell in the oil",
+      "Cold-start rattle that persists"
+    ],
+    "description": "Some naturally aspirated 991.1 engines develop scoring of the cylinder liners (most often cylinders 5 and 6). It is a documented pattern discussed widely by owners and independent specialists — not a factory recall.",
+    "fix": "Monitor oil consumption and listen at each bank; borescope the suspect cylinders. Confirmed scoring means engine repair/replacement — a specialist job, not DIY. Regular oil changes with the correct grade and avoiding lugging a cold engine are the main mitigations.",
+    "estCost": "£/$ significant (engine work)",
+    "source": "Community / independent-specialist reported (911 owner forums); not a Porsche campaign"
+  },
+  {
+    "id": "991-aos-failure",
+    "title": "Air-Oil Separator (AOS) failure",
+    "system": "Engine",
+    "severity": "MED",
+    "affected": "991 flat-six (crankcase breather / AOS diaphragm)",
+    "symptoms": [
+      "Sudden large cloud of blue/white smoke, especially at idle or on start",
+      "Rough idle, whistling from the breather",
+      "Raised oil consumption"
+    ],
+    "description": "The air-oil separator diaphragm can fail, upsetting crankcase ventilation and pulling oil into the intake — a common flat-six wear item across generations.",
+    "fix": "Confirm with a vacuum check at the oil-filler cap, then replace the AOS and gaskets. A moderate DIY job on most trims.",
+    "source": "Community / independent-specialist reported"
+  },
+  {
+    "id": "991-coolant-pipes-pump",
+    "title": "Coolant pipes / water-pump seepage",
+    "system": "Cooling",
+    "severity": "MED",
+    "affected": "991 (plastic coolant pipe unions, water pump)",
+    "symptoms": [
+      "Slow coolant loss / sweet smell",
+      "Low expansion-tank level",
+      "Stain or crust at pipe joints or the pump weep hole"
+    ],
+    "description": "Plastic coolant pipe joints and the water pump can weep with age — a routine cooling-system wear pattern to watch on higher-mileage cars.",
+    "fix": "Pressure-test the system, inspect the front pipe junctions and pump weep hole, and replace the failed component. Use G40 coolant.",
+    "source": "Community / independent-specialist reported"
+  },
+  {
+    "id": "991-pdk-mechatronics",
+    "title": "PDK jerkiness / mechatronic faults",
+    "system": "Transmission",
+    "severity": "MED",
+    "affected": "991 with 7-speed PDK",
+    "symptoms": [
+      "Jerky low-speed shifts or hesitation",
+      "Transmission warning lamp",
+      "Stored P17xx-type shift/pressure codes"
+    ],
+    "description": "Degraded PDK fluid or a mechatronic (valve-body) fault can cause poor low-speed shift quality. Fluid condition and clutch adaptation are the usual first suspects.",
+    "fix": "Read the fault memory, service the PDK fluid at interval, and re-run clutch adaptation. Persistent faults point to the mechatronic unit — specialist territory.",
+    "source": "Community / independent-specialist reported"
+  }
+]

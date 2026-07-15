@@ -174,7 +174,26 @@ export interface ObdScan {
 
 // Selectable car-variant ids (also stored as vehicle.body). Legacy 981 values
 // stay 'boxster'/'cayman'; newer generations are suffixed. See lib/models.ts.
-export type BodyType = 'boxster' | 'cayman' | 'cayman-gt4-981' | 'cayman-987' | 'boxster-987' | 'spyder-987' | 'audi-a4-b9';
+export type BodyType =
+  | 'boxster' | 'cayman' | 'cayman-gt4-981' | 'cayman-987' | 'boxster-987' | 'spyder-987'
+  | 'audi-a4-b9'
+  // 911 (991) — full trim matrix, id pattern <trim>-<body?>-991-<phase>. See CAR_VARIANTS.
+  // 991.1 (2012–2016)
+  | 'carrera-991-1' | 'carrera-cab-991-1' | 'carrera-s-991-1' | 'carrera-s-cab-991-1'
+  | 'carrera-4-991-1' | 'carrera-4-cab-991-1' | 'carrera-4s-991-1' | 'carrera-4s-cab-991-1'
+  | 'carrera-gts-991-1' | 'carrera-gts-cab-991-1' | 'carrera-4-gts-991-1' | 'carrera-4-gts-cab-991-1'
+  | 'targa-4-991-1' | 'targa-4s-991-1'
+  | 'turbo-991-1' | 'turbo-cab-991-1' | 'turbo-s-991-1' | 'turbo-s-cab-991-1'
+  | 'gt3-991-1' | 'gt3-rs-991-1' | '911-r-991-1'
+  // 991.2 (2016–2019)
+  | 'carrera-991-2' | 'carrera-cab-991-2' | 'carrera-s-991-2' | 'carrera-s-cab-991-2'
+  | 'carrera-4-991-2' | 'carrera-4-cab-991-2' | 'carrera-4s-991-2' | 'carrera-4s-cab-991-2'
+  | 'carrera-gts-991-2' | 'carrera-gts-cab-991-2' | 'carrera-4-gts-991-2' | 'carrera-4-gts-cab-991-2'
+  | 'targa-4-991-2' | 'targa-4s-991-2' | 'targa-4-gts-991-2'
+  | 'turbo-991-2' | 'turbo-cab-991-2' | 'turbo-s-991-2' | 'turbo-s-cab-991-2' | 'turbo-s-exclusive-991-2'
+  | 'gt3-991-2' | 'gt3-touring-991-2' | 'gt3-rs-991-2' | 'gt2-rs-991-2' | 'speedster-991-2'
+  // Customs (own GLB)
+  | 'gt3-rs-weissach-991-2' | 'gt2-rs-clubsport-991-2';
 
 export interface Vehicle {
   /** which 3D model to render */

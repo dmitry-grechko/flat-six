@@ -288,7 +288,9 @@ export function exteriorPartsFor(body: BodyType): EnginePart[] {
   // pins leak onto it.
   return EXTERIOR_DEFS.filter((d) => {
     if (!d.generations.includes(variant.generation as '981' | '987')) return false;
-    if (d.bodyStyles && !d.bodyStyles.includes(variant.bodyStyle)) return false;
+    // EXTERIOR_DEFS only cover Porsche mid-engine bodies; cast to compare against
+    // the wider CarVariant.bodyStyle union (a 911 'coupe' simply matches nothing).
+    if (d.bodyStyles && !(d.bodyStyles as string[]).includes(variant.bodyStyle)) return false;
     return true;
   }).map(({ generations: _g, bodyStyles: _b, ...part }) => part);
 }

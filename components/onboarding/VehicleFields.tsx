@@ -95,6 +95,7 @@ export default function VehicleFields({
         <ModelPicker
           value={value.body}
           isAdmin={isAdmin}
+          startExpanded
           onSelect={(id) => {
             // Switching model may change the valid engine/transmission sets.
             // A variant with a signature powertrain (e.g. GT4 = 3.8 / manual)

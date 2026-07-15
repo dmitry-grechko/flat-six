@@ -7,8 +7,10 @@ import {
   variantMake,
   variantNameplate,
   variantShortName,
+  variantTrimLabel,
   generationYears,
   generationCode,
+  type CarVariant,
 } from '@/lib/models';
 
 const mono = "'JetBrains Mono',monospace";
@@ -38,89 +40,113 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
 }
 
 const uniq = (arr: string[]) => Array.from(new Set(arr));
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+// The cascade is data-driven: one dimension per level, each derived from the
+// variant registry. A level is shown only when it discriminates (>1 option);
+// single-option levels auto-advance, so Boxster/Cayman/A4 collapse to Brand →
+// Model → Generation, while the 911 expands to Brand → 911 → Series (991.1/991.2)
+// → Body (Coupe/Cabriolet/Targa) → Trim. `series` maps to CarVariant.phase and is
+// N/A (skipped) for variants without a phase.
+type DimKey = 'brand' | 'nameplate' | 'gen' | 'series' | 'body';
+const DIM_ORDER: DimKey[] = ['brand', 'nameplate', 'gen', 'series', 'body'];
+type Sel = Record<DimKey, string | null>;
+const EMPTY_SEL: Sel = { brand: null, nameplate: null, gen: null, series: null, body: null };
+
+const dimValue = (v: CarVariant, dim: DimKey): string | null => {
+  switch (dim) {
+    case 'brand': return variantMake(v);
+    case 'nameplate': return variantNameplate(v);
+    case 'gen': return v.generation;
+    case 'series': return v.phase ?? null; // null = no phase → dimension is N/A
+    case 'body': return v.bodyStyle;
+  }
+};
+
+const ROW_LABEL: Record<DimKey, string> = {
+  brand: 'Brand', nameplate: 'Model', gen: 'Generation', series: 'Series', body: 'Body',
+};
 
 /**
- * Cascading vehicle picker: Brand → Model → Generation → variant. Collapses to a
- * one-line summary of the selected car once chosen; "Change" re-opens the cascade.
- * This keeps the panel compact and makes the model identity (which drives the 3D
- * model + all per-generation data) the single source of truth — no free-text model
- * field to drift out of sync. Single-option levels auto-advance; the final leaf
+ * Cascading vehicle picker: Brand → Model → Generation → (Series) → (Body) → variant.
+ * Collapses to a one-line summary once chosen; "Change" re-opens the cascade. The
+ * model identity drives the 3D model + all per-generation data, so there is no
+ * free-text model field to drift. Single-option levels auto-advance; the final leaf
  * commits via onSelect. Dev-mode cars are admin-only (visibleVariants).
  */
 export default function ModelPicker({
   value,
   isAdmin,
   onSelect,
+  startExpanded = false,
 }: {
   value: BodyType;
   isAdmin: boolean;
   onSelect: (id: BodyType) => void;
+  /**
+   * Open in the expanded cascade instead of the collapsed summary. Used by the
+   * add-vehicle / onboarding flow, where the form's default body is just a seed —
+   * the user should pick a car directly, not have to press "Change" first.
+   */
+  startExpanded?: boolean;
 }) {
   const variants = visibleVariants(isAdmin);
   const current = variants.find((v) => v.id === value);
 
-  // Collapsed to the summary when we already have a valid car; expanded otherwise.
-  const [editing, setEditing] = useState(!current);
-  const [brand, setBrand] = useState<string | null>(current ? variantMake(current) : null);
-  const [nameplate, setNameplate] = useState<string | null>(current ? variantNameplate(current) : null);
-  const [gen, setGen] = useState<string | null>(current ? current.generation : null);
+  const selFor = (v: CarVariant | undefined): Sel =>
+    v ? { brand: variantMake(v), nameplate: variantNameplate(v), gen: v.generation, series: v.phase ?? null, body: v.bodyStyle } : { ...EMPTY_SEL };
 
-  const brands = uniq(variants.map(variantMake));
-  const models = brand ? uniq(variants.filter((v) => variantMake(v) === brand).map(variantNameplate)) : [];
-  const gens =
-    brand && nameplate
-      ? uniq(
-          variants
-            .filter((v) => variantMake(v) === brand && variantNameplate(v) === nameplate)
-            .map((v) => v.generation),
-        )
-      : [];
-  const leaves =
-    brand && nameplate && gen
-      ? variants.filter(
-          (v) => variantMake(v) === brand && variantNameplate(v) === nameplate && v.generation === gen,
-        )
-      : [];
+  const [editing, setEditing] = useState(!current || startExpanded);
+  const [sel, setSel] = useState<Sel>(selFor(current));
 
-  const openEdit = () => {
-    if (current) {
-      setBrand(variantMake(current));
-      setNameplate(variantNameplate(current));
-      setGen(current.generation);
-    }
-    setEditing(true);
+  // Variants matching every non-null dimension in `s`.
+  const filtered = (s: Sel): CarVariant[] =>
+    variants.filter((v) => DIM_ORDER.every((d) => s[d] == null || dimValue(v, d) === s[d]));
+
+  // Distinct options for a dimension, given the choices before it. `series` returns
+  // [] when no candidate has a phase (dimension is N/A and gets skipped).
+  const optionsFor = (dim: DimKey, s: Sel): string[] => {
+    const idx = DIM_ORDER.indexOf(dim);
+    const upstream: Sel = { ...s };
+    DIM_ORDER.slice(idx).forEach((d) => (upstream[d] = null));
+    const vals = filtered(upstream).map((v) => dimValue(v, dim)).filter((x): x is string => x != null);
+    return uniq(vals);
   };
+
   const commit = (id: BodyType) => {
     onSelect(id);
-    setEditing(false);
+    // In the add/onboarding flow keep the cascade open (the selected trim just
+    // highlights); elsewhere collapse back to the summary as a confirmation.
+    if (!startExpanded) setEditing(false);
   };
 
-  const pickBrand = (b: string) => {
-    setBrand(b);
-    const ms = uniq(variants.filter((v) => variantMake(v) === b).map(variantNameplate));
-    setNameplate(ms.length === 1 ? ms[0] : null);
-    setGen(null);
+  const openEdit = () => {
+    setSel(selFor(current));
+    setEditing(true);
   };
-  const pickModel = (m: string) => {
-    setNameplate(m);
-    const gs = uniq(
-      variants.filter((v) => variantMake(v) === brand && variantNameplate(v) === m).map((v) => v.generation),
-    );
-    setGen(gs.length === 1 ? gs[0] : null);
-  };
-  const pickGen = (g: string) => {
-    setGen(g);
-    const vs = variants.filter(
-      (v) => variantMake(v) === brand && variantNameplate(v) === nameplate && v.generation === g,
-    );
-    if (vs.length === 1) commit(vs[0].id); // single variant → commit + collapse
+
+  // Pick a value at `dim`: clear deeper dims, auto-advance any single-option deeper
+  // dims, and commit when the choice resolves to exactly one variant.
+  const pick = (dim: DimKey, val: string) => {
+    const idx = DIM_ORDER.indexOf(dim);
+    const next: Sel = { ...sel, [dim]: val };
+    DIM_ORDER.slice(idx + 1).forEach((d) => (next[d] = null));
+    for (const d of DIM_ORDER.slice(idx + 1)) {
+      const opts = optionsFor(d, next);
+      if (opts.length === 0) { next[d] = null; continue; } // N/A (e.g. series)
+      if (opts.length === 1) { next[d] = opts[0]; continue; } // auto-advance
+      break; // needs a choice
+    }
+    const leaves = filtered(next);
+    const resolved = DIM_ORDER.every((d) => optionsFor(d, next).length <= 1 || next[d] != null);
+    if (resolved && leaves.length === 1) { commit(leaves[0].id); return; }
+    setSel(next);
   };
 
   // Collapsed summary of the selected car.
   if (!editing && current) {
-    const meta = [generationCode(current.generation), generationYears(current.generation), 'rendered in 3D']
-      .filter(Boolean)
-      .join(' · ');
+    const code = current.phase ?? generationCode(current.generation);
+    const meta = [code, generationYears(current.generation), 'rendered in 3D'].filter(Boolean).join(' · ');
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px', background: '#FAFAFB', border: '1px solid #E3E3E5', borderRadius: 4 }}>
         <div style={{ minWidth: 0, flex: 1 }}>
@@ -140,10 +166,32 @@ export default function ModelPicker({
     );
   }
 
-  // Expanded cascade.
+  // Build the visible cascade rows: walk the dimensions, hiding single-option (auto-
+  // advanced) levels, and stop at the first unchosen discriminating level. When all
+  // shown dimensions are chosen and >1 variant remains, show the final Trim row.
+  const rows: { dim: DimKey; opts: string[] }[] = [];
+  const work: Sel = { ...EMPTY_SEL };
+  let stopped = false;
+  for (const dim of DIM_ORDER) {
+    const opts = optionsFor(dim, work);
+    if (opts.length === 0) continue;          // N/A dimension (skip)
+    if (opts.length === 1) { work[dim] = opts[0]; continue; } // auto-advanced (hidden)
+    rows.push({ dim, opts });
+    if (sel[dim] == null) { stopped = true; break; } // wait for this choice
+    work[dim] = sel[dim];
+  }
+  const trimLeaves = !stopped ? filtered(work) : [];
+  const showTrim = !stopped && trimLeaves.length > 1;
+
+  const chipLabel = (dim: DimKey, val: string): string => {
+    if (dim === 'gen') return generationYears(val) ? `${generationCode(val)} · ${generationYears(val)}` : generationCode(val);
+    if (dim === 'body') return cap(val);
+    return val;
+  };
+
   return (
     <div>
-      {current && (
+      {current && !startExpanded && (
         <div style={{ display: 'flex', marginBottom: 12 }}>
           <button
             type="button"
@@ -155,39 +203,21 @@ export default function ModelPicker({
         </div>
       )}
 
-      <Row label="Brand">
-        {brands.map((b) => (
-          <button key={b} type="button" onClick={() => pickBrand(b)} style={chip(brand === b)}>
-            {b}
-          </button>
-        ))}
-      </Row>
-
-      {brand && (
-        <Row label="Model">
-          {models.map((m) => (
-            <button key={m} type="button" onClick={() => pickModel(m)} style={chip(nameplate === m)}>
-              {m}
+      {rows.map(({ dim, opts }) => (
+        <Row key={dim} label={ROW_LABEL[dim]}>
+          {opts.map((o) => (
+            <button key={o} type="button" onClick={() => pick(dim, o)} style={chip(sel[dim] === o)}>
+              {chipLabel(dim, o)}
             </button>
           ))}
         </Row>
-      )}
+      ))}
 
-      {brand && nameplate && (
-        <Row label="Generation">
-          {gens.map((g) => (
-            <button key={g} type="button" onClick={() => pickGen(g)} style={chip(gen === g)}>
-              {generationYears(g) ? `${generationCode(g)} · ${generationYears(g)}` : generationCode(g)}
-            </button>
-          ))}
-        </Row>
-      )}
-
-      {brand && nameplate && gen && leaves.length > 1 && (
-        <Row label="Variant">
-          {leaves.map((v) => (
+      {showTrim && (
+        <Row label="Trim">
+          {trimLeaves.map((v) => (
             <button key={v.id} type="button" onClick={() => commit(v.id)} style={chip(value === v.id)}>
-              {variantShortName(v)}
+              {variantTrimLabel(v)}
             </button>
           ))}
         </Row>

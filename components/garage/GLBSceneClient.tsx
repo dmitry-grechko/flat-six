@@ -16,11 +16,18 @@ import type { EnginePart } from '@/lib/types';
 //   • Audi A4 B9 (davidthe19th) → "A4_tex" (a single-atlas "clay" material shared
 //     by body + rims + trim, so paint colours body and rims together; glass
 //     "a4_tex_glass" stays excluded by the $ anchor)
+// Matches the painted shell across all model sources, incl. the 911 (991) GLBs
+// whose body materials are "CarPaint" / "carpaint" / "…Paint_Material1" / "…Paint_Geo…"
+// / "B_Paint" (all caught by the /car|paint/ terms). Two 991 GLBs (Carrera S 991.1,
+// GT3 RS 991.2) use opaque atlas names with no paint token → they render in their
+// baked colour (the paint picker is a no-op there — acceptable, they look correct).
 const BODY_MAT = /paint|car|Vehicle_Exterior_mm_ext$|^Cphong3SG1$|^A4_tex$/i;
 // A material can read as "paint-ish" by substring yet not be the painted shell —
-// e.g. the Spyder's underbody is "…CARBOTTOM…" which the /car/ term catches.
-// Exclude underbody/undertray/floor panels so they keep their own dark finish.
-const NOT_BODY_MAT = /bottom|under|floor/i;
+// e.g. the Spyder's underbody is "…CARBOTTOM…" which the /car/ term catches, and the
+// 991 GLBs have "carbon" trim pieces (and "…CarPaint_Trim_CarbonA…") the /car/ term
+// would otherwise paint body-colour. Exclude underbody/undertray/floor + carbon trim
+// so they keep their own finish.
+const NOT_BODY_MAT = /bottom|under|floor|carbon/i;
 const TYRE_MAT = /^1529b39_dds$|^c4bb8b1e_dds1$|^c5ebe6d_dds$|MAT_Tire|sidewall/i;
 const DISC_RIM_MAT = /MAT_Disk|MAT_Hub|MAT_Brake|tormoz/i;
 const YELLOW_MAP_MAT = /_dds/i;
