@@ -131,62 +131,56 @@ jobs:
           npm --prefix apps/desktop run icons
           test -f apps/desktop/obd-host-runner.mjs
 
-      - name: Pack macOS DMG + zip
+      - name: Pack + publish macOS DMG + zip
         working-directory: apps/desktop
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # `hdiutil detach … Resource busy (exit 16)` while building the DMG is a
           # known CI flake: Spotlight (mds/mdworker) grabs the freshly-mounted DMG
           # volume before electron-builder can detach it, so the (second) arm64 DMG
-          # build fails. Disable Spotlight indexing to fix the root cause, then retry
-          # the BUILD to ride out any residual flakiness.
-          #
-          # IMPORTANT: build only (`--publish never`). Do NOT use electron-builder's
-          # `--publish always` here — it is NOT retry-safe: a retry (or partial
-          # publish) re-POSTs an already-uploaded asset and GitHub returns
-          # `422 already_exists` for the .dmg, failing the job AFTER it has published
-          # some assets but before the arm64 DMG / latest-mac.yml. Assets are uploaded
-          # idempotently in the next step with `gh release upload --clobber` (same
-          # pattern as the Windows job), so retries and re-runs never collide.
+          # build fails. Disable Spotlight indexing to fix the root cause, then retry.
           sudo mdutil -a -i off || true
+
+          if [ "${{ github.event_name }}" = "push" ] || [ "${{ inputs.publish }}" = "true" ]; then
+            version=$(node -p "require('./package.json').version")
+            tag="v$version"
+            # Publish with electron-builder's own uploader (`--publish always`), NOT a
+            # plain `gh release upload` of the on-disk files. The mac target has no
+            # explicit `artifactName` (the win targets do), so on macOS electron-builder
+            # names assets from the scoped package name (`@flatsix/desktop-*`) and writes
+            # those SAME names into latest-mac.yml. A plain gh upload would push the
+            # on-disk names (`FLAT.SIX-*`) instead, leaving latest-mac.yml pointing at
+            # names/checksums that don't match the uploaded files → broken auto-update.
+            #
+            # electron-builder's uploader keeps assets and latest-mac.yml in sync, but is
+            # NOT retry-safe: a retry (or partial upload) re-POSTs an existing asset and
+            # GitHub returns `422 already_exists`, killing the job mid-publish. So before
+            # EACH attempt we delete any mac assets left by a prior attempt / re-run,
+            # letting it publish a clean, self-consistent set. (Windows assets — .exe /
+            # latest.yml — never match these patterns, so the concurrent win job is safe.)
+            publish() {
+              if gh release view "$tag" >/dev/null 2>&1; then
+                gh release view "$tag" --json assets -q '.assets[].name' \
+                  | grep -Ei '(-mac\.zip|\.dmg|\.dmg\.blockmap|latest-mac\.yml)$' \
+                  | while read -r a; do
+                      echo "clearing stale mac asset: $a"
+                      gh release delete-asset "$tag" "$a" --yes || true
+                    done
+              fi
+              npx electron-builder --mac dmg zip --x64 --arm64 --publish always
+            }
+          else
+            publish() { npm run pack:mac; }
+          fi
+
           for attempt in 1 2 3; do
-            if npx electron-builder --mac dmg zip --x64 --arm64 --publish never; then
-              exit 0
-            fi
+            if publish; then exit 0; fi
             echo "macOS pack attempt ${attempt}/3 failed; retrying in 20s…"
             sleep 20
           done
           echo "macOS pack failed after 3 attempts" >&2
           exit 1
-
-      - name: Publish macOS release assets
-        if: github.event_name == 'push' || inputs.publish
-        working-directory: apps/desktop
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          version=$(node -p "require('./package.json').version")
-          tag="v$version"
-          # Create the release if the Windows job hasn't yet (either job may win the
-          # race); tolerate a concurrent create from the other job.
-          if ! gh release view "$tag" >/dev/null 2>&1; then
-            gh release create "$tag" --title "$version" --prerelease --notes "FLAT·SIX Desktop $version" \
-              || gh release view "$tag" >/dev/null 2>&1
-          fi
-          # Upload each mac artifact idempotently — --clobber overwrites any existing
-          # asset of the same name, so retries and re-runs never hit 422 already_exists.
-          shopt -s nullglob
-          for asset in release/*.dmg release/*.dmg.blockmap release/*-mac.zip release/latest-mac.yml; do
-            ok=
-            for attempt in 1 2 3; do
-              if gh release upload "$tag" "$asset" --clobber; then ok=1; break; fi
-              echo "Upload failed for $(basename "$asset") (attempt ${attempt}/3); retrying in 30s…"
-              sleep 30
-            done
-            if [ -z "$ok" ]; then
-              echo "Failed to upload $(basename "$asset") after 3 attempts" >&2
-              exit 1
-            fi
-          done
 
       - name: Upload artifacts
         if: github.event_name == 'workflow_dispatch' && !inputs.publish
