@@ -121,6 +121,35 @@ the new car, and walk Garage / Documents / Tools / Faults.
 - [ ] Fitment presets + alignment
 - [ ] MCP verified for the new generation; `tsc` clean; app walked
 
+### ✅ 718 (982) reference implementation (shipped — grep `982`)
+
+The **718 (982)** is the reference for a wide-trim *mid-engine* generation shipped
+with **honest-absence knowledge** (no factory docs collected yet). It reuses the
+Boxster/Cayman body family, so it was closer to a 981/987 copy than the 991:
+
+- **Full trim matrix (14 variants)** in `CAR_VARIANTS` — 7 Cayman (base/T/S/GTS/
+  GTS 4.0/GT4/GT4 RS) + 7 Boxster (base/T/S/GTS/GTS 4.0/Spyder/Spyder RS). No new
+  `bodyStyle` (still `boxster`/`cayman`); `nameplate` derives to Boxster/Cayman so
+  the picker reads Brand → Boxster/Cayman → **982 (2016–2024)** → Trim, sharing the
+  Model chip with the 981/987 (the Generation step disambiguates). 8 exterior GLBs;
+  stand-in trims set `modelAvailable:false`.
+- **Mixed powertrain** — `GENERATION_POWERTRAIN['982']` carries both the turbo
+  flat-fours (2.0 / 2.5) and the NA 4.0 flat-six (3 states of tune); each trim
+  snaps to its signature via `CarVariant.defaultEngine/defaultTransmission`.
+- **Own palette** — `COLORS_982` (Miami/Shark/Gulf Blue, Lava Orange, Python/Lizard
+  Green, …) via `GENERATION_COLORS`.
+- **Honest absence** — `GENERATION_KB['982'] = EMPTY_BUNDLE` (faults/specs/maint/
+  issues empty); `documentsForGeneration('982')` → `[]` (982 deliberately NOT in
+  `KNOWN_DOC_GENS`); no fitment/alignment/exterior-pins; `hasCutaway2D/hasXray3D:false`.
+- **OBD** — 982 pack registered in `profiles.ts` (UDS DME candidate, `verified:false`);
+  `uds-modules.ts` `REGISTRY['982']` ports the 981's live-verified addresses as
+  candidates (982 = the facelifted 981 platform), all `addressConfirmed:false`.
+- **3D material tweaks** — the Ddiaz GLBs tint via the existing `/car|paint/` body
+  regex; `NOT_BODY_MAT` gained `trim` (the GTS's `CarPaint_Trim_*Black` plastic must
+  stay black) and `TYRE_MAT` gained `tyre|tire` (982 tyre material names → rim
+  detection). The stand-in notice in `ComponentExplorer` is now generation-aware
+  (`variantNameplate(variant)` → "a similar Cayman/Boxster", not a hardcoded "991").
+
 ## ⚠ The 911 (991 / 992) is not a Boxster/Cayman
 
 The steps above assume a mid-engine two-seater. A 911 is **rear-engine**, so

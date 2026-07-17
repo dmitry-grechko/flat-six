@@ -12,7 +12,7 @@ import { formatPartNumber } from '@/lib/catalog';
 import { lookupPartExact, type CatalogPartRow } from '@/lib/parts-lookup';
 import { exteriorPartsFor } from '@/lib/exterior-parts';
 import { useVehicle, modelGlb } from '@/lib/vehicle-context';
-import { getVariant, generationForBody, subGeneration } from '@/lib/models';
+import { getVariant, generationForBody, subGeneration, variantNameplate } from '@/lib/models';
 import { modelCreditFor, cutawayImageFor, engineRefFor } from '@/lib/credits';
 import { GITHUB_ISSUES } from '@/components/marketing/tokens';
 import type { Component, SystemName, Vehicle, EnginePart } from '@/lib/types';
@@ -302,7 +302,7 @@ export default function ComponentExplorer() {
             </div>
           )}
 
-          {/* Stand-in exterior: this trim has no dedicated GLB, so a same-family 991
+          {/* Stand-in exterior: this trim has no dedicated GLB, so a same-family
               model is shown. Invite a contribution rather than implying it's exact. */}
           {view === '3d' && !xray && modelStandIn && (
             <a
@@ -318,7 +318,7 @@ export default function ComponentExplorer() {
               }}
             >
               <span style={{ fontSize: 11, lineHeight: 1 }}>⚠</span>
-              No exact 3D model for this trim yet — showing a similar 991. Contribute one on GitHub →
+              No exact 3D model for this trim yet — showing a similar {variantNameplate(variant)}. Contribute one on GitHub →
             </a>
           )}
 

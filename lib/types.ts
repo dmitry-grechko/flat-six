@@ -178,6 +178,12 @@ export type BodyType =
   | 'boxster' | 'boxster-base-981' | 'cayman' | 'cayman-base-981' | 'cayman-gt4-981'
   | 'cayman-987' | 'cayman-base-987' | 'boxster-base-987' | 'boxster-987' | 'spyder-987'
   | 'audi-a4-b9'
+  // 718 (982) — mid-engine Boxster/Cayman, 2016–2024. Turbo flat-four (base/T/S/GTS)
+  // + NA 4.0 flat-six (GTS 4.0 / GT4 / Spyder / GT4 RS / Spyder RS). See CAR_VARIANTS.
+  | 'cayman-982' | 'cayman-t-982' | 'cayman-s-982' | 'cayman-gts-982' | 'cayman-gts-4-982'
+  | 'cayman-gt4-982' | 'cayman-gt4-rs-982'
+  | 'boxster-982' | 'boxster-t-982' | 'boxster-s-982' | 'boxster-gts-982' | 'boxster-gts-4-982'
+  | 'spyder-982' | 'spyder-rs-982'
   // 911 (991) — full trim matrix, id pattern <trim>-<body?>-991-<phase>. See CAR_VARIANTS.
   // 991.1 (2012–2016)
   | 'carrera-991-1' | 'carrera-cab-991-1' | 'carrera-s-991-1' | 'carrera-s-cab-991-1'

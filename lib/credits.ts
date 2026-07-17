@@ -80,6 +80,44 @@ export const MODEL_CREDITS: Partial<Record<BodyType, ModelCredit>> = {
     licenseUrl: CC_BY_URL,
   },
 
+  // ── 718 (982) — 8 distinct GLBs, all by Ddiaz Design, keyed by their owning
+  //    variant. Stand-in trims (Cayman T/S, GTS 4.0, Boxster base/GTS/GTS 4.0) reuse
+  //    one of these GLBs and resolve to its credit via modelCreditFor(). Mixed CC BY /
+  //    CC BY-NC-SA as provided by the author; FLAT·SIX is non-commercial so NC is fine,
+  //    and redistributed derivatives of the NC-SA models must keep that licence.
+  'cayman-982': {
+    title: '2017 Porsche 718 Cayman (982)', author: 'Ddiaz Design',
+    source: 'https://skfb.ly/psoyS', license: CC_BY, licenseUrl: CC_BY_URL,
+  },
+  'cayman-gts-982': {
+    title: '2018 Porsche 718 Cayman GTS', author: 'Ddiaz Design',
+    source: 'https://skfb.ly/pwGBM', license: CC_BY_NC_SA, licenseUrl: CC_BY_NC_SA_URL,
+  },
+  'cayman-gt4-982': {
+    title: '2020 Porsche 718 Cayman GT4', author: 'Ddiaz Design',
+    source: 'https://skfb.ly/prLXG', license: CC_BY, licenseUrl: CC_BY_URL,
+  },
+  'cayman-gt4-rs-982': {
+    title: '2022 Porsche 718 Cayman GT4 RS', author: 'Ddiaz Design',
+    source: 'https://skfb.ly/prEsI', license: CC_BY, licenseUrl: CC_BY_URL,
+  },
+  'boxster-s-982': {
+    title: '2017 Porsche 718 Boxster S', author: 'Ddiaz Design',
+    source: 'https://skfb.ly/ptr6L', license: CC_BY, licenseUrl: CC_BY_URL,
+  },
+  'boxster-t-982': {
+    title: '2019 Porsche 718 Boxster T', author: 'Ddiaz Design',
+    source: 'https://skfb.ly/pJHpO', license: CC_BY_NC_SA, licenseUrl: CC_BY_NC_SA_URL,
+  },
+  'spyder-982': {
+    title: '2020 Porsche 718 Spyder', author: 'Ddiaz Design',
+    source: 'https://skfb.ly/pytYW', license: CC_BY_NC_SA, licenseUrl: CC_BY_NC_SA_URL,
+  },
+  'spyder-rs-982': {
+    title: '2024 Porsche 718 Spyder RS', author: 'Ddiaz Design',
+    source: 'https://skfb.ly/prErn', license: CC_BY, licenseUrl: CC_BY_URL,
+  },
+
   // ── 911 (991) — 12 distinct GLBs, keyed by their owning variant. Licences
   //    confirmed by the uploader. FLAT·SIX is non-commercial, so the NC term is
   //    satisfied; redistributed derivatives of NC-SA models must keep that licence.

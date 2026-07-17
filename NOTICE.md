@@ -44,6 +44,41 @@ license (CC BY 4.0 — https://creativecommons.org/licenses/by/4.0/). Required a
   Served as `public/models/audi-a4-b9.glb` (for the in-development, admin-only
   Audi A4 (B9)).
 
+### Porsche 718 (982)
+
+Eight exterior models (all by **Ddiaz Design**) cover the 718 range; trims without a
+dedicated model reuse a same-family stand-in (the Garage shows a "contribute on
+GitHub" notice). FLAT·SIX is non-commercial, so the NonCommercial (NC) term of the
+NC-SA assets is satisfied; redistributed derivatives of NC-SA models must keep the
+same licence.
+
+- **"2017 Porsche 718 Cayman (982)"** (https://skfb.ly/psoyS) by **Ddiaz Design**,
+  licensed under [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/).
+  Served as `public/models/cayman-982.glb`.
+- **"2018 Porsche 718 Cayman GTS"** (https://skfb.ly/pwGBM) by **Ddiaz Design**,
+  licensed under [CC BY-NC-SA 4.0](http://creativecommons.org/licenses/by-nc-sa/4.0/).
+  Served as `public/models/cayman-gts-982.glb`.
+- **"2020 Porsche 718 Cayman GT4"** (https://skfb.ly/prLXG) by **Ddiaz Design**,
+  licensed under [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/).
+  Served as `public/models/cayman-gt4-982.glb`.
+- **"2022 Porsche 718 Cayman GT4 RS"** (https://skfb.ly/prEsI) by **Ddiaz Design**,
+  licensed under [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/).
+  Served as `public/models/cayman-gt4-rs-982.glb`.
+- **"2017 Porsche 718 Boxster S"** (https://skfb.ly/ptr6L) by **Ddiaz Design**,
+  licensed under [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/).
+  Served as `public/models/boxster-s-982.glb`.
+- **"2019 Porsche 718 Boxster T"** (https://skfb.ly/pJHpO) by **Ddiaz Design**,
+  licensed under [CC BY-NC-SA 4.0](http://creativecommons.org/licenses/by-nc-sa/4.0/).
+  Served as `public/models/boxster-t-982.glb`.
+- **"2020 Porsche 718 Spyder"** (https://skfb.ly/pytYW) by **Ddiaz Design**,
+  licensed under [CC BY-NC-SA 4.0](http://creativecommons.org/licenses/by-nc-sa/4.0/).
+  Served as `public/models/spyder-982.glb`.
+- **"2024 Porsche 718 Spyder RS"** (https://skfb.ly/prErn) by **Ddiaz Design**,
+  licensed under [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/).
+  Served as `public/models/spyder-rs-982.glb`.
+
+The in-app attribution is shown in the Garage 3D viewer (exterior view).
+
 ### Porsche 911 (991)
 
 Twelve exterior models cover the 991 range; trims without a dedicated model reuse

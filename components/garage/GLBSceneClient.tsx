@@ -24,11 +24,16 @@ import type { EnginePart } from '@/lib/types';
 const BODY_MAT = /paint|car|Vehicle_Exterior_mm_ext$|^Cphong3SG1$|^A4_tex$/i;
 // A material can read as "paint-ish" by substring yet not be the painted shell —
 // e.g. the Spyder's underbody is "…CARBOTTOM…" which the /car/ term catches, and the
-// 991 GLBs have "carbon" trim pieces (and "…CarPaint_Trim_CarbonA…") the /car/ term
-// would otherwise paint body-colour. Exclude underbody/undertray/floor + carbon trim
-// so they keep their own finish.
-const NOT_BODY_MAT = /bottom|under|floor|carbon/i;
-const TYRE_MAT = /^1529b39_dds$|^c4bb8b1e_dds1$|^c5ebe6d_dds$|MAT_Tire|sidewall/i;
+// 991/718 GLBs have "carbon" trim pieces and black plastic trim ("…CarPaint_Trim_
+// PlasticSmoothBlack…" on the 718 Cayman GTS) the /car|paint/ terms would otherwise
+// paint body-colour. Exclude underbody/undertray/floor + carbon/trim so they keep
+// their own finish.
+const NOT_BODY_MAT = /bottom|under|floor|carbon|trim/i;
+// Tyre sidewalls, by material name across sources (718 Cayman 982 = "tyre";
+// 718 Boxster T = "tire") → rendered matte black, and used to geometrically locate
+// wheel rims (a body-material mesh concentric with a tyre). No body/paint material
+// contains "tyre"/"tire", so this never mis-hits a panel.
+const TYRE_MAT = /^1529b39_dds$|^c4bb8b1e_dds1$|^c5ebe6d_dds$|MAT_Tire|sidewall|tyre|tire/i;
 const DISC_RIM_MAT = /MAT_Disk|MAT_Hub|MAT_Brake|tormoz/i;
 const YELLOW_MAP_MAT = /_dds/i;
 // Audi A4 (B9, davidthe19th) is a single-atlas "clay" model: head/tail-lamp lenses

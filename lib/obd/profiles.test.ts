@@ -21,6 +21,12 @@ const p991 = obdProfile('991');
 assert(p991.dme.protocol === 'uds' && p991.dme.readCmd === '1902FF', '991 DME is UDS');
 assert(p991.dme.verified === false, '991 unverified');
 
+// 718 (982) profile: turbo flat-four cylinder bound, UDS candidate (unverified).
+const p982 = obdProfile('982');
+assert(p982.cylinders === 4, '982 is a flat-four (base/S/GTS)');
+assert(p982.dme.protocol === 'uds' && p982.dme.verified === false, '982 DME is a UDS candidate');
+assert(p982.modules.some((m) => m.id === 'dme'), '982 includes DME module');
+
 // Unknown generation falls back to UDS defaults, never throws.
 const pUnknown = obdProfile('zzz');
 assert(pUnknown.dme.protocol === 'uds', 'unknown → UDS default');

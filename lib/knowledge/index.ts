@@ -73,6 +73,12 @@ const GENERATION_KB: Record<string, KnowledgeBundle> = {
     knownIssues: knownIssues991Json as KnownIssue[],
     articles: [],
   },
+  // 718 (982) — public Porsche generation shipped with honest-absence knowledge:
+  // no official factory docs collected yet, so faults/specs/maintenance/known-issues
+  // are all empty (registries return "no data yet" rather than showing 981 figures).
+  // Fill from official 982 docs later; the 3D models, powertrain, colours and OBD
+  // scaffold are live now. (Do NOT copy 981 data here — see the golden scoping rule.)
+  '982': EMPTY_BUNDLE,
   // Audi A4 (B9) — dev car. Verified fluids/capacities/tyre-pressures extracted
   // from the factory fluid + tyre-pressure tables. Faults/known-issues/articles
   // are still empty (honest absence) until more Audi data is collected.

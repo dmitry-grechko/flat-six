@@ -95,11 +95,37 @@ export const COLORS_991: PaintColor[] = [
   { name: 'ULTRAVIOLET', hex: '#5B4B8A' },
 ];
 
+// Factory paint offered on the 718 (982, 2016–2024) Boxster/Cayman — its own
+// era's palette (incl. the GTS/GT4/RS special colours) rather than the 981/987
+// range. Swatch hexes are display approximations, not paint-match values. Kept
+// separate so the 718 shows its own colours (see colorsFor).
+export const COLORS_982: PaintColor[] = [
+  // Whites / silvers / greys
+  { name: 'WHITE', hex: '#E8E8EA' }, { name: 'CARRARA WHITE METALLIC', hex: '#E9EAEC' },
+  { name: 'GT SILVER METALLIC', hex: '#C6C8CA' }, { name: 'DOLOMITE SILVER METALLIC', hex: '#B9BDC0' },
+  { name: 'CRAYON', hex: '#B8BBBD' }, { name: 'CHALK', hex: '#C7C6BE' },
+  { name: 'AGATE GREY METALLIC', hex: '#45484B' },
+  // Blacks
+  { name: 'BLACK', hex: '#131316' }, { name: 'JET BLACK METALLIC', hex: '#17181A' },
+  // Blues
+  { name: 'SAPPHIRE BLUE METALLIC', hex: '#27364E' }, { name: 'NIGHT BLUE METALLIC', hex: '#1B2740' },
+  { name: 'GRAPHITE BLUE METALLIC', hex: '#2B3A4A' }, { name: 'GENTIAN BLUE METALLIC', hex: '#1F3A6E' },
+  { name: 'MIAMI BLUE', hex: '#00A0C6' }, { name: 'SHARK BLUE', hex: '#1E7FB0' },
+  { name: 'GULF BLUE', hex: '#4FA6C4' },
+  // Reds
+  { name: 'GUARDS RED', hex: '#D5001C' }, { name: 'CARMINE RED', hex: '#97011F' },
+  { name: 'BORDEAUX RED METALLIC', hex: '#5C1A2A' }, { name: 'LAVA ORANGE', hex: '#E5501F' },
+  // Yellows / greens
+  { name: 'RACING YELLOW', hex: '#EFC03B' }, { name: 'SPEED YELLOW', hex: '#F5C400' },
+  { name: 'PYTHON GREEN', hex: '#6E7B2E' }, { name: 'LIZARD GREEN', hex: '#7FA01E' },
+];
+
 // Per-generation paint registry. Porsche 981/987 share the base COLORS palette;
-// the 911 (991) has its own wider palette; other marques register their own here.
-// Unknown → COLORS.
+// the 718 (982) and 911 (991) each have their own; other marques register their
+// own here. Unknown → COLORS.
 const GENERATION_COLORS: Record<string, PaintColor[]> = {
   'audi-b9': COLORS_AUDI_B9,
+  '982': COLORS_982,
   '991': COLORS_991,
 };
 
@@ -142,6 +168,20 @@ export const ENGINES_991 = [
 ];
 export const TRANS_991 = ['7-Speed Manual', '6-Speed Manual', '7-Speed PDK'];
 
+// 718 (982): the base/T run a 2.0 turbo flat-four; S/GTS a 2.5 turbo flat-four;
+//  the GTS 4.0 / GT4 / Spyder / GT4 RS / Spyder RS run the NA 4.0 flat-six (three
+//  states of tune — GTS 4.0 ~394 hp, GT4/Spyder ~414 hp, RS ~493 hp). 6-speed
+//  manual or 7-speed PDK across the range; the GT4 RS / Spyder RS are PDK-only.
+//  Engine ids MUST match lib/models.ts (per-variant defaults reference these strings).
+export const ENGINES_982 = [
+  '2.0 L Turbo Flat-Four',
+  '2.5 L Turbo Flat-Four (S/GTS)',
+  '4.0 L Flat-Six (GTS 4.0)',
+  '4.0 L Flat-Six (GT4/Spyder)',
+  '4.0 L Flat-Six (GT4 RS/Spyder RS)',
+];
+export const TRANS_982 = ['6-Speed Manual', '7-Speed PDK'];
+
 // Back-compat aliases (default to the 981 sets).
 export const ENGINES = ENGINES_981;
 export const TRANS = TRANS_981;
@@ -169,6 +209,9 @@ export interface GenerationPowertrain {
 const GENERATION_POWERTRAIN: Record<string, GenerationPowertrain> = {
   '981': { engines: ENGINES_981, transmissions: TRANS_981, defaultEngine: '3.4 L Flat-Six (S)', defaultTransmission: '7-Speed PDK' },
   '987': { engines: ENGINES_987, transmissions: TRANS_987, defaultEngine: '3.4 L Flat-Six (S)', defaultTransmission: '6-Speed Manual' },
+  // 718 (982) — seed defaults to a base 2.0 turbo / PDK; each trim carries its own
+  // signature powertrain via CarVariant.defaultEngine/defaultTransmission.
+  '982': { engines: ENGINES_982, transmissions: TRANS_982, defaultEngine: '2.0 L Turbo Flat-Four', defaultTransmission: '7-Speed PDK' },
   // 911 (991) — seed defaults to a 991.1 Carrera S/PDK; each trim carries its own
   // signature powertrain via CarVariant.defaultEngine/defaultTransmission.
   '991': { engines: ENGINES_991, transmissions: TRANS_991, defaultEngine: '3.8 L Flat-Six (Carrera S/GTS)', defaultTransmission: '7-Speed PDK' },

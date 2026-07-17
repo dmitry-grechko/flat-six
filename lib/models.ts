@@ -135,6 +135,31 @@ export const CAR_VARIANTS: CarVariant[] = [
   // generic-UDS pack (lib/obd/pack-audi-b9.ts). Powertrain is provisional.
   { id: 'audi-a4-b9', make: 'Audi', nameplate: 'A4', generation: 'audi-b9', bodyStyle: 'sedan', label: 'A4 (B9) · dev', modelName: 'Audi A4 (B9)', glb: '/models/audi-a4-b9.glb', hasCutaway2D: false, hasXray3D: false, status: 'development', defaultEngine: '2.0 TFSI', defaultTransmission: '7-Speed S tronic (DSG)' },
 
+  // ── 718 (982, 2016–2024): the mid-engine Boxster/Cayman facelifted onto the 981
+  //    platform, rebadged "718". Turbo flat-four (base/T/S/GTS) + NA 4.0 flat-six
+  //    (GTS 4.0 / GT4 / Spyder / GT4 RS / Spyder RS). 8 exterior GLBs cover the range;
+  //    trims with no dedicated model reuse a same-family stand-in (modelAvailable:false
+  //    → the garage shows a "contribute on GitHub" notice). Same body family as the
+  //    981/987, so nameplate derives to Boxster/Cayman and the Generation step (982)
+  //    disambiguates. No 2D cutaway / 3D X-ray internals yet (honest absence); engine
+  //    ids MUST match GENERATION_POWERTRAIN['982'] in lib/data.ts. ──
+  // Cayman (982)
+  { id: 'cayman-982', generation: '982', bodyStyle: 'cayman', label: '718 Cayman (982)', modelName: '718 Cayman (982)', glb: '/models/cayman-982.glb', hasCutaway2D: false, hasXray3D: false, defaultEngine: '2.0 L Turbo Flat-Four', defaultTransmission: '7-Speed PDK' },
+  { id: 'cayman-t-982', generation: '982', bodyStyle: 'cayman', label: '718 Cayman T (982)', modelName: '718 Cayman T (982)', glb: '/models/cayman-982.glb', hasCutaway2D: false, hasXray3D: false, modelAvailable: false, defaultEngine: '2.0 L Turbo Flat-Four', defaultTransmission: '6-Speed Manual' },
+  { id: 'cayman-s-982', generation: '982', bodyStyle: 'cayman', label: '718 Cayman S (982)', modelName: '718 Cayman S (982)', glb: '/models/cayman-982.glb', hasCutaway2D: false, hasXray3D: false, modelAvailable: false, defaultEngine: '2.5 L Turbo Flat-Four (S/GTS)', defaultTransmission: '7-Speed PDK' },
+  { id: 'cayman-gts-982', generation: '982', bodyStyle: 'cayman', label: '718 Cayman GTS (982)', modelName: '718 Cayman GTS (982)', glb: '/models/cayman-gts-982.glb', hasCutaway2D: false, hasXray3D: false, defaultEngine: '2.5 L Turbo Flat-Four (S/GTS)', defaultTransmission: '7-Speed PDK' },
+  { id: 'cayman-gts-4-982', generation: '982', bodyStyle: 'cayman', label: '718 Cayman GTS 4.0 (982)', modelName: '718 Cayman GTS 4.0 (982)', glb: '/models/cayman-gts-982.glb', hasCutaway2D: false, hasXray3D: false, modelAvailable: false, defaultEngine: '4.0 L Flat-Six (GTS 4.0)', defaultTransmission: '6-Speed Manual' },
+  { id: 'cayman-gt4-982', generation: '982', bodyStyle: 'cayman', label: '718 Cayman GT4 (982)', modelName: '718 Cayman GT4 (982)', glb: '/models/cayman-gt4-982.glb', hasCutaway2D: false, hasXray3D: false, defaultEngine: '4.0 L Flat-Six (GT4/Spyder)', defaultTransmission: '6-Speed Manual' },
+  { id: 'cayman-gt4-rs-982', generation: '982', bodyStyle: 'cayman', label: '718 Cayman GT4 RS (982)', modelName: '718 Cayman GT4 RS (982)', glb: '/models/cayman-gt4-rs-982.glb', hasCutaway2D: false, hasXray3D: false, defaultEngine: '4.0 L Flat-Six (GT4 RS/Spyder RS)', defaultTransmission: '7-Speed PDK' },
+  // Boxster (982)
+  { id: 'boxster-982', generation: '982', bodyStyle: 'boxster', label: '718 Boxster (982)', modelName: '718 Boxster (982)', glb: '/models/boxster-s-982.glb', hasCutaway2D: false, hasXray3D: false, modelAvailable: false, defaultEngine: '2.0 L Turbo Flat-Four', defaultTransmission: '7-Speed PDK' },
+  { id: 'boxster-t-982', generation: '982', bodyStyle: 'boxster', label: '718 Boxster T (982)', modelName: '718 Boxster T (982)', glb: '/models/boxster-t-982.glb', hasCutaway2D: false, hasXray3D: false, defaultEngine: '2.0 L Turbo Flat-Four', defaultTransmission: '6-Speed Manual' },
+  { id: 'boxster-s-982', generation: '982', bodyStyle: 'boxster', label: '718 Boxster S (982)', modelName: '718 Boxster S (982)', glb: '/models/boxster-s-982.glb', hasCutaway2D: false, hasXray3D: false, defaultEngine: '2.5 L Turbo Flat-Four (S/GTS)', defaultTransmission: '7-Speed PDK' },
+  { id: 'boxster-gts-982', generation: '982', bodyStyle: 'boxster', label: '718 Boxster GTS (982)', modelName: '718 Boxster GTS (982)', glb: '/models/boxster-s-982.glb', hasCutaway2D: false, hasXray3D: false, modelAvailable: false, defaultEngine: '2.5 L Turbo Flat-Four (S/GTS)', defaultTransmission: '7-Speed PDK' },
+  { id: 'boxster-gts-4-982', generation: '982', bodyStyle: 'boxster', label: '718 Boxster GTS 4.0 (982)', modelName: '718 Boxster GTS 4.0 (982)', glb: '/models/boxster-s-982.glb', hasCutaway2D: false, hasXray3D: false, modelAvailable: false, defaultEngine: '4.0 L Flat-Six (GTS 4.0)', defaultTransmission: '6-Speed Manual' },
+  { id: 'spyder-982', generation: '982', bodyStyle: 'boxster', label: '718 Spyder (982)', modelName: '718 Spyder (982)', glb: '/models/spyder-982.glb', hasCutaway2D: false, hasXray3D: false, defaultEngine: '4.0 L Flat-Six (GT4/Spyder)', defaultTransmission: '6-Speed Manual' },
+  { id: 'spyder-rs-982', generation: '982', bodyStyle: 'boxster', label: '718 Spyder RS (982)', modelName: '718 Spyder RS (982)', glb: '/models/spyder-rs-982.glb', hasCutaway2D: false, hasXray3D: false, defaultEngine: '4.0 L Flat-Six (GT4 RS/Spyder RS)', defaultTransmission: '7-Speed PDK' },
+
   // ── 991.1 (2012–2016): NA flat-six Carreras, first-gen Turbo/GT3 ──
   { ...B991, id: 'carrera-991-1', phase: '991.1', bodyStyle: 'coupe', label: 'Carrera (991.1)', modelName: '911 Carrera (991.1)', glb: GLB.cs1, defaultEngine: ENG.c34, defaultTransmission: TRN.pdk, modelAvailable: false },
   { ...B991, id: 'carrera-cab-991-1', phase: '991.1', bodyStyle: 'cabriolet', label: 'Carrera Cabriolet (991.1)', modelName: '911 Carrera Cabriolet (991.1)', glb: GLB.cs1, defaultEngine: ENG.c34, defaultTransmission: TRN.pdk, modelAvailable: false },
@@ -207,6 +232,7 @@ export const GENERATIONS: string[] = Array.from(new Set(CAR_VARIANTS.map((v) => 
 export const GENERATION_YEARS: Record<string, string> = {
   '987': '2005–2012',
   '981': '2012–2016',
+  '982': '2016–2024',
   '991': '2011–2019',
   'audi-b9': '2016–2024',
 };

@@ -102,6 +102,20 @@ registerVehiclePack({
 });
 
 registerVehiclePack({
+  key: '982', make: 'Porsche', model: '718 Boxster / Cayman (982)', generation: '982', visibility: 'public',
+  profile: {
+    generation: '982',
+    cylinders: 4, // base/T/S/GTS are turbo flat-fours; the GTS 4.0 / GT4 / Spyder / RS are flat-six — refine per-trim later
+    dme: {
+      ...UDS_DME,
+      verified: false,
+      note: 'Candidate — the 982 runs newer 9A2 turbo/DFI DMEs likely on UDS (ISO 14229); confirm 19 02 FF on a real 718 (the older 981 platform DME was KWP). Generic Mode 03/07 works regardless.',
+    },
+    modules: udsModulesFor('982'),
+  },
+});
+
+registerVehiclePack({
   key: '991', make: 'Porsche', model: '911 (991)', generation: '991', visibility: 'public',
   profile: {
     generation: '991',

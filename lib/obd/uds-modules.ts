@@ -133,9 +133,33 @@ const CANDIDATES_991: UdsModule[] = [
   { id: 'gateway', name: 'Gateway', reqId: '7F1', respId: '7F9', protocol: 'uds', addressConfirmed: false, note: 'Candidate — 981-platform address; verify on a real 991.' },
 ];
 
+// 718 (982) is the FACELIFTED 981 platform (same PIWIS module families / CAN
+// layout), so the 981's live-verified request ids are strong CANDIDATE starting
+// points — very likely exact, but NONE confirmed on a real 982 yet
+// (addressConfirmed:false). The scan reports which actually answer; a `refused`
+// 7F still proves the address, `silent` means routing differs. The newer 9A2
+// turbo/DFI DMEs may speak UDS rather than the 981's KWP — verify on a real 718.
+// Verify with tools/obd-bridge/ and record findings here (never cross generations).
+const CANDIDATES_982: UdsModule[] = [
+  { id: 'tpms', name: 'TPMS (tyre pressure)', reqId: '70B', respId: '775', protocol: 'uds', addressConfirmed: false, note: 'Candidate — 981-platform address (982 is the facelifted 981); verify on a real 718.' },
+  { id: 'bcm-front', name: 'BCM front (body)', reqId: '70E', respId: '778', protocol: 'uds', addressConfirmed: false, note: 'Candidate — 981-platform address; verify on a real 718.' },
+  { id: 'eps', name: 'Steering (EPS)', reqId: '712', respId: '77C', protocol: 'uds', addressConfirmed: false, note: 'Candidate — 981-platform address; verify on a real 718.' },
+  { id: 'psm', name: 'PSM / ABS', reqId: '713', respId: '77D', protocol: 'uds', addressConfirmed: false, note: 'Candidate — 981-platform address; verify on a real 718.' },
+  { id: 'cluster', name: 'Instrument cluster', reqId: '714', respId: '77E', protocol: 'uds', addressConfirmed: false, note: 'Candidate — 981-platform address; verify on a real 718.' },
+  { id: 'airbag', name: 'Airbag / SRS', reqId: '715', respId: '77F', protocol: 'uds', addressConfirmed: false, note: 'Candidate — 981-platform address; verify on a real 718.' },
+  { id: 'pdk', name: 'PDK / Transmission', reqId: '71E', respId: '788', protocol: 'kwp', addressConfirmed: false, note: 'Candidate — 981 PDK speaks KWP at this id; verify protocol + address on a real 718.' },
+  { id: 'climate', name: 'Climate', reqId: '746', respId: '7B0', protocol: 'uds', addressConfirmed: false, note: 'Candidate — 981-platform address; verify on a real 718.' },
+  { id: 'epb', name: 'Parking brake (EPB)', reqId: '752', respId: '7BC', protocol: 'uds', addressConfirmed: false, note: 'Candidate — 981-platform address; verify on a real 718.' },
+  { id: 'pcm', name: 'PCM head unit', reqId: '773', respId: '7DD', protocol: 'kwp', addressConfirmed: false, note: 'Candidate — 981 PCM speaks KWP; the 982 (PCM 4.0/6.0) may differ. Verify on a real 718.' },
+  { id: 'gateway', name: 'Gateway', reqId: '7F1', respId: '7F9', protocol: 'uds', addressConfirmed: false, note: 'Candidate — 981-platform address; verify on a real 718.' },
+];
+
 const REGISTRY: Record<string, UdsModule[]> = {
   '987': [DME, ...CANDIDATES_987],
   '981': [DME, ...CANDIDATES_981],
+  // 718 (982) — DME (7E0) via generic OBD Mode 03; non-DME modules are candidates
+  // ported from the facelifted-981 platform (all addressConfirmed:false).
+  '982': [DME, ...CANDIDATES_982],
   // 911 (991) — DME (7E0) via generic OBD Mode 03; non-DME modules are candidates
   // ported from the same-era 981 platform (all addressConfirmed:false).
   '991': [DME, ...CANDIDATES_991],
