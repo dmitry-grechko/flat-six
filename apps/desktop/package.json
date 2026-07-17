@@ -96,6 +96,7 @@
       "identity": null
     },
     "dmg": {
+      "artifactName": "FLAT-SIX-${version}-${arch}.${ext}",
       "contents": [
         { "x": 130, "y": 220 },
         { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
