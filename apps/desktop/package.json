@@ -13,8 +13,8 @@
     "prepare:standalone": "node scripts/prepare-standalone.mjs",
     "prepack:artifacts": "node scripts/bundle-host.mjs && node scripts/prepare-standalone.mjs && node scripts/build-icons.mjs",
     "pack": "npm run bundle:host && npm run icons && electron-builder --win nsis portable --x64",
-    "pack:mac": "npm run bundle:host && npm run icons && electron-builder --mac dmg zip --x64 --arm64",
-    "pack:all": "npm run bundle:host && npm run icons && electron-builder --win nsis portable --x64 --mac dmg zip --x64 --arm64"
+    "pack:mac": "npm run bundle:host && npm run icons && electron-builder --mac dmg zip --arm64",
+    "pack:all": "npm run bundle:host && npm run icons && electron-builder --win nsis portable --x64 --mac dmg zip --arm64"
   },
   "dependencies": {
     "electron-updater": "^6.8.9",
@@ -83,13 +83,14 @@
       "target": [
         {
           "target": "dmg",
-          "arch": ["x64", "arm64"]
+          "arch": ["arm64"]
         },
         {
           "target": "zip",
-          "arch": ["x64", "arm64"]
+          "arch": ["arm64"]
         }
       ],
+      "artifactName": "FLAT-SIX-${version}-${arch}-mac.${ext}",
       "category": "public.app-category.utilities",
       "hardenedRuntime": true,
       "gatekeeperAssess": false,

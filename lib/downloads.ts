@@ -40,7 +40,7 @@ export function buildDownloadsCatalog(assets: LatestDesktopAssets | null): Downl
       name: 'FLAT·SIX Desktop',
       tagline:
         'Recommended for owners. Full garage app (history, plans, tools, Live OBD) with USB + Classic Bluetooth OBD built in — no terminal.',
-      platform: 'Windows (installer + portable) · macOS (DMG, Intel + Apple Silicon)',
+      platform: 'Windows (installer + portable) · macOS (DMG, Apple Silicon)',
       href: winHref,
       hrefMac: macHref,
       cta: 'Download for Windows',
@@ -53,9 +53,7 @@ export function buildDownloadsCatalog(assets: LatestDesktopAssets | null): Downl
           : 'Packaged builds publish via GitHub Releases — buttons say “soon” until a release is found.',
         'Installed Desktop checks GitHub for updates on launch and downloads them in the background.',
         'Live OBD uses the adapter inside the app. Documents and AI still need network.',
-        assets?.macIntel && assets?.macArm
-          ? 'Mac button is Apple silicon; Intel Macs — grab the x64 DMG from the release page.'
-          : 'Mac: use the DMG that matches your chip (arm64 or x64) on the release page if unsure.',
+        'Mac build is Apple Silicon (arm64) — for Macs from 2020 on. Intel Macs are supported up to v0.1.9 on the GitHub Release page.',
       ],
       macNotes: [
         'The Mac build is not notarized yet, so on first launch macOS blocks it with “Apple could not verify FLAT·SIX is free of malware.”',
