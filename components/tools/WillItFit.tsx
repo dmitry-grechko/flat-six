@@ -48,6 +48,26 @@ function DiskFields({ label, d, set }: { label: string; d: Disk; set: (d: Disk) 
   );
 }
 
+/** One axle row in the OEM stock reference card. */
+function StockRow({ label, s, divider }: { label: string; s: WheelSpec; divider: boolean }) {
+  return (
+    <div
+      style={{
+        display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap',
+        padding: '10px 14px', borderBottom: divider ? '1px solid #F0F0F1' : 'none',
+      }}
+    >
+      <span style={{ font: `600 10px/1 ${mono}`, letterSpacing: '.08em', color: '#9A9AA0', width: 42, flexShrink: 0 }}>{label}</span>
+      <span style={{ font: `500 13px/1 ${sans}`, color: '#0B0B0C' }}>{s.rimWidth}J × {s.rimDiameter}&quot;</span>
+      <span style={{ font: `500 12px/1 ${mono}`, color: '#6E6E73' }}>ET{s.offsetEt}</span>
+      <span style={{ font: `500 13px/1 ${sans}`, color: '#0B0B0C' }}>{s.tire.width}/{s.tire.aspect} R{s.rimDiameter}</span>
+      <span style={{ marginLeft: 'auto', font: `500 11px/1 ${mono}`, color: '#9A9AA0' }}>
+        Ø {round(overallDiameterMm(s.tire.width, s.tire.aspect, s.rimDiameter))} mm
+      </span>
+    </div>
+  );
+}
+
 function Row({ status, label, text }: { status: Verdict | 'unknown'; label: string; text: string }) {
   const color = status === 'unknown' ? '#9A9AA0' : V_COLOR[status];
   return (
@@ -94,12 +114,36 @@ export default function WillItFit({ preset }: { preset?: FitmentPreset }) {
     setSaved(true);
   };
 
+  const resetToOem = () => {
+    if (!preset) return;
+    setFront(fromSpec(preset.front, DEF_FRONT));
+    setRear(fromSpec(preset.rear, DEF_REAR));
+    setSaved(false);
+  };
+
   return (
     <div>
+      {/* ── OEM stock (staggered front/rear) ──────────────────────── */}
+      {preset && (
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ font: `500 11px/1 ${mono}`, letterSpacing: '.12em', color: '#6E6E73', margin: '4px 0 4px' }}>
+            OEM STOCK — {preset.label}
+          </div>
+          <p style={{ margin: '0 0 10px', font: `400 12px/1.5 ${sans}`, color: '#9A9AA0' }}>
+            Factory staggered fitment — the front and rear differ. Switch wheel size with the{' '}
+            <span style={{ font: `500 11px/1 ${mono}`, color: '#6E6E73' }}>OEM preset</span> selector above.
+          </p>
+          <div style={{ border: '1px solid #E3E3E5', borderRadius: 4, overflow: 'hidden' }}>
+            <StockRow label="FRONT" s={preset.front} divider />
+            <StockRow label="REAR" s={preset.rear} divider={false} />
+          </div>
+        </div>
+      )}
+
       {/* ── Your disks ────────────────────────────────────────────── */}
       <div style={{ font: `500 11px/1 ${mono}`, letterSpacing: '.12em', color: '#6E6E73', margin: '4px 0 4px' }}>YOUR DISKS</div>
       <p style={{ margin: '0 0 12px', font: `400 12px/1.5 ${sans}`, color: '#9A9AA0' }}>
-        Save the wheels you own — then check any tyre against them below.
+        {preset ? 'Pre-filled from OEM stock — edit the front and rear independently, then save the wheels you actually run.' : 'Save the wheels you own — then check any tyre against them below.'}
       </p>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 18 }}>
         <DiskFields label="FRONT" d={front} set={dirty2(setFront, () => setSaved(false))} />
@@ -114,6 +158,15 @@ export default function WillItFit({ preset }: { preset?: FitmentPreset }) {
         >
           Save my disks
         </button>
+        {preset && (
+          <button
+            type="button"
+            onClick={resetToOem}
+            style={{ font: `500 12px/1 ${sans}`, padding: '10px 16px', borderRadius: 3, border: '1px solid #D2D2D6', cursor: 'pointer', background: '#F6F6F7', color: '#46464A' }}
+          >
+            Reset to OEM
+          </button>
+        )}
         {saved && <span style={{ font: `500 12px/1 ${sans}`, color: '#1B8A4B' }}>Saved ✓</span>}
         {!activeId && <span style={{ font: `400 12px/1 ${sans}`, color: '#9A9AA0' }}>Add a car first to save.</span>}
       </div>
