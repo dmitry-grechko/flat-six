@@ -603,3 +603,19 @@ model-viewer { width: 100%; height: 100%; --poster-color: transparent; }
   .docsSearch { margin-left: 0 !important; max-width: none !important; height: 44px !important; font-size: 16px !important; }
   .docsGrid { grid-template-columns: 1fr !important; }
 }
+
+/* --- Print: PDF printouts (service history / plans) ---------------------
+   A report is rendered into a body-level portal with class .print-surface
+   (see components/print/PrintButton). On screen it is hidden; when printing,
+   the app is hidden and only the surface prints. Zero-dependency, offline-safe
+   (works in web, PWA and the Electron desktop). */
+.print-surface { display: none; }
+@media print {
+  html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
+  /* Hide the app; show only the report surface. */
+  body > *:not(.print-surface) { display: none !important; }
+  .print-surface { display: block !important; }
+  /* Keep backgrounds/colours in the printout (Chrome/Safari/Electron). */
+  .print-surface, .print-surface * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  @page { margin: 14mm; }
+}

@@ -6,7 +6,9 @@ import { fmtMiles } from '@/lib/data';
 import { useVehicle } from '@/lib/vehicle-context';
 import { useUnits } from '@/lib/units';
 import { useServiceRecords } from '@/lib/records-context';
-import type { ServiceRecord } from '@/lib/types';
+import { PrintButton } from '@/components/print/PrintButton';
+import { ServiceHistoryReport, ServiceRecordReport } from '@/components/print/ServiceReports';
+import type { ServiceRecord, Vehicle } from '@/lib/types';
 
 const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 
@@ -57,9 +59,34 @@ export default function ServiceHistory() {
         ))}
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 14 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
         <div style={{ font: "500 11px/1 'JetBrains Mono',monospace", letterSpacing: '.16em', color: '#6E6E73' }}>SERVICE LOG</div>
         <div style={{ font: "400 13px/1 'Helvetica Neue',Arial,sans-serif", color: '#9A9AA0' }}>{records.length} records</div>
+        {records.length > 0 && (
+          <PrintButton
+            title="Print or save the full service history as a PDF"
+            style={{
+              marginLeft: 'auto',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 7,
+              height: 34,
+              padding: '0 13px',
+              background: '#fff',
+              border: '1px solid #DDDDE0',
+              borderRadius: 2,
+              color: '#46464A',
+              font: "600 10px/1 'JetBrains Mono',monospace",
+              letterSpacing: '.08em',
+              cursor: 'pointer',
+            }}
+            renderDocument={() => (
+              <ServiceHistoryReport vehicle={vehicle} records={records} units={units} />
+            )}
+          >
+            <span aria-hidden style={{ fontSize: 13, lineHeight: 1 }}>⎙</span> EXPORT PDF
+          </PrintButton>
+        )}
       </div>
 
       <div style={{ background: '#fff', border: '1px solid #E3E3E5', borderRadius: 4, overflow: 'hidden' }}>
@@ -68,7 +95,7 @@ export default function ServiceHistory() {
         ) : records.length === 0 ? (
           <EmptyState text="No records yet — log your first service to start the history." />
         ) : (
-          records.map((rec) => <ServiceRow key={rec.id} rec={rec} />)
+          records.map((rec) => <ServiceRow key={rec.id} rec={rec} vehicle={vehicle} />)
         )}
       </div>
     </div>
@@ -90,7 +117,7 @@ function EmptyState({ text }: { text: string }) {
   );
 }
 
-function ServiceRow({ rec }: { rec: ServiceRecord }) {
+function ServiceRow({ rec, vehicle }: { rec: ServiceRecord; vehicle: Vehicle }) {
   const router = useRouter();
   const { remove } = useServiceRecords();
   const { units } = useUnits();
@@ -220,6 +247,13 @@ function ServiceRow({ rec }: { rec: ServiceRecord }) {
             </>
           ) : (
             <>
+              <PrintButton
+                title="Print or save this record as a PDF"
+                style={{ ...actionBtn, color: '#6E6E73' }}
+                renderDocument={() => <ServiceRecordReport vehicle={vehicle} record={rec} units={units} />}
+              >
+                PDF
+              </PrintButton>
               <button
                 onClick={() => router.push(`/history/new?edit=${rec.id}`)}
                 style={{ ...actionBtn, color: '#6E6E73' }}

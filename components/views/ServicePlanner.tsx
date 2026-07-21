@@ -8,7 +8,10 @@ import { fmtMiles } from '@/lib/data';
 import { useUnits, milesToDisplay, displayToMiles } from '@/lib/units';
 import { track } from '@/lib/analytics';
 import { uid } from '@/lib/uid';
+import { PrintButton } from '@/components/print/PrintButton';
+import { ServicePlanReport } from '@/components/print/ServiceReports';
 import type {
+  Vehicle,
   ServicePlan,
   ServicePlanItem,
   ServicePlanLink,
@@ -152,6 +155,7 @@ export default function ServicePlanner() {
             <PlanCard
               key={p.id}
               plan={p}
+              vehicle={vehicle}
               onEdit={() => setEditing(p)}
               onDelete={() => remove(p.id)}
               onToggleItem={(itemId) =>
@@ -193,12 +197,14 @@ function Empty({ text }: { text: string }) {
 // ---------------------------------------------------------------------------
 function PlanCard({
   plan,
+  vehicle,
   onEdit,
   onDelete,
   onToggleItem,
   onStatus,
 }: {
   plan: ServicePlan;
+  vehicle: Vehicle;
   onEdit: () => void;
   onDelete: () => void;
   onToggleItem: (itemId: string) => void;
@@ -259,6 +265,13 @@ function PlanCard({
         >
           Start service
         </button>
+        <PrintButton
+          title="Print or save this plan as a PDF"
+          style={iconTextBtn}
+          renderDocument={() => <ServicePlanReport vehicle={vehicle} plan={plan} units={units} />}
+        >
+          PDF
+        </PrintButton>
         <button onClick={onEdit} style={iconTextBtn}>Edit</button>
         <button
           onClick={() => {
