@@ -390,13 +390,8 @@ export const RECORDS: ServiceRecord[] = [
   { id: 'r4', date: '2024-02-10', mileage: 31050, title: 'PDK Service', system: 'Transmission', diy: false, cost: '£520', items: [{ name: 'PDK fluid & filter' }, { name: 'Indy specialist' }] },
 ];
 
-export const REC_TEMPLATES: Record<string, string[]> = {
-  'Oil & Filter': ['Drain engine oil (warm)', 'Replace Mahle OX 366D filter', 'New drain-plug crush washer', 'Refill 7.5 L Mobil 1 0W-40', 'Verify level on iPM', 'Reset oil-service interval'],
-  'Brake Fluid': ['Top reservoir with fresh fluid', 'Bleed RR caliper', 'Bleed LR caliper', 'Bleed RF caliper', 'Bleed LF caliper', 'Confirm firm pedal'],
-  'Spark Plugs': ['Remove rear lid & covers', 'Unbolt 6 coil packs', 'Remove & gap-check plugs', 'Fit 6 new plugs @ 30 Nm', 'Refit coils @ 9 Nm', 'Clear adaptation'],
-  'Tyre Rotation': ['Check cold pressures', 'Inspect tread & inner edge', 'Reset TPMS', 'Torque bolts 160 Nm', 'Re-torque after 50 mi'],
-  'Custom': ['Add your first step…'],
-};
+// Service-record templates moved to lib/service-templates.ts (generation-aware,
+// multi-operation bundles + single jobs) — see GitHub issue #12.
 
 /**
  * The real MCP tools exposed at /api/mcp (see app/api/[transport]/route.ts).

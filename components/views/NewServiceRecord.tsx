@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { REC_TEMPLATES } from '@/lib/data';
+import { serviceTemplatesFor, type ServiceTemplate } from '@/lib/service-templates';
+import { generationForBody } from '@/lib/models';
 import { useVehicle } from '@/lib/vehicle-context';
 import { useServiceRecords } from '@/lib/records-context';
 import { useServicePlans } from '@/lib/plans-context';
@@ -19,14 +20,17 @@ interface ItemRow extends ServiceItem {
   id: string;
 }
 
-const REC_TYPES = Object.keys(REC_TEMPLATES);
-
-function seedItems(type: string): ItemRow[] {
-  return (REC_TEMPLATES[type] || []).map((t) => ({ id: uid(), name: t }));
-}
+/** Sentinel template key for a blank/free-form record. */
+const CUSTOM = 'custom';
 
 function blankItem(): ItemRow {
   return { id: uid(), name: '' };
+}
+
+/** Seed editable line-item rows from a template (blank single row if none). */
+function seedFrom(tpl: ServiceTemplate | undefined): ItemRow[] {
+  if (!tpl) return [blankItem()];
+  return tpl.items.map((it) => ({ id: uid(), name: it.name, description: it.description }));
 }
 
 /** Initial form values resolved by the wrapper for create / from-plan / edit. */
@@ -58,6 +62,9 @@ export default function NewServiceRecord() {
   const sourcePlan = fromPlanId ? plans.find((p) => p.id === fromPlanId) : undefined;
 
   const today = useMemo(() => new Date().toISOString().slice(0, 10), []);
+  // Templates are generation-aware (issue #12): the Porsche flat-four/six set for
+  // 981/987/982/991, empty (→ Custom only) for other marques / unknown.
+  const templates = serviceTemplatesFor(generationForBody(vehicle.body));
 
   // --- Edit mode: wait for the record, or report if it's gone. ---
   if (editId) {
@@ -69,7 +76,7 @@ export default function NewServiceRecord() {
       );
     }
     const initial: FormInitial = {
-      type: 'Custom',
+      type: CUSTOM,
       title: editing.title,
       date: editing.date,
       mileage: editing.mileage ? String(editing.mileage) : '',
@@ -78,13 +85,13 @@ export default function NewServiceRecord() {
       notes: editing.notes ?? '',
       items: editing.items.map((it) => ({ id: uid(), ...it })),
     };
-    return <RecordForm key={`edit:${editId}`} mode="edit" editId={editId} heading="EDIT SERVICE RECORD" initial={initial} />;
+    return <RecordForm key={`edit:${editId}`} mode="edit" editId={editId} heading="EDIT SERVICE RECORD" initial={initial} templates={templates} />;
   }
 
   // --- From a plan: prefill from the plan. ---
   if (sourcePlan) {
     const initial: FormInitial = {
-      type: 'Custom',
+      type: CUSTOM,
       title: sourcePlan.title,
       date: today,
       mileage: sourcePlan.targetMileage ? String(sourcePlan.targetMileage) : vehicle.mileage,
@@ -105,22 +112,24 @@ export default function NewServiceRecord() {
         heading="START SERVICE FROM PLAN"
         planTitle={sourcePlan.title}
         initial={initial}
+        templates={templates}
       />
     );
   }
 
-  // --- Brand-new record. ---
+  // --- Brand-new record: default to the Oil & Filter job when available. ---
+  const defaultTpl = templates.find((t) => t.key === 'oil');
   const initial: FormInitial = {
-    type: 'Oil & Filter',
-    title: 'Oil & Filter',
+    type: defaultTpl ? defaultTpl.key : CUSTOM,
+    title: defaultTpl ? defaultTpl.label : '',
     date: today,
     mileage: vehicle.mileage,
     diy: true,
     cost: '',
     notes: '',
-    items: seedItems('Oil & Filter'),
+    items: seedFrom(defaultTpl),
   };
-  return <RecordForm key="new" mode="create" heading="NEW SERVICE RECORD" initial={initial} />;
+  return <RecordForm key="new" mode="create" heading="NEW SERVICE RECORD" initial={initial} templates={templates} />;
 }
 
 function RecordForm({
@@ -129,12 +138,14 @@ function RecordForm({
   heading,
   planTitle,
   editId,
+  templates,
 }: {
   initial: FormInitial;
   mode: 'create' | 'edit';
   heading: string;
   planTitle?: string;
   editId?: string;
+  templates: ServiceTemplate[];
 }) {
   const router = useRouter();
   const { add, update } = useServiceRecords();
@@ -152,13 +163,21 @@ function RecordForm({
   const [items, setItems] = useState<ItemRow[]>(initial.items);
   const [saving, setSaving] = useState(false);
 
-  function selectType(next: string) {
-    setType(next);
-    if (next !== 'Custom') {
-      setTitle(next);
-      setItems(seedItems(next));
-    } else if (items.length === 0) {
-      setItems([blankItem()]);
+  const activeLabel = templates.find((t) => t.key === type)?.label;
+  const activeBlurb = templates.find((t) => t.key === type)?.blurb;
+  const services = templates.filter((t) => t.kind === 'service');
+  const jobs = templates.filter((t) => t.kind === 'job');
+
+  function selectType(key: string) {
+    setType(key);
+    if (key === CUSTOM) {
+      setItems((rows) => (rows.length ? rows : [blankItem()]));
+      return;
+    }
+    const tpl = templates.find((t) => t.key === key);
+    if (tpl) {
+      setTitle(tpl.label);
+      setItems(seedFrom(tpl));
     }
   }
 
@@ -190,7 +209,7 @@ function RecordForm({
       const payload = {
         date,
         mileage: mi,
-        title: title.trim() || type,
+        title: title.trim() || activeLabel || 'Service',
         system: '',
         diy,
         cost: cost.trim() || undefined,
@@ -223,6 +242,13 @@ function RecordForm({
     letterSpacing: '.1em',
     textTransform: 'uppercase',
     color: '#6E6E73',
+  };
+  const groupLabel: React.CSSProperties = {
+    font: `500 10px/1 ${mono}`,
+    letterSpacing: '.1em',
+    textTransform: 'uppercase',
+    color: '#B4B4B8',
+    margin: '0 0 8px',
   };
   const inputBase: React.CSSProperties = {
     width: '100%',
@@ -288,14 +314,38 @@ function RecordForm({
           </div>
         )}
 
-        <label style={{ ...labelStyle, margin: '0 0 10px' }}>Quick start from a template</label>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 22 }}>
-          {REC_TYPES.map((t) => (
-            <button key={t} onClick={() => selectType(t)} style={chipStyle(type === t)}>
-              {t}
+        <label style={{ ...labelStyle, margin: '0 0 12px' }}>Quick start from a template</label>
+
+        {services.length > 0 && (
+          <>
+            <div style={groupLabel}>Full services — pre-fill the whole bundle</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 14 }}>
+              {services.map((t) => (
+                <button key={t.key} onClick={() => selectType(t.key)} style={chipStyle(type === t.key)}>
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+
+        <div style={groupLabel}>{services.length ? 'Single jobs' : 'Templates'}</div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: activeBlurb ? 8 : 22 }}>
+          {jobs.map((t) => (
+            <button key={t.key} onClick={() => selectType(t.key)} style={chipStyle(type === t.key)}>
+              {t.label}
             </button>
           ))}
+          <button onClick={() => selectType(CUSTOM)} style={chipStyle(type === CUSTOM)}>
+            Custom
+          </button>
         </div>
+
+        {activeBlurb && (
+          <div style={{ marginBottom: 22, font: `500 11px/1.45 ${mono}`, color: '#9A9AA0' }}>
+            {activeBlurb}
+          </div>
+        )}
 
         <div className="stackSm" style={{ display: 'grid', gridTemplateColumns: '1fr 130px 130px', gap: 14, marginBottom: 18 }}>
           <div>
